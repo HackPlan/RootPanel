@@ -53,7 +53,7 @@ RP3 的核心功能包括：
 ## 技术构成
 
 * 前端：Bootstrap3, jQuery, jade, less
-* 后端：koa, Coffee(如果可能的话)
+* 后端：express, Coffee
 * 数据库：mongodb, memcache
 
 操作系统支持，按推荐程度排序：
