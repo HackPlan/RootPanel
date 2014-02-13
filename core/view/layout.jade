@@ -1,0 +1,55 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    block head
+      link(rel='stylesheet', href='http://cdn.staticfile.org/twitter-bootstrap/3.0.0-rc2/css/bootstrap.min.css')
+      link(rel='stylesheet', href='/style/layout.css')
+  body
+    header.navbar-fixed-top
+      .container
+        nav.navbar.navbar-default.navbar-inverse(role='navigation')
+          .navbar-header
+            button.navbar-toggle(type='button', data-toggle='collapse', data-target='#navbar-collapse')
+              span.sr-only Toggle navigation
+              span.icon-bar
+              span.icon-bar
+              span.icon-bar
+            a.navbar-brand(href='/')= t('app.name')
+          #navbar-collapse.collapse.navbar-collapse
+            ul.nav.navbar-nav
+              li
+                a(href='/topnav1/') Top Nav1
+            ul.nav.navbar-nav.navbar-right
+                li
+                  a(href='/user/signup/')= t('word.signup')
+                li
+                  a(href='/user/login/')= t('word.login')
+
+    #content.container
+      .row
+        .col-md-9
+          if errorMsg
+            .row
+              .alert.alert-danger.alert-dismissable
+                button.close(type='button', data-dismiss='alert', aria-hidden='true') ×
+                strong= t('word.error')
+                p= errorMsg
+          block main
+
+        #sidebar.col-md-3
+          block sidebar
+            .row
+              header= t('app.name')
+              p= t('app.description')
+
+    #footer
+      script(src='http://cdn.staticfile.org/jquery/2.0.3/jquery.min.js')
+      script(src='http://cdn.staticfile.org/twitter-bootstrap/3.0.0-rc2/js/bootstrap.min.js')
+      script.
+        $(function() {
+          $('nav a').each(function(index) {
+            if($('nav a')[index].pathname == location.pathname)
+              $($('nav a')[index]).parent().addClass('active')
+          });
+        });

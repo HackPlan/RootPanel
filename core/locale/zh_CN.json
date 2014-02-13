@@ -1,0 +1,22 @@
+{
+  "app": {
+    "name": "RootPanel",
+    "description": "一个插件化的 Linux 虚拟主机管理系统。"
+  },
+  "word": {
+    "user": "用户",
+    "signup": "注册",
+    "login": "登录",
+    "username": "用户名",
+    "email": "邮箱",
+    "passwd": "密码",
+    "error": "错误",
+    "logout": "注销"
+  },
+  "view": {
+    "signup": {
+      "passwd2": "重复",
+      "alreadySignup": "已有帐号？"
+    }
+  }
+}

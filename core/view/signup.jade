@@ -1,0 +1,32 @@
+extends layout
+
+prepend head
+  title #{t("word.signup")} | #{t('app.name')}
+
+block main
+  header= t('word.signup')
+  form.form-horizontal(method='post', role='form')
+    .form-group
+      label.col-sm-2.col-md-offset-1.control-label(for='username')= t('word.username')
+      .col-sm-5
+        input#username.form-control(type='text', name='username', required, value=username)
+    .form-group
+      label.col-sm-2.col-md-offset-1.control-label(for='email')= t('word.email')
+      .col-sm-5
+        input#email.form-control(type='email', name='email', required, value=email)
+    .form-group
+      label.col-sm-2.col-md-offset-1.control-label(for='passwd')= t('word.passwd')
+      .col-sm-5
+        input#passwd.form-control(type='password', name='passwd', required)
+    .form-group
+      label.col-sm-2.col-md-offset-1.control-label(for='passwd2')= t('view.signup.passwd2')
+      .col-sm-5
+        input#passwd2.form-control(type='password', name='passwd2', required)
+    .form-group
+      .col-sm-offset-3
+        button.btn.btn-lg.btn-primary(type='submit')= t('word.signup')
+
+prepend sidebar
+  .row
+    header= t('view.signup.alreadySignup')
+    a.btn.btn-lg.btn-success(href='/account/login/')= t('word.login')

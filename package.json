@@ -19,6 +19,8 @@
   "license": "GPLv3",
   "dependencies": {
     "express": "*",
+    "jade": "*",
+    "i18next": "*",
     "coffee-script": "*"
   }
 }
