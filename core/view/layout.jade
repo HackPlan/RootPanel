@@ -46,10 +46,4 @@ html
     #footer
       script(src='http://cdn.staticfile.org/jquery/2.0.3/jquery.min.js')
       script(src='http://cdn.staticfile.org/twitter-bootstrap/3.0.0-rc2/js/bootstrap.min.js')
-      script.
-        $(function() {
-          $('nav a').each(function(index) {
-            if($('nav a')[index].pathname == location.pathname)
-              $($('nav a')[index]).parent().addClass('active')
-          });
-        });
+      script(src='/script/layout.js')
