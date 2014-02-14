@@ -17,6 +17,9 @@
     "signup": {
       "passwd2": "重复",
       "alreadySignup": "已有帐号？"
+    },
+    "login": {
+      "noAccount": "还没有账户？"
     }
   }
 }
