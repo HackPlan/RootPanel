@@ -11,3 +11,4 @@ module.exports =
     server: '/home/rpadmin/mongod.sock'
     user: 'rpadmin'
     passwd: 'passwd'
+    name: 'RootPanel'
