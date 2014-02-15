@@ -21,6 +21,8 @@
     "express": "*",
     "jade": "*",
     "i18next": "*",
-    "coffee-script": "*"
+    "coffee-script": "*",
+    "node-sha256": "*",
+    "mongous" : "*"
   }
 }
