@@ -8,21 +8,21 @@ class BaseModel
 	@dbHandle : ->
 		$ "#{config.db.name}.#{@table()}"
 
-	save : ->
+	save : (callback)->
+		# @constructor.resetErrors()
 		@validate (validated)->
 			if validated
 				@constructor.resetErrors()
 				@constructor.dbHandle().save(@data)
+			callback()
 	#如验证需重写
 	validate : (callback)->
-		@constructor.ep.all 'validate',callback
+		@constructor.ep.once 'validate',callback
 	@findByName: (name,callback,num = 1) ->
-		@resetErrors()
 		@dbHandle().find num,
 			name : name
 		,callback
 	@findBy : (obj,callback,num = 1) ->
-		@resetErrors()
 		@dbHandle().find num,obj,callback
 
 	@getErrors : ->
@@ -32,7 +32,6 @@ class BaseModel
 		@errors = {}
 	@setErrors : (k,v)->
 		@errors[k] = v
-		console.log v
 	required : (arr)->
 		@constructor.setErrors key, "#{key}不能为空" for key in arr when !@data[key]
 
