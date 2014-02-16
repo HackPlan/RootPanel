@@ -1,7 +1,5 @@
 BaseModel = require "./BaseModel"
 crypto = require "crypto"
-EventProxy = require 'eventproxy'
-ep = new EventProxy()
 isEmptyObj = (obj)->
 	for key of obj
 		return false
