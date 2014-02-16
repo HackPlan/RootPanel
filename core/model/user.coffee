@@ -13,7 +13,7 @@ class User extends BaseModel
 			email : data.email or null
 			passwd_salt : passwd_salt
 			passwd : crypto.createHash('sha256').update(data.passwd+data.passwd_salt).digest('hex') if data.passwd
-			signup_at : Date.parse new Date
+			signup_at : Math.round Date.now()/1000
 			group : []
 			tokens : []
 			setting : {}
