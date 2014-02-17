@@ -2,10 +2,15 @@ $ = (require "mongous").Mongous
 config = require "../config"
 EventProxy = require 'eventproxy'
 nullFunc = ->
+firstCapital = (str) ->
+	return str.replace /\b\w+\b/g,(word) ->
+		return word.substring(0,1).toUpperCase() + word.substring 1
+
 class BaseModel
 	constructor : ->
 		@constructor.errors = {}
 		@constructor.ep = new EventProxy()
+		@constructor.searchBy = ''
 	@dbHandle : ->
 		$ "#{config.db.name}.#{@table()}"
 
@@ -14,9 +19,10 @@ class BaseModel
 		@validate (validated)=>
 			err = @constructor.errors
 			if validated
+				searchBy = @constructor.searchBy
 				@constructor.resetErrors()
 				@constructor.dbHandle().save @data
-				@constructor.findByName @data.name,(r)=>
+				@constructor["findBy#{firstCapital searchBy}"] @data[searchBy],(r)=>
 					@data = r.documents[0]
 					callback(null,@data)
 			else
@@ -32,10 +38,8 @@ class BaseModel
 
 	@update : (what,update,upsert = false,multi = true) ->
 		@dbHandle().update what,update,upsert,multi
-	@findByName: (name,callback,num = 1) ->
-		@dbHandle().find num,
-			name : name
-		,callback
+	@findById : (id,callback) ->
+		@dbHandle().find 1,{_id : id},callback
 	@findBy : (obj,callback,num = 1) ->
 		@dbHandle().find num,obj,callback
 	@getErrors : ->

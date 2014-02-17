@@ -18,6 +18,7 @@ class User extends BaseModel
 			tokens : []
 			setting : {}
 			attribute : {}
+		@constructor.searchBy = 'name'
 	@table : ->
 		'users'
 	validate : (callback)->
@@ -28,6 +29,9 @@ class User extends BaseModel
 		@exsited 'name' ,@data.name
 		@exsited 'email', @data.email
 		# if isEmptyObj constructor.errors  then false else true
-
+	@findByName: (name,callback,num = 1) ->
+		@dbHandle().find num,
+			name : name
+		,callback
 
 module.exports = User
