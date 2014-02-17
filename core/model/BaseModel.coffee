@@ -12,10 +12,12 @@ class BaseModel
 		# @constructor.resetErrors()
 		@validate (validated)=>
 			err = @constructor.errors
+			results = null
 			if validated
 				@constructor.resetErrors()
-				@constructor.dbHandle().save(@data)
-			callback(err)
+				@constructor.dbHandle().save @data
+				results = @data
+			callback(err,results)
 	#如验证需重写
 	validate : (callback)->
 		@constructor.ep.once 'validate',callback

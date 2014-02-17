@@ -3,6 +3,6 @@ user = new User
 	name : '123'
 	email : '123@gmail.com'
 	passwd : '123'
-user.save (err)->
+result = user.save (err,result)->
 	console.log err
-
+	console.log result
