@@ -1,10 +1,7 @@
 $ = (require "mongous").Mongous
 config = require "../config"
 EventProxy = require 'eventproxy'
-nullFunc = ->
-firstCapital = (str) ->
-	return str.replace /\b\w+\b/g,(word) ->
-		return word.substring(0,1).toUpperCase() + word.substring 1
+Tool = require '../tool'
 
 class BaseModel
 	constructor : ->
@@ -14,7 +11,7 @@ class BaseModel
 	@dbHandle : ->
 		$ "#{config.db.name}.#{@table()}"
 
-	save : (callback = nullFunc)->
+	save : (callback = Tool.nullFunc)->
 		# @constructor.resetErrors()
 		@validate (validated)=>
 			err = @constructor.errors
@@ -22,7 +19,7 @@ class BaseModel
 				searchBy = @constructor.searchBy
 				@constructor.resetErrors()
 				@constructor.dbHandle().save @data
-				@constructor["findBy#{firstCapital searchBy}"] @data[searchBy],(r)=>
+				@constructor["findBy#{Tool.firstCapital searchBy}"] @data[searchBy],(r)=>
 					@data = r.documents[0]
 					callback(null,@data)
 			else

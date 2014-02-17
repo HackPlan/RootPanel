@@ -1,5 +1,6 @@
 BaseModel = require "./BaseModel"
 crypto = require "crypto"
+Tool = require '../tool'
 isEmptyObj = (obj)->
 	for key of obj
 		return false
@@ -33,5 +34,16 @@ class User extends BaseModel
 		@dbHandle().find num,
 			name : name
 		,callback
+	addToGroup : (group) ->
+		if Tool.typeIsArray group
+			@update
+				'$addToSet' :
+					group :
+						'$each' : group
+		else
+			@update
+				'$addToSet' :
+					group : gourp
+
 
 module.exports = User

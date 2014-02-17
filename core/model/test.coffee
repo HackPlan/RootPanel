@@ -4,8 +4,6 @@ user = new User
 	email : '123@gmail.com'
 	passwd : '123'
 user.save (err,result) ->
-	user.update
-		'$addToSet' :
-			group : 'admin'
+	user.addToGroup ['admin','user']
 
 
