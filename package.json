@@ -22,7 +22,7 @@
     "jade": "*",
     "i18next": "*",
     "coffee-script": "*",
-    "mongous" : "*",
-    "eventproxy" : "0.2.6"
+    "mongodb" : "*",
+    "underscore" : "*"
   }
 }

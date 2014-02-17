@@ -5,9 +5,15 @@ User = require './model/User'
 exports.sha256 = (data) ->
     return crypto.createHash('sha256').update(data).digest('hex');
 
+exports.randomSalt = ->
+  return exports.sha256 crypto.randomBytes(256)
+
+exports.hashPasswd = (passwd, passwd_salt) ->
+  return exports.sha256(exports.sha256(passwd) + passwd_salt)
+
 exports.createToken = (user, attribute, callback = undefined) ->
   generateToken = (callback) ->
-    token = exports.sha256 crypto.randomBytes(256)
+    token = exports.randomSalt()
 
     User.findBy {'tokens.token': token}, (result) ->
       if result.documents.length > 0

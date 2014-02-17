@@ -1,49 +1,27 @@
-BaseModel = require "./BaseModel"
-crypto = require "crypto"
-Tool = require '../tool'
-isEmptyObj = (obj)->
-	for key of obj
-		return false
-	true
-class User extends BaseModel
-	constructor : (data = {name : null,email:null,passwd:null}) ->
-		super()
-		passwd_salt = crypto.createHash('sha256').digest('hex')
-		@data =
-			name : data.name or null
-			email : data.email or null
-			passwd_salt : passwd_salt
-			passwd : crypto.createHash('sha256').update(data.passwd+data.passwd_salt).digest('hex') if data.passwd
-			signup_at : Math.round Date.now()/1000
-			group : []
-			tokens : []
-			setting : {}
-			attribute : {}
-		@constructor.searchBy = 'name'
-	@table : ->
-		'users'
-	validate : (callback)->
-		super(callback)
-		@required ['name','passwd','email']
-		@constructor.ep.all 'exsited_name','exsited_email',(name,email)=>
-			@constructor.ep.emit 'validate', if name and email then true else false
-		@exsited 'name' ,@data.name
-		@exsited 'email', @data.email
-		# if isEmptyObj constructor.errors  then false else true
-	@findByName: (name,callback,num = 1) ->
-		@dbHandle().find num,
-			name : name
-		,callback
-	addToGroup : (group) ->
-		if Tool.typeIsArray group
-			@update
-				'$addToSet' :
-					group :
-						'$each' : group
-		else
-			@update
-				'$addToSet' :
-					group : gourp
+Model = require './Model'
+auth = require '../auth'
 
+module.exports = class User extends Model
+  collection: ->
+    return Model.db.collection 'users'
 
-module.exports = User
+  @register: (username, email, passwd, callback = null) ->
+    passwd_salt = auth.randomSalt()
+
+    data =
+      name: username
+      passwd: auth.hashPasswd(passwd, passwd_salt)
+      passwd_salt: passwd_salt
+      email: email
+      signup: new Date()
+      group: []
+      setting: {}
+      attribure: {}
+      tokens: []
+
+    @collection.insert data, {}, (err, result) ->
+      throw err if err
+
+      if callback
+        result = new User(result)
+        callback null, result
