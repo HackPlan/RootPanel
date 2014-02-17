@@ -29,12 +29,6 @@ html
     #content.container
       .row
         .col-md-9
-          if errorMsg
-            .row
-              .alert.alert-danger.alert-dismissable
-                button.close(type='button', data-dismiss='alert', aria-hidden='true') ×
-                strong= t('word.error')
-                p= errorMsg
           block main
 
         #sidebar.col-md-3
