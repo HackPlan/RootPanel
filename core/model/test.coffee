@@ -4,5 +4,6 @@ user = new User
 	email : '123@gmail.com'
 	passwd : '123'
 result = user.save (err,result)->
-	console.log err
-	console.log result
+	user.remove()
+
+

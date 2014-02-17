@@ -12,22 +12,25 @@ class BaseModel
 		# @constructor.resetErrors()
 		@validate (validated)=>
 			err = @constructor.errors
-			results = null
 			if validated
 				@constructor.resetErrors()
 				@constructor.dbHandle().save @data
-				results = @data
-			callback(err,results)
+				@constructor.findByName @data.name,(r)=>
+					@data = r.documents[0]
+					callback(null,@data)
+			else
+				callback(err,null)
 	#如验证需重写
 	validate : (callback)->
 		@constructor.ep.once 'validate',callback
+	remove : ->
+		@constructor.dbHandle().remove _id: @data._id
 	@findByName: (name,callback,num = 1) ->
 		@dbHandle().find num,
 			name : name
 		,callback
 	@findBy : (obj,callback,num = 1) ->
 		@dbHandle().find num,obj,callback
-
 	@getErrors : ->
 		@errors
 
