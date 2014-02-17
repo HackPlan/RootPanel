@@ -2,3 +2,5 @@ node_modules
 
 *.js
 *.css
+
+!/DOC/DB/*.js
