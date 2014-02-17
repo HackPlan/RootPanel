@@ -1,6 +1,7 @@
 $ = (require "mongous").Mongous
 config = require "../config"
 EventProxy = require 'eventproxy'
+nullFunc = ->
 class BaseModel
 	constructor : ->
 		@constructor.errors = {}
@@ -8,7 +9,7 @@ class BaseModel
 	@dbHandle : ->
 		$ "#{config.db.name}.#{@table()}"
 
-	save : (callback)->
+	save : (callback = nullFunc)->
 		# @constructor.resetErrors()
 		@validate (validated)=>
 			err = @constructor.errors
@@ -25,6 +26,12 @@ class BaseModel
 		@constructor.ep.once 'validate',callback
 	remove : ->
 		@constructor.dbHandle().remove _id: @data._id
+
+	update : (update,upsert = false, multi = true)->
+		@constructor.update {_id : @data._id},update,upsert,multi
+
+	@update : (what,update,upsert = false,multi = true) ->
+		@dbHandle().update what,update,upsert,multi
 	@findByName: (name,callback,num = 1) ->
 		@dbHandle().find num,
 			name : name
