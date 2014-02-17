@@ -14,7 +14,7 @@
     }
   ],
   "scripts": {
-    "start": "node --harmony app.js"
+    "start": "node app.js"
   },
   "license": "GPLv3",
   "dependencies": {
