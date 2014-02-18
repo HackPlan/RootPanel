@@ -2,6 +2,7 @@ Model = require './Model'
 auth = require '../auth'
 assert = require 'assert'
 db = require '../db'
+_ = require 'underscore'
 
 module.exports = class User extends Model
   @table : ->
@@ -31,3 +32,10 @@ module.exports = class User extends Model
 
   save : ->
     console.log 'asd'
+
+  set : (key, value = null) ->
+    if (_.isObject key) is 'object' then attrs = key else attrs[key] = value
+    @attributes[k] = v for k, v of attrs
+    @
+  get : (attr)->
+    @attributes[attr]
