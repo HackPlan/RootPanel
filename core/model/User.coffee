@@ -5,6 +5,8 @@ db = require '../db'
 _ = require 'underscore'
 
 module.exports = class User extends Model
+  @create : (attrs,opts = {})->
+    return new User attrs,opts
   @table : ->
     'users'
 
