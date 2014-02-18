@@ -57,7 +57,7 @@ module.exports = class Model
               results.push @create doc
           callback null,results
 
-  @FindById: (id, callback = null) ->
+  @findById: (id, callback = null) ->
     throw 'id must be string' if !_.isString id
     db.open (err,db) =>
       @collection().findOne {_id: new ObjectID id}, (err, result) =>
