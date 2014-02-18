@@ -1,23 +1,29 @@
 MongoClient = require('mongodb').MongoClient
-BSON = require('mongodb').BSONPure;
+ObjectID = require('mongodb').ObjectID;
 _ = require 'underscore'
+assert = require 'assert'
 
 db = require '../db'
-
+# db.open (err,db)->
+#   (db.collection 'users').findOne {name: '123'},(err,result)->
+#       console.log result
 module.exports = class Model
-  db: db.mongodb
+  constructor: (@attributes,opts = {}) ->
 
-  constructor: (@data) ->
-
-  collection: ->
+  @table : ->
     throw 'this function must be overrided'
 
-  byId: (id, callback) ->
-    if _.isString id
-      id = BSON.ObjectID id
+  @collection: (db)->
+    db.collection @table()
+
+  @byId: (id, callback) ->
+    throw 'id must be string' if !_.isString id
+
+    id = new ObjectID id
 
     @collection().findOne {_id: id}, (err, result) ->
       throw err if err
 
-      result = new @(result)
-      callback(result)
+      result = new @constructor result
+      callback result
+
