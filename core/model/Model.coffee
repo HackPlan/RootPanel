@@ -36,7 +36,7 @@ module.exports = class Model
               results.push @create doc
           else
             results = @create docs[0]
-          callback null,results
+          callback err,results
   @find : (attrs,opts = {},callback = null)->
     if _.isFunction attrs
       callback = attrs
@@ -55,7 +55,7 @@ module.exports = class Model
           else
             for doc in docs
               results.push @create doc
-          callback null,results
+          callback err,results
 
   @findById: (id, callback = null) ->
     throw 'id must be string' if !_.isString id
@@ -65,4 +65,4 @@ module.exports = class Model
         db.close()
         result = @create result
         if callback
-          callback result
+          callback err,result

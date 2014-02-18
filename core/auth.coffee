@@ -1,5 +1,5 @@
 crypto = require 'crypto'
-
+assert = require 'assert'
 User = require './model/User'
 
 exports.sha256 = (data) ->
@@ -15,8 +15,9 @@ exports.createToken = (user, attribute, callback = undefined) ->
   generateToken = (callback) ->
     token = exports.randomSalt()
 
-    User.findBy {'tokens.token': token}, (result) ->
-      if result.documents.length > 0
+    User.find {'tokens.token': token}, (err,result) ->
+      assert.equal null,err
+      if result.length > 0
         generateToken callback
       else
         callback token
@@ -37,8 +38,9 @@ exports.authenticate = (token, callback) ->
   if not token
     callback true, null
 
-  User.findBy {'tokens.token': token}, (result) ->
-    if result.documents.length > 0
+  User.find {'tokens.token': token}, (err,result) ->
+    assert.equal null,err
+    if result.length > 0
       callback undefined, result
     else
       callback true, null
