@@ -21,21 +21,4 @@ module.exports = class User extends Model
       setting: {}
       attribure: {}
       tokens: []
-    db.open (err,db)=>
-      @collection(db).insert attributes, {}, (err, result) ->
-        assert.equal null,err
-
-        if callback
-          result = new User result[0]
-          db.close()
-          callback null, result
-
-  save : ->
-    console.log 'asd'
-
-  set : (key, value = null) ->
-    if (_.isObject key) is 'object' then attrs = key else attrs[key] = value
-    @attributes[k] = v for k, v of attrs
-    @
-  get : (attr)->
-    @attributes[attr]
+    @save attributes,callback
