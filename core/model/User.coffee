@@ -20,4 +20,4 @@ module.exports = class User extends Model
       setting: {}
       attribure: {}
       tokens: []
-    @save data, callback
+    @insert data, callback

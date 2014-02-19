@@ -23,8 +23,8 @@ module.exports = class Model
   get : (attr) ->
     @data[attr]
 
-  save : (data, callback) ->
-    @collection().insert data, {}, (err, docs) =>
+  insert : (data, callback) ->
+    @collection().insert data, {w:1}, (err, docs) =>
       throw err if err
       if callback
         results = []
@@ -34,6 +34,8 @@ module.exports = class Model
         else
           results = @create docs[0]
         callback err, results
+
+  update : (newObj , opts = {},callback) ->
 
   @find : (data, opts = {}, callback = null) ->
     if _.isFunction data
