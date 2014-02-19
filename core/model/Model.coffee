@@ -1,7 +1,6 @@
 MongoClient = require('mongodb').MongoClient
 ObjectID = require('mongodb').ObjectID;
 _ = require 'underscore'
-assert = require 'assert'
 db = require '../db'
 
 module.exports = class Model
@@ -27,7 +26,7 @@ module.exports = class Model
   save : (data, callback) ->
     db.open (err,db) =>
       @collection(db).insert data, {}, (err, docs) =>
-        assert.equal null, err
+        throw err if err
         db.close()
         if callback
           results = []
@@ -47,7 +46,7 @@ module.exports = class Model
       opts = {}
     db.open (err,db) =>
       @collection(db).find(data, opts).toArray (err, docs)=>
-        assert.equal null, err
+        throw err if err
         db.close()
         if callback
           results = []

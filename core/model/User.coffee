@@ -1,6 +1,5 @@
 Model = require './Model'
 auth = require '../auth'
-assert = require 'assert'
 db = require '../db'
 _ = require 'underscore'
 
