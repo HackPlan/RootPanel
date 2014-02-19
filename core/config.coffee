@@ -8,7 +8,7 @@ module.exports =
 
   db:
     type: 'mongo'
-    server: '/home/rpadmin/mongod.sock'
+    server: 'localhost'
+    name: 'RootPanel'
     user: 'rpadmin'
     passwd: 'passwd'
-    name: 'RootPanel'
