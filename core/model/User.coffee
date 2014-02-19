@@ -5,8 +5,8 @@ db = require '../db'
 _ = require 'underscore'
 
 module.exports = class User extends Model
-  @create : (attrs,opts = {})->
-    return new User attrs,opts
+  @create : (attrs)->
+    return new User attrs
 
   @register: (username, email, passwd, callback = null) ->
     passwd_salt = auth.randomSalt()

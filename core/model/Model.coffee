@@ -5,7 +5,7 @@ assert = require 'assert'
 db = require '../db'
 
 module.exports = class Model
-  constructor: (@attributes,opts = {}) ->
+  constructor: (@attributes) ->
 
   @create : ->
     throw 'this function must be overrided'
