@@ -4,6 +4,7 @@ path = require 'path'
 
 config = require './config'
 router = require './router'
+db = require './db'
 
 app = express()
 
@@ -25,4 +26,5 @@ for url, controller of router.get
 for url, controller of router.post
   app.post url, controller
 
-app.listen config.web.port
+db.connect ->
+  app.listen config.web.port

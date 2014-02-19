@@ -12,8 +12,8 @@ module.exports = class Model
   @table : ->
     "#{@name.toLowerCase()}s"
 
-  @collection: (db) ->
-    db.collection @table()
+  @collection: ->
+    db.mongo.collection @table()
 
   set : (key, value = null) ->
     if (_.isObject key) is 'object' then attrs = key else attrs[key] = value
@@ -24,18 +24,16 @@ module.exports = class Model
     @data[attr]
 
   save : (data, callback) ->
-    db.open (err,db) =>
-      @collection(db).insert data, {}, (err, docs) =>
-        throw err if err
-        db.close()
-        if callback
-          results = []
-          if docs.length is 1
-            for doc in doc
-              results.push @create doc
-          else
-            results = @create docs[0]
-          callback err, results
+    @collection().insert data, {}, (err, docs) =>
+      throw err if err
+      if callback
+        results = []
+        if docs.length is 1
+          for doc in doc
+            results.push @create doc
+        else
+          results = @create docs[0]
+        callback err, results
 
   @find : (data, opts = {}, callback = null) ->
     if _.isFunction data
@@ -44,26 +42,22 @@ module.exports = class Model
     else if _.isFunction opts
       callback = opts
       opts = {}
-    db.open (err,db) =>
-      @collection(db).find(data, opts).toArray (err, docs)=>
-        throw err if err
-        db.close()
-        if callback
-          results = []
-          if docs.length is 1
-            results = @create docs[0]
-          else
-            for doc in docs
-              results.push @create doc
-          callback err, results
+    @collection().find(data, opts).toArray (err, docs)=>
+      throw err if err
+      if callback
+        results = []
+        if docs.length is 1
+          results = @create docs[0]
+        else
+          for doc in docs
+            results.push @create doc
+        callback err, results
 
   @findById: (id, callback) ->
     if _.isString id
       id = new ObjectID id
 
-    db.open (err,db) =>
-      @collection().findOne {_id: id}, (err, result) =>
-        throw err if err
-        db.close()
-        result = @create result
-        callback err, result
+    @collection().findOne {_id: id}, (err, result) =>
+      throw err if err
+      result = @create result
+      callback err, result

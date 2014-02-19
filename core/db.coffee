@@ -1,12 +1,12 @@
-Db = (require 'mongodb').Db
-Server = (require 'mongodb').Server
-assert = require 'assert'
+MongoClient = (require 'mongodb').MongoClient
 config = (require './config').db
 
-# url = "mongodb://#{config.user}:#{config.passwd}@#{config.server}/#{config.name}"
-url = "mongodb://127.0.0.1:27017/#{config.name}"
-# MongoClient.connect url, {}, (err, db) ->
-#   assert.equal null,err
-#   module.exports = db
+exports.connect = (callback = null)->
+  #url = "mongodb://#{config.user}:#{config.passwd}@#{config.server}/#{config.name}"
+  url = "mongodb://#{config.server}/#{config.name}"
 
-module.exports = new Db config.name, (new Server 'localhost',27017),safe : true
+  MongoClient.connect url, {}, (err, db) ->
+    throw err if err
+    exports.mongo = db
+
+    callback(db) if callback
