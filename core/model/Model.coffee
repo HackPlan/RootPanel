@@ -13,19 +13,21 @@ module.exports = class Model
   @table : ->
     "#{@name.toLowerCase()}s"
 
-  @collection: (db)->
+  @collection: (db) ->
     db.collection @table()
+
   set : (key, value = null) ->
     if (_.isObject key) is 'object' then attrs = key else attrs[key] = value
     @data[k] = v for k, v of attrs
-    @
-  get : (attr)->
+    return @
+
+  get : (attr) ->
     @data[attr]
 
-  save : (data,callback)->
+  save : (data, callback) ->
     db.open (err,db) =>
-      @collection(db).insert data,{},(err,docs) =>
-        assert.equal null,err
+      @collection(db).insert data, {}, (err, docs) =>
+        assert.equal null, err
         db.close()
         if callback
           results = []
@@ -34,8 +36,9 @@ module.exports = class Model
               results.push @create doc
           else
             results = @create docs[0]
-          callback err,results
-  @find : (data,opts = {},callback = null)->
+          callback err, results
+
+  @find : (data, opts = {}, callback = null) ->
     if _.isFunction data
       callback = data
       data = {}
@@ -43,8 +46,8 @@ module.exports = class Model
       callback = opts
       opts = {}
     db.open (err,db) =>
-      @collection(db).find(data,opts).toArray (err,docs)=>
-        assert.equal null,err
+      @collection(db).find(data, opts).toArray (err, docs)=>
+        assert.equal null, err
         db.close()
         if callback
           results = []
@@ -53,7 +56,7 @@ module.exports = class Model
           else
             for doc in docs
               results.push @create doc
-          callback err,results
+          callback err, results
 
   @findById: (id, callback = null) ->
     throw 'id must be string' if !_.isString id

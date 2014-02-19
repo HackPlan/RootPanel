@@ -5,7 +5,7 @@ db = require '../db'
 _ = require 'underscore'
 
 module.exports = class User extends Model
-  @create : (data)->
+  @create : (data) ->
     return new User data
 
   @register: (username, email, passwd, callback = null) ->
@@ -21,4 +21,4 @@ module.exports = class User extends Model
       setting: {}
       attribure: {}
       tokens: []
-    @save data,callback
+    @save data, callback
