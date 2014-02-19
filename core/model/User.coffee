@@ -5,13 +5,13 @@ db = require '../db'
 _ = require 'underscore'
 
 module.exports = class User extends Model
-  @create : (attrs)->
-    return new User attrs
+  @create : (data)->
+    return new User data
 
   @register: (username, email, passwd, callback = null) ->
     passwd_salt = auth.randomSalt()
 
-    attributes =
+    data =
       name: username
       passwd: auth.hashPasswd(passwd, passwd_salt)
       passwd_salt: passwd_salt
@@ -21,4 +21,4 @@ module.exports = class User extends Model
       setting: {}
       attribure: {}
       tokens: []
-    @save attributes,callback
+    @save data,callback

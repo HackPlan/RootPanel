@@ -5,7 +5,7 @@ assert = require 'assert'
 db = require '../db'
 
 module.exports = class Model
-  constructor: (@attributes) ->
+  constructor: (@data) ->
 
   @create : ->
     throw 'this function must be overrided'
@@ -17,14 +17,14 @@ module.exports = class Model
     db.collection @table()
   set : (key, value = null) ->
     if (_.isObject key) is 'object' then attrs = key else attrs[key] = value
-    @attributes[k] = v for k, v of attrs
+    @data[k] = v for k, v of attrs
     @
   get : (attr)->
-    @attributes[attr]
+    @data[attr]
 
-  save : (attributes,callback)->
+  save : (data,callback)->
     db.open (err,db) =>
-      @collection(db).insert attributes,{},(err,docs) =>
+      @collection(db).insert data,{},(err,docs) =>
         assert.equal null,err
         db.close()
         if callback
@@ -35,15 +35,15 @@ module.exports = class Model
           else
             results = @create docs[0]
           callback err,results
-  @find : (attrs,opts = {},callback = null)->
-    if _.isFunction attrs
-      callback = attrs
-      attrs = {}
+  @find : (data,opts = {},callback = null)->
+    if _.isFunction data
+      callback = data
+      data = {}
     else if _.isFunction opts
       callback = opts
       opts = {}
     db.open (err,db) =>
-      @collection(db).find(attrs,opts).toArray (err,docs)=>
+      @collection(db).find(data,opts).toArray (err,docs)=>
         assert.equal null,err
         db.close()
         if callback
