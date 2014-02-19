@@ -9,8 +9,10 @@ routers =
 
     '/': (req,res) ->
     	User.register 'wangzi','wangzi@gmail','wangzi',(err,results) ->
-    		console.log results
-    		results.remove()
+    		results.set 'name','xiaowangzi'
+    		results.update (err,results)->
+    			throw err if err
+    			console.log results
     		res.end()
 
   post: {}

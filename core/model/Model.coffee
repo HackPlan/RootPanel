@@ -10,7 +10,8 @@ module.exports = class Model
     throw 'this function must be overrided'
 
   @createModels: (docs)->
-    throw 'docs must be array' if not _.isArray docs
+    if not _.isArray docs
+      docs = [].push docs
     results = []
     if docs.length is 1
       results = @create docs[0]
@@ -25,6 +26,7 @@ module.exports = class Model
     db.mongo.collection @table()
 
   set: (key, value = null) ->
+    attrs = {}
     if (_.isObject key) is 'object' then attrs = key else attrs[key] = value
     @data[k] = v for k, v of attrs
     return @
@@ -58,20 +60,16 @@ module.exports = class Model
     @collection().update selector,documents,opts,(err,numberUpdated)=>
       throw err if err
       if callback
-        @find selector,(err,results)->
+        @find selector,(err,results)=>
           throw err if err
+          results = @createModels doc
           callback err,results
 
-  update: (documents , opts = {w:1},callback = null) ->
-    if _.isFunction opts
-      callback = opts
-      opts = {w: 1}
-    throw 'arguments wrong' if not _.isObject documents
-    @constructor.collection().update {_id: @data._id},documents,opts,(err,doc)=>
+  update: (callback = null) ->
+    @constructor.collection().update {_id: @data._id},@data,{w: 1},(err,docs)=>
       throw err if err
       if callback
-        results = @constructor.createModels doc
-        callback err,results
+        callback err,@
 
   @find: (selector, opts = {}, callback = null) ->
     if _.isFunction selector
@@ -90,7 +88,7 @@ module.exports = class Model
     if _.isString id
       id = new ObjectID id
 
-    @collection().findOne {_id: id}, (err, result) =>
+    @collection().findOne {_id: id}, (err, results) =>
       throw err if err
-      result = @create result
-      callback err, result
+      results = @create results
+      callback err, results
