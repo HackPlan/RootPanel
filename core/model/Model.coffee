@@ -62,7 +62,6 @@ module.exports = class Model
           throw err if err
           callback err,results
 
-
   update: (documents , opts = {w:1},callback = null) ->
     if _.isFunction opts
       callback = opts
@@ -73,8 +72,6 @@ module.exports = class Model
       if callback
         results = @constructor.createModels doc
         callback err,results
-
-
 
   @find: (selector, opts = {}, callback = null) ->
     if _.isFunction selector
