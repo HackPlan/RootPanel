@@ -8,7 +8,7 @@ routers =
   post: {}
 
 for item in ['user']
-  for url, controller of require("./#{item}")
+  for url, controller of require("./" + item)
     routers.post[url] = controller
 
 module.exports = routers
