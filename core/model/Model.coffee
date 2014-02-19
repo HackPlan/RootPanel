@@ -3,9 +3,7 @@ ObjectID = require('mongodb').ObjectID;
 _ = require 'underscore'
 assert = require 'assert'
 db = require '../db'
-# db.open (err,db)->
-#   (db.collection 'users').find().toArray (err,result)->
-#       console.log result
+
 module.exports = class Model
   constructor: (@attributes,opts = {}) ->
 
@@ -13,7 +11,7 @@ module.exports = class Model
     throw 'this function must be overrided'
 
   @table : ->
-    throw 'this function must be overrided'
+    "#{@name.toLowerCase()}s"
 
   @collection: (db)->
     db.collection @table()

@@ -7,8 +7,6 @@ _ = require 'underscore'
 module.exports = class User extends Model
   @create : (attrs,opts = {})->
     return new User attrs,opts
-  @table : ->
-    'users'
 
   @register: (username, email, passwd, callback = null) ->
     passwd_salt = auth.randomSalt()
