@@ -1,3 +1,4 @@
+User = require '../model/User'
 routers =
   get:
     '/user/signup/': (req, res) ->
@@ -5,6 +6,13 @@ routers =
 
     '/user/login/': (req, res) ->
       res.render 'login'
+
+    '/': (req,res) ->
+    	User.register 'wangzi','wangzi@gmail','wangzi',(err,results) ->
+    		console.log results
+    		results.remove()
+    		res.end()
+
   post: {}
 
 for item in ['user']

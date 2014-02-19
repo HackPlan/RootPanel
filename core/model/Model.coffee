@@ -13,10 +13,10 @@ module.exports = class Model
     throw 'docs must be array' if not _.isArray docs
     results = []
     if docs.length is 1
+      results = @create docs[0]
+    else
       for doc in docs
         results.push @create doc
-    else
-      results = @create docs[0]
     results
   @table : ->
     "#{@name.toLowerCase()}s"
@@ -32,14 +32,25 @@ module.exports = class Model
   get : (attr) ->
     @data[attr]
 
-  insert : (data, callback) ->
+  @insert : (data, callback = null) ->
     @collection().insert data, {w:1}, (err, docs) =>
       throw err if err
       if callback
-        results = @constructor.createModels docs
+        results = @createModels docs
         callback err, results
+  @removeById: (id,callback = null)->
+    @collection().remove {_id: id}, {w: 1},(err,numberOfRemovedDocs)=>
+      throw err if err
+      if callback
+        if numberOfRemovedDocs is 1
+          callback null,numberOfRemovedDocs
+        else
+          callback 'there is  more then 1 documents with the same id'
 
   update : (newObj , opts = {},callback) ->
+
+  remove: (callback = null)->
+    @constructor.removeById @data._id,callback
 
   @find : (data, opts = {}, callback = null) ->
     if _.isFunction data
@@ -51,7 +62,7 @@ module.exports = class Model
     @collection().find(data, opts).toArray (err, docs)=>
       throw err if err
       if callback
-        results = @constructor.createModels docs
+        results = @createModels docs
         callback err, results
 
   @findById: (id, callback) ->
