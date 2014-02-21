@@ -65,11 +65,16 @@ module.exports = class Model
           results = @createModels doc
           callback err,results
 
-  update: (callback = null) ->
-    @constructor.collection().update {_id: @data._id},@data,{w: 1},(err,docs)=>
+  update: (documents,callback = null) ->
+    if _.isFunction documents
+      callback = documents
+      documents = @data
+    @constructor.collection().update {_id: @data._id},documents,{w: 1},(err,docs)=>
       throw err if err
       if callback
-        callback err,@
+        @constructor.findById @data._id,(err,results)->
+          throw err if err
+          callback err,results
 
   @find: (selector, opts = {}, callback = null) ->
     if _.isFunction selector

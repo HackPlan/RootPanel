@@ -41,5 +41,7 @@ module.exports = class User extends Model
     group = [].push group if not _.isArray group
     for i in group
       throw 'bad group' if i not in @constructor.validateData['group']
-    @data.group = group
-    @update callback
+    @update $addToSet:
+      group:
+        $each:group
+    ,callback
