@@ -4,8 +4,9 @@ db = require '../db'
 _ = require 'underscore'
 
 module.exports = class User extends Model
-  @validateData:
-    group: ['admin','user','trial']
+  #传入model
+  # @validateData:
+  #   group: ['admin','user','trial']
   # 必须重写
   @create: (data) ->
     new User data
@@ -39,8 +40,8 @@ module.exports = class User extends Model
   #       console.log result
   addToGroup: (group,callback) ->
     group = [].push group if not _.isArray group
-    for i in group
-      throw 'unknown group' if i not in @constructor.validateData['group']
+    # for i in group
+      # throw 'unknown group' if i not in @constructor.validateData['group']
     @update $addToSet:
       group:
         $each:group
@@ -52,8 +53,8 @@ module.exports = class User extends Model
   #     user.removeFromGroup 'user',(err,result)->
   #       console.log result
   removeFromGroup: (group,callback) ->
-    throw 'group must be string' if not _.isString group
-    throw 'unknown group' if group not in @constructor.validateData['group']
+    # throw 'group must be string' if not _.isString group
+    # throw 'unknown group' if group not in @constructor.validateData['group']
     @update $pull:
       group: group
     ,callback
