@@ -11,7 +11,8 @@
     "email": "邮箱",
     "passwd": "密码",
     "error": "错误",
-    "logout": "注销"
+    "logout": "注销",
+    "panel": "管理面板"
   },
   "view": {
     "signup": {

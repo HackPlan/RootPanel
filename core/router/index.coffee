@@ -1,5 +1,5 @@
 exports.bind = (app) ->
-  for item in ['user']
+  for item in ['user', 'panel']
     apiModule = require('./' + item)
 
     for name, controller of apiModule.get
