@@ -1,4 +1,13 @@
 module.exports =
-  '/user/signup/': (req, res) ->
+  get:
+    signup: (req, res) ->
+      res.render 'signup'
 
-  '/user/login/': (req, res) ->
+    login: (req, res) ->
+      res.render 'login'
+
+  post:
+    signup: (req, res) ->
+
+    login: (req, res) ->
+

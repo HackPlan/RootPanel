@@ -1,22 +1,11 @@
-User = require '../model/User'
-routers =
-  get:
-    '/user/signup/': (req, res) ->
-      res.render 'signup'
+exports.bind = (app) ->
+  for item in ['user']
+    apiModule = require('./' + item)
 
-    '/user/login/': (req, res) ->
-      res.render 'login'
+    for name, controller of apiModule.get
+      name = name ? name + "/"
+      app.all "/#{item}/#{name}", controller
 
-    '/': (req,res) ->
-    	User.register 'wangzi','wangzi@gmail','wangzi',(err,results) ->
-    		console.log results
-    		results.remove()
-    		res.end()
-
-  post: {}
-
-for item in ['user']
-  for url, controller of require("./" + item)
-    routers.post[url] = controller
-
-module.exports = routers
+    for name, controller of apiModule.post
+      name = name ? name + "/"
+      app.post "/#{item}/#{name}", controller

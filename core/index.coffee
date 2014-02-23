@@ -20,11 +20,7 @@ app.use express.static(path.join(__dirname, 'static'))
 app.set 'views', path.join(__dirname, 'view')
 app.set 'view engine', 'jade'
 
-for url, controller of router.get
-  app.get url, controller
-
-for url, controller of router.post
-  app.post url, controller
-
 db.connect ->
+  router.bind(app)
+
   app.listen config.web.port
