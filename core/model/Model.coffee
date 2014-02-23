@@ -19,6 +19,7 @@ module.exports = class Model
       for doc in docs
         results.push @create doc
     results
+
   @table: ->
     "#{@name.toLowerCase()}s"
 
@@ -35,12 +36,13 @@ module.exports = class Model
     @data[attr]
 
   @insert: (data, callback = null) ->
-    @collection().insert data, {w:1}, (err, docs) =>
+    @collection().insert data, {w: 1}, (err, docs) =>
       throw err if err
       if callback
         results = @createModels docs
         callback err, results
-  @removeById: (id,callback = null)->
+
+  @removeById: (id, callback = null)->
     @collection().remove {_id: id}, {w: 1},(err,numberOfRemovedDocs)=>
       throw err if err
       if callback
@@ -50,40 +52,40 @@ module.exports = class Model
           callback 'there is  more then 1 documents with the same id'
 
   remove: (callback = null)->
-    @constructor.removeById @data._id,callback
+    @constructor.removeById @data._id, callback
 
-  @update: (selector, documents,opts = {w: 1,multi: true},callback = null) ->
+  @update: (selector, documents,opts = {w: 1, multi: true}, callback = null) ->
     if _.isFunction opts
       callback = opts
       opts = {w: 1,multi: true}
     throw 'arguments wrong' if not ((_.isObject selector) and (_.isObject documents))
-    @collection().update selector,documents,opts,(err,numberUpdated)=>
+    @collection().update selector, documents, opts, (err, numberUpdated) =>
       throw err if err
       if callback
-        @find selector,(err,results)=>
+        @find selector, (err, results) =>
           throw err if err
           results = @createModels doc
-          callback err,results
+          callback err, results
 
-  update: (documents,callback = null) ->
+  update: (documents, callback = null) ->
     if _.isFunction documents
       callback = documents
       documents = @data
-    @constructor.collection().update {_id: @data._id},documents,{w: 1},(err,docs)=>
+    @constructor.collection().update {_id: @data._id}, documents,{w: 1}, (err, docs)=>
       throw err if err
       if callback
-        @constructor.findById @data._id,(err,results)->
+        @constructor.findById @data._id, (err, results)->
           throw err if err
-          callback err,results
+          callback err, results
 
-  @find: (selector, opts = {}, callback = null) ->
+  @find: (selector, options = {}, callback = null) ->
     if _.isFunction selector
       callback = selector
       selector = {}
-    else if _.isFunction opts
-      callback = opts
-      opts = {}
-    @collection().find(selector, opts).toArray (err, docs)=>
+    else if _.isFunction options
+      callback = options
+      options = {}
+    @collection().find(selector, options).toArray (err, docs)=>
       throw err if err
       if callback
         results = @createModels docs
