@@ -1,4 +1,4 @@
 module.exports =
   get:
-    '/': (req, res) ->
+    '/panel/': (req, res) ->
       res.render 'panel'

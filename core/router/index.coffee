@@ -1,11 +1,15 @@
 exports.bind = (app) ->
-  for item in ['user', 'panel']
+  for item in ['index-page', 'user', 'panel']
     apiModule = require('./' + item)
 
+    generateUrl = (name) ->
+      if name[0] == '/'
+        return name
+      else
+        return "/#{item}/#{name}"
+
     for name, controller of apiModule.get
-      name = name ? name + "/"
-      app.all "/#{item}/#{name}", controller
+      app.get generateUrl(name), controller
 
     for name, controller of apiModule.post
-      name = name ? name + "/"
-      app.post "/#{item}/#{name}", controller
+      app.post generateUrl(name), controller
