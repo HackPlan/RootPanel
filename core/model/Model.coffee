@@ -91,6 +91,9 @@ module.exports = class Model
         results = @createModels docs
         callback err, results
 
+  @findOne: (selector, callback) ->
+
+
   @findById: (id, callback) ->
     if _.isString id
       id = new ObjectID id
