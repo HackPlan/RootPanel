@@ -29,6 +29,42 @@ module.exports = class User extends Model
       attribure: {}
       tokens: []
     @insert data, callback
+
+  # @param callback(token)
+  createToken: (attribute, callback) ->
+    # @param callback(token)
+    generateToken = (callback) ->
+      token = exports.randomSalt()
+
+      User.findOne
+        'tokens.token': token
+      , (err, result) ->
+        throw err if err
+        if result
+          generateToken callback
+        else
+          callback token
+
+    generateToken (token) ->
+      @update
+        $push:
+          tokens:
+            token: token
+            available: true
+            created_at: new Date()
+            updated_at: new Date()
+            attribute: attribute
+      , ->
+        callback token
+
+  removeToken: (token, callback = null) ->
+    @update
+      $pull:
+        tokens:
+          token: token
+    , ->
+      callback() if callback
+
   # 添加分组的功能
   # @group 可以是数组，也可以是字符串，但是必须在['admin','user','trial']中
   # @callback 第一个参数是err,第二个参数是添加分组后的model
