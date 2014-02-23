@@ -20,9 +20,9 @@ Exception:
 
 * username_exist
 * email_exist
-* invalid_username
-* invalid_email
-* invalid_passwd
+* invalid_username `/^[0-9a-z_]+$/`
+* invalid_email `/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/`
+* invalid_passwd `/^.+$/`
 
 ### POST /user/login/
 

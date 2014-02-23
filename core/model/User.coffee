@@ -65,6 +65,24 @@ module.exports = class User extends Model
     , ->
       callback() if callback
 
+  # @return bool
+  matchPasswd: (passwd) ->
+    return auth.hashPassword(passwd, @data.passwd_salt) == @data.passwd
+
+  @byUsername: (username, callback) ->
+    @findOne
+      username: username
+    , (err, result) ->
+      throw err if err
+      callback result
+
+  @byEmail: (email, callback) ->
+    @findOne
+      email: email
+    , (err, result) ->
+      throw err if err
+      callback result
+
   # 添加分组的功能
   # @group 可以是数组，也可以是字符串，但是必须在['admin','user','trial']中
   # @callback 第一个参数是err,第二个参数是添加分组后的model
