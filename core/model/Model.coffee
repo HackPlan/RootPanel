@@ -105,10 +105,4 @@ module.exports = class Model
 
   # id为string
   @findById: (id, opts = {}, callback) ->
-    if _.isFunction opts
-      callback = opts
-      opts = {}
-    @collection().findOne {_id: id}, (err, doc) =>
-      throw err if err
-      result = @create doc
-      callback err, result
+    @findOne {_id: id},opts,callback
