@@ -90,15 +90,25 @@ module.exports = class Model
       if callback
         results = @createModels docs
         callback err, results
-
-  @findOne: (selector, callback) ->
-
-
-  @findById: (id, callback) ->
-    if _.isString id
-      id = new ObjectID id
-
-    @collection().findOne {_id: id}, (err, results) =>
+  #
+  # 例：
+  # User.findone {name: 'wangzi'},(err,result)->
+  #   console.log result
+  @findOne: (selector, opts = {},callback) ->
+    if _.isFunction opts
+      callback = opts
+      opts = {}
+    @collection().findOne selector,opts,(err,doc) ->
       throw err if err
-      results = @create results
-      callback err, results
+      result = @create doc
+      callback err, result
+
+  # id为string
+  @findById: (id, opts = {}, callback) ->
+    if _.isFunction opts
+      callback = opts
+      opts = {}
+    @collection().findOne {_id: id}, (err, doc) =>
+      throw err if err
+      result = @create doc
+      callback err, result
