@@ -4,10 +4,6 @@ db = require '../db'
 _ = require 'underscore'
 
 module.exports = class User extends Model
-  #传入model
-  # @validateData:
-  #   group: ['admin','user','trial']
-  # 必须重写
   @create: (data) ->
     new User data
   # 注册新用户

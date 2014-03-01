@@ -9,7 +9,7 @@ module.exports = class Model
   @create: ->
     throw 'this function must be overrided'
 
-  @createModels: (docs)->
+  @createModels: (docs) ->
     if not _.isArray docs
       docs = [].push docs
     results = []
@@ -57,7 +57,7 @@ module.exports = class Model
   @update: (selector, documents,opts = {w: 1, multi: true}, callback = null) ->
     if _.isFunction opts
       callback = opts
-      opts = {w: 1,multi: true}
+      opts = {w: 1, multi: true}
     throw 'arguments wrong' if not ((_.isObject selector) and (_.isObject documents))
     @collection().update selector, documents, opts, (err, numberUpdated) =>
       throw err if err
@@ -71,10 +71,10 @@ module.exports = class Model
     if _.isFunction documents
       callback = documents
       documents = @data
-    @constructor.collection().update {_id: @data._id}, documents,{w: 1}, (err, docs)=>
+    @constructor.collection().update {_id: @data._id}, documents, {w: 1}, (err, docs)=>
       throw err if err
       if callback
-        @constructor.findById @data._id, (err, results)->
+        @constructor.findById @data._id, (err, results) ->
           throw err if err
           callback err, results
 
@@ -94,11 +94,11 @@ module.exports = class Model
   # 例：
   # User.findone {name: 'wangzi'},(err,result)->
   #   console.log result
-  @findOne: (selector, opts = {},callback) ->
+  @findOne: (selector, opts = {}, callback) ->
     if _.isFunction opts
       callback = opts
       opts = {}
-    @collection().findOne selector,opts,(err,doc) ->
+    @collection().findOne selector, opts, (err, doc) ->
       throw err if err
       result = @create doc
       callback err, result
