@@ -10,99 +10,101 @@ module.exports = class Model
     throw 'this function must be overrided'
 
   @createModels: (docs) ->
-    if not _.isArray docs
-      docs = [].push docs
-    results = []
-    if docs.length is 1
-      results = @create docs[0]
-    else
-      for doc in docs
-        results.push @create doc
-    results
+    result = []
+    for doc in docs
+      result.push @create doc
 
-  @table: ->
-    "#{@name.toLowerCase()}s"
+    return result
 
   @collection: ->
-    db.mongo.collection @table()
+    return db.mongo.collection "#{@name.toLowerCase()}s"
 
-  set: (key, value = null) ->
-    attrs = {}
-    if (_.isObject key) is 'object' then attrs = key else attrs[key] = value
-    @data[k] = v for k, v of attrs
-    return @
+  @find: (selector, options, callback) ->
+    arguments[arguments.length] = null
 
-  get: (attr) ->
-    @data[attr]
-
-  @insert: (data, callback = null) ->
-    @collection().insert data, {w: 1}, (err, docs) =>
+    @collection().find.apply(this, arguments).toArray (err, result) ->
       throw err if err
-      if callback
-        results = @createModels docs
-        callback err, results
 
-  @removeById: (id, callback = null)->
-    @collection().remove {_id: id}, {w: 1},(err,numberOfRemovedDocs)=>
+      callback @createModels result
+
+  @findOne: (selector, options, callback) ->
+    arguments[arguments.length] = (err, result) ->
       throw err if err
-      if callback
-        if numberOfRemovedDocs is 1
-          callback null,numberOfRemovedDocs
-        else
-          callback 'there is  more then 1 documents with the same id'
+      callback @create result
 
-  remove: (callback = null)->
-    @constructor.removeById @data._id, callback
+    @collection().find.apply this, arguments
 
-  @update: (selector, documents,opts = {w: 1, multi: true}, callback = null) ->
-    if _.isFunction opts
-      callback = opts
-      opts = {w: 1, multi: true}
-    throw 'arguments wrong' if not ((_.isObject selector) and (_.isObject documents))
-    @collection().update selector, documents, opts, (err, numberUpdated) =>
-      throw err if err
-      if callback
-        @find selector, (err, results) =>
-          throw err if err
-          results = @createModels doc
-          callback err, results
+  @findById: (id, callback) ->
+    @findOne {_id: id}, callback
 
-  update: (documents, callback = null) ->
-    if _.isFunction documents
-      callback = documents
-      documents = @data
-    @constructor.collection().update {_id: @data._id}, documents, {w: 1}, (err, docs)=>
-      throw err if err
-      if callback
-        @constructor.findById @data._id, (err, results) ->
-          throw err if err
-          callback err, results
+  @insert: (data, options, callback = null) ->
+    if _.isFunction arguments[arguments.length]
+      arguments[arguments.length] = (err, result) ->
+        throw err if err
 
-  @find: (selector, options = {}, callback = null) ->
-    if _.isFunction selector
-      callback = selector
-      selector = {}
-    else if _.isFunction options
-      callback = options
-      options = {}
-    @collection().find(selector, options).toArray (err, docs)=>
-      throw err if err
-      if callback
-        results = @createModels docs
-        callback err, results
-  #
-  # 例：
-  # User.findone {name: 'wangzi'},(err,result)->
-  #   console.log result
-  @findOne: (selector, opts = {}, callback) ->
-    if _.isFunction opts
-      callback = opts
-      opts = {}
-    @collection().findOne selector, opts, (err, doc) ->
-      throw err if err
-      result = @create doc
-      callback err, result
+        if callback
+          if _.isArray data
+            callback @createModels result
+          else
+            callback @create result[0]
 
-  # id为string
-  @findById: (id, opts = {}, callback) ->
-    @findOne {_id: id},opts,callback
+    @collection().insert.apply this, arguments
+
+  @update: (selector, documents, options, callback = null) ->
+    if _.isFunction arguments[arguments.length]
+      arguments[arguments.length] = (err, result) ->
+        throw err if err
+
+        if callback
+          callback result
+
+    @collection().update.apply this, arguments
+
+  save: (options, callback = null) ->
+    args = Array.prototype.slice.call arguments, 0
+    args.unshift @data
+
+    if _.isFunction args[args.length]
+      args[args.length] = (err, result) ->
+        throw err if err
+
+        if callback
+          callback result
+
+    @collection().save.apply this, args
+
+  update: (modifiers, options, callback = null) ->
+    args = Array.prototype.slice.call arguments, 0
+    args.unshift {_id: @data._id}
+
+    if _.isFunction args[args.length]
+      args[args.length] = (err, result) ->
+        throw err if err
+
+        if callback
+          callback result
+
+    @collection().update.apply this, args
+
+  @remove: (selector, options, callback = null) ->
+    if _.isFunction arguments[arguments.length]
+      arguments[arguments.length] = (err, result) ->
+        throw err if err
+
+        if callback
+          callback result
+
+    @collection().remove.apply this, arguments
+
+  remove: (options, callback = null) ->
+    args = Array.prototype.slice.call arguments, 0
+    args.unshift {_id: @data._id}
+
+    if _.isFunction args[args.length]
+      args[args.length] = (err, result) ->
+        throw err if err
+
+        if callback
+          callback result
+
+    @collection().remove.apply this, args
