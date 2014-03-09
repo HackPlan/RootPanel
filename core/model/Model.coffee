@@ -3,6 +3,17 @@ ObjectID = require('mongodb').ObjectID;
 _ = require 'underscore'
 db = require '../db'
 
+# @param callback(args, callback)
+mongoOverloadHelper = (that, commend, args, callback) ->
+  args = Array.prototype.slice.call args, 0
+  originalCallback = _.find args, _.isFunction
+  collection = that.collection()
+
+  args[args.length - 1] = (err, result) ->
+    callback err, result, originalCallback
+
+  commend.apply collection, args
+
 module.exports = class Model
   constructor: (@data) ->
 
@@ -11,6 +22,7 @@ module.exports = class Model
 
   @createModels: (docs) ->
     result = []
+
     for doc in docs
       result.push @create doc
 
@@ -20,91 +32,87 @@ module.exports = class Model
     return db.mongo.collection "#{@name.toLowerCase()}s"
 
   @find: (selector, options, callback) ->
-    arguments[arguments.length] = null
+    args = Array.prototype.slice.call arguments, 0
+    callback = _.find args, _.isFunction
+    collection = @collection()
 
-    @collection().find.apply(this, arguments).toArray (err, result) ->
+    args[args.length - 1] = null
+
+    collection.find.apply(collection, args).toArray (err, result) =>
       throw err if err
-
       callback @createModels result
 
   @findOne: (selector, options, callback) ->
-    arguments[arguments.length] = (err, result) ->
+    mongoOverloadHelper @, @collection().findOne, arguments, (err, result, callback) =>
       throw err if err
-      callback @create result
 
-    @collection().find.apply this, arguments
+      if result
+        callback @create result
+      else
+        callback null
 
   @findById: (id, callback) ->
     @findOne {_id: id}, callback
 
   @insert: (data, options, callback = null) ->
-    if _.isFunction arguments[arguments.length]
-      arguments[arguments.length] = (err, result) ->
-        throw err if err
+    mongoOverloadHelper @, @collection().insert, arguments, (err, result, callback) =>
+      throw err if err
 
-        if callback
-          if _.isArray data
-            callback @createModels result
-          else
-            callback @create result[0]
-
-    @collection().insert.apply this, arguments
+      if callback
+        if _.isArray data
+          callback @createModels result
+        else
+          callback @create result[0]
 
   @update: (selector, documents, options, callback = null) ->
-    if _.isFunction arguments[arguments.length]
-      arguments[arguments.length] = (err, result) ->
-        throw err if err
+    mongoOverloadHelper @, @collection().update, arguments, (err, result, callback) =>
+      throw err if err
 
-        if callback
-          callback result
-
-    @collection().update.apply this, arguments
+      if callback
+        callback result
 
   save: (options, callback = null) ->
-    args = Array.prototype.slice.call arguments, 0
-    args.unshift @data
+    mongoOverloadHelper @constructor, @constructor.collection().save, arguments, (err, result, callback) =>
+      throw err if err
 
-    if _.isFunction args[args.length]
-      args[args.length] = (err, result) ->
-        throw err if err
-
-        if callback
-          callback result
-
-    @collection().save.apply this, args
+      if callback
+        callback result
 
   update: (modifiers, options, callback = null) ->
     args = Array.prototype.slice.call arguments, 0
+
+    callback = _.find args, _.isFunction
+    collection = @constructor.collection()
+
     args.unshift {_id: @data._id}
 
-    if _.isFunction args[args.length]
-      args[args.length] = (err, result) ->
-        throw err if err
+    args[args.length - 1] = (err, result) ->
+      throw err if err
 
-        if callback
-          callback result
+      if callback
+        callback result
 
-    @collection().update.apply this, args
+    collection.update.apply collection, args
 
   @remove: (selector, options, callback = null) ->
-    if _.isFunction arguments[arguments.length]
-      arguments[arguments.length] = (err, result) ->
-        throw err if err
+    mongoOverloadHelper @, @collection().remove, arguments, (err, result, callback) =>
+      throw err if err
 
-        if callback
-          callback result
-
-    @collection().remove.apply this, arguments
+      if callback
+        callback result
 
   remove: (options, callback = null) ->
     args = Array.prototype.slice.call arguments, 0
+
+    callback = _.find args, _.isFunction
+    collection = @constructor.collection()
+
     args.unshift {_id: @data._id}
 
-    if _.isFunction args[args.length]
-      args[args.length] = (err, result) ->
-        throw err if err
+    args[args.length - 1] = (err, result) ->
+      throw err if err
 
-        if callback
-          callback result
+      if callback
+        callback result
 
-    @collection().remove.apply this, args
+    collection.remove.apply collection, args
