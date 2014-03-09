@@ -12,8 +12,19 @@ i18next.init
   fallbackLng: config.i18n.defaultLanguage
   resGetPath: path.join(__dirname, 'locale/__lng__.json')
 
-i18next.registerAppHelper(app);
-app.use(i18next.handle);
+i18next.registerAppHelper app
+app.use i18next.handle
+app.use express.bodyParser()
+app.use express.cookieParser()
+app.use express.logger('dev')
+
+app.use (req, res, next) ->
+  if req.headers['x-token']
+    req.token = req.headers['x-token']
+  else
+    req.token = req.cookies.token
+
+  next()
 
 app.use express.static(path.join(__dirname, 'static'))
 
