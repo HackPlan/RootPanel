@@ -26,7 +26,7 @@ module.exports = class User extends Model
   createToken: (attribute, callback) ->
     # @param callback(token)
     generateToken = (callback) ->
-      token = exports.randomSalt()
+      token = auth.randomSalt()
 
       User.findOne
         'tokens.token': token
@@ -36,7 +36,7 @@ module.exports = class User extends Model
         else
           callback token
 
-    generateToken (token) ->
+    generateToken (token) =>
       @update
         $push:
           tokens:
@@ -55,6 +55,19 @@ module.exports = class User extends Model
           token: token
     , ->
       callback() if callback
+
+  # @param callback(User)
+  @authenticate: (token, callback) ->
+    if not token
+      callback null
+
+    User.findOne
+      'tokens.token': token
+    , (result) ->
+      if result
+        callback result
+      else
+        callback null
 
   # @return bool
   matchPasswd: (passwd) ->

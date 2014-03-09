@@ -8,21 +8,7 @@ exports.sha256 = (data) ->
   return crypto.createHash('sha256').update(data).digest('hex')
 
 exports.randomSalt = ->
-  return exports.sha256 crypto.randomBytes(256)
+  return exports.sha256 crypto.randomBytes 256
 
 exports.hashPasswd = (passwd, passwd_salt) ->
   return exports.sha256(exports.sha256(passwd) + passwd_salt)
-
-# @param callback(User)
-exports.authenticate = (token, callback) ->
-  if not token
-    callback null
-
-  User.findOne
-    'tokens.token': token
-  , (err, result) ->
-    throw err if err
-    if result
-      callback result
-    else
-      callback null
