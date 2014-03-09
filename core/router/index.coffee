@@ -8,11 +8,8 @@ exports.bind = (app) ->
       else
         return "/#{item}/#{name}"
 
-
     for name, controller of apiModule.get
       app.get generateUrl(name), controller
-
-
 
     for name, controller of apiModule.post
       app.post generateUrl(name), controller

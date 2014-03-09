@@ -12,30 +12,30 @@ module.exports =
     signup: (req, res) ->
       data = req.body
 
-      if not /^[0-9a-z_]+$/.test data.username
+      unless /^[0-9a-z_]+$/.test data.username
         return res.json 400, error: 'invalid_username'
 
-      if not /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test data.email
+      unless /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test data.email
         return res.json 400, error: 'invalid_email'
 
-      if not data.passwd or not /^.+$/.test data.passwd
+      unless data.passwd or not /^.+$/.test data.passwd
         return res.json 400, error: 'invalid_passwd'
 
-      User.byUsername data.username, (account) ->
-        if account
+      User.byUsername data.username, (user) ->
+        if user
           return res.json 400, error: 'username_exist'
 
-        User.byEmail data.email, (account) ->
-          if account
+        User.byEmail data.email, (user) ->
+          if user
             return res.json 400, error: 'email_exist'
 
-          User.register data.username, data.email, data.password, (account) ->
-            account.createToken {}, (token)->
+          User.register data.username, data.email, data.password, (user) ->
+            user.createToken {}, (token)->
               res.cookie 'token', token,
                 expires: new Date(Date.now() + 30 * 24 * 3600 * 1000)
 
               return res.json
-                id: account.data._id
+                id: user.data._id
 
     login: (req, res) ->
       data = req.body
