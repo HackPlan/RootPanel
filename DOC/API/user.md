@@ -6,7 +6,7 @@ Request:
 
     {
         "username": "jysperm",
-        "email": "jysperm@gmail.com"
+        "email": "jysperm@gmail.com",
         "passwd": "password"
     }
 
