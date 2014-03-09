@@ -7,7 +7,7 @@ Request:
     {
         "username": "jysperm",
         "email": "jysperm@gmail.com",
-        "passwd": "password"
+        "passwd": "passwd"
     }
 
 Response:
@@ -29,6 +29,7 @@ Exception:
 Request:
 
     {
+        // username or email
         "username": "jysperm",
         "passwd": "passwd"
     }

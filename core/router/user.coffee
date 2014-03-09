@@ -1,3 +1,5 @@
+config = require '../config'
+
 User = require '../model/User'
 
 module.exports =
@@ -32,7 +34,7 @@ module.exports =
           User.register data.username, data.email, data.password, (user) ->
             user.createToken {}, (token)->
               res.cookie 'token', token,
-                expires: new Date(Date.now() + 30 * 24 * 3600 * 1000)
+                expires: new Date(Date.now() + config.user.cookieTime)
 
               return res.json
                 id: user.data._id
@@ -49,17 +51,17 @@ module.exports =
           User.byEmail data.email, (account) ->
             return callback account
 
-      getAccount (account) ->
-        if not account
+      getAccount (user) ->
+        unless user
           return res.json 400, error: 'auth_failed'
 
-        if not account.matchPasswd data.password
+        unless user.matchPasswd data.password
           return res.json 400, error: 'auth_failed'
 
-        account.createToken {}, (token)->
+        user.createToken {}, (token) ->
           res.cookie 'token', token,
-            expires: new Date(Date.now() + 30 * 24 * 3600 * 1000)
+            expires: new Date(Date.now() + config.user.cookieTime)
 
           return res.json
-            id: account.data._id
+            id: user.data._id
             token: token

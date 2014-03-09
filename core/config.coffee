@@ -2,6 +2,9 @@ module.exports =
   web:
     port: 3000
 
+  user:
+    cookieTime: 30 * 24 * 3600 * 1000
+
   i18n:
     defaultLanguage: 'zh_CN'
     availableLanguage: ['zh_CN']

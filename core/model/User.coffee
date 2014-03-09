@@ -11,7 +11,7 @@ module.exports = class User extends Model
     passwd_salt = auth.randomSalt()
 
     data =
-      name: username
+      username: username
       passwd: auth.hashPasswd(passwd, passwd_salt)
       passwd_salt: passwd_salt
       email: email
@@ -58,7 +58,7 @@ module.exports = class User extends Model
 
   # @param callback(User)
   @authenticate: (token, callback) ->
-    if not token
+    unless token
       callback null
 
     User.findOne
@@ -71,7 +71,7 @@ module.exports = class User extends Model
 
   # @return bool
   matchPasswd: (passwd) ->
-    return auth.hashPassword(passwd, @data.passwd_salt) == @data.passwd
+    return auth.hashPasswd(passwd, @data.passwd_salt) == @data.passwd
 
   @byUsername: (username, callback) ->
     @findOne
