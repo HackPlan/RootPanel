@@ -22,7 +22,7 @@
     "jade": "*",
     "i18next": "*",
     "coffee-script": "*",
-    "mongodb" : "*",
-    "underscore" : "*"
+    "mongodb": "*",
+    "underscore": "*"
   }
 }
