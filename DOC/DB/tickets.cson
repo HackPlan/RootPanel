@@ -5,6 +5,8 @@ updated_at: ISODate('2013-02-22T03:03:37.312Z')
 title: 'Ticket Title'
 content: 'Ticket Content(Markdown)'
 content_html: 'Ticket Conetnt(HTML)'
+type: 'linux'
+status: 'open/pending/finish/closed/public'
 attribute: {}
 replys: [
   _id: ObjectID('525284cc2cebb6d0008b4567')
