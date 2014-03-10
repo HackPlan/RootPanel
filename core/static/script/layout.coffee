@@ -1,4 +1,4 @@
 $ ->
-  $('nav a').each (index) ->
-    if $('nav a')[index].pathname == location.pathname
-      $($('nav a')[index]).parent().addClass('active')
+  $('nav a').each  ->
+    $(@).parent().addClass('active') if $(@).attr('href') is location.pathname
+
