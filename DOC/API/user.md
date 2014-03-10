@@ -16,6 +16,10 @@ Response:
         "id": "525284cc2cebb6d0008b4567"
     }
 
+Response Header:
+
+    Set-Cookie: token=b535a6cec7b73a60c53673f434686e04972ccafddb2a5477f066f30eded55a9b
+
 Exception:
 
 * username_exist
@@ -40,6 +44,24 @@ Response:
         "id": "525284cc2cebb6d0008b4567",
         "token": "b535a6cec7b73a60c53673f434686e04972ccafddb2a5477f066f30eded55a9b"
     }
+
+Response Header:
+
+    Set-Cookie: token=b535a6cec7b73a60c53673f434686e04972ccafddb2a5477f066f30eded55a9b
+
+Exception:
+
+* auth_failed
+
+### POST /user/logout/
+
+No Request.
+
+No Response.
+
+Response Header:
+
+    Set-Cookie: token=deleted
 
 Exception:
 

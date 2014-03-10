@@ -44,12 +44,12 @@ module.exports =
 
       # @param callback(account)
       getAccount = (callback) ->
-        User.byUsername data.username, (account) ->
-          if account
-            return callback account
+        User.byUsername data.username, (user) ->
+          if user
+            return callback user
 
-          User.byEmail data.email, (account) ->
-            return callback account
+          User.byEmail data.email, (user) ->
+            return callback user
 
       getAccount (user) ->
         unless user
@@ -65,3 +65,13 @@ module.exports =
           return res.json
             id: user.data._id
             token: token
+
+    logout: (req, res) ->
+      User.authenticate req.token, (user) ->
+        unless user
+          return res.json 400, error: 'auth_failed'
+
+        user.removeToken req.token, ->
+          res.clearCookie 'token'
+
+          res.json {}
