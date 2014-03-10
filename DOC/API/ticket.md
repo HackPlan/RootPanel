@@ -46,7 +46,18 @@ Request:
         // optional
         "type": "linux",
         // optional
-        "status": "closed"
+        "status": "closed",
+
+        // only for admin group user
+        "attribute": {
+            "public": true
+        },
+        "members": {
+            // add a user
+            "525284cc2cebb6d0008b4567": true,
+            // remove a user
+            "4cc2cebb6d5254567280008b": false
+        }
     }
 
 No Response.

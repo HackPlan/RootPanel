@@ -6,11 +6,13 @@ title: 'Ticket Title'
 content: 'Ticket Content(Markdown)'
 content_html: 'Ticket Conetnt(HTML)'
 type: 'linux'
-status: 'open/pending/finish/closed/public',
+status: 'open/pending/finish/closed',
 members: [
   ObjectID('525284cc2cebb6d0008b4567')
 ],
-attribute: {}
+attribute: {
+  public: false
+}
 replys: [
   _id: ObjectID('525284cc2cebb6d0008b4567')
   reply_to: ObjectID('525284cc2cebb6d0008b4567')
