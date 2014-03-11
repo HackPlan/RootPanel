@@ -1,5 +1,18 @@
 $ ->
-	$.fn.checkAndRequest = (url, callback, opts) ->
+	window.pageErrorHandle =
+		addError: (error) ->
+			$('#page-alert').append error
+
+		clearError: ->
+			$('#page-alert').find('button').nextAll().remove()
+
+		showError: ->
+			$('#page-alert').show()
+
+		hideError: ->
+			$('#page-alert').hide()
+
+	$.fn.checkAndRequest = (url, opts, callback, errorHandle) ->
 		defaults = {}
 
 		opts = $.extend defaults, opts
@@ -42,3 +55,4 @@ $ ->
 				method: 'post'
 				data: data
 				success: callback
+				error: errorHandle
