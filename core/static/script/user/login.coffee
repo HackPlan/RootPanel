@@ -10,7 +10,6 @@ $ ->
       url: '/user/login/'
       data: data
     .done (reply) ->
-      console.log reply
       location.href = '/'
     .fail (reply) ->
       if reply.status is 400

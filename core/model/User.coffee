@@ -71,7 +71,7 @@ module.exports = class User extends Model
 
   # @return bool
   matchPasswd: (passwd) ->
-    return auth.hashPasswd(passwd, @data.passwd_salt) == @data.passwd
+    auth.hashPasswd(passwd, @data.passwd_salt) is @data.passwd
 
   @byUsername: (username, callback) ->
     @findOne
