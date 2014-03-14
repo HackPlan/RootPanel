@@ -35,7 +35,7 @@ module.exports =
           if user
             return res.json 400, error: 'email_exist'
 
-          User.register data.username, data.email, data.password, (user) ->
+          User.register data.username, data.email, data.passwd, (user) ->
             user.createToken {}, (token)->
               res.cookie 'token', token,
                 expires: new Date(Date.now() + config.user.cookieTime)
@@ -59,7 +59,9 @@ module.exports =
         unless user
           return res.json 400, error: 'auth_failed'
 
-        unless user.matchPasswd data.password
+        console.log(user.matchPasswd data.passwd);
+
+        unless user.matchPasswd data.passwd
           return res.json 400, error: 'auth_failed'
 
         user.createToken {}, (token) ->
