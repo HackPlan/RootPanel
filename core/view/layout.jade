@@ -21,10 +21,18 @@ html
               li
                 a(href='/topnav1/') Top Nav1
             ul.nav.navbar-nav.navbar-right
-              li
-                a(href='/user/signup/')= t('word.signup')
-              li
-                a(href='/user/login/')= t('word.login')
+              if user
+                li
+                  a= user.data.username
+                li
+                  a(href='/panel/')= t('word.panel')
+                li
+                  a(href='/account/logout/')= t('word.logout')
+              else
+                li
+                  a(href='/user/signup/')= t('word.signup')
+                li
+                  a(href='/user/login/')= t('word.login')
 
     #content.container
       .row

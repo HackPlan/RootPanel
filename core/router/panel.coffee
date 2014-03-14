@@ -1,7 +1,11 @@
+User = require '../model/User'
+
 module.exports =
   get:
     '/': (req, res) ->
       res.redirect '/panel/'
 
     '/panel/': (req, res) ->
-      res.render 'panel'
+      User.authenticate req.token, (user) ->
+        res.render 'panel',
+          user: user
