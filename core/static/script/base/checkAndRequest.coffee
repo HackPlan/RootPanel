@@ -1,7 +1,7 @@
 $ ->
 	window.pageErrorHandle =
 		addError: (error) ->
-			$('#page-alert').append error
+			$('#page-alert').append "<p>#{error}</p>"
 
 		clearError: ->
 			$('#page-alert').find('button').nextAll().remove()
