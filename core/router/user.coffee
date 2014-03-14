@@ -59,8 +59,6 @@ module.exports =
         unless user
           return res.json 400, error: 'auth_failed'
 
-        console.log(user.matchPasswd data.passwd);
-
         unless user.matchPasswd data.passwd
           return res.json 400, error: 'auth_failed'
 
