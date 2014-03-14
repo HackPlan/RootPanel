@@ -1,5 +1,5 @@
 _id: ObjectID('525284cc2cebb6d0008b4567')
-name: 'jysperm'
+username: 'jysperm'
 passwd: '53673f434686ce045477f066f30eded55a9bb535a6cec7b73a60972ccafddb2a'
 passwd_salt: '53673f434686b535a6cec7b73a60ce045477f066f30eded55a9b972ccafddb2a'
 email: 'jysperm@gmail.com'
