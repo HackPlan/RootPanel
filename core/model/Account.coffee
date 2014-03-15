@@ -10,7 +10,7 @@ module.exports = class Account extends Model
   @register: (username, email, passwd, callback = null) ->
     passwd_salt = auth.randomSalt()
 
-    data =
+    @insert
       username: username
       passwd: auth.hashPasswd(passwd, passwd_salt)
       passwd_salt: passwd_salt
@@ -20,7 +20,7 @@ module.exports = class Account extends Model
       setting: {}
       attribure: {}
       tokens: []
-    @insert data, callback
+     , callback
 
   # @param callback(token)
   createToken: (attribute, callback) ->
