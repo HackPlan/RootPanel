@@ -24,11 +24,11 @@ module.exports =
           return res.json 400, error: 'invalid_type'
 
         createTicket = (members) ->
-          Ticket.createTicket account, title, content, type, members, {}, (ticket) ->
+          Ticket.createTicket account, data.title, data.content, data.type, members, {}, (ticket) ->
             return res.json
               id: ticket.id()
 
-        if account.inGroup('root')
+        if account.inGroup 'root'
           tasks = []
 
           if data.members
