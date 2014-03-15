@@ -4,7 +4,7 @@ passwd: '53673f434686ce045477f066f30eded55a9bb535a6cec7b73a60972ccafddb2a'
 passwd_salt: '53673f434686b535a6cec7b73a60ce045477f066f30eded55a9b972ccafddb2a'
 email: 'jysperm@gmail.com'
 signup_at: ISODate('2013-02-22T03:03:37.312Z')
-group: ['admin', 'stduser']
+group: ['root', 'stduser']
 setting:
   language: 'zh_CN'
   QQ: '184300584'

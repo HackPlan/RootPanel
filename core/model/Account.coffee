@@ -73,6 +73,9 @@ module.exports = class Account extends Model
   matchPasswd: (passwd) ->
     auth.hashPasswd(passwd, @data.passwd_salt) is @data.passwd
 
+  inGroup: (group) ->
+    return group in @data.group
+
   @byUsername: (username, callback) ->
     @findOne
       username: username
