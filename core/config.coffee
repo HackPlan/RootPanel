@@ -2,7 +2,7 @@ module.exports =
   web:
     port: 3000
 
-  user:
+  account:
     cookieTime: 30 * 24 * 3600 * 1000
 
   i18n:

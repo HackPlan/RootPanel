@@ -3,9 +3,9 @@ auth = require '../auth'
 db = require '../db'
 _ = require 'underscore'
 
-module.exports = class User extends Model
+module.exports = class Account extends Model
   @create: (data) ->
-    new User data
+    new Account data
 
   @register: (username, email, passwd, callback = null) ->
     passwd_salt = auth.randomSalt()
@@ -28,7 +28,7 @@ module.exports = class User extends Model
     generateToken = (callback) ->
       token = auth.randomSalt()
 
-      User.findOne
+      Account.findOne
         'tokens.token': token
       , (result) ->
         if result
@@ -61,7 +61,7 @@ module.exports = class User extends Model
     unless token
       callback null
 
-    User.findOne
+    Account.findOne
       'tokens.token': token
     , (result) ->
       if result

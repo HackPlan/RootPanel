@@ -1,7 +1,7 @@
 $ ->
   $('.signup-form').find('button').on 'click', (e) ->
     e.preventDefault()
-    $('.signup-form').checkAndRequest '/user/signup/',
+    $('.signup-form').checkAndRequest '/account/signup/',
       username:
         check: /^[0-9a-z_]+$/
         error: '用户名必须以数字或小写字母开头'

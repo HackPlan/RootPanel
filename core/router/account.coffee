@@ -1,18 +1,18 @@
 config = require '../config'
 
-User = require '../model/User'
+Account = require '../model/Account'
 
 module.exports =
   get:
     signup: (req, res) ->
-      User.authenticate req.token, (user) ->
+      Account.authenticate req.token, (account) ->
         res.render 'signup',
-          user: user
+          user: account
 
     login: (req, res) ->
-      User.authenticate req.token, (user) ->
+      Account.authenticate req.token, (account) ->
         res.render 'login',
-          user: user
+          user: account
 
   post:
     signup: (req, res) ->
@@ -27,55 +27,55 @@ module.exports =
       unless data.passwd or not /^.+$/.test data.passwd
         return res.json 400, error: 'invalid_passwd'
 
-      User.byUsername data.username, (user) ->
-        if user
+      Account.byUsername data.username, (account) ->
+        if account
           return res.json 400, error: 'username_exist'
 
-        User.byEmail data.email, (user) ->
-          if user
+        Account.byEmail data.email, (account) ->
+          if account
             return res.json 400, error: 'email_exist'
 
-          User.register data.username, data.email, data.passwd, (user) ->
-            user.createToken {}, (token)->
+          Account.register data.username, data.email, data.passwd, (account) ->
+            account.createToken {}, (token)->
               res.cookie 'token', token,
-                expires: new Date(Date.now() + config.user.cookieTime)
+                expires: new Date(Date.now() + config.account.cookieTime)
 
               return res.json
-                id: user.data._id
+                id: account.data._id
 
     login: (req, res) ->
       data = req.body
 
       # @param callback(account)
       getAccount = (callback) ->
-        User.byUsername data.username, (user) ->
-          if user
-            return callback user
+        Account.byUsername data.username, (account) ->
+          if account
+            return callback account
 
-          User.byEmail data.email, (user) ->
-            return callback user
+          Account.byEmail data.email, (account) ->
+            return callback account
 
-      getAccount (user) ->
-        unless user
+      getAccount (account) ->
+        unless account
           return res.json 400, error: 'auth_failed'
 
-        unless user.matchPasswd data.passwd
+        unless account.matchPasswd data.passwd
           return res.json 400, error: 'auth_failed'
 
-        user.createToken {}, (token) ->
+        account.createToken {}, (token) ->
           res.cookie 'token', token,
-            expires: new Date(Date.now() + config.user.cookieTime)
+            expires: new Date(Date.now() + config.account.cookieTime)
 
           return res.json
-            id: user.data._id
+            id: account.data._id
             token: token
 
     logout: (req, res) ->
-      User.authenticate req.token, (user) ->
-        unless user
+      Account.authenticate req.token, (account) ->
+        unless account
           return res.json 400, error: 'auth_failed'
 
-        user.removeToken req.token, ->
+        account.removeToken req.token, ->
           res.clearCookie 'token'
 
           res.json {}

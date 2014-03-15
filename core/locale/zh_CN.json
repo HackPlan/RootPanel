@@ -4,7 +4,7 @@
     "description": "一个插件化的 Linux 虚拟主机管理系统。"
   },
   "word": {
-    "user": "用户",
+    "account": "帐号",
     "signup": "注册",
     "login": "登录",
     "username": "用户名",

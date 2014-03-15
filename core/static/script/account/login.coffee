@@ -7,7 +7,7 @@ $ ->
 
     $.ajax
       method: 'post'
-      url: '/user/login/'
+      url: '/account/login/'
       data: data
     .done (reply) ->
       location.href = '/'

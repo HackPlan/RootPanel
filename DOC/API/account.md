@@ -1,6 +1,6 @@
 ## User API
 
-### POST /user/signup/
+### POST /account/signup/
 
 Request:
 
@@ -28,7 +28,7 @@ Exception:
 * invalid_email `/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/`
 * invalid_passwd `/^.+$/`
 
-### POST /user/login/
+### POST /account/login/
 
 Request:
 
@@ -53,7 +53,7 @@ Exception:
 
 * auth_failed
 
-### POST /user/logout/
+### POST /account/logout/
 
 No Request.
 

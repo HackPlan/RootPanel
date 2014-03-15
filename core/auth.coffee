@@ -1,6 +1,6 @@
 crypto = require 'crypto'
 assert = require 'assert'
-User = require './model/User'
+User = require './model/Account'
 
 exports.sha256 = (data) ->
   if not data
