@@ -1,22 +1,20 @@
 $ ->
-  $('.signup-form').find('button').on 'click', (e) ->
+  $('.signup-btn').on 'click', (e) ->
     e.preventDefault()
-    $('.signup-form').checkAndRequest '/account/signup/',
-      username:
-        check: /^[0-9a-z_]+$/
-        error: '用户名必须以数字或小写字母开头'
-      email:
-        check: /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/
-        error: '邮箱格式不正确'
-      passwd:
-        check: ->
-          $('#passwd').val() is $('#passwd2').val()
-        error: '两次密码不一致'
-    , (reply) ->
-      location.href = '/'
-    , (reply) ->
-      if reply.status is 400
-        error = reply.responseJSON.error
-        pageErrorHandle.clearError()
-        pageErrorHandle.addError error
-        pageErrorHandle.showError()
+    if $('#passwd').val() isnt $('#passwd2').val()
+      ErrorHandle.flushError '两次密码不一致'
+    else
+      data =
+        username: $('#username').val()
+        passwd: $('#passwd').val()
+        email: $('#email').val()
+      $.ajax
+        method: 'post'
+        url: '/account/signup/'
+        data: data
+      .done (reply) ->
+        location.href = '/'
+      .fail (reply) ->
+        if reply.status is 400
+          error = reply.responseJSON.error
+          ErrorHandle.flushError error
