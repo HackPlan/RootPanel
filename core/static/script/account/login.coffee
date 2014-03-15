@@ -14,6 +14,4 @@ $ ->
     .fail (reply) ->
       if reply.status is 400
         error = reply.responseJSON.error
-        pageErrorHandle.clearError()
-        pageErrorHandle.addError error
-        pageErrorHandle.showError()
+        ErrorHandle.flushError error

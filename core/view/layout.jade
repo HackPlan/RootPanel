@@ -23,11 +23,11 @@ html
             ul.nav.navbar-nav.navbar-right
               if account
                 li
-                  a= user.data.username
+                  a= account.data.username
                 li
                   a(href='/panel/')= t('word.panel')
                 li
-                  a(href='/account/logout/')= t('word.logout')
+                  a#logout(href='/account/logout/')= t('word.logout')
               else
                 li
                   a(href='/account/signup/')= t('word.signup')
@@ -50,6 +50,6 @@ html
     #footer
       script(src='http://cdn.staticfile.org/jquery/2.0.3/jquery.min.js')
       script(src='http://cdn.staticfile.org/twitter-bootstrap/3.0.0-rc2/js/bootstrap.min.js')
+      script(src='/script/base/ErrorHandle.js')
       script(src='/script/layout.js')
-
       block script
