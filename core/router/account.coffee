@@ -46,16 +46,7 @@ module.exports =
     login: (req, res) ->
       data = req.body
 
-      # @param callback(account)
-      getAccount = (callback) ->
-        Account.byUsername data.username, (account) ->
-          if account
-            return callback account
-
-          Account.byEmail data.email, (account) ->
-            return callback account
-
-      getAccount (account) ->
+      Account.byUsernameOrEmail data.username, (account) ->
         unless account
           return res.json 400, error: 'auth_failed'
 

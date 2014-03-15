@@ -84,3 +84,11 @@ module.exports = class Account extends Model
       email: email
     , (result) ->
       callback result
+
+  @byUsernameOrEmail: (username) ->
+    Account.byUsername username, (account) ->
+      if account
+        return callback account
+
+      Account.byEmail username, (account) ->
+        return callback account
