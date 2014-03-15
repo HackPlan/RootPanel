@@ -9,6 +9,11 @@ module.exports =
     defaultLanguage: 'zh_CN'
     availableLanguage: ['zh_CN']
 
+  ticket:
+    availableType: [
+      'linux', 'nodejs', 'php', 'python', 'rootpanel'
+    ]
+
   db:
     type: 'mongo'
     server: 'localhost'

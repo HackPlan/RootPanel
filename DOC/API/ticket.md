@@ -21,6 +21,12 @@ Response:
         "id": "525284cc2cebb6d0008b4567"
     }
 
+Exception:
+
+* invalid_title `/^.+$/`
+* invalid_type
+* invalid_account: username
+
 ### POST /ticket/reply
 
 Request:

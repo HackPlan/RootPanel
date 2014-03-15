@@ -20,9 +20,12 @@
   "dependencies": {
     "express": "*",
     "jade": "*",
+    "less": "*",
     "i18next": "*",
     "coffee-script": "*",
     "mongodb": "*",
-    "underscore": "*"
+    "underscore": "*",
+    "markdown": "*",
+    "clone": "*"
   }
 }
