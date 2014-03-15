@@ -7,5 +7,8 @@ module.exports =
 
     '/panel/': (req, res) ->
       Account.authenticate req.token, (account) ->
+        unless account
+          return res.redirect '/account/login/'
+
         res.render 'panel',
           account: account
