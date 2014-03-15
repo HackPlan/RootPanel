@@ -10,7 +10,7 @@ module.exports = class Account extends Model
   @register: (username, email, passwd, callback = null) ->
     passwd_salt = auth.randomSalt()
 
-    data =
+    @insert
       username: username
       passwd: auth.hashPasswd(passwd, passwd_salt)
       passwd_salt: passwd_salt
@@ -20,7 +20,7 @@ module.exports = class Account extends Model
       setting: {}
       attribure: {}
       tokens: []
-    @insert data, callback
+     , callback
 
   # @param callback(token)
   createToken: (attribute, callback) ->
@@ -73,6 +73,9 @@ module.exports = class Account extends Model
   matchPasswd: (passwd) ->
     auth.hashPasswd(passwd, @data.passwd_salt) is @data.passwd
 
+  inGroup: (group) ->
+    return group in @data.group
+
   @byUsername: (username, callback) ->
     @findOne
       username: username
@@ -84,3 +87,11 @@ module.exports = class Account extends Model
       email: email
     , (result) ->
       callback result
+
+  @byUsernameOrEmail: (username) ->
+    Account.byUsername username, (account) ->
+      if account
+        return callback account
+
+      Account.byEmail username, (account) ->
+        return callback account

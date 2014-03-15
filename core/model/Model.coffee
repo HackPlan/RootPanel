@@ -5,7 +5,7 @@ db = require '../db'
 
 # @param callback(args, callback)
 mongoOverloadHelper = (that, commend, args, callback) ->
-  args = Array.prototype.slice.call args, 0
+  args = _.toArray args
   originalCallback = _.find args, _.isFunction
   collection = that.collection()
 
@@ -28,11 +28,14 @@ module.exports = class Model
 
     return result
 
+  id: ->
+    return @data._id
+
   @collection: ->
     return db.mongo.collection "#{@name.toLowerCase()}s"
 
   @find: (selector, options, callback) ->
-    args = Array.prototype.slice.call arguments, 0
+    args = _.toArray arguments
     callback = _.find args, _.isFunction
     collection = @collection()
 
@@ -79,7 +82,7 @@ module.exports = class Model
         callback result
 
   update: (modifiers, options, callback = null) ->
-    args = Array.prototype.slice.call arguments, 0
+    args = _.toArray arguments
 
     callback = _.find args, _.isFunction
     collection = @constructor.collection()
@@ -102,7 +105,7 @@ module.exports = class Model
         callback result
 
   remove: (options, callback = null) ->
-    args = Array.prototype.slice.call arguments, 0
+    args = _.toArray arguments
 
     callback = _.find args, _.isFunction
     collection = @constructor.collection()
