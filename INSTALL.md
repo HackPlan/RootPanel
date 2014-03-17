@@ -4,7 +4,7 @@
     apt-get update
     
     apt-get install nodejs git mongodb memcached
-    npm install pm2 -g
+    npm install pm2 gulp -g
     
     git clone https://github.com/jysperm/RootPanel.git
     cd RootPanel
