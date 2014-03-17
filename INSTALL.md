@@ -4,10 +4,10 @@
     apt-get update
     
     apt-get install nodejs git mongodb memcached
+    npm install pm2 -g
     
     git clone https://github.com/jysperm/RootPanel.git
-    
     cd RootPanel
-    gulp less coffee
     
-    node app.js
+    gulp less coffee
+    pm2 start app.coffee
