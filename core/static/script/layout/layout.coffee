@@ -1,13 +1,14 @@
 $ ->
   $('nav a').each ->
-    $(@).parent().addClass('active') if $(@).attr('href') is location.pathname
+    $(this).parent().addClass('active') if $(this).attr('href') is location.pathname
 
 
   $('#logout').on 'click', (e) ->
     e.preventDefault()
-    $.ajax
+    $.ajax {
       method: 'post'
       url: '/account/logout/'
+    }
     .done ->
       location.href = '/'
     .fail (reply) ->
