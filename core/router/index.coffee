@@ -1,5 +1,5 @@
 exports.bind = (app) ->
-  for item in ['account', 'panel']
+  for item in ['account', 'panel', 'ticket']
     apiModule = require('./' + item)
 
     generateUrl = (name) ->
