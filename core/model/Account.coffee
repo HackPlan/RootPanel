@@ -88,7 +88,7 @@ module.exports = class Account extends Model
     , (result) ->
       callback result
 
-  @byUsernameOrEmail: (username) ->
+  @byUsernameOrEmail: (username, callback) ->
     Account.byUsername username, (account) ->
       if account
         return callback account
