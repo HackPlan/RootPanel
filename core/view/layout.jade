@@ -34,26 +34,27 @@ html
                 li
                   a(href='/account/login/')= t('word.login')
 
-    #content.container
-      .row
-        .col-md-9
-          .alert#page-alert
-            button(type='button',class='close') &times;
-          block main
-
-        #sidebar.col-md-3
-          block sidebar
-            .row
-              header= t('app.name')
-              p= t('app.description')
-
-            .row
-              header Version
-              ul
-                li Version: #{app.locals.version.version.slice(0, 10)}
-                li Author: #{app.locals.version.author}
-                li= app.locals.version.time.toJSON()
-                li= app.locals.version.message
+    block content
+      #content.container
+        .row
+          .col-md-9
+            .alert#page-alert
+              button(type='button',class='close') &times;
+            block main
+  
+          #sidebar.col-md-3
+            block sidebar
+              .row
+                header= t('app.name')
+                p= t('app.description')
+  
+              .row
+                header Version
+                ul
+                  li Version: #{app.locals.version.version.slice(0, 10)}
+                  li Author: #{app.locals.version.author}
+                  li= app.locals.version.time.toJSON()
+                  li= app.locals.version.message
 
     #footer
       script(src='http://cdn.staticfile.org/jquery/2.0.3/jquery.min.js')

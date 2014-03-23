@@ -3,5 +3,19 @@ extends layout
 prepend head
   title #{t("word.panel")} | #{t('app.name')}
 
-block main
-  header= t('word.panel')
+block content
+  #content.container
+    .row
+      #sidenav.col-md-3
+        ul.nav.nav-pills.nav-stacked
+          li.active
+            a(href='#') 1
+          li 
+            a(href='#') 2
+          li
+            a(href='#') 3
+          li
+            a(href='#') 4
+      
+      .col-md-9
+        h2 Panel
