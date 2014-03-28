@@ -15,7 +15,8 @@ i18next.init
 
 i18next.registerAppHelper app
 app.use i18next.handle
-app.use express.bodyParser()
+app.use express.json()
+app.use express.urlencoded()
 app.use express.cookieParser()
 app.use express.logger('dev')
 
