@@ -14,14 +14,12 @@ gulp.task('less', function() {
 gulp.task('coffee', function() {
   return gulp.src(coffeePath + "/**/*.coffee").pipe(coffee()).on('error', function(error) {
     throw error;
-  }).pipe(uglify().pipe(gulp.dest(coffeePath)));
+  }).pipe(uglify()).pipe(gulp.dest(coffeePath));
 });
 
-gulp.task('default', ['less', 'coffee'], function() {
-  gulp.watch(lessPath + "/**/*.less", function() {
-    return gulp.run('less');
-  });
-  return gulp.watch(coffeePath + "/**/*.coffee", function() {
-    return gulp.run('coffee');
-  });
+gulp.task('watch', function(){
+  gulp.watch(coffeePath + "/**/*.coffee",['coffee']);
+  gulp.watch(lessPath + "/**/*.less",['less']);
 });
+
+gulp.task('default', ['less', 'coffee', 'watch']);
