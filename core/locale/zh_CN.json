@@ -12,7 +12,8 @@
     "passwd": "密码",
     "error": "错误",
     "logout": "注销",
-    "panel": "管理面板"
+    "panel": "管理面板",
+    "ticket": "工单"
   },
   "view": {
     "signup": {
