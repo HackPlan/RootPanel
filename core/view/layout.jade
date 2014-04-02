@@ -47,14 +47,15 @@ html
               .row
                 header= t('app.name')
                 p= t('app.description')
-  
-              .row
-                header Version
-                ul
-                  li Version: #{app.locals.version.version.slice(0, 10)}
-                  li Author: #{app.locals.version.author}
-                  li= app.locals.version.time.toJSON()
-                  li= app.locals.version.message
+
+              if app?.locals?.version
+                .row
+                  header Version
+                  ul
+                    li Version: #{app.locals.version.version.slice(0, 10)}
+                    li Author: #{app.locals.version.author}
+                    li= app.locals.version.time.toJSON()
+                    li= app.locals.version.message
 
     #footer
       block footer
