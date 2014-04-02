@@ -12,7 +12,7 @@ gulp.task('less', function() {
 });
 
 gulp.task('coffee', function() {
-  return gulp.src(coffeePath + "/**/*.coffee").pipe(coffee()).on('error', function(error) {
+  return gulp.src(coffeePath + "/**/*.coffee").pipe(coffee({bare:true})).on('error', function(error) {
     throw error;
   }).pipe(uglify()).pipe(gulp.dest(coffeePath));
 });
