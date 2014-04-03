@@ -9,12 +9,16 @@ block main
   table.table.table-hover
     thead
       tr
-        td= t('word.type')
-        td= t('word.title')
-        td= t('word.status')
+        th= t('word.type')
+        th= t('word.title')
+        th= t('word.status')
     tbody
       for ticket in tickets
         tr
           td= ticket.data.type
           td= ticket.data.title
           td= ticket.data.status
+
+prepend sidebar
+  .row
+    a.btn.btn-lg.btn-success(href='/ticket/create/')= t('view.ticket.word.create')

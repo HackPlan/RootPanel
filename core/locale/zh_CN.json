@@ -27,6 +27,10 @@
       "noAccount": "还没有账户？"
     },
     "ticket": {
+      "word": {
+        "create": "创建工单"
+      },
+
       "list": {
         "title": "工单列表"
       }
