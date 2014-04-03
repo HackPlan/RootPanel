@@ -35,15 +35,12 @@ module.exports = class Model
     return db.mongo.collection "#{@name.toLowerCase()}s"
 
   @find: (selector, options, callback) ->
-    args = _.toArray arguments
-    callback = _.find args, _.isFunction
-    collection = @collection()
-
-    args[args.length - 1] = null
-
-    collection.find.apply(collection, args).toArray (err, result) =>
+    mongoOverloadHelper @, @collection().find, arguments, (err, result, callback) =>
       throw err if err
-      callback @createModels result
+
+      result.toArray (err, result) =>
+        throw err if err
+        callback @createModels result
 
   @findOne: (selector, options, callback) ->
     mongoOverloadHelper @, @collection().findOne, arguments, (err, result, callback) =>
