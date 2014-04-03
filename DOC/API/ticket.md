@@ -43,6 +43,11 @@ Response:
         "id": "525284cc2cebb6d0008b4567"
     }
 
+Exception:
+
+* reply_not_exist
+* forbidden
+
 ### POST /ticket/update
 
 Request:
