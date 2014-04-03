@@ -7,12 +7,12 @@ module.exports =
     signup: (req, res) ->
       Account.authenticate req.token, (account) ->
         res.render 'signup',
-          user: account
+          account: account
 
     login: (req, res) ->
       Account.authenticate req.token, (account) ->
         res.render 'login',
-          user: account
+          account: account
 
   post:
     signup: (req, res) ->
