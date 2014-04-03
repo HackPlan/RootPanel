@@ -48,7 +48,7 @@ html
                 header= t('app.name')
                 p= t('app.description')
 
-              if app?.locals?.version
+              if app && app.locals && app.locals.version
                 .row
                   header Version
                   ul
