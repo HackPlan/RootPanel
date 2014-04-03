@@ -7,7 +7,15 @@ Account = require '../model/Account'
 Ticket = require '../model/Ticket'
 
 module.exports =
-  get: {}
+  get:
+    list: (req, res) ->
+      Account.authenticate req.token, (account) ->
+        Ticket.find
+          account_id: account.id()
+        , (tickets) ->
+          res.render 'ticket/list',
+            account: account
+            tickets: tickets
 
   post:
     create: (req, res) ->

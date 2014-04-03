@@ -13,7 +13,10 @@
     "error": "错误",
     "logout": "注销",
     "panel": "管理面板",
-    "ticket": "工单"
+    "ticket": "工单",
+    "type": "类型",
+    "title": "标题",
+    "status": "状态"
   },
   "view": {
     "signup": {
@@ -22,6 +25,11 @@
     },
     "login": {
       "noAccount": "还没有账户？"
+    },
+    "ticket": {
+      "list": {
+        "title": "工单列表"
+      }
     }
   }
 }
