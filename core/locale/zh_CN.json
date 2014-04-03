@@ -16,7 +16,8 @@
     "ticket": "工单",
     "type": "类型",
     "title": "标题",
-    "status": "状态"
+    "status": "状态",
+    "create": "创建"
   },
   "view": {
     "signup": {

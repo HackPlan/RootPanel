@@ -10,12 +10,24 @@ module.exports =
   get:
     list: (req, res) ->
       Account.authenticate req.token, (account) ->
+        unless account
+          return res.redirect '/account/login/'
+
         Ticket.find
           account_id: account.id()
         , (tickets) ->
           res.render 'ticket/list',
             account: account
             tickets: tickets
+
+    create: (req, res) ->
+      Account.authenticate req.token, (account) ->
+        unless account
+          return res.redirect '/account/login/'
+
+        res.render 'ticket/create',
+          account: account
+          ticketTypes: config.ticket.availableType
 
   post:
     create: (req, res) ->
