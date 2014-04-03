@@ -52,6 +52,9 @@ module.exports = class Model
         callback null
 
   @findById: (id, callback) ->
+    if _.isString id
+      id = new ObjectID id
+
     @findOne {_id: id}, callback
 
   @insert: (data, options, callback = null) ->
