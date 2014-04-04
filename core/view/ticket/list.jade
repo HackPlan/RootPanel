@@ -14,7 +14,7 @@ block main
         th= t('word.status')
     tbody
       for ticket in tickets
-        tr
+        tr(data-id= ticket.data._id)
           td= ticket.data.type
           td= ticket.data.title
           td= ticket.data.status
