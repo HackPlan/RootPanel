@@ -41,7 +41,7 @@ html
             .alert#page-alert
               button(type='button',class='close') &times;
             block main
-  
+
           #sidebar.col-md-3
             block sidebar
               .row
@@ -58,8 +58,9 @@ html
                     li= app.locals.version.message
 
     #footer
-      block footer
       script(src='http://cdn.staticfile.org/jquery/2.0.3/jquery.min.js')
       script(src='http://cdn.staticfile.org/twitter-bootstrap/3.0.3/js/bootstrap.min.js')
       script(src='/script/base/ErrorHandle.js')
       script(src='/script/layout/layout.js')
+      block footer
+
