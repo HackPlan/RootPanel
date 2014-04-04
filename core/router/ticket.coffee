@@ -102,7 +102,7 @@ module.exports =
               unless account.inGroup 'root'
                 return res.json 400, error: 'forbidden'
 
-            ticket.createReply account, reply_to, content, (reply) ->
+            ticket.createReply account, data.reply_to, data.content, (reply) ->
               return res.json
                 id: reply._id
 
