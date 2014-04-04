@@ -4,7 +4,7 @@ $ ->
     data = {
       type: $('#type').val()
       title: $('#title').val()
-      content: $('#content').val()
+      content: $('#ticket-content').val()
     }
 
     $.ajax {
@@ -13,7 +13,7 @@ $ ->
       data: data
     }
     .done (reply) ->
-      console.log reply
+      location.href = '/ticket/list/'
     .fail (reply) ->
       if reply.status is 400
         error = reply.responseJSON.error
