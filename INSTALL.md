@@ -9,5 +9,6 @@
     git clone https://github.com/jysperm/RootPanel.git
     cd RootPanel
     
+    npm install
     gulp less coffee
     pm2 start app.coffee
