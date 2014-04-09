@@ -1,5 +1,6 @@
 async = require 'async'
 clone = require 'clone'
+ObjectID = require('mongodb').ObjectID
 
 config = require '../config'
 
@@ -107,3 +108,87 @@ module.exports =
                 id: reply._id
 
     update: (req, res) ->
+      Account.authenticate req.token, (account) ->
+        unless account
+          return res.json 400, error: 'auth_failed'
+
+        data = req.body
+        modifier = {}
+
+        addToSetModifier = []
+        pullModifier = []
+
+        Ticket.findById data.id, (ticket) ->
+          if data.type
+            if data.type in config.ticket.availableType
+              modifier['type'] = data.type
+            else
+              return res.json 400, error: 'invalid_type'
+
+          if data.status
+            if account.inGroup 'root'
+              allow_status = ['open', 'pending', 'finish', 'closed']
+            else
+              allow_status = ['closed']
+
+            if data.status in allow_status
+              if ticket.data.status == data.status
+                return res.json 400, error: 'already_in_status'
+              else
+                modifier['status'] = ticket.data.status
+            else
+              return res.json 400, error: 'invalid_status'
+
+          if account.inGroup 'root'
+            if data.attribute
+              unless data.attribute.public == undefined
+                modifier['attribute.public'] = false
+              else
+                modifier['attribute.public'] = true
+
+            if data.members
+              for member_id, op of data.members
+                member_id = new ObjectID member_id
+
+                if ticket.hasMemberId member_id
+                  unless op
+                    pullModifier.push member_id
+                else
+                  if op
+                    addToSetModifier.push member_id
+
+          async.parallel [
+            (callback) ->
+              unless _.isEmpty modifier
+                ticket.update
+                  $set: modifier
+                , callback
+              else
+                callback()
+
+            (callback) ->
+              unless _.isEmpty addToSetModifier
+                ticket.update
+                  $addToSet:
+                    members:
+                      $each: addToSetModifier
+                , callback
+              else
+                callback()
+
+            (callback) ->
+              unless _.isEmpty pullModifier
+                ticket.update
+                  $pullAll:
+                    members: pullModifier
+                , callback
+              else
+                callback()
+          ], ->
+            return res.json {}
+
+
+
+
+                
+        

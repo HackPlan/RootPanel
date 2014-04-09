@@ -66,3 +66,9 @@ module.exports = class Ticket extends Model
       return true
     else
       return false
+
+  hasMemberId: (account_id) ->
+    if _.find(@data.members, (member) -> member.equals(account_id))
+      return true
+    else
+      return false
