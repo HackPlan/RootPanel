@@ -1,7 +1,13 @@
-Model = require './Model'
+_ = require 'underscore'
+
 auth = require '../auth'
 db = require '../db'
-_ = require 'underscore'
+
+mAccount = db.collection 'accounts'
+
+db.buildModel module.exports, mAccount
+
+  
 
 module.exports = class Account extends Model
   @create: (data) ->
