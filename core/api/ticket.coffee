@@ -1,5 +1,5 @@
 async = require 'async'
-clone = require 'clone'
+_ = require 'underscore'
 
 db = require '../db'
 config = require '../config'
@@ -52,7 +52,7 @@ module.exports =
 
           if req.body.members
             for memberName in req.body.members
-              do (memberName = clone(memberName)) ->
+              do (memberName = _.clone(memberName)) ->
                 tasks.push (callback) ->
                   account.byUsernameOrEmail memberName, (member) ->
                     unless member

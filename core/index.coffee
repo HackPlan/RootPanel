@@ -1,5 +1,6 @@
 express = require 'express'
 i18next = require 'i18next'
+connect = require 'connect'
 path = require 'path'
 fs = require 'fs'
 
@@ -15,10 +16,10 @@ i18next.init
 
 i18next.registerAppHelper app
 app.use i18next.handle
-app.use express.json()
-app.use express.urlencoded()
-app.use express.cookieParser()
-app.use express.logger('dev')
+app.use connect.json()
+app.use connect.urlencoded()
+app.use connect.cookieParser()
+app.use connect.logger('dev')
 
 app.locals.version = do ->
   logs = fs.readFileSync './.git/logs/HEAD', 'utf8'
