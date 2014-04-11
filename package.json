@@ -26,9 +26,7 @@
     "mongodb": "*",
     "underscore": "*",
     "markdown": "*",
-    "clone": "*",
-    "async": "*",
-    "clone": "*"
+    "async": "*"
   },
   "devDependencies": {
     "gulp": "~3.5.6",
