@@ -4,7 +4,7 @@ path = require 'path'
 fs = require 'fs'
 
 config = require './config'
-router = require './router'
+api = require './api'
 db = require './db'
 
 app = express()
@@ -57,6 +57,6 @@ app.set 'views', path.join(__dirname, 'view')
 app.set 'view engine', 'jade'
 
 db.connect ->
-  router.bind(app)
+  api.bind(app)
 
   app.listen config.web.port

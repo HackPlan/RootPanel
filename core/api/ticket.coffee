@@ -1,28 +1,28 @@
 async = require 'async'
 clone = require 'clone'
-ObjectID = require('mongodb').ObjectID
 
+db = require '../db'
 config = require '../config'
 
-Account = require '../model/account'
-Ticket = require '../model/ticket'
+mAccount = require '../model/account'
+mTicket = require '../model/ticket'
 
 module.exports =
   get:
     list: (req, res) ->
-      account.authenticate req.token, (account) ->
+      mAccount.authenticate req.token, (account) ->
         unless account
           return res.redirect '/account/login/'
 
-        tTicket.find
-          account_id: account.id()
-        , (tickets) ->
+        mTicket.find
+          account_id: account._id
+        , {}, (tickets) ->
           res.render 'ticket/list',
             account: account
             tickets: tickets
 
     create: (req, res) ->
-      account.authenticate req.token, (account) ->
+      mAccount.authenticate req.token, (account) ->
         unless account
           return res.redirect '/account/login/'
 
@@ -32,28 +32,26 @@ module.exports =
 
   post:
     create: (req, res) ->
-      account.authenticate req.token, (account) ->
+      mAccount.authenticate req.token, (account) ->
         unless account
           return res.json 400, error: 'auth_failed'
 
-        data = req.body
-
-        unless /^.+$/.test data.title
+        unless /^.+$/.test req.body.title
           return res.json 400, error: 'invalid_title'
 
-        unless data.type in config.ticket.availableType
+        unless req.body.type in config.ticket.availableType
           return res.json 400, error: 'invalid_type'
 
         createTicket = (members) ->
-          tTicket.createTicket account, data.title, data.content, data.type, members, {}, (ticket) ->
+          mTicket.createTicket account, req.body.title, req.body.content, req.body.type, members, {}, (ticket) ->
             return res.json
-              id: ticket.id()
+              id: ticket._id
 
-        if account.inGroup 'root'
+        if mAccount.inGroup account, 'root'
           tasks = []
 
-          if data.members
-            for memberName in data.members
+          if req.body.members
+            for memberName in req.body.members
               do (memberName = clone(memberName)) ->
                 tasks.push (callback) ->
                   account.byUsernameOrEmail memberName, (member) ->
@@ -67,7 +65,7 @@ module.exports =
               if err
                 return
 
-              unless _.find(result, (item) -> item.id() == account.id())
+              unless _.find(result, (item) -> item._id == account._id)
                 result.push account
 
               createTicket result
@@ -76,18 +74,16 @@ module.exports =
           createTicket [account]
 
     reply: (req, res) ->
-      account.authenticate req.token, (account) ->
+      mAccount.authenticate req.token, (account) ->
         unless account
           return res.json 400, error: 'auth_failed'
 
-        data = req.body
-
-        tTicket.findById data.id, (ticket) ->
+        mTicket.findById req.body.id, (ticket) ->
           checkReplyTo = (callback) ->
-            if data.reply_to
-              tTicket.findOne
-                'replys._id': data.reply_to
-              , (result) ->
+            if req.body.reply_to
+              mTicket.findOne
+                'replys._id': req.body.reply_to
+              , {}, (result) ->
                 if result
                   callback null
                 else
@@ -99,58 +95,57 @@ module.exports =
             if err
               return res.json 400, error: 'reply_not_exist'
 
-            unless ticket.hasMember account
-              unless account.inGroup 'root'
+            unless mTicket.hasMember ticket, account
+              unless mAccount.inGroup account, 'root'
                 return res.json 400, error: 'forbidden'
 
-            ticket.createReply account, data.reply_to, data.content, (reply) ->
+            ticket.createReply ticket, account, req.body.reply_to, req.body.content, (reply) ->
               return res.json
                 id: reply._id
 
     update: (req, res) ->
-      account.authenticate req.token, (account) ->
+      mAccount.authenticate req.token, (account) ->
         unless account
           return res.json 400, error: 'auth_failed'
 
-        data = req.body
         modifier = {}
 
         addToSetModifier = []
         pullModifier = []
 
-        tTicket.findById data.id, (ticket) ->
-          if data.type
-            if data.type in config.ticket.availableType
-              modifier['type'] = data.type
+        mTicket.findId req.body.id, (ticket) ->
+          if req.body.type
+            if req.body.type in config.ticket.availableType
+              modifier['type'] = req.body.type
             else
               return res.json 400, error: 'invalid_type'
 
-          if data.status
-            if account.inGroup 'root'
+          if req.body.status
+            if mAccount.inGroup account, 'root'
               allow_status = ['open', 'pending', 'finish', 'closed']
             else
               allow_status = ['closed']
 
-            if data.status in allow_status
-              if ticket.data.status == data.status
+            if req.body.status in allow_status
+              if ticket.data.status == req.body.status
                 return res.json 400, error: 'already_in_status'
               else
-                modifier['status'] = ticket.data.status
+                modifier['status'] = ticket.status
             else
               return res.json 400, error: 'invalid_status'
 
-          if account.inGroup 'root'
-            if data.attribute
-              unless data.attribute.public == undefined
+          if mAccount.inGroup account, 'root'
+            if req.body.attribute
+              unless req.body.attribute.public == undefined
                 modifier['attribute.public'] = false
               else
                 modifier['attribute.public'] = true
 
-            if data.members
-              for member_id, op of data.members
-                member_id = new ObjectID member_id
+            if req.body.members
+              for member_id, op of req.body.members
+                member_id = db.ObjectID member_id
 
-                if ticket.hasMemberId member_id
+                if mTicket.hasMember ticket, {_id: member_id}
                   unless op
                     pullModifier.push member_id
                 else
@@ -162,7 +157,7 @@ module.exports =
               unless _.isEmpty modifier
                 ticket.update
                   $set: modifier
-                , callback
+                , {}, callback
               else
                 callback()
 
@@ -172,7 +167,7 @@ module.exports =
                   $addToSet:
                     members:
                       $each: addToSetModifier
-                , callback
+                , {}, callback
               else
                 callback()
 
@@ -181,14 +176,8 @@ module.exports =
                 ticket.update
                   $pullAll:
                     members: pullModifier
-                , callback
+                , {}, callback
               else
                 callback()
           ], ->
             return res.json {}
-
-
-
-
-                
-        
