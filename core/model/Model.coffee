@@ -1,5 +1,5 @@
 MongoClient = require('mongodb').MongoClient
-ObjectID = require('mongodb').ObjectID;
+ObjectID = require('mongodb').ObjectID
 _ = require 'underscore'
 db = require '../db'
 

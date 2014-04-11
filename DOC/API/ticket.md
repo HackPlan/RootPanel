@@ -72,3 +72,9 @@ Request:
     }
 
 No Response.
+
+Exception:
+
+* invalid_type
+* already_in_status
+* invalid_status

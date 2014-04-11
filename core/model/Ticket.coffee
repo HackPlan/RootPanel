@@ -47,10 +47,12 @@ module.exports = class Ticket extends Model
     @update
       $push:
         replys: data
-    , ->
+    , =>
       unless @hasMember account
         @addMember account, ->
           callback data
+      else
+        callback data
 
   addMember: (member, callback) ->
     @update
@@ -60,7 +62,13 @@ module.exports = class Ticket extends Model
       callback()
 
   hasMember: (account) ->
-    if account.id() in @data.members
+    if _.find(@data.members, (member) -> member.equals(account.id()))
+      return true
+    else
+      return false
+
+  hasMemberId: (account_id) ->
+    if _.find(@data.members, (member) -> member.equals(account_id))
       return true
     else
       return false
