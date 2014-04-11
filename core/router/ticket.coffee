@@ -4,8 +4,8 @@ ObjectID = require('mongodb').ObjectID
 
 config = require '../config'
 
-Account = require '../model/aAccount'
-Ticket = require '../model/tTicket'
+Account = require '../model/account'
+Ticket = require '../model/ticket'
 
 module.exports =
   get:

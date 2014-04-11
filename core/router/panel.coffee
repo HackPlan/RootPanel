@@ -1,4 +1,4 @@
-Account = require '../model/aAccount'
+Account = require '../model/account'
 
 module.exports =
   get:
