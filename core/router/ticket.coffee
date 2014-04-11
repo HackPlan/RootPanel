@@ -4,17 +4,17 @@ ObjectID = require('mongodb').ObjectID
 
 config = require '../config'
 
-Account = require '../model/Account'
-Ticket = require '../model/Ticket'
+Account = require '../model/aAccount'
+Ticket = require '../model/tTicket'
 
 module.exports =
   get:
     list: (req, res) ->
-      Account.authenticate req.token, (account) ->
+      account.authenticate req.token, (account) ->
         unless account
           return res.redirect '/account/login/'
 
-        Ticket.find
+        tTicket.find
           account_id: account.id()
         , (tickets) ->
           res.render 'ticket/list',
@@ -22,7 +22,7 @@ module.exports =
             tickets: tickets
 
     create: (req, res) ->
-      Account.authenticate req.token, (account) ->
+      account.authenticate req.token, (account) ->
         unless account
           return res.redirect '/account/login/'
 
@@ -32,7 +32,7 @@ module.exports =
 
   post:
     create: (req, res) ->
-      Account.authenticate req.token, (account) ->
+      account.authenticate req.token, (account) ->
         unless account
           return res.json 400, error: 'auth_failed'
 
@@ -45,7 +45,7 @@ module.exports =
           return res.json 400, error: 'invalid_type'
 
         createTicket = (members) ->
-          Ticket.createTicket account, data.title, data.content, data.type, members, {}, (ticket) ->
+          tTicket.createTicket account, data.title, data.content, data.type, members, {}, (ticket) ->
             return res.json
               id: ticket.id()
 
@@ -56,7 +56,7 @@ module.exports =
             for memberName in data.members
               do (memberName = clone(memberName)) ->
                 tasks.push (callback) ->
-                  Account.byUsernameOrEmail memberName, (member) ->
+                  account.byUsernameOrEmail memberName, (member) ->
                     unless member
                       res.json 400, error: 'invalid_account', username: memberName
                       callback true
@@ -76,16 +76,16 @@ module.exports =
           createTicket [account]
 
     reply: (req, res) ->
-      Account.authenticate req.token, (account) ->
+      account.authenticate req.token, (account) ->
         unless account
           return res.json 400, error: 'auth_failed'
 
         data = req.body
 
-        Ticket.findById data.id, (ticket) ->
+        tTicket.findById data.id, (ticket) ->
           checkReplyTo = (callback) ->
             if data.reply_to
-              Ticket.findOne
+              tTicket.findOne
                 'replys._id': data.reply_to
               , (result) ->
                 if result
@@ -108,7 +108,7 @@ module.exports =
                 id: reply._id
 
     update: (req, res) ->
-      Account.authenticate req.token, (account) ->
+      account.authenticate req.token, (account) ->
         unless account
           return res.json 400, error: 'auth_failed'
 
@@ -118,7 +118,7 @@ module.exports =
         addToSetModifier = []
         pullModifier = []
 
-        Ticket.findById data.id, (ticket) ->
+        tTicket.findById data.id, (ticket) ->
           if data.type
             if data.type in config.ticket.availableType
               modifier['type'] = data.type

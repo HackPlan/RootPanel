@@ -59,3 +59,12 @@ exports.buildModel = (that, mongo) ->
     mongo.remove selector, options, (err, result) ->
       throw err if err
       callback result if callback
+
+exports.buildByXXOO = (xxoo, mongo) ->
+  return (value, callback) ->
+    selector = {}
+    selector[xxoo] = value
+
+    mongo.findOne selector, (err, result) ->
+      throw err if err
+      callback result

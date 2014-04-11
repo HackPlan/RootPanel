@@ -1,4 +1,4 @@
-Account = require '../model/Account'
+Account = require '../model/aAccount'
 
 module.exports =
   get:
@@ -6,7 +6,7 @@ module.exports =
       res.redirect '/panel/'
 
     '/panel/': (req, res) ->
-      Account.authenticate req.token, (account) ->
+      account.authenticate req.token, (account) ->
         unless account
           return res.redirect '/account/login/'
 

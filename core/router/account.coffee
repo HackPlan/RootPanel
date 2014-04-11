@@ -1,16 +1,16 @@
 config = require '../config'
 
-Account = require '../model/Account'
+Account = require '../model/aAccount'
 
 module.exports =
   get:
     signup: (req, res) ->
-      Account.authenticate req.token, (account) ->
+      account.authenticate req.token, (account) ->
         res.render 'signup',
           account: account
 
     login: (req, res) ->
-      Account.authenticate req.token, (account) ->
+      account.authenticate req.token, (account) ->
         res.render 'login',
           account: account
 
@@ -27,15 +27,15 @@ module.exports =
       unless data.passwd or not /^.+$/.test data.passwd
         return res.json 400, error: 'invalid_passwd'
 
-      Account.byUsername data.username, (account) ->
+      account.byUsername data.username, (account) ->
         if account
           return res.json 400, error: 'username_exist'
 
-        Account.byEmail data.email, (account) ->
+        account.byEmail data.email, (account) ->
           if account
             return res.json 400, error: 'email_exist'
 
-          Account.register data.username, data.email, data.passwd, (account) ->
+          account.register data.username, data.email, data.passwd, (account) ->
             account.createToken {}, (token)->
               res.cookie 'token', token,
                 expires: new Date(Date.now() + config.account.cookieTime)
@@ -46,7 +46,7 @@ module.exports =
     login: (req, res) ->
       data = req.body
 
-      Account.byUsernameOrEmail data.username, (account) ->
+      account.byUsernameOrEmail data.username, (account) ->
         unless account
           return res.json 400, error: 'auth_failed'
 
@@ -62,7 +62,7 @@ module.exports =
             token: token
 
     logout: (req, res) ->
-      Account.authenticate req.token, (account) ->
+      account.authenticate req.token, (account) ->
         unless account
           return res.json 400, error: 'auth_failed'
 
