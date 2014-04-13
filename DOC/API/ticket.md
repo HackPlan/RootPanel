@@ -45,6 +45,7 @@ Response:
 
 Exception:
 
+* ticket_not_exist
 * reply_not_exist
 * forbidden
 

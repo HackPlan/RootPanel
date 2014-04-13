@@ -78,7 +78,10 @@ module.exports =
         unless account
           return res.json 400, error: 'auth_failed'
 
-        mTicket.findById req.body.id, (ticket) ->
+        mTicket.findId req.body.id, (ticket) ->
+          unless ticket
+            return res.json 400, error: 'ticket_not_exist'
+
           checkReplyTo = (callback) ->
             if req.body.reply_to
               mTicket.findOne
@@ -99,7 +102,7 @@ module.exports =
               unless mAccount.inGroup account, 'root'
                 return res.json 400, error: 'forbidden'
 
-            ticket.createReply ticket, account, req.body.reply_to, req.body.content, (reply) ->
+            mTicket.createReply ticket, account, req.body.reply_to, req.body.content, (reply) ->
               return res.json
                 id: reply._id
 

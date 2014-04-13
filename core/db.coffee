@@ -35,7 +35,7 @@ exports.buildModel = (that, mongo) ->
 
   that.findId = (id, callback) ->
     if _.isString id
-      id = exports.newID id
+      id = exports.ObjectID id
 
     mongo.findOne
       _id: id

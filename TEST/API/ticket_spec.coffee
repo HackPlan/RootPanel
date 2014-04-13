@@ -39,3 +39,12 @@ frisby.create '/ticket/create/'
   .expectJSONTypes
     id: String
   .toss()
+
+frisby.create '/ticket/reply/'
+  .post "#{baseUrl}/ticket/reply/",
+    id: '533b0cb894f6c673123e33a4'
+    content: 'Reply Content(Markdown)'
+  .expectStatus 200
+  .expectJSONTypes
+    id: String
+  .toss()

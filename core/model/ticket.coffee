@@ -30,21 +30,21 @@ exports.createTicket = (account, title, content, type, members, attribute, callb
 
 exports.createReply = (ticket, account, reply_to, content, callback) ->
   if reply_to and _.isString reply_to
-    reply_to = new ObjectID reply_to
+    reply_to = new db.ObjectID reply_to
 
   unless reply_to
     reply_to = null
 
   data =
-    _id: new ObjectID()
+    _id: db.ObjectID()
     reply_to: reply_to
-    account_id: account.id()
+    account_id: account._id
     created_at: new Date()
     content: content
     content_html: markdown.toHTML content
     attribute: {}
 
-  exports.update
+  exports.update _id: ticket._id,
     $push:
       replys: data
   , ->
