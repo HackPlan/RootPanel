@@ -2,13 +2,19 @@ markdown = require('markdown').markdown
 ObjectID = require('mongodb').ObjectID
 _ = require 'underscore'
 
+db = require '../db'
+
+cTicket = db.collection 'tickets'
+
+db.buildModel module.exports, cTicket
+
 exports.createTicket = (account, title, content, type, members, attribute, callback) ->
   membersID = []
   for member in members
     membersID.push member._id
 
   exports.insert
-    account_id: account.id()
+    account_id: account._id
     created_at: new Date()
     updated_at: new Date()
     title: title

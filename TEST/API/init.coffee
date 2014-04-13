@@ -26,7 +26,7 @@ module.exports = (callback) ->
         email: 'test_main@jysperm.me'
         singup_at: new Date()
 
-        group: []
+        group: ['root']
         setting: {}
         attribute: {}
 

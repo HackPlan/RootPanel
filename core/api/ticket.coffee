@@ -54,21 +54,21 @@ module.exports =
             for memberName in req.body.members
               do (memberName = _.clone(memberName)) ->
                 tasks.push (callback) ->
-                  account.byUsernameOrEmail memberName, (member) ->
+                  mAccount.byUsernameOrEmail memberName, (member) ->
                     unless member
                       res.json 400, error: 'invalid_account', username: memberName
                       callback true
 
                     callback null, member
 
-            async.parallel tasks, (err, result) ->
-              if err
-                return
+          async.parallel tasks, (err, result) ->
+            if err
+              return
 
-              unless _.find(result, (item) -> item._id == account._id)
-                result.push account
+            unless _.find(result, (item) -> item._id == account._id)
+              result.push account
 
-              createTicket result
+            createTicket result
 
         else
           createTicket [account]
