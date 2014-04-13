@@ -50,7 +50,7 @@ exports.buildModel = (that, mongo) ->
 
   that.insert = (data, options, callback = null) ->
     mongo.insert data, options, (err, result) ->
-      if _.isArray result
+      if _.isArray data
         callback result
       else
         callback result[0]

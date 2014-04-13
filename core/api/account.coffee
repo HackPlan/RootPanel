@@ -39,7 +39,7 @@ module.exports =
                 expires: new Date(Date.now() + config.account.cookie_time)
 
               return res.json
-                id: account.data._id
+                id: account._id
 
     login: (req, res) ->
       mAccount.byUsernameOrEmail req.body.username, (account) ->
@@ -54,7 +54,7 @@ module.exports =
             expires: new Date(Date.now() + config.account.cookie_time)
 
           return res.json
-            id: account.data._id
+            id: account._id
             token: token
 
     logout: (req, res) ->
