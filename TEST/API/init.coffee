@@ -30,13 +30,23 @@ module.exports = (callback) ->
         setting: {}
         attribute: {}
 
-        token: [
-          token: 'token'
-          available: true
-          created_at: new Date()
-          updated_at: new Date()
+        tokens: [
+          {
+            token: 'token'
+            available: true
+            created_at: new Date()
+            updated_at: new Date()
 
-          attribute: {}
+            attribute: {}
+          },
+          {
+            token: 'need_be_remove'
+            available: true
+            created_at: new Date()
+            updated_at: new Date()
+
+            attribute: {}
+          }
         ]
       , callback
 
