@@ -130,7 +130,7 @@ module.exports =
               allow_status = ['closed']
 
             if req.body.status in allow_status
-              if ticket.data.status == req.body.status
+              if ticket.status == req.body.status
                 return res.json 400, error: 'already_in_status'
               else
                 modifier['status'] = ticket.status
@@ -139,10 +139,10 @@ module.exports =
 
           if mAccount.inGroup account, 'root'
             if req.body.attribute
-              unless req.body.attribute.public == undefined
-                modifier['attribute.public'] = false
-              else
+              if req.body.attribute.public
                 modifier['attribute.public'] = true
+              else
+                modifier['attribute.public'] = false
 
             if req.body.members
               for member_id, op of req.body.members
@@ -158,7 +158,7 @@ module.exports =
           async.parallel [
             (callback) ->
               unless _.isEmpty modifier
-                ticket.update
+                mTicket.update _id: ticket._id,
                   $set: modifier
                 , {}, callback
               else
@@ -166,7 +166,7 @@ module.exports =
 
             (callback) ->
               unless _.isEmpty addToSetModifier
-                ticket.update
+                mTicket.update _id: ticket._id,
                   $addToSet:
                     members:
                       $each: addToSetModifier
@@ -176,7 +176,7 @@ module.exports =
 
             (callback) ->
               unless _.isEmpty pullModifier
-                ticket.update
+                mTicket.update _id: ticket._id,
                   $pullAll:
                     members: pullModifier
                 , {}, callback

@@ -48,3 +48,19 @@ frisby.create '/ticket/reply/'
   .expectJSONTypes
     id: String
   .toss()
+
+frisby.create '/ticket/update/'
+  .post "#{baseUrl}/ticket/update/",
+    id: '533b0cb894f6c673123e33a4'
+    type: 'nodejs'
+    status: 'closed'
+  .expectStatus 200
+  .toss()
+
+frisby.create '/ticket/update/'
+  .post "#{baseUrl}/ticket/update/",
+    id: '533b0cb894f6c673123e33a4'
+    attribute:
+      public: true
+  .expectStatus 200
+  .toss()
