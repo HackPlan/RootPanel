@@ -1,22 +1,28 @@
 {
   "name": "RootPanel",
-  "description": "A pluggable Linux virtual host selling system.",
   "version": "3.0.0",
+  "description": "A pluggable Linux virtual host selling system.",
+  "homepage": "http://rpvhost.net",
+  "license": "GPL-3.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jybox/RootPanel"
+    "url": "https://github.com/jysperm/RootPanel.git"
   },
   "contributors": [
     {
       "name": "jysperm",
       "email": "jysperm@gmail.com",
-      "web": "http://jysperm.me/"
+      "url": "http://jysperm.me/"
+    },
+    {
+      "name": "yudong",
+      "email": "liyudonog1992@gmail.com",
+      "url": "feicunyue.com"
     }
   ],
   "scripts": {
     "start": "node app.js"
   },
-  "license": "GPLv3",
   "dependencies": {
     "express": "*",
     "jade": "*",
@@ -25,10 +31,12 @@
     "coffee-script": "*",
     "mongodb": "*",
     "underscore": "*",
+    "jasmine-node": "~1.14.3",
+    "pm2": "*",
     "markdown": "*",
-    "clone": "*",
+    "frisby": "*",
     "async": "*",
-    "clone": "*"
+    "connect": "*"
   },
   "devDependencies": {
     "gulp": "~3.5.6",

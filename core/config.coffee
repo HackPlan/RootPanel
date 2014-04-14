@@ -3,7 +3,7 @@ module.exports =
     port: 3000
 
   account:
-    cookieTime: 30 * 24 * 3600 * 1000
+    cookie_time: 30 * 24 * 3600 * 1000
 
   i18n:
     defaultLanguage: 'zh_CN'

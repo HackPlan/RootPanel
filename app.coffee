@@ -1,1 +1,3 @@
-require './core'
+core = require './core'
+
+core.runWebServer()

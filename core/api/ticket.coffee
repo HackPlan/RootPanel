@@ -1,28 +1,28 @@
 async = require 'async'
-clone = require 'clone'
-ObjectID = require('mongodb').ObjectID
+_ = require 'underscore'
 
+db = require '../db'
 config = require '../config'
 
-Account = require '../model/Account'
-Ticket = require '../model/Ticket'
+mAccount = require '../model/account'
+mTicket = require '../model/ticket'
 
 module.exports =
   get:
     list: (req, res) ->
-      Account.authenticate req.token, (account) ->
+      mAccount.authenticate req.token, (account) ->
         unless account
           return res.redirect '/account/login/'
 
-        Ticket.find
-          account_id: account.id()
-        , (tickets) ->
+        mTicket.find
+          account_id: account._id
+        , {}, (tickets) ->
           res.render 'ticket/list',
             account: account
             tickets: tickets
 
     create: (req, res) ->
-      Account.authenticate req.token, (account) ->
+      mAccount.authenticate req.token, (account) ->
         unless account
           return res.redirect '/account/login/'
 
@@ -32,62 +32,61 @@ module.exports =
 
   post:
     create: (req, res) ->
-      Account.authenticate req.token, (account) ->
+      mAccount.authenticate req.token, (account) ->
         unless account
           return res.json 400, error: 'auth_failed'
 
-        data = req.body
-
-        unless /^.+$/.test data.title
+        unless /^.+$/.test req.body.title
           return res.json 400, error: 'invalid_title'
 
-        unless data.type in config.ticket.availableType
+        unless req.body.type in config.ticket.availableType
           return res.json 400, error: 'invalid_type'
 
         createTicket = (members) ->
-          Ticket.createTicket account, data.title, data.content, data.type, members, {}, (ticket) ->
+          mTicket.createTicket account, req.body.title, req.body.content, req.body.type, members, {}, (ticket) ->
             return res.json
-              id: ticket.id()
+              id: ticket._id
 
-        if account.inGroup 'root'
+        if mAccount.inGroup account, 'root'
           tasks = []
 
-          if data.members
-            for memberName in data.members
-              do (memberName = clone(memberName)) ->
+          if req.body.members
+            for memberName in req.body.members
+              do (memberName = _.clone(memberName)) ->
                 tasks.push (callback) ->
-                  Account.byUsernameOrEmail memberName, (member) ->
+                  mAccount.byUsernameOrEmail memberName, (member) ->
                     unless member
                       res.json 400, error: 'invalid_account', username: memberName
                       callback true
 
                     callback null, member
 
-            async.parallel tasks, (err, result) ->
-              if err
-                return
+          async.parallel tasks, (err, result) ->
+            if err
+              return
 
-              unless _.find(result, (item) -> item.id() == account.id())
-                result.push account
+            unless _.find(result, (item) -> item._id == account._id)
+              result.push account
 
-              createTicket result
+            createTicket result
 
         else
           createTicket [account]
 
     reply: (req, res) ->
-      Account.authenticate req.token, (account) ->
+      mAccount.authenticate req.token, (account) ->
         unless account
           return res.json 400, error: 'auth_failed'
 
-        data = req.body
+        mTicket.findId req.body.id, (ticket) ->
+          unless ticket
+            return res.json 400, error: 'ticket_not_exist'
 
-        Ticket.findById data.id, (ticket) ->
           checkReplyTo = (callback) ->
-            if data.reply_to
-              Ticket.findOne
-                'replys._id': data.reply_to
-              , (result) ->
+            if req.body.reply_to
+              mTicket.findOne
+                'replys._id': req.body.reply_to
+              , {}, (result) ->
                 if result
                   callback null
                 else
@@ -99,58 +98,57 @@ module.exports =
             if err
               return res.json 400, error: 'reply_not_exist'
 
-            unless ticket.hasMember account
-              unless account.inGroup 'root'
+            unless mTicket.hasMember ticket, account
+              unless mAccount.inGroup account, 'root'
                 return res.json 400, error: 'forbidden'
 
-            ticket.createReply account, data.reply_to, data.content, (reply) ->
+            mTicket.createReply ticket, account, req.body.reply_to, req.body.content, (reply) ->
               return res.json
                 id: reply._id
 
     update: (req, res) ->
-      Account.authenticate req.token, (account) ->
+      mAccount.authenticate req.token, (account) ->
         unless account
           return res.json 400, error: 'auth_failed'
 
-        data = req.body
         modifier = {}
 
         addToSetModifier = []
         pullModifier = []
 
-        Ticket.findById data.id, (ticket) ->
-          if data.type
-            if data.type in config.ticket.availableType
-              modifier['type'] = data.type
+        mTicket.findId req.body.id, (ticket) ->
+          if req.body.type
+            if req.body.type in config.ticket.availableType
+              modifier['type'] = req.body.type
             else
               return res.json 400, error: 'invalid_type'
 
-          if data.status
-            if account.inGroup 'root'
+          if req.body.status
+            if mAccount.inGroup account, 'root'
               allow_status = ['open', 'pending', 'finish', 'closed']
             else
               allow_status = ['closed']
 
-            if data.status in allow_status
-              if ticket.data.status == data.status
+            if req.body.status in allow_status
+              if ticket.status == req.body.status
                 return res.json 400, error: 'already_in_status'
               else
-                modifier['status'] = ticket.data.status
+                modifier['status'] = ticket.status
             else
               return res.json 400, error: 'invalid_status'
 
-          if account.inGroup 'root'
-            if data.attribute
-              unless data.attribute.public == undefined
-                modifier['attribute.public'] = false
-              else
+          if mAccount.inGroup account, 'root'
+            if req.body.attribute
+              if req.body.attribute.public
                 modifier['attribute.public'] = true
+              else
+                modifier['attribute.public'] = false
 
-            if data.members
-              for member_id, op of data.members
-                member_id = new ObjectID member_id
+            if req.body.members
+              for member_id, op of req.body.members
+                member_id = db.ObjectID member_id
 
-                if ticket.hasMemberId member_id
+                if mTicket.hasMember ticket, {_id: member_id}
                   unless op
                     pullModifier.push member_id
                 else
@@ -160,35 +158,29 @@ module.exports =
           async.parallel [
             (callback) ->
               unless _.isEmpty modifier
-                ticket.update
+                mTicket.update _id: ticket._id,
                   $set: modifier
-                , callback
+                , {}, callback
               else
                 callback()
 
             (callback) ->
               unless _.isEmpty addToSetModifier
-                ticket.update
+                mTicket.update _id: ticket._id,
                   $addToSet:
                     members:
                       $each: addToSetModifier
-                , callback
+                , {}, callback
               else
                 callback()
 
             (callback) ->
               unless _.isEmpty pullModifier
-                ticket.update
+                mTicket.update _id: ticket._id,
                   $pullAll:
                     members: pullModifier
-                , callback
+                , {}, callback
               else
                 callback()
           ], ->
             return res.json {}
-
-
-
-
-                
-        

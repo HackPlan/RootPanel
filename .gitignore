@@ -4,3 +4,5 @@ node_modules
 *.css
 /.DS_Store
 /config.codekit
+
+/reports/*
