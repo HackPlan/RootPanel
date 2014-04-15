@@ -36,6 +36,12 @@ module.exports =
           return res.redirect '/account/login/'
 
         mTicket.findId req.body.id, (ticket) ->
+          unless ticket
+            return res.send 404
+
+          unless mTicket.hasMember ticket, account
+            return res.send 403
+
           res.render 'ticket/view',
             account: account
             ticket: ticket
