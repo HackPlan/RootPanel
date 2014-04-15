@@ -8,8 +8,15 @@ exports.bind = (app) ->
       else
         return "/#{item}/#{name}/"
 
+    buildGetController = (controller) ->
+      return (req, res) ->
+        if req.method == 'GET'
+          req.body = req.query
+
+        return controller req, res
+
     for name, controller of apiModule.get
-      app.get generateUrl(name), controller
+      app.get generateUrl(name), buildGetController controller
 
     for name, controller of apiModule.post
       app.post generateUrl(name), controller

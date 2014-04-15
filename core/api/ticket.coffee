@@ -30,6 +30,16 @@ module.exports =
           account: account
           ticketTypes: config.ticket.availableType
 
+    view: (req, res) ->
+      mAccount.authenticate req.token, (account) ->
+        unless account
+          return res.redirect '/account/login/'
+
+        mTicket.findId req.body.id, (ticket) ->
+          res.render 'ticket/view',
+            account: account
+            ticket: ticket
+
   post:
     create: (req, res) ->
       mAccount.authenticate req.token, (account) ->

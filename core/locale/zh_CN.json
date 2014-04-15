@@ -17,7 +17,9 @@
     "type": "类型",
     "title": "标题",
     "status": "状态",
-    "create": "创建"
+    "create": "创建",
+    "reply": "回复",
+    "create_reply": "创建回复"
   },
   "view": {
     "signup": {
