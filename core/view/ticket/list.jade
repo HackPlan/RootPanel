@@ -14,10 +14,11 @@ block main
         th= t('word.status')
     tbody
       for ticket in tickets
-        tr(data-id= ticket.data._id)
-          td= ticket.data.type
-          td= ticket.data.title
-          td= ticket.data.status
+        tr(data-id= ticket._id)
+          td= ticket.type
+          td
+            a(href='/ticket/view/?id=#{ticket._id}')= ticket.title
+          td= ticket.status
 
 prepend sidebar
   .row
