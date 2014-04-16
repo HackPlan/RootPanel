@@ -6,12 +6,12 @@ module.exports =
   get:
     signup: (req, res) ->
       mAccount.authenticate req.token, (account) ->
-        res.render 'signup',
+        res.render 'account/signup',
           account: account
 
     login: (req, res) ->
       mAccount.authenticate req.token, (account) ->
-        res.render 'login',
+        res.render 'account/login',
           account: account
 
   post:
