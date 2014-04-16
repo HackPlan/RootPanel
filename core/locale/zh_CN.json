@@ -19,7 +19,8 @@
     "status": "状态",
     "create": "创建",
     "reply": "回复",
-    "create_reply": "创建回复"
+    "create_reply": "创建回复",
+    "adminPanel": "管理员面板"
   },
   "view": {
     "signup": {

@@ -1,0 +1,21 @@
+extends ../layout
+
+prepend head
+  title #{t("word.adminPanel")} | #{t('app.name')}
+
+block main
+  header= t('word.adminPanel')
+  table.table.table-hover
+    thead
+      tr
+        th= t('word.username')
+        th= t('word.email')
+    tbody
+      for account in accounts
+        tr
+          td= account.username
+          td= account.email
+
+prepend sidebar
+  .row
+    a.btn.btn-lg.btn-success(href='/admin/ticket/')= t('view.ticket.list.title')
