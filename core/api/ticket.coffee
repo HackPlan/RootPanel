@@ -39,8 +39,9 @@ module.exports =
           unless ticket
             return res.send 404
 
-          unless mTicket.hasMember ticket, account
-            return res.send 403
+          unless mAccount.inGroup account, 'root'
+            unless mTicket.hasMember ticket, account
+              return res.send 403
 
           res.render 'ticket/view',
             account: account
