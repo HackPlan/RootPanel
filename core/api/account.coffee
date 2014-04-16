@@ -34,7 +34,7 @@ module.exports =
             return res.json 400, error: 'email_exist'
 
           mAccount.register req.body.username, req.body.email, req.body.passwd, (account) ->
-            mAccount.createToken {}, (token)->
+            mAccount.createToken account, {}, (token)->
               res.cookie 'token', token,
                 expires: new Date(Date.now() + config.account.cookie_time)
 
@@ -49,7 +49,7 @@ module.exports =
         unless mAccount.matchPasswd account, req.body.passwd
           return res.json 400, error: 'auth_failed'
 
-        mAccount.createToken {}, (token) ->
+        mAccount.createToken account, {}, (token) ->
           res.cookie 'token', token,
             expires: new Date(Date.now() + config.account.cookie_time)
 

@@ -11,6 +11,7 @@ exports.register = (username, email, passwd, callback = null) ->
   passwd_salt = auth.randomSalt()
 
   exports.insert
+    _id: db.ObjectID()
     username: username
     passwd: auth.hashPasswd(passwd, passwd_salt)
     passwd_salt: passwd_salt
@@ -24,7 +25,7 @@ exports.register = (username, email, passwd, callback = null) ->
     callback(result) if callback
 
 # @param callback(token)
-exports.createToken = (attribute, callback) ->
+exports.createToken = (account, attribute, callback) ->
   # @param callback(token)
   generateToken = (callback) ->
     token = auth.randomSalt()
@@ -38,7 +39,7 @@ exports.createToken = (attribute, callback) ->
         callback token
 
   generateToken (token) ->
-    exports.update
+    exports.update _id: account._id,
       $push:
         tokens:
           token: token
