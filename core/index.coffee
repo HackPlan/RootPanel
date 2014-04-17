@@ -1,5 +1,4 @@
 express = require 'express'
-i18next = require 'i18next'
 connect = require 'connect'
 path = require 'path'
 fs = require 'fs'
@@ -7,17 +6,18 @@ fs = require 'fs'
 config = require './config'
 api = require './api'
 db = require './db'
+i18n = require './i18n'
 
 exports.runWebServer = ->
   db.connect ->
     app = express()
 
-    i18next.init
-      fallbackLng: config.i18n.defaultLanguage
-      resGetPath: path.join(__dirname, 'locale/__lng__.json')
+    i18n.init
+      default_language: 'zh_CN'
+      available_language: ['zh_CN']
 
-    i18next.registerAppHelper app
-    app.use i18next.handle
+    i18n.load path.join(__dirname, 'locale')
+
     app.use connect.json()
     app.use connect.urlencoded()
     app.use connect.cookieParser()
@@ -43,6 +43,7 @@ exports.runWebServer = ->
 
     app.use (req, res, next) ->
       res.locals.app = app
+      res.locals.t = i18n.getTranslator 'zh_CN'
 
       next()
 
