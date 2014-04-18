@@ -1,7 +1,6 @@
 var gulp = require('gulp');
 var less = require('gulp-less');
 var coffee = require('gulp-coffee');
-var uglify = require('gulp-uglify');
 
 gulp.task('less', function() {
   gulp.src(['./**/*.less', '!node_modules/**/*.less'])
@@ -11,7 +10,7 @@ gulp.task('less', function() {
 
 gulp.task('coffee', function() {
   gulp.src(['./**/*.coffee', '!node_modules/**/*.coffee'])
-      .pipe(coffee({bare:true}))
+      .pipe(coffee({bare: true}))
       .on('error', function(err) {
         throw err;
       })
