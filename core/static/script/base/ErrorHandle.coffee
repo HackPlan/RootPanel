@@ -4,7 +4,7 @@ $ ->
 			$('#page-alert').append "<p>#{error}</p>"
 
 		clearError: ->
-			$('#page-alert').find('button').nextAll().remove()
+			$('#page-alert').empty()
 
 		showError: ->
 			$('#page-alert').show()
