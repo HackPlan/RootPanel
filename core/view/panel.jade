@@ -1,7 +1,7 @@
 extends layout
 
 prepend head
-  title #{t('word.panel')} | #{t('app.name')}
+  title #{t('panel.panel')} | #{t('app.name')}
 
 append head
   link(rel='stylesheet', href='/style/panel/panel.css')
@@ -14,11 +14,11 @@ block content
           li.active
             a(href='/panel/')
               span.glyphicon.pull-right.glyphicon-home
-              | #{t('word.panel')}
+              | #{t('panel.')}
           li
             a(href='/ticket/list/')
               span.glyphicon.pull-right.glyphicon-edit
-              | #{t('word.ticket')}
+              | #{t('ticket.')}
       
       .col-md-9
         h2 Panel

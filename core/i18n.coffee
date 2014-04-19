@@ -21,7 +21,7 @@ exports.translate = (name, lang) ->
   result = data[lang][names.shift()]
 
   for item in names
-    if result[item]
+    if result and result[item]
       result = result[item]
     else
       return name

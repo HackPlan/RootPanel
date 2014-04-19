@@ -11,7 +11,7 @@ html
         nav.navbar.navbar-default.navbar-inverse(role='navigation')
           .navbar-header
             button.navbar-toggle(type='button', data-toggle='collapse', data-target='#navbar-collapse')
-              span.sr-only Toggle navigation
+              span.sr-only= t('view.layout.navigation')
               span.icon-bar
               span.icon-bar
               span.icon-bar
@@ -25,20 +25,20 @@ html
                 li
                   a= account.username
                 li
-                  a(href='/panel/')= t('word.panel')
+                  a(href='/panel/')= t('panel.')
                 li
-                  a#logout(href='/account/logout/')= t('word.logout')
+                  a#logout(href='/account/logout/')= t('account.logout')
               else
                 li
-                  a(href='/account/signup/')= t('word.signup')
+                  a(href='/account/signup/')= t('account.signup')
                 li
-                  a(href='/account/login/')= t('word.login')
+                  a(href='/account/login/')= t('account.login')
 
     block content
       #content.container
         .row
           .col-md-9
-            .alert.alert-danger#page-alert
+            #page-alert.alert.alert-danger
             block main
 
           #sidebar.col-md-3

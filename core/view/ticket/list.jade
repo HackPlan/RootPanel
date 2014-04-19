@@ -1,17 +1,17 @@
 extends ../layout
 
 prepend head
-  title #{t('view.ticket.list.title')} | #{t('app.name')}
+  title #{t('ticket.ticket_list')} | #{t('app.name')}
 
 block main
-  header= t('view.ticket.list.title')
+  header= t('ticket.ticket_list')
 
   table.table.table-hover
     thead
       tr
-        th= t('word.type')
-        th= t('word.title')
-        th= t('word.status')
+        th= t('ticket.type')
+        th= t('ticket.title')
+        th= t('ticket.status')
     tbody
       for ticket in tickets
         tr(data-id= ticket._id)
@@ -22,4 +22,4 @@ block main
 
 prepend sidebar
   .row
-    a.btn.btn-lg.btn-success(href='/ticket/create/')= t('view.ticket.word.create')
+    a.btn.btn-lg.btn-success(href='/ticket/create/')= t('ticket.create_reply')

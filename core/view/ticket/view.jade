@@ -10,7 +10,7 @@ block main
     p!= ticket.content_html
 
   .row
-    header= t('word.reply')
+    header= t('ticket.replies')
     ul.list-group
       for reply in ticket.replys
         li.list-group-item
@@ -25,8 +25,8 @@ block main
       .form-group.contentarea
         textarea#contetn.form-control(name='content', rows='5', required)
       .form-group
-        button.btn.btn-lg.btn-primary(type='submit')= t('word.create_reply')
+        button.btn.btn-lg.btn-primary(type='submit')= t('ticket.create_reply')
 
 prepend sidebar
   .row
-    a.btn.btn-lg.btn-success(href='/ticket/list/')= t('view.ticket.list.title')
+    a.btn.btn-lg.btn-success(href='/ticket/list/')= t('ticket.ticket_list')

@@ -3,41 +3,44 @@
     "name": "RootPanel",
     "description": "一个插件化的 Linux 虚拟主机管理系统。"
   },
-  "word": {
-    "account": "帐号",
+  "common": {
+    "error": "错误"
+  },
+  "account": {
+    "": "帐号",
     "signup": "注册",
     "login": "登录",
     "username": "用户名",
     "email": "邮箱",
     "passwd": "密码",
-    "error": "错误",
-    "logout": "注销",
-    "panel": "管理面板",
-    "ticket": "工单",
+    "logout": "注销"
+  },
+  "panel": {
+    "": "管理面板"
+  },
+  "ticket": {
+    "": "工单",
     "type": "类型",
     "title": "标题",
     "status": "状态",
     "create": "创建",
     "reply": "回复",
+    "replies": "全部回复",
+    "create_ticket": "创建工单",
     "create_reply": "创建回复",
-    "adminPanel": "管理员面板"
+    "ticket_list": "工单列表"
+  },
+  "admin": {
+    "admin_panel": "管理员面板"
   },
   "view": {
-    "signup": {
+    "layout": {
+      "navigation": "展开导航"
+    },
+    "account": {
       "passwd2": "重复",
-      "alreadySignup": "已有帐号？"
-    },
-    "login": {
-      "noAccount": "还没有账户？"
-    },
-    "ticket": {
-      "word": {
-        "create": "创建工单"
-      },
-
-      "list": {
-        "title": "工单列表"
-      }
+      "already_signup": "已有帐号？",
+      "no_account": "还没有账户？"
     }
   }
 }

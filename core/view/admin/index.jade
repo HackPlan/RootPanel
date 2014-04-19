@@ -1,15 +1,15 @@
 extends ../layout
 
 prepend head
-  title #{t("word.adminPanel")} | #{t('app.name')}
+  title #{t('admin.admin_panel')} | #{t('app.name')}
 
 block main
-  header= t('word.adminPanel')
+  header= t('admin.admin_panel')
   table.table.table-hover
     thead
       tr
-        th= t('word.username')
-        th= t('word.email')
+        th= t('account.username')
+        th= t('account.email')
     tbody
       for account in accounts
         tr
@@ -18,4 +18,4 @@ block main
 
 prepend sidebar
   .row
-    a.btn.btn-lg.btn-success(href='/admin/ticket/')= t('view.ticket.list.title')
+    a.btn.btn-lg.btn-success(href='/admin/ticket/')= t('ticket.ticket_list')

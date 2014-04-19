@@ -1,35 +1,35 @@
 extends ../layout
 
 prepend head
-  title #{t("word.signup")} | #{t('app.name')}
+  title #{t('account.signup')} | #{t('app.name')}
 
 block main
-  header= t('word.signup')
+  header= t('account.signup')
   form.form-horizontal.signup-form(method='post', role='form')
     .form-group
-      label.col-sm-2.col-md-offset-1.control-label(for='username')= t('word.username')
+      label.col-sm-2.col-md-offset-1.control-label(for='username')= t('account.username')
       .col-sm-5
-        input#username.form-control(type='text', name='username', required, value=username)
+        input#username.form-control(type='text', name='username', required)
     .form-group
-      label.col-sm-2.col-md-offset-1.control-label(for='email')= t('word.email')
+      label.col-sm-2.col-md-offset-1.control-label(for='email')= t('account.email')
       .col-sm-5
-        input#email.form-control(type='email', name='email', required, value=email)
+        input#email.form-control(type='email', name='email', required)
     .form-group
-      label.col-sm-2.col-md-offset-1.control-label(for='passwd')= t('word.passwd')
+      label.col-sm-2.col-md-offset-1.control-label(for='passwd')= t('account.passwd')
       .col-sm-5
         input#passwd.form-control(type='password', name='passwd', required)
     .form-group
-      label.col-sm-2.col-md-offset-1.control-label(for='passwd2')= t('view.signup.passwd2')
+      label.col-sm-2.col-md-offset-1.control-label(for='passwd2')= t('view.account.passwd2')
       .col-sm-5
         input#passwd2.form-control(type='password', name='passwd2', required)
     .form-group
       .col-sm-offset-3
-        button.signup-btn.btn.btn-lg.btn-primary(type='submit')= t('word.signup')
+        button.signup-btn.btn.btn-lg.btn-primary(type='submit')= t('account.signup')
 
 prepend sidebar
   .row
-    header= t('view.signup.alreadySignup')
-    a.btn.btn-lg.btn-success(href='/account/login/')= t('word.login')
+    header= t('view.account.already_signup')
+    a.btn.btn-lg.btn-success(href='/account/login/')= t('account.login')
 
 append footer
   script(src='/script/account/signup.js')
