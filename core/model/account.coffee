@@ -60,7 +60,7 @@ exports.removeToken = (token, callback = null) ->
 
 exports.authenticate = (token, callback) ->
   unless token
-    callback null
+    return callback null
 
   exports.findOne
     'tokens.token': token
