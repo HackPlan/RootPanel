@@ -40,7 +40,7 @@ module.exports =
             return res.send 404
 
           unless mAccount.inGroup account, 'root'
-            unless mTicket.hasMember ticket, account
+            unless mTicket.getMember ticket, account
               return res.send 403
 
           res.render 'ticket/view',
@@ -115,7 +115,7 @@ module.exports =
             if err
               return res.json 400, error: 'reply_not_exist'
 
-            unless mTicket.hasMember ticket, account
+            unless mTicket.getMember ticket, account
               unless mAccount.inGroup account, 'root'
                 return res.json 400, error: 'forbidden'
 
@@ -165,7 +165,7 @@ module.exports =
               for member_id, op of req.body.members
                 member_id = db.ObjectID member_id
 
-                if mTicket.hasMember ticket, {_id: member_id}
+                if mTicket.getMember ticket, {_id: member_id}
                   unless op
                     pullModifier.push member_id
                 else

@@ -10,6 +10,7 @@ db.buildModel module.exports, cTicket
 
 exports.createTicket = (account, title, content, type, members, attribute, callback) ->
   membersID = []
+
   for member in members
     membersID.push member._id
 
@@ -25,19 +26,15 @@ exports.createTicket = (account, title, content, type, members, attribute, callb
     members: membersID
     attribute: attribute
     replys: []
-  , {}, (ticket) ->
-    callback ticket
+  , {}, callback
 
 exports.createReply = (ticket, account, reply_to, content, callback) ->
   if reply_to and _.isString reply_to
     reply_to = new db.ObjectID reply_to
 
-  unless reply_to
-    reply_to = null
-
   data =
     _id: db.ObjectID()
-    reply_to: reply_to
+    reply_to: reply_to ? null
     account_id: account._id
     created_at: new Date()
     content: content
@@ -48,7 +45,7 @@ exports.createReply = (ticket, account, reply_to, content, callback) ->
     $push:
       replys: data
   , ->
-    unless exports.hasMember ticket, account
+    unless exports.getMember ticket, account
       exports.addMember ticket, account, ->
         callback data
     else
@@ -58,11 +55,7 @@ exports.addMember = (ticket, account, callback) ->
   exports.update
     $push:
       members: account._id
-  , ->
-  callback()
+  , callback
 
-exports.hasMember = (ticket, account) ->
-  if _.find(ticket.members, (member) -> member.equals(account._id))
-    return true
-  else
-    return false
+exports.getMember = (ticket, account) ->
+  return _.find(ticket.members, (member) -> member.equals(account._id))

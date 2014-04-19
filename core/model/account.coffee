@@ -7,6 +7,9 @@ cAccount = db.collection 'accounts'
 
 db.buildModel module.exports, cAccount
 
+exports.byUsername = db.buildByXXOO 'username', cAccount
+exports.byEmail = db.buildByXXOO 'email', cAccount
+
 exports.register = (username, email, passwd, callback = null) ->
   passwd_salt = auth.randomSalt()
 
@@ -21,8 +24,7 @@ exports.register = (username, email, passwd, callback = null) ->
     setting: {}
     attribure: {}
     tokens: []
-  , {}, (result) ->
-    callback(result) if callback
+  , {}, callback
 
 # @param callback(token)
 exports.createToken = (account, attribute, callback) ->
@@ -50,13 +52,12 @@ exports.createToken = (account, attribute, callback) ->
     , {}, ->
       callback token
 
-exports.removeToken = (token, callback = null) ->
+exports.removeToken = (token, callback) ->
   exports.update
     $pull:
       tokens:
         token: token
-  , {}, ->
-    callback() if callback
+  , {}, callback
 
 exports.authenticate = (token, callback) ->
   unless token
@@ -64,23 +65,14 @@ exports.authenticate = (token, callback) ->
 
   exports.findOne
     'tokens.token': token
-  , {}, (result) ->
-    if result
-      callback result
-    else
-      callback null
-
-exports.byUsername = db.buildByXXOO 'username', cAccount
-
-exports.byEmail = db.buildByXXOO 'email', cAccount
+  , {}, callback
 
 exports.byUsernameOrEmail = (username, callback) ->
   exports.byUsername username, (account) ->
     if account
       return callback account
 
-    exports.byEmail username, (account) ->
-      return callback account
+    exports.byEmail username, callback
 
 # @return bool
 exports.matchPasswd = (account, passwd) ->
