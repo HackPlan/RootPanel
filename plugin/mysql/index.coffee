@@ -3,7 +3,7 @@ service = require './service'
 monitor = require './monitor'
 
 module.exports =
-  name: 'ssh'
+  name: 'mysql'
   type: 'service'
   version: '0.1.0'
 
@@ -11,16 +11,8 @@ module.exports =
   service: service
   monitor: monitor
 
-  panel_widget:
-    content: action.widget
-
   static: './static'
 
-  inject:
-    script: [
-      'panel'
-    ]
-
   resources: [
-    'storage', 'transfer', 'cpu', 'memory', 'diskio'
+    'storage', 'cpu', 'memory'
   ]

@@ -1,4 +1,4 @@
 module.exports =
-  disk:
+  storage:
     interval: '6h'
     callback: ->

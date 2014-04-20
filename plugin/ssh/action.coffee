@@ -1,6 +1,6 @@
 module.exports =
   update_passwd:
-    mode: 'custom'
+    mode: 'passwd'
     callback: ->
 
   killall:
@@ -10,3 +10,5 @@ module.exports =
   resetPermission:
     mode: 'alert'
     callback: ->
+
+  widget: ->
