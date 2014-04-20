@@ -3,41 +3,44 @@
     "name": "RootPanel",
     "description": "A linux virtual host management system with extensibility"
   },
-  "word": {
-    "account": "Account",
-    "signup": "Signup",
+  "common": {
+    "error": "Error"
+  },
+   "account": {
+    "": "Account",
+    "signup": "Register",
     "login": "Login",
     "username": "Username",
-    "email": "E-mail",
+    "email": "E-Mail",
     "passwd": "Password",
-    "error": "Error",
-    "logout": "Logout",
-    "panel": "Control Panel",
-    "ticket": "Support Tickets",
+    "logout": "Logout"
+  },
+  "panel": {
+    "": "Control Panel"
+  },
+    "ticket": {
+    "": "Support Tickets",
     "type": "Type",
     "title": "Title",
     "status": "Status",
     "create": "Create",
-    "reply": "Replies",
-    "create_reply": "Reply",
-    "adminPanel": "Admin Panel"
+    "reply": "Reply",
+    "replies": "All Replies",
+    "create_ticket": "Create Ticket",
+    "create_reply": "Create Reply",
+    "ticket_list": "Ticket List"
+  },
+  "admin": {
+    "admin_panel": "Admin Panel"
   },
   "view": {
-    "signup": {
-      "passwd2": "Duplicate Account",
-      "alreadySignup": "Already have an account?"
+    "layout": {
+      "navigation": "Show Navigation"
     },
-    "login": {
-      "noAccount": "Don't have an account?"
-    },
-    "ticket": {
-      "word": {
-        "create": "New Ticket"
-      },
-
-      "list": {
-        "title": "All Tickets"
-      }
+    "account": {
+      "passwd2": "Repeat Password",
+      "already_signup": "Need an account?",
+      "no_account": "Don't have an account?"
     }
   }
 }
