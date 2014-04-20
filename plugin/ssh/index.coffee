@@ -8,8 +8,8 @@ module.exports =
   version: '0.1.0'
 
   action: action
-
   service: service
+  monitor: monitor
 
   static: './static'
 
@@ -20,8 +20,4 @@ module.exports =
 
   resources: [
     'disk'
-  ]
-
-  monitor: [
-    {interval: '6h', callback: monitor.disk}
   ]
