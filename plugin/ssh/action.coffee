@@ -7,7 +7,7 @@ module.exports =
     mode: 'alert'
     callback: ->
 
-  resetPermission:
+  reset_permission:
     mode: 'alert'
     callback: ->
 

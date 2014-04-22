@@ -3,7 +3,7 @@ service = require './service'
 monitor = require './monitor'
 
 module.exports =
-  name: 'mysql'
+  name: 'mongodb'
   type: 'service'
   version: '0.1.0'
 
@@ -15,5 +15,5 @@ module.exports =
     content: action.widget
 
   resources: [
-    'storage', 'cpu', 'memory'
+    'storage'
   ]

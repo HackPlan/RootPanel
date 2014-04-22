@@ -6,3 +6,5 @@ module.exports =
   set_size:
     mode: 'number'
     callback: ->
+
+  widget: ->
