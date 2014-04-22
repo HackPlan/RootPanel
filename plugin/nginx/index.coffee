@@ -14,6 +14,13 @@ module.exports =
   panel_widget:
     content: action.widget
 
+  static: './static'
+
+  inject:
+    script: [
+      'panel'
+    ]
+
   resources: [
-    'storage', 'transfer', 'cpu', 'memory', 'diskio'
+    'transfer', 'cpu', 'diskio'
   ]
