@@ -10,7 +10,7 @@ setting:
   language: 'zh_CN'
   QQ: '184300584'
 attribute:
-  expired: ISODate('2013-02-22T03:03:37.312Z')
+  amount: 100
 
 tokens: [
   token: 'b535a6cec7b73a60c53673f434686e04972ccafddb2a5477f066f30eded55a9b'

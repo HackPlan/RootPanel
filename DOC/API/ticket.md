@@ -79,3 +79,26 @@ Exception:
 * invalid_type
 * already_in_status
 * invalid_status
+
+### POST /ticket/list/
+
+Request:
+
+    {
+        "type": "linux",
+        "status": "open/pending/finish/closed",
+        "limit": 30,
+        "skip": 0
+    }
+
+Response:
+
+    [
+        {
+            "id": "525284cc2cebb6d0008b4567",
+            "title": "Ticket Title",
+            "type": "linux",
+            "status": "open",
+            "updated_at": "2014-02-18T09:18:27.214Z"
+        }
+    ]

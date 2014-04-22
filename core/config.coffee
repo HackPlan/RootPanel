@@ -2,6 +2,9 @@ module.exports =
   web:
     port: 3000
 
+  admin:
+    username: ['jysperm']
+
   account:
     cookie_time: 30 * 24 * 3600 * 1000
 

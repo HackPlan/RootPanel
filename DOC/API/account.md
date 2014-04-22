@@ -66,3 +66,18 @@ Response Header:
 Exception:
 
 * auth_failed
+
+### POST /account/update_passwd/
+
+Request:
+
+    {
+        "old_passwd": "123456",
+        "new_passwd": "abcdef"
+    }
+
+No Response.
+
+Exception:
+
+* auth_failed
