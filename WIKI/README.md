@@ -3,6 +3,7 @@
 ### FAQ
 
 * [财务问题](FAQ/Billing.md)
+* [域名问题](FAQ/Domain.md)
 
 ### Linux
 
