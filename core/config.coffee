@@ -14,6 +14,14 @@ module.exports =
       'linux', 'nodejs', 'php', 'python', 'rootpanel'
     ]
 
+  plans:
+    all:
+      service: ['memcached', 'mongodb', 'mysql', 'nginx', 'phpfpm', 'pptp', 'shadowsocks', 'ssh']
+      resources:
+        storage: 520
+        transfer: 39
+        memory: 27
+
   db:
     type: 'mongo'
     server: 'localhost'
