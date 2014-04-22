@@ -1,6 +1,6 @@
 ## Ticket API
 
-### POST /ticket/create
+### POST /ticket/create/
 
 Request:
 
@@ -27,7 +27,7 @@ Exception:
 * invalid_type
 * invalid_account: username
 
-### POST /ticket/reply
+### POST /ticket/reply/
 
 Request:
 
@@ -49,7 +49,7 @@ Exception:
 * reply_not_exist
 * forbidden
 
-### POST /ticket/update
+### POST /ticket/update/
 
 Request:
 
