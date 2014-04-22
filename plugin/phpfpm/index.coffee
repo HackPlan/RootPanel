@@ -3,7 +3,7 @@ service = require './service'
 monitor = require './monitor'
 
 module.exports =
-  name: 'nginx'
+  name: 'phpfpm'
   type: 'service'
   version: '0.1.0'
 
@@ -13,14 +13,3 @@ module.exports =
 
   panel_widget:
     content: action.widget
-
-  static: './static'
-
-  inject:
-    script: [
-      'panel'
-    ]
-
-  resources: [
-    'transfer', 'cpu', 'diskio'
-  ]
