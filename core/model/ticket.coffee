@@ -28,13 +28,9 @@ exports.createTicket = (account, title, content, type, members, attribute, callb
     replys: []
   , {}, callback
 
-exports.createReply = (ticket, account, reply_to, content, callback) ->
-  if reply_to and _.isString reply_to
-    reply_to = new db.ObjectID reply_to
-
+exports.createReply = (ticket, account, content, callback) ->
   data =
     _id: db.ObjectID()
-    reply_to: reply_to ? null
     account_id: account._id
     created_at: new Date()
     content: content

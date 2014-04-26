@@ -33,7 +33,6 @@ Request:
 
     {
         "id": "525284cc2cebb6d0008b4567"
-        "reply_to": "525284cc2cebb6d0008b4567",
         "content": "Reply Content(Markdown)"
     }
 
@@ -46,7 +45,6 @@ Response:
 Exception:
 
 * ticket_not_exist
-* reply_not_exist
 * forbidden
 
 ### POST /ticket/update/

@@ -99,29 +99,13 @@ module.exports =
           unless ticket
             return res.json 400, error: 'ticket_not_exist'
 
-          checkReplyTo = (callback) ->
-            if req.body.reply_to
-              mTicket.findOne
-                'replys._id': req.body.reply_to
-              , {}, (result) ->
-                if result
-                  callback null
-                else
-                  callback true
-            else
-              callback null
+          unless mTicket.getMember ticket, account
+            unless mAccount.inGroup account, 'root'
+              return res.json 400, error: 'forbidden'
 
-          checkReplyTo (err) ->
-            if err
-              return res.json 400, error: 'reply_not_exist'
-
-            unless mTicket.getMember ticket, account
-              unless mAccount.inGroup account, 'root'
-                return res.json 400, error: 'forbidden'
-
-            mTicket.createReply ticket, account, req.body.reply_to, req.body.content, (reply) ->
-              return res.json
-                id: reply._id
+          mTicket.createReply ticket, account, req.body.content, (reply) ->
+            return res.json
+              id: reply._id
 
     update: (req, res) ->
       mAccount.authenticate req.token, (account) ->
