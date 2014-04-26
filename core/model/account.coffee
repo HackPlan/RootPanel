@@ -1,4 +1,5 @@
 _ = require 'underscore'
+crypto = require 'crypto'
 
 auth = require '../auth'
 db = require '../db'
@@ -21,7 +22,8 @@ exports.register = (username, email, passwd, callback = null) ->
     email: email
     signup: new Date()
     group: []
-    setting: {}
+    setting:
+      avatar_url: crypto.createHash('md5').update(email).digest('hex')
     attribure:
       plnas: []
     tokens: []

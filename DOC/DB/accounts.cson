@@ -7,6 +7,7 @@ signup_at: ISODate('2013-02-22T03:03:37.312Z')
 
 group: ['root']
 setting:
+  avatar_url: 'http://ruby-china.org/avatar/efcc15b92617a95a09f514a9bff9e6c3?s=58'
   language: 'zh_CN'
   QQ: '184300584'
 attribute:
