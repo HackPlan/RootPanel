@@ -5,11 +5,12 @@ passwd_salt: '53673f434686b535a6cec7b73a60ce045477f066f30eded55a9b972ccafddb2a'
 email: 'jysperm@gmail.com'
 signup_at: ISODate('2013-02-22T03:03:37.312Z')
 
-group: ['root', 'stduser']
+group: ['root']
 setting:
   language: 'zh_CN'
   QQ: '184300584'
 attribute:
+  plans: ['all']
   amount: 100
 
 tokens: [

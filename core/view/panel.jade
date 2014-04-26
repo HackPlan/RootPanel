@@ -1,7 +1,7 @@
 extends layout
 
 prepend head
-  title #{t('panel.panel')} | #{t('app.name')}
+  title #{t('panel.')} | #{t('app.name')}
 
 append head
   link(rel='stylesheet', href='/style/panel/panel.css')
@@ -21,4 +21,21 @@ block content
               | #{t('ticket.')}
       
       .col-md-9
-        h2 Panel
+        .row
+          header 概况
+
+        .row
+          header= t('plan.')
+          table.table.table-hover
+            tbody
+              for plan in plans
+                tr
+                  td= plan.t_name
+                  td= plan.t_service
+                  td= plan.t_resources
+                  td
+                    if plan.isEnable
+                      button.btn.btn-danger.btn-sm 退订
+                    else
+                      button.btn.btn-success.btn-sm 订购
+

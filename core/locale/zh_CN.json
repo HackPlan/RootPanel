@@ -3,6 +3,12 @@
     "name": "RootPanel",
     "description": "一个插件化的 Linux 虚拟主机管理系统。"
   },
+  "plans": {
+    "all": {
+      "name": "所有服务(默认)",
+      "description": "该套餐包含所有的服务"
+    }
+  },
   "common": {
     "error": "错误"
   },
@@ -30,6 +36,9 @@
     "create_reply": "创建回复",
     "ticket_list": "工单列表"
   },
+  "plan": {
+    "": "套餐"
+  },
   "admin": {
     "admin_panel": "管理员面板"
   },
@@ -42,5 +51,8 @@
       "already_signup": "已有帐号？",
       "no_account": "还没有账户？"
     }
+  },
+  "plugins": {
+
   }
 }

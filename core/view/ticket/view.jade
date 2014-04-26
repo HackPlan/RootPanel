@@ -20,7 +20,7 @@ block main
             p!= reply.content_html
 
   .row
-    header= t('word.create_reply')
+    header= t('ticket.create_reply')
     form.form-horizontal(method='post', role='form')
       .form-group.contentarea
         textarea.form-control#reply-content(name='content', rows='5', required)
