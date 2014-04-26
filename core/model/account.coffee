@@ -22,7 +22,8 @@ exports.register = (username, email, passwd, callback = null) ->
     signup: new Date()
     group: []
     setting: {}
-    attribure: {}
+    attribure:
+      plnas: []
     tokens: []
   , {}, callback
 

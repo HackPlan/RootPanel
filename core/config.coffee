@@ -19,11 +19,22 @@ module.exports =
 
   plans:
     all:
+      t_name: '所有服务(默认)'
+      t_service: '支持所有服务'
+      t_resources: '磁盘: 520MB, 内存: 27MB, 流量: 37GB'
       service: ['memcached', 'mongodb', 'mysql', 'nginx', 'phpfpm', 'pptp', 'shadowsocks', 'ssh']
       resources:
         storage: 520
         transfer: 39
         memory: 27
+
+    shadowsocks:
+      t_name: 'ShadowSocks'
+      t_service: '仅 ShadowSocks'
+      t_resources: '流量: 100GB'
+      service: ['shadowsocks']
+      resources:
+        transfer: 100
 
   db:
     type: 'mongo'
