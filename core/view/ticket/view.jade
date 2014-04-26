@@ -13,8 +13,8 @@ block main
     header= t('ticket.replies')
     ul.list-group
       for reply in ticket.replys
-        li.list-group-item
-          a(href='/member/')
+        li.list-group-item.clearfix
+          a.pull-left(href='/member/')
             img(src='http://ruby-china.org/avatar/efcc15b92617a95a09f514a9bff9e6c3?s=58')
           .list-content
             p!= reply.content_html
