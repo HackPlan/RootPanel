@@ -5,7 +5,7 @@ prepend head
   link(rel='stylesheet', href='/style/ticket.css')
 
 block main
-  .row#ticketid(data-id= ticket._id)
+  .row#ticketid(data-id= "#{ticket._id}")
     header= ticket.title
     p!= ticket.content_html
 
