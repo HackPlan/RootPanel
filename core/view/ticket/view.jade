@@ -25,14 +25,23 @@ block main
   .row
     header= t('ticket.create_reply')
     form.form-horizontal(method='post', role='form')
-      .form-group.contentarea
+      .form-group.padding
         textarea.form-control#reply-content(name='content', rows='5', required)
-      .form-group
+      .form-group.padding
         button.btn.btn-lg.btn-primary#reply(type='submit')= t('ticket.create_reply')
 
 prepend sidebar
   .row
     a.btn.btn-lg.btn-success(href='/ticket/list/')= t('ticket.ticket_list')
+
+  .row
+    li.list-group-item.clearfix
+      a.pull-left
+        img(src= ticket.account.setting.avatar_url)
+      p
+        span.label.label-info= ticket.account.username
+        br
+        span.label.label-default= ticket.created_at.toJSON()
 
 append footer
   script(src='/script/ticket/reply.js')

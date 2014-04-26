@@ -38,8 +38,11 @@ module.exports =
         , (err, result) ->
           ticket.replys = result
 
-          renderer 'ticket/view',
-            ticket: ticket
+          mAccount.findId ticket.account_id, (ticket_account) ->
+            ticket.account = ticket_account
+
+            renderer 'ticket/view',
+              ticket: ticket
 
   post:
     create: (req, res) ->
