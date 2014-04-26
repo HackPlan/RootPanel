@@ -5,7 +5,7 @@ prepend head
   link(rel='stylesheet', href='/style/ticket.css')
 
 block main
-  .row
+  .row#ticketid(data-id= ticket._id)
     header= ticket.title
     p!= ticket.content_html
 
@@ -23,10 +23,13 @@ block main
     header= t('word.create_reply')
     form.form-horizontal(method='post', role='form')
       .form-group.contentarea
-        textarea#contetn.form-control(name='content', rows='5', required)
+        textarea.form-control#reply-content(name='content', rows='5', required)
       .form-group
-        button.btn.btn-lg.btn-primary(type='submit')= t('ticket.create_reply')
+        button.btn.btn-lg.btn-primary#reply(type='submit')= t('ticket.create_reply')
 
 prepend sidebar
   .row
     a.btn.btn-lg.btn-success(href='/ticket/list/')= t('ticket.ticket_list')
+
+append footer
+  script(src='/script/ticket/reply.js')
