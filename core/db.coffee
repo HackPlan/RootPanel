@@ -18,7 +18,10 @@ exports.collection = (name) ->
   return exports.mongo.collection name
 
 exports.ObjectID = (id) ->
-  return new ObjectID id
+  try
+    return new ObjectID id
+  catch e
+    return null
 
 exports.buildModel = (that, mongo) ->
   that.find = (selector, options, callback) ->
