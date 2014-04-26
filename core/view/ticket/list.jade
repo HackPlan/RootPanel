@@ -14,7 +14,7 @@ block main
         th= t('ticket.status')
     tbody
       for ticket in tickets
-        tr(data-id= ticket._id)
+        tr(data-id= '#{ticket._id}')
           td= ticket.type
           td
             a(href='/ticket/view/?id=#{ticket._id}')= ticket.title
