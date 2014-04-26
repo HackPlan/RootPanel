@@ -25,7 +25,7 @@ exports.register = (username, email, passwd, callback = null) ->
     setting:
       avatar_url: crypto.createHash('md5').update(email).digest('hex')
     attribure:
-      plnas: []
+      plans: []
     tokens: []
   , {}, callback
 
