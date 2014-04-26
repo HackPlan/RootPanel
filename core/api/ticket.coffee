@@ -13,7 +13,10 @@ module.exports =
     list: api.accountAuthenticateRender (req, res, account, renderer) ->
       mTicket.find
         account_id: account._id
-      , {}, (tickets) ->
+      ,
+        sort:
+          updated_at: -1
+      , (tickets) ->
         renderer 'ticket/list',
           tickets: tickets
 
