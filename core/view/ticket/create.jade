@@ -6,7 +6,6 @@ prepend head
 
 block main
   header= t('ticket.create_ticket')
-
   form.form-horizontal(method='post', role='form')
     .form-group
       .col-sm-3
@@ -15,11 +14,9 @@ block main
             option(value=type)= type
       .col-sm-9
         input#title.form-control(type='text', name='title', required)
-    .form-group.contentarea
+    .form-group.padding
       textarea#ticket-content.form-control(name='content', rows='15', required)
-    .form-group
-      .col-sm-offset-3
-        button.btn.btn-lg.btn-primary#create-ticket(type='submit')= t('ticket.create')
-
+    .form-group.padding
+      button.btn.btn-lg.btn-primary#create-ticket(type='submit')= t('ticket.create')
 append footer
   script(src='/script/ticket/create.js')
