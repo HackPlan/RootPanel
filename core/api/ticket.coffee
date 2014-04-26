@@ -30,8 +30,16 @@ module.exports =
           unless mTicket.getMember ticket, account
             return res.send 403
 
-        renderer 'ticket/view',
-          ticket: ticket
+        async.map ticket.replys, (reply, callback) ->
+          mAccount.findId reply.account_id, (reply_account) ->
+            reply.account = reply_account
+            callback null, reply
+
+        , (err, result) ->
+          ticket.replys = result
+
+          renderer 'ticket/view',
+            ticket: ticket
 
   post:
     create: (req, res) ->

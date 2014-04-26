@@ -23,7 +23,7 @@ exports.register = (username, email, passwd, callback = null) ->
     signup: new Date()
     group: []
     setting:
-      avatar_url: crypto.createHash('md5').update(email).digest('hex')
+      avatar_url: "//ruby-china.org/avatar/#{crypto.createHash('md5').update(email).digest('hex')}?s=58"
     attribure:
       plans: []
     tokens: []

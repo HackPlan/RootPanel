@@ -14,10 +14,13 @@ block main
     ul.list-group
       for reply in ticket.replys
         li.list-group-item.clearfix
-          a.pull-left(href='/member/')
-            img(src='http://ruby-china.org/avatar/efcc15b92617a95a09f514a9bff9e6c3?s=58')
+          a.pull-left
+            img(src= reply.account.setting.avatar_url)
           .list-content
             p!= reply.content_html
+            p
+              span.label.label-info= reply.account.username
+              span.label.label-default= reply.created_at
 
   .row
     header= t('ticket.create_reply')
