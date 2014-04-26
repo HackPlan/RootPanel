@@ -4,7 +4,6 @@ path = require 'path'
 fs = require 'fs'
 
 config = require './config'
-api = require './api'
 db = require './db'
 i18n = require './i18n'
 
@@ -60,6 +59,7 @@ exports.runWebServer = ->
     app.set 'views', path.join(__dirname, 'view')
     app.set 'view engine', 'jade'
 
+    api = require './api'
     api.bind app
 
     app.listen config.web.port

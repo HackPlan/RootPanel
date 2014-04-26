@@ -1,18 +1,15 @@
 config = require '../config'
+api = require './index'
 
 mAccount = require '../model/account'
 
 module.exports =
   get:
-    signup: (req, res) ->
-      mAccount.authenticate req.token, (account) ->
-        res.render 'account/signup',
-          account: account
+    signup: api.accountRender (req, res, account, renderer) ->
+      renderer 'account/signup'
 
-    login: (req, res) ->
-      mAccount.authenticate req.token, (account) ->
-        res.render 'account/login',
-          account: account
+    login: api.accountRender (req, res, account, renderer) ->
+      renderer 'account/login'
 
   post:
     signup: (req, res) ->

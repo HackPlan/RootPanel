@@ -1,6 +1,7 @@
 _ = require 'underscore'
 
 config = require '../config'
+api = require './index'
 
 mAccount = require '../model/account'
 
@@ -9,18 +10,13 @@ module.exports =
     '/': (req, res) ->
       res.redirect '/panel/'
 
-    '/panel/': (req, res) ->
-      mAccount.authenticate req.token, (account) ->
-        unless account
-          return res.redirect '/account/login/'
+    '/panel/': api.accountAuthenticateRender (req, res, account, renderer) ->
+      plans = []
 
-        plans = []
+      for name, info of config.plans
+        plans.push _.extend info,
+          name: name
+          isEnable: name in account.attribure.plans
 
-        for name, info of config.plans
-          plans.push _.extend info,
-            name: name
-            isEnable: name in account.attribure.plans
-
-        res.render 'panel',
-          account: account
-          plans: plans
+      renderer 'panel',
+        plans: plans

@@ -1,18 +1,12 @@
+api = require './index'
+
 mAccount = require '../model/account'
 
 module.exports =
   get:
-    '/admin/': (req, res) ->
-      mAccount.authenticate req.token, (account) ->
-        unless account
-          return res.redirect '/account/login/'
-
-        unless mAccount.inGroup account, 'root'
-          return res.send 403
-
-        mAccount.find {}, {}, (accounts) ->
-          res.render 'admin/index',
-            account: account
-            accounts: accounts
+    '/admin/': api.accountAdminAuthenticateRender (req, res, account, renderer) ->
+      mAccount.find {}, {}, (accounts) ->
+        renderer 'admin/index',
+          accounts: accounts
 
   post:{}

@@ -3,49 +3,35 @@ _ = require 'underscore'
 
 db = require '../db'
 config = require '../config'
+api = require './index'
 
 mAccount = require '../model/account'
 mTicket = require '../model/ticket'
 
 module.exports =
   get:
-    list: (req, res) ->
-      mAccount.authenticate req.token, (account) ->
-        unless account
-          return res.redirect '/account/login/'
+    list: api.accountAuthenticateRender (req, res, account, renderer) ->
+      mTicket.find
+        account_id: account._id
+      , {}, (tickets) ->
+        renderer 'ticket/list',
+          tickets: tickets
 
-        mTicket.find
-          account_id: account._id
-        , {}, (tickets) ->
-          res.render 'ticket/list',
-            account: account
-            tickets: tickets
+    create: api.accountAuthenticateRender (req, res, account, renderer) ->
+      renderer 'ticket/create',
+        ticketTypes: config.ticket.availableType
 
-    create: (req, res) ->
-      mAccount.authenticate req.token, (account) ->
-        unless account
-          return res.redirect '/account/login/'
+    view: api.accountAuthenticateRender (req, res, account, renderer) ->
+      mTicket.findId req.body.id, (ticket) ->
+        unless ticket
+          return res.send 404
 
-        res.render 'ticket/create',
-          account: account
-          ticketTypes: config.ticket.availableType
+        unless mAccount.inGroup account, 'root'
+          unless mTicket.getMember ticket, account
+            return res.send 403
 
-    view: (req, res) ->
-      mAccount.authenticate req.token, (account) ->
-        unless account
-          return res.redirect '/account/login/'
-
-        mTicket.findId req.body.id, (ticket) ->
-          unless ticket
-            return res.send 404
-
-          unless mAccount.inGroup account, 'root'
-            unless mTicket.getMember ticket, account
-              return res.send 403
-
-          res.render 'ticket/view',
-            account: account
-            ticket: ticket
+        renderer 'ticket/view',
+          ticket: ticket
 
   post:
     create: (req, res) ->
