@@ -22,24 +22,6 @@ exports.runWebServer = ->
     app.use connect.cookieParser()
     app.use connect.logger('dev')
 
-    app.locals.version = do ->
-      logs = fs.readFileSync './.git/logs/HEAD', 'utf8'
-      logs = logs.split "\n"
-      lastline = logs[logs.length - 2]
-
-      result = lastline.match /([a-f0-9]{40})\s([a-f0-9]{40})\s(\S+)\s(\S+)\s(\d+)\s(\+\d+)\s(.+)/
-
-      version =
-        parent: result[1]
-        version: result[2]
-        author: result[3]
-        email: result[4]
-        time: new Date parseInt(result[5]) * 1000
-        timezone: result[6]
-        message: result[7]
-
-      return version
-
     app.use (req, res, next) ->
       res.locals.app = app
       res.locals.t = i18n.getTranslator 'zh_CN'
