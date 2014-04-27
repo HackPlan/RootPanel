@@ -34,7 +34,10 @@
     "replies": "全部回复",
     "create_ticket": "创建工单",
     "create_reply": "创建回复",
-    "ticket_list": "工单列表"
+    "ticket_list": "工单列表",
+    "close_ticket": "关闭",
+    "finish_ticket": "完成",
+    "reopen_ticket": "重新打开"
   },
   "plan": {
     "": "套餐"

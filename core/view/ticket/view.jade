@@ -29,6 +29,9 @@ block main
         textarea.form-control#reply-content(name='content', rows='5', required)
       .form-group.padding
         button.btn.btn-lg.btn-primary#reply(type='submit')= t('ticket.create_reply')
+        button.btn.btn-lg.btn-danger= t('ticket.close_ticket')
+        button.btn.btn-lg.btn-success= t('ticket.finish_ticket')
+        button.btn.btn-lg.btn-success= t('ticket.reopen_ticket')
 
 prepend sidebar
   .row
