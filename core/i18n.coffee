@@ -13,6 +13,10 @@ exports.load = (path) ->
   for lang in options.available_language
     data[lang] = JSON.parse fs.readFileSync((require 'path').join(path, "#{lang}.json"), 'utf8')
 
+exports.loadPlugin = (path, name) ->
+  for lang in options.available_language
+    data[lang]['plugins'][name] = JSON.parse fs.readFileSync((require 'path').join(path, "#{lang}.json"), 'utf8')
+
 exports.translate = (name, lang) ->
   unless lang
     lang = options.default_language

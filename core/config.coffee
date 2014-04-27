@@ -17,6 +17,9 @@ module.exports =
       'linux', 'nodejs', 'php', 'python', 'rootpanel'
     ]
 
+  plugin:
+    availablePlugin: ['shadowsocks']
+
   plans:
     all:
       t_name: '所有服务(默认)'

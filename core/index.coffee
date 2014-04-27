@@ -62,6 +62,9 @@ exports.runWebServer = ->
     api = require './api'
     api.bind app
 
+    plugin = require './plugin'
+    plugin.loadPlugins()
+
     app.listen config.web.port
 
 unless module.parent
