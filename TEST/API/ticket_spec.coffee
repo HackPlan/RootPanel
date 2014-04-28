@@ -64,3 +64,16 @@ frisby.create '/ticket/update/'
       public: true
   .expectStatus 200
   .toss()
+
+frisby.create '/ticket/list/'
+  .post "#{baseUrl}/ticket/list/",
+    status: 'open'
+  .expectStatus 200
+  .expectJSON '*',
+    status: 'open'
+  .expectJSONTypes '*',
+    id: String
+    title: String
+    type: String
+    updated_at: String
+  .toss()

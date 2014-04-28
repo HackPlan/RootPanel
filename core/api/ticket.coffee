@@ -107,6 +107,37 @@ module.exports =
             return res.json
               id: reply._id
 
+    list: (req, res) ->
+      mAccount.authenticate req.token, (account) ->
+        unless account
+          return res.json 400, error: 'auth_failed'
+
+        mTicket.find do ->
+          selector =
+            account_id: account._id
+
+          if req.body.type?.toLowerCase() in config.ticket.availableType
+            selector['type'] = req.body.type.toLowerCase()
+
+          if req.body.status?.toLowerCase() in ['open', 'pending', 'finish', 'closed']
+            selector['status'] = req.body.status.toLowerCase()
+
+          return selector
+        ,
+          sort:
+            updated_at: -1
+          limit: req.body.limit ? 30
+          skip: req.body.skip ? 0
+        , (tickets) ->
+          res.json _.map tickets, (item) ->
+            return {
+              id: item._id
+              title: item.title
+              type: item.type
+              status: item.status
+              updated_at: item.updated_at
+            }
+
     update: (req, res) ->
       mAccount.authenticate req.token, (account) ->
         unless account
