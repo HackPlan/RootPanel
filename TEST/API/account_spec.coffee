@@ -59,3 +59,15 @@ frisby.create '/account/logout/ auth_failed'
   .expectJSON
     error: 'auth_failed'
   .toss()
+
+frisby.globalSetup
+  request:
+    headers:
+      'x-token': 'token'
+
+frisby.create '/account/update_passwd/'
+  .post "#{baseUrl}/account/update_passwd/",
+    old_passwd: 'password',
+    new_passwd: '123123'
+  .expectStatus 200
+  .toss()

@@ -63,3 +63,17 @@ module.exports =
           res.clearCookie 'token'
 
           res.json {}
+
+    update_passwd: (req, res) ->
+      mAccount.authenticate req.token, (account) ->
+        unless account
+          return res.json 400, error: 'auth_failed'
+
+        unless mAccount.matchPasswd account, req.body.old_passwd
+          return res.json 400, error: 'auth_failed'
+
+        unless req.body.new_passwd or not /^.+$/.test req.body.new_passwd
+          return res.json 400, error: 'invalid_passwd'
+
+        mAccount.updatePasswd account, req.body.new_passwd, ->
+          res.json {}

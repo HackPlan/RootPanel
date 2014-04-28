@@ -29,6 +29,15 @@ exports.register = (username, email, passwd, callback = null) ->
     tokens: []
   , {}, callback
 
+exports.updatePasswd = (account, passwd, callback) ->
+  passwd_salt = auth.randomSalt()
+
+  exports.update _id: account._id,
+    $set:
+      passwd: auth.hashPasswd(passwd, passwd_salt)
+      passwd_salt: passwd_salt
+  , {}, callback
+
 # @param callback(token)
 exports.createToken = (account, attribute, callback) ->
   # @param callback(token)

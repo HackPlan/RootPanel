@@ -22,8 +22,8 @@ module.exports = (callback) ->
         _id: db.ObjectID '533b0cb894f6c673123e33a3'
 
         username: 'test_main'
-        password: 'a75b5ef8038c8bd6f623beaee94fd429e522d6f00f94183c0023655e723cf123'
-        password_salt: '891bad13e24d964bc7a95b97b6762926719fec8739d2ca23e6b1089d4ca273a9'
+        passwd: '9de9bb1f01888f4cf6c32cd02c6ad2b15804b292947552324ae8f7d52e12714c'
+        passwd_salt: '9499537d1f65ae43e7ac4d1c2901bb7647ac735b5b9b6c9eea945d8453c3636f'
         email: 'test_main@jysperm.me'
         singup_at: new Date()
 
