@@ -3,6 +3,12 @@
     "name": "RootPanel",
     "description": "A linux virtual host management system with extensibility"
   },
+  "plans": {
+    "all": {
+      "name": "All Services(Default)",
+      "description": "This plan includes all the services."
+    }
+  },
   "common": {
     "error": "Error"
   },
@@ -28,7 +34,13 @@
     "replies": "All Replies",
     "create_ticket": "Create Ticket",
     "create_reply": "Create Reply",
-    "ticket_list": "Ticket List"
+    "ticket_list": "Ticket List",
+    "close_ticket": "Close",
+    "finish_ticket": "Finish",
+    "reopen_ticket": "Reopen"
+  },
+    "plan": {
+    "": "Plan"
   },
   "admin": {
     "admin_panel": "Admin Panel"
@@ -42,5 +54,8 @@
       "already_signup": "Need an account?",
       "no_account": "Don't have an account?"
     }
+  },
+  "plugins": {
+
   }
 }
