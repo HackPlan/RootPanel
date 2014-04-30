@@ -20,7 +20,7 @@ exports.register = (username, email, passwd, callback = null) ->
     passwd: auth.hashPasswd(passwd, passwd_salt)
     passwd_salt: passwd_salt
     email: email
-    signup: new Date()
+    signup_at: new Date()
     group: []
     setting:
       avatar_url: "//ruby-china.org/avatar/#{crypto.createHash('md5').update(email).digest('hex')}?s=58"
