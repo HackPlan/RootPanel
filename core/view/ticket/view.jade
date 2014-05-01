@@ -7,6 +7,12 @@ prepend head
 block main
   .row#ticketid(data-id= '#{ticket._id}')
     header= ticket.title
+    //- 等pending改好后可以统一处理，这里先用case
+    case ticket.status
+      when 'open'
+        span.btn-success(role='btn') 打开的
+      when 'closed'
+        span.btn-danger(role='btn') 关闭的
     p!= ticket.content_html
 
   .row
@@ -28,10 +34,14 @@ block main
       .form-group.padding
         textarea.form-control#reply-content(name='content', rows='5', required)
       .form-group.padding
-        button.btn.btn-lg.btn-primary#reply(type='submit')= t('ticket.create_reply')
-        button.btn.btn-lg.btn-danger= t('ticket.close_ticket')
+        button.btn.btn-lg.btn-primary#reply-btn(type='submit')= t('ticket.create_reply')
+        case ticket.status
+          when 'open'
+            button.btn.btn-lg.btn-danger#close-btn= t('ticket.close_ticket')
+          when 'closed'
+            button.btn.btn-lg.btn-success= t('ticket.reopen_ticket')
+
         button.btn.btn-lg.btn-success= t('ticket.finish_ticket')
-        button.btn.btn-lg.btn-success= t('ticket.reopen_ticket')
 
 prepend sidebar
   .row
