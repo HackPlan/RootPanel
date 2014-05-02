@@ -38,6 +38,7 @@ prepend sidebar
     a.btn.btn-lg.btn-success(href='/ticket/list/')= t('ticket.ticket_list')
 
   .row
+    header= t('ticket.creator')
     li.list-group-item.clearfix
       a.pull-left
         img(src= ticket.account.setting.avatar_url)
@@ -45,6 +46,12 @@ prepend sidebar
         span.label.label-info= ticket.account.username
         br
         span.label.label-default= ticket.created_at.toJSON()
+
+  .row
+    header= t('ticket.members')
+    for member in ticket.members
+      a.pull-left
+        img(src= member.setting.avatar_url, alt= member.username)
 
 append footer
   script(src='/script/ticket/reply.js')

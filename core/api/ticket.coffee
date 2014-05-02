@@ -33,19 +33,25 @@ module.exports =
           unless mTicket.getMember ticket, account
             return res.send 403
 
-        async.map ticket.replys, (reply, callback) ->
-          mAccount.findId reply.account_id, (reply_account) ->
-            reply.account = reply_account
-            callback null, reply
-
+        async.map ticket.members, (member, callback) ->
+          mAccount.findId member, (member_account) ->
+            callback null, member_account
         , (err, result) ->
-          ticket.replys = result
+          ticket.members = result
 
-          mAccount.findId ticket.account_id, (ticket_account) ->
-            ticket.account = ticket_account
+          async.map ticket.replys, (reply, callback) ->
+            mAccount.findId reply.account_id, (reply_account) ->
+              reply.account = reply_account
+              callback null, reply
 
-            renderer 'ticket/view',
-              ticket: ticket
+          , (err, result) ->
+            ticket.replys = result
+
+            mAccount.findId ticket.account_id, (ticket_account) ->
+              ticket.account = ticket_account
+
+              renderer 'ticket/view',
+                ticket: ticket
 
   post:
     create: (req, res) ->
