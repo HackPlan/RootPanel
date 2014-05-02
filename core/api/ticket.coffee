@@ -225,8 +225,6 @@ module.exports =
                       callback null, result
 
               async.parallel tasks, (err, result) ->
-                console.log result
-
                 if req.body.members.add
                   for item in req.body.members.add
                     addToSetModifier.push result[item]._id
@@ -236,6 +234,8 @@ module.exports =
                     pullModifier.push result[item]._id
 
                 saveToDatabase()
+            else
+              saveToDatabase()
 
           else
             saveToDatabase()
