@@ -8,7 +8,7 @@ cTicket = db.collection 'tickets'
 
 db.buildModel module.exports, cTicket
 
-exports.createTicket = (account, title, content, type, members, attribute, callback) ->
+exports.createTicket = (account, title, content, type, members, status, attribute, callback) ->
   membersID = []
 
   for member in members
@@ -22,13 +22,13 @@ exports.createTicket = (account, title, content, type, members, attribute, callb
     content: content
     content_html: markdown.toHTML content
     type: type
-    status: 'open'
+    status: status
     members: membersID
     attribute: attribute
     replys: []
   , {}, callback
 
-exports.createReply = (ticket, account, content, callback) ->
+exports.createReply = (ticket, account, content, status, callback) ->
   data =
     _id: db.ObjectID()
     account_id: account._id
@@ -40,6 +40,8 @@ exports.createReply = (ticket, account, content, callback) ->
   exports.update _id: ticket._id,
     $push:
       replys: data
+    status: status
+    updated_at: new Date()
   , ->
     unless exports.getMember ticket, account
       exports.addMember ticket, account, ->
@@ -51,6 +53,7 @@ exports.addMember = (ticket, account, callback) ->
   exports.update
     $push:
       members: account._id
+    updated_at: new Date()
   , callback
 
 exports.getMember = (ticket, account) ->

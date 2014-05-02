@@ -59,8 +59,8 @@ module.exports =
         unless req.body.type in config.ticket.availableType
           return res.json 400, error: 'invalid_type'
 
-        createTicket = (members) ->
-          mTicket.createTicket account, req.body.title, req.body.content, req.body.type, members, {}, (ticket) ->
+        createTicket = (members, status) ->
+          mTicket.createTicket account, req.body.title, req.body.content, req.body.type, members, status, {}, (ticket) ->
             return res.json
               id: ticket._id
 
@@ -85,10 +85,10 @@ module.exports =
             unless _.find(result, (item) -> item._id == account._id)
               result.push account
 
-            createTicket result
+            createTicket result, 'open'
 
         else
-          createTicket [account]
+          createTicket [account], 'pending'
 
     reply: (req, res) ->
       mAccount.authenticate req.token, (account) ->
@@ -103,7 +103,8 @@ module.exports =
             unless mAccount.inGroup account, 'root'
               return res.json 400, error: 'forbidden'
 
-          mTicket.createReply ticket, account, req.body.content, (reply) ->
+          status = if mAccount.inGroup(account, 'root') then 'open' else 'pending'
+          mTicket.createReply ticket, account, req.body.content, status, (reply) ->
             return res.json
               id: reply._id
 
