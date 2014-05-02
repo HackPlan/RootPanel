@@ -71,7 +71,7 @@ module.exports =
             for memberName in req.body.members
               do (memberName = _.clone(memberName)) ->
                 tasks.push (callback) ->
-                  mAccount.byUsernameOrEmail memberName, (member) ->
+                  mAccount.byUsernameOrEmailOrId memberName, (member) ->
                     unless member
                       res.json 400, error: 'invalid_account', username: memberName
                       callback true
@@ -170,6 +170,37 @@ module.exports =
             else
               return res.json 400, error: 'invalid_status'
 
+          saveToDatabase = ->
+            async.parallel [
+              (callback) ->
+                unless _.isEmpty modifier
+                  mTicket.update _id: ticket._id,
+                    $set: modifier
+                  , {}, callback
+                else
+                  callback()
+
+              (callback) ->
+                unless _.isEmpty addToSetModifier
+                  mTicket.update _id: ticket._id,
+                    $addToSet:
+                      members:
+                        $each: addToSetModifier
+                  , {}, callback
+                else
+                  callback()
+
+              (callback) ->
+                unless _.isEmpty pullModifier
+                  mTicket.update _id: ticket._id,
+                    $pullAll:
+                      members: pullModifier
+                  , {}, callback
+                else
+                  callback()
+            ], ->
+              return res.json {}
+
           if mAccount.inGroup account, 'root'
             if req.body.attribute
               if req.body.attribute.public
@@ -178,42 +209,27 @@ module.exports =
                 modifier['attribute.public'] = false
 
             if req.body.members
-              for member_id, op of req.body.members
-                member_id = db.ObjectID member_id
+              tasks = {}
 
-                if mTicket.getMember ticket, {_id: member_id}
-                  unless op
-                    pullModifier.push member_id
-                else
-                  if op
-                    addToSetModifier.push member_id
+              member_name = _.filter _.union(req.body.members.add, req.body.members.remove), (item) -> item
+              for item in member_name
+                tasks[item] = do (item = _.clone(item)) ->
+                  return (callback) ->
+                    mAccount.byUsernameOrEmailOrId item, (result) ->
+                      callback null, result
 
-          async.parallel [
-            (callback) ->
-              unless _.isEmpty modifier
-                mTicket.update _id: ticket._id,
-                  $set: modifier
-                , {}, callback
-              else
-                callback()
+              async.parallel tasks, (err, result) ->
+                console.log result
 
-            (callback) ->
-              unless _.isEmpty addToSetModifier
-                mTicket.update _id: ticket._id,
-                  $addToSet:
-                    members:
-                      $each: addToSetModifier
-                , {}, callback
-              else
-                callback()
+                if req.body.members.add
+                  for item in req.body.members.add
+                    addToSetModifier.push result[item]._id
 
-            (callback) ->
-              unless _.isEmpty pullModifier
-                mTicket.update _id: ticket._id,
-                  $pullAll:
-                    members: pullModifier
-                , {}, callback
-              else
-                callback()
-          ], ->
-            return res.json {}
+                if req.body.members.remove
+                  for item in req.body.members.remove
+                    pullModifier.push result[item]._id
+
+                saveToDatabase()
+
+          else
+            saveToDatabase()
