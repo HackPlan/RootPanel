@@ -172,7 +172,7 @@ module.exports =
               if ticket.status == req.body.status
                 return res.json 400, error: 'already_in_status'
               else
-                modifier['status'] = ticket.status
+                modifier['status'] = req.body.status
             else
               return res.json 400, error: 'invalid_status'
 
