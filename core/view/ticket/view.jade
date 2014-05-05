@@ -25,13 +25,17 @@ block main
   .row
     header= t('ticket.create_reply')
     form.form-horizontal(method='post', role='form')
+      if ticket.status != 'closed'
+        .form-group.padding
+          textarea.form-control#reply-content(name='content', rows='5', required)
       .form-group.padding
-        textarea.form-control#reply-content(name='content', rows='5', required)
-      .form-group.padding
-        button.btn.btn-lg.btn-primary#reply(type='submit')= t('ticket.create_reply')
-        button.btn.btn-lg.btn-danger= t('ticket.close_ticket')
-        button.btn.btn-lg.btn-success= t('ticket.finish_ticket')
-        button.btn.btn-lg.btn-success= t('ticket.reopen_ticket')
+        if ticket.status != 'closed'
+          button.btn.btn-lg.btn-primary#reply(type='submit')= t('ticket.create_reply')
+          button.btn.btn-lg.btn-danger= t('ticket.close_ticket')
+        if mAccount.inGroup(account, 'root') && (ticket.status == 'open' || ticket.status == 'pending')
+          button.btn.btn-lg.btn-success= t('ticket.finish_ticket')
+        if mAccount.inGroup(account, 'root') && ticket.status == 'closed'
+          button.btn.btn-lg.btn-success= t('ticket.reopen_ticket')
 
 prepend sidebar
   .row

@@ -12,7 +12,11 @@ module.exports =
   get:
     list: api.accountAuthenticateRender (req, res, account, renderer) ->
       mTicket.find
-        account_id: account._id
+        $or: [
+            account_id: account._id
+          ,
+            members: account._id
+        ]
       ,
         sort:
           updated_at: -1
@@ -121,7 +125,11 @@ module.exports =
 
         mTicket.find do ->
           selector =
-            account_id: account._id
+            $or: [
+                account_id: account._id
+              ,
+                members: account._id
+            ]
 
           if req.body.type?.toLowerCase() in config.ticket.availableType
             selector['type'] = req.body.type.toLowerCase()
@@ -156,6 +164,13 @@ module.exports =
         pullModifier = []
 
         mTicket.findId req.body.id, (ticket) ->
+          unless ticket
+            return res.json 400, error: 'ticket_not_exist'
+
+          unless mTicket.getMember ticket, account
+            unless mAccount.inGroup account, 'root'
+              return res.json 400, error: 'forbidden'
+
           if req.body.type
             if req.body.type in config.ticket.availableType
               modifier['type'] = req.body.type
