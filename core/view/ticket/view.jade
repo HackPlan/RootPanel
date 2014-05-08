@@ -29,25 +29,27 @@ block main
               span.label.label-default= reply.created_at
 
   .row
-    header= t('ticket.create_reply')
+    if ticket.status != 'closed'
+      header= t('ticket.create_reply')
     form.form-horizontal(method='post', role='form')
+      if ticket.status != 'closed'
+        .form-group.padding
+          textarea.form-control#reply-content(name='content', rows='5', required)
       .form-group.padding
-        textarea.form-control#reply-content(name='content', rows='5', required)
-      .form-group.padding
-        button.btn.btn-lg.btn-primary#reply-btn(type='submit')= t('ticket.create_reply')
-        case ticket.status
-          when 'open'
-            button.btn.btn-lg.btn-danger#close-btn= t('ticket.close_ticket')
-          when 'closed'
-            button.btn.btn-lg.btn-success= t('ticket.reopen_ticket')
-
-        button.btn.btn-lg.btn-success= t('ticket.finish_ticket')
+        if ticket.status != 'closed'
+          button.btn.btn-lg.btn-primary#reply-btn(type='submit')= t('ticket.create_reply')
+          button.btn.btn-lg.btn-danger#close-btn= t('ticket.close_ticket')
+        if mAccount.inGroup(account, 'root') && (ticket.status == 'open' || ticket.status == 'pending')
+          button.btn.btn-lg.btn-success#finish-btn= t('ticket.finish_ticket')
+        if mAccount.inGroup(account, 'root') && ticket.status == 'closed'
+          button.btn.btn-lg.btn-success#reopen-btn= t('ticket.reopen_ticket')
 
 prepend sidebar
   .row
     a.btn.btn-lg.btn-success(href='/ticket/list/')= t('ticket.ticket_list')
 
   .row
+    header= t('ticket.creator')
     li.list-group-item.clearfix
       a.pull-left
         img(src= ticket.account.setting.avatar_url)
@@ -55,6 +57,12 @@ prepend sidebar
         span.label.label-info= ticket.account.username
         br
         span.label.label-default= ticket.created_at.toJSON()
+
+  .row
+    header= t('ticket.members')
+    for member in ticket.members
+      a.pull-left
+        img(src= member.setting.avatar_url, alt= member.username)
 
 append footer
   script(src='/script/ticket/reply.js')

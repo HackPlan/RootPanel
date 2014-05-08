@@ -13,7 +13,7 @@ module.exports =
 
   post:
     signup: (req, res) ->
-      unless /^[0-9a-z_]+$/.test req.body.username
+      unless /^[0-9a-z_]{3,23}$/.test req.body.username
         return res.json 400, error: 'invalid_username'
 
       unless /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test req.body.email
@@ -39,7 +39,7 @@ module.exports =
                 id: account._id
 
     login: (req, res) ->
-      mAccount.byUsernameOrEmail req.body.username, (account) ->
+      mAccount.byUsernameOrEmailOrId req.body.username, (account) ->
         unless account
           return res.json 400, error: 'auth_failed'
 

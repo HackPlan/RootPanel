@@ -3,7 +3,7 @@ _ = require 'underscore'
 mAccount = require '../model/account'
 
 exports.bind = (app) ->
-  for item in ['account', 'panel', 'ticket', 'admin']
+  for item in ['account', 'panel', 'ticket', 'admin', 'plan']
     apiModule = require('./' + item)
 
     generateUrl = (name) ->

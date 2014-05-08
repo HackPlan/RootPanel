@@ -12,7 +12,11 @@ module.exports =
   get:
     list: api.accountAuthenticateRender (req, res, account, renderer) ->
       mTicket.find
-        account_id: account._id
+        $or: [
+            account_id: account._id
+          ,
+            members: account._id
+        ]
       ,
         sort:
           updated_at: -1
@@ -33,19 +37,25 @@ module.exports =
           unless mTicket.getMember ticket, account
             return res.send 403
 
-        async.map ticket.replys, (reply, callback) ->
-          mAccount.findId reply.account_id, (reply_account) ->
-            reply.account = reply_account
-            callback null, reply
-
+        async.map ticket.members, (member, callback) ->
+          mAccount.findId member, (member_account) ->
+            callback null, member_account
         , (err, result) ->
-          ticket.replys = result
+          ticket.members = result
 
-          mAccount.findId ticket.account_id, (ticket_account) ->
-            ticket.account = ticket_account
+          async.map ticket.replys, (reply, callback) ->
+            mAccount.findId reply.account_id, (reply_account) ->
+              reply.account = reply_account
+              callback null, reply
 
-            renderer 'ticket/view',
-              ticket: ticket
+          , (err, result) ->
+            ticket.replys = result
+
+            mAccount.findId ticket.account_id, (ticket_account) ->
+              ticket.account = ticket_account
+
+              renderer 'ticket/view',
+                ticket: ticket
 
   post:
     create: (req, res) ->
@@ -59,8 +69,8 @@ module.exports =
         unless req.body.type in config.ticket.availableType
           return res.json 400, error: 'invalid_type'
 
-        createTicket = (members) ->
-          mTicket.createTicket account, req.body.title, req.body.content, req.body.type, members, {}, (ticket) ->
+        createTicket = (members, status) ->
+          mTicket.createTicket account, req.body.title, req.body.content, req.body.type, members, status, {}, (ticket) ->
             return res.json
               id: ticket._id
 
@@ -71,7 +81,7 @@ module.exports =
             for memberName in req.body.members
               do (memberName = _.clone(memberName)) ->
                 tasks.push (callback) ->
-                  mAccount.byUsernameOrEmail memberName, (member) ->
+                  mAccount.byUsernameOrEmailOrId memberName, (member) ->
                     unless member
                       res.json 400, error: 'invalid_account', username: memberName
                       callback true
@@ -85,10 +95,10 @@ module.exports =
             unless _.find(result, (item) -> item._id == account._id)
               result.push account
 
-            createTicket result
+            createTicket result, 'open'
 
         else
-          createTicket [account]
+          createTicket [account], 'pending'
 
     reply: (req, res) ->
       mAccount.authenticate req.token, (account) ->
@@ -103,7 +113,8 @@ module.exports =
             unless mAccount.inGroup account, 'root'
               return res.json 400, error: 'forbidden'
 
-          mTicket.createReply ticket, account, req.body.content, (reply) ->
+          status = if mAccount.inGroup(account, 'root') then 'open' else 'pending'
+          mTicket.createReply ticket, account, req.body.content, status, (reply) ->
             return res.json
               id: reply._id
 
@@ -114,7 +125,11 @@ module.exports =
 
         mTicket.find do ->
           selector =
-            account_id: account._id
+            $or: [
+                account_id: account._id
+              ,
+                members: account._id
+            ]
 
           if req.body.type?.toLowerCase() in config.ticket.availableType
             selector['type'] = req.body.type.toLowerCase()
@@ -149,6 +164,13 @@ module.exports =
         pullModifier = []
 
         mTicket.findId req.body.id, (ticket) ->
+          unless ticket
+            return res.json 400, error: 'ticket_not_exist'
+
+          unless mTicket.getMember ticket, account
+            unless mAccount.inGroup account, 'root'
+              return res.json 400, error: 'forbidden'
+
           if req.body.type
             if req.body.type in config.ticket.availableType
               modifier['type'] = req.body.type
@@ -165,9 +187,40 @@ module.exports =
               if ticket.status == req.body.status
                 return res.json 400, error: 'already_in_status'
               else
-                modifier['status'] = ticket.status
+                modifier['status'] = req.body.status
             else
               return res.json 400, error: 'invalid_status'
+
+          saveToDatabase = ->
+            async.parallel [
+              (callback) ->
+                unless _.isEmpty modifier
+                  mTicket.update _id: ticket._id,
+                    $set: modifier
+                  , {}, callback
+                else
+                  callback()
+
+              (callback) ->
+                unless _.isEmpty addToSetModifier
+                  mTicket.update _id: ticket._id,
+                    $addToSet:
+                      members:
+                        $each: addToSetModifier
+                  , {}, callback
+                else
+                  callback()
+
+              (callback) ->
+                unless _.isEmpty pullModifier
+                  mTicket.update _id: ticket._id,
+                    $pullAll:
+                      members: pullModifier
+                  , {}, callback
+                else
+                  callback()
+            ], ->
+              return res.json {}
 
           if mAccount.inGroup account, 'root'
             if req.body.attribute
@@ -177,42 +230,27 @@ module.exports =
                 modifier['attribute.public'] = false
 
             if req.body.members
-              for member_id, op of req.body.members
-                member_id = db.ObjectID member_id
+              tasks = {}
 
-                if mTicket.getMember ticket, {_id: member_id}
-                  unless op
-                    pullModifier.push member_id
-                else
-                  if op
-                    addToSetModifier.push member_id
+              member_name = _.filter _.union(req.body.members.add, req.body.members.remove), (item) -> item
+              for item in member_name
+                tasks[item] = do (item = _.clone(item)) ->
+                  return (callback) ->
+                    mAccount.byUsernameOrEmailOrId item, (result) ->
+                      callback null, result
 
-          async.parallel [
-            (callback) ->
-              unless _.isEmpty modifier
-                mTicket.update _id: ticket._id,
-                  $set: modifier
-                , {}, callback
-              else
-                callback()
+              async.parallel tasks, (err, result) ->
+                if req.body.members.add
+                  for item in req.body.members.add
+                    addToSetModifier.push result[item]._id
 
-            (callback) ->
-              unless _.isEmpty addToSetModifier
-                mTicket.update _id: ticket._id,
-                  $addToSet:
-                    members:
-                      $each: addToSetModifier
-                , {}, callback
-              else
-                callback()
+                if req.body.members.remove
+                  for item in req.body.members.remove
+                    pullModifier.push result[item]._id
 
-            (callback) ->
-              unless _.isEmpty pullModifier
-                mTicket.update _id: ticket._id,
-                  $pullAll:
-                    members: pullModifier
-                , {}, callback
-              else
-                callback()
-          ], ->
-            return res.json {}
+                saveToDatabase()
+            else
+              saveToDatabase()
+
+          else
+            saveToDatabase()

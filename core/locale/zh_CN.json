@@ -37,7 +37,9 @@
     "ticket_list": "工单列表",
     "close_ticket": "关闭",
     "finish_ticket": "完成",
-    "reopen_ticket": "重新打开"
+    "reopen_ticket": "重新打开",
+    "creator": "创建者",
+    "members": "成员"
   },
   "plan": {
     "": "套餐"

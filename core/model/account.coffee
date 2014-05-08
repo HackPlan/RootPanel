@@ -79,12 +79,16 @@ exports.authenticate = (token, callback) ->
     'tokens.token': token
   , {}, callback
 
-exports.byUsernameOrEmail = (username, callback) ->
+exports.byUsernameOrEmailOrId = (username, callback) ->
   exports.byUsername username, (account) ->
     if account
       return callback account
 
-    exports.byEmail username, callback
+    exports.byEmail username, (account) ->
+      if account
+        return callback account
+
+      exports.findId username, callback
 
 # @return bool
 exports.matchPasswd = (account, passwd) ->

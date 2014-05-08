@@ -25,6 +25,7 @@ exports.runWebServer = ->
     app.use (req, res, next) ->
       res.locals.app = app
       res.locals.t = i18n.getTranslator 'zh_CN'
+      res.locals.mAccount = require './model/account'
 
       next()
 
