@@ -25,7 +25,11 @@ exports.register = (username, email, passwd, callback = null) ->
     setting:
       avatar_url: "//ruby-china.org/avatar/#{crypto.createHash('md5').update(email).digest('hex')}?s=58"
     attribure:
+      service: []
       plans: []
+      balance: 0
+      last_billing: new Date()
+      arrears_at: null
     tokens: []
   , {}, callback
 
@@ -65,7 +69,7 @@ exports.createToken = (account, attribute, callback) ->
       callback token
 
 exports.removeToken = (token, callback) ->
-  exports.update
+  exports.update 'tokens.token': token,
     $pull:
       tokens:
         token: token
@@ -96,3 +100,15 @@ exports.matchPasswd = (account, passwd) ->
 
 exports.inGroup = (account, group) ->
   return group in account.group
+
+exports.joinPlan = (account, plan, callback) ->
+  exports.update _id: account._id,
+    $addToSet:
+      'attribute.plans': plan
+  , {}, callback
+
+exports.incBalance = (account, amount, callback) ->
+  exports.update _id: account._id,
+    $inc:
+      'attribute.balance': amount
+  , {}, callback

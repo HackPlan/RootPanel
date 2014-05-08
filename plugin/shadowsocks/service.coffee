@@ -1,6 +1,6 @@
 module.exports =
-  enable: ->
+  enable: (account, callback) ->
 
-  pause: ->
+  pause: (account, callback) ->
 
-  delete: ->
+  delete: (account, callback) ->
