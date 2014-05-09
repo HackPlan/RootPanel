@@ -7,6 +7,12 @@ prepend head
 block main
   .row#ticketid(data-id= '#{ticket._id}')
     header= ticket.title
+    //- 等pending改好后可以统一处理，这里先用case
+    case ticket.status
+      when 'open'
+        span.btn-success(role='btn') 打开的
+      when 'closed'
+        span.btn-danger(role='btn') 关闭的
     p!= ticket.content_html
 
   .row
@@ -23,19 +29,20 @@ block main
               span.label.label-default= reply.created_at
 
   .row
-    header= t('ticket.create_reply')
+    if ticket.status != 'closed'
+      header= t('ticket.create_reply')
     form.form-horizontal(method='post', role='form')
       if ticket.status != 'closed'
         .form-group.padding
           textarea.form-control#reply-content(name='content', rows='5', required)
       .form-group.padding
         if ticket.status != 'closed'
-          button.btn.btn-lg.btn-primary#reply(type='submit')= t('ticket.create_reply')
-          button.btn.btn-lg.btn-danger= t('ticket.close_ticket')
+          button.btn.btn-lg.btn-primary#reply-btn(type='submit')= t('ticket.create_reply')
+          button.btn.btn-lg.btn-danger#close-btn= t('ticket.close_ticket')
         if mAccount.inGroup(account, 'root') && (ticket.status == 'open' || ticket.status == 'pending')
-          button.btn.btn-lg.btn-success= t('ticket.finish_ticket')
+          button.btn.btn-lg.btn-success#finish-btn= t('ticket.finish_ticket')
         if mAccount.inGroup(account, 'root') && ticket.status == 'closed'
-          button.btn.btn-lg.btn-success= t('ticket.reopen_ticket')
+          button.btn.btn-lg.btn-success#reopen-btn= t('ticket.reopen_ticket')
 
 prepend sidebar
   .row
