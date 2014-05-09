@@ -4,7 +4,7 @@
     add-apt-repository ppa:chris-lea/node.js
     apt-get update
     apt-get upgrade
-    
+
     apt-get install nodejs git mongodb memcached nginx python g++ make
     npm install pm2 gulp -g
 
@@ -19,8 +19,6 @@
     vi core/config.coffee
 
     npm install
-    gulp less coffee
-    pm2 start app.coffee
 
     rm /etc/nginx/sites-enabled/default
     cat > /etc/nginx/sites-available/rpadmin
@@ -38,4 +36,3 @@
 
     ln -s /etc/nginx/sites-available/rpadmin /etc/nginx/sites-enabled
     service nginx restart
-
