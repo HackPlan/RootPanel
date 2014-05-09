@@ -8,7 +8,7 @@ exports.calcBilling = (account, callback) ->
   for planName in account.attribute.plans
     plan = config.plans[planName]
 
-    price = plan.pirce / 30 / 24
+    price = plan.price / 30 / 24
     time = (Date.now() - account.attribute.last_billing.getTime()) / 1000 / 3600
     time = Math.ceil time
     amount += price * time
