@@ -35,7 +35,8 @@
     "markdown": "*",
     "frisby": "*",
     "async": "*",
-    "connect": "*"
+    "connect": "*",
+    "harp": "*"
   },
   "devDependencies": {
     "gulp": "~3.5.6",

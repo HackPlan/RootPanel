@@ -1,6 +1,7 @@
 express = require 'express'
 connect = require 'connect'
 path = require 'path'
+harp = require 'harp'
 fs = require 'fs'
 
 config = require './config'
@@ -37,7 +38,7 @@ exports.runWebServer = ->
 
       next()
 
-    app.use express.static(path.join(__dirname, 'static'))
+    app.use harp.mount(path.join(__dirname, 'static'))
 
     app.set 'views', path.join(__dirname, 'view')
     app.set 'view engine', 'jade'
