@@ -24,6 +24,7 @@
     "start": "make run"
   },
   "dependencies": {
+    "jade": "*",
     "express": "*",
     "coffee-script": "*",
     "mongodb": "*",

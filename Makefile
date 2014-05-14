@@ -21,10 +21,10 @@ run:
 	node node_modules/coffee-script/bin/coffee app.coffee
 
 start:
-	node node_modules/coffee-script/bin/pm2 -n RootPanel start app.coffee
+	node node_modules/pm2/bin/pm2 -n RootPanel start app.coffee
 
 restart:
-	node node_modules/coffee-script/bin/pm2 restart RootPanel
+	node node_modules/pm2/bin/pm2 restart RootPanel
 
 stop:
-	node node_modules/coffee-script/bin/pm2 delete RootPanel
+	node node_modules/pm2/bin/pm2 delete RootPanel

@@ -6,7 +6,6 @@
     apt-get upgrade
 
     apt-get install nodejs git mongodb memcached nginx python g++ make
-    npm install pm2 gulp -g
 
     adduser rpadmin
     usermod -G rpadmin -a www-data
@@ -36,3 +35,5 @@
 
     ln -s /etc/nginx/sites-available/rpadmin /etc/nginx/sites-enabled
     service nginx restart
+
+    make start
