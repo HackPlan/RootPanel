@@ -32,14 +32,16 @@ module.exports =
         transfer: 39
         memory: 27
 
-    shadowsocks:
+    ssh:
       price: 8
-      t_name: 'ShadowSocks'
-      t_service: '仅 ShadowSocks'
-      t_resources: '流量: 100GB'
-      service: ['shadowsocks']
+      t_name: 'SSH'
+      t_service: '仅 SSH'
+      t_resources: '前期测试用'
+      service: ['ssh']
       resources:
-        transfer: 100
+        storage: 520
+        transfer: 39
+        memory: 27
 
   db:
     type: 'mongo'
