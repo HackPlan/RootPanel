@@ -17,7 +17,7 @@ exports.calcBilling = (account, callback) ->
     $set:
       'attribute.last_billing': new Date()
     $inc:
-      'attribute.balance': amount
+      'attribute.balance': -amount
 
   if !account.attribute.arrears_at and account.attribute.balance < 0
     modifier['attribute.arrears_at'] = new Date()
