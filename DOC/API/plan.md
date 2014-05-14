@@ -25,3 +25,7 @@ Request:
     }
 
 No Response.
+
+Exception:
+
+* not_in_plan
