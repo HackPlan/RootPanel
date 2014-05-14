@@ -25,3 +25,15 @@ exports.calcBilling = (account, callback) ->
   mAccount.update _id: account._id, modifier, {}, ->
     mAccount.findId account._id, (account) ->
       callback account
+
+exports.calcRemainingTime = (account) ->
+  price = 0
+
+  for planName in account.attribute.plans
+    plan = config.plans[planName]
+
+    price += plan.price / 30 / 24
+
+  console.log price
+
+  return account.attribute.balance / price

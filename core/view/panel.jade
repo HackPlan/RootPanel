@@ -19,10 +19,13 @@ block content
             a(href='/ticket/list/')
               span.glyphicon.pull-right.glyphicon-edit
               | #{t('ticket.')}
-      
+
       .col-md-9
         .row
-          header 概况
+          header= t('panel.overview')
+          p
+            | #{t('plan.balance')}: #{account.attribute.balance.toFixed(2)} #{t('plan.currency.cny')}
+            | #{t('plan.remaining_time')}: #{account.attribute.remaining_time} #{t('time.day')}
 
         .row
           header= t('plan.')
@@ -35,7 +38,6 @@ block content
                   td= plan.t_resources
                   td
                     if plan.isEnable
-                      button.btn.btn-danger.btn-sm 退订
+                      button.btn.btn-danger.btn-sm= t('plan.unsubscribe')
                     else
-                      button.btn.btn-success.btn-sm 订购
-
+                      button.btn.btn-success.btn-sm= t('plan.subscribe')

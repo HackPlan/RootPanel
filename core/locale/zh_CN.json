@@ -22,7 +22,8 @@
     "logout": "注销"
   },
   "panel": {
-    "": "管理面板"
+    "": "管理面板",
+    "overview": "概况"
   },
   "ticket": {
     "": "工单",
@@ -42,10 +43,20 @@
     "members": "成员"
   },
   "plan": {
-    "": "套餐"
+    "": "套餐",
+    "subscribe": "订购",
+    "unsubscribe": "退订",
+    "balance": "余额",
+    "remaining_time": "剩余时长",
+    "currency": {
+      "cny": "CNY"
+    }
   },
   "admin": {
     "admin_panel": "管理员面板"
+  },
+  "time": {
+    "day": "天"
   },
   "view": {
     "layout": {
