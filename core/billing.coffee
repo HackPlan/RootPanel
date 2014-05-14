@@ -14,7 +14,8 @@ exports.calcBilling = (account, callback) ->
     amount += price * time
 
   modifier =
-    'attribute.last_billing': new Date()
+    $set:
+      'attribute.last_billing': new Date()
     $inc:
       'attribute.balance': amount
 

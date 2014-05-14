@@ -21,7 +21,7 @@
     }
   ],
   "scripts": {
-    "start": "node app.js"
+    "start": "make run"
   },
   "dependencies": {
     "express": "*",

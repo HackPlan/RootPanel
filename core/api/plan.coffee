@@ -15,17 +15,17 @@ module.exports =
         unless account
           return res.json 400, error: 'auth_failed'
 
-        unless req.body.plan in config.plans
+        unless req.body.plan in _.keys(config.plans)
           return res.json 400, error: 'invaild_plan'
 
         if req.body.plan in account.attribute.plans
           return res.json 400, error: 'already_in_plan'
 
-        billing.calcBiling account, (account) ->
+        billing.calcBilling account, (account) ->
           if account.attribute.balance < 0
             return res.json 400, error: 'insufficient_balance'
 
-          mAccount.joinPlan account, req.body.plan, (account) ->
+          mAccount.joinPlan account, req.body.plan, ->
             async.each config.plans[req.body.plan].service, (serviceName, callback) ->
               if serviceName in account.attribute.service
                 return callback()
@@ -47,7 +47,7 @@ module.exports =
         unless req.body.plan in account.attribute.plans
           return res.json 400, error: 'not_in_plan'
 
-        billing.calcBiling account, (account) ->
+        billing.calcBilling account, (account) ->
           async.each config.plans[req.body.plan].service, (serviceName, callback) ->
             stillInService = do ->
               for item in account.attribute.plans

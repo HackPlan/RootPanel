@@ -16,7 +16,7 @@ module.exports =
       for name, info of config.plans
         plans.push _.extend info,
           name: name
-          isEnable: name in account.attribure.plans
+          isEnable: name in account.attribute.plans
 
       renderer 'panel',
         plans: plans
