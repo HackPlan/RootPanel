@@ -30,7 +30,7 @@ module.exports =
               if serviceName in account.attribute.service
                 return callback()
 
-              mAccount.uodate _id: account._id,
+              mAccount.update _id: account._id,
                 $addToSet:
                   'attribute.service': serviceName
               , {}, ->
@@ -48,22 +48,23 @@ module.exports =
           return res.json 400, error: 'not_in_plan'
 
         billing.calcBilling account, (account) ->
-          async.each config.plans[req.body.plan].service, (serviceName, callback) ->
-            stillInService = do ->
-              for item in account.attribute.plans
-                if serviceName in config.plans[req.body.plan].service
-                  return true
+          mAccount.leavePlan account, req.body.plan, ->
+            async.each config.plans[req.body.plan].service, (serviceName, callback) ->
+              stillInService = do ->
+                for item in _.without(account.attribute.plans, req.body.plan)
+                  if serviceName in config.plans[req.body.plan].service
+                    return true
 
-              return false
+                return false
 
-            if stillInService
-              callback()
-            else
-              mAccount.uodate _id: account._id,
-                $pull:
-                  'attribute.service': serviceName
-              , {}, ->
-                (plugin.get serviceName).service.delete account, ->
-                  callback()
-          , ->
-            return res.json {}
+              if stillInService
+                callback()
+              else
+                mAccount.update _id: account._id,
+                  $pull:
+                    'attribute.service': serviceName
+                , {}, ->
+                  (plugin.get serviceName).service.delete account, ->
+                    callback()
+            , ->
+              return res.json {}

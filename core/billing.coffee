@@ -19,7 +19,7 @@ exports.calcBilling = (account, callback) ->
     $inc:
       'attribute.balance': amount
 
-  if (not account.attribute.arrears_at) and account.attribute.balance < 0
+  if !account.attribute.arrears_at and account.attribute.balance < 0
     modifier['attribute.arrears_at'] = new Date()
 
   mAccount.update _id: account._id, modifier, {}, ->

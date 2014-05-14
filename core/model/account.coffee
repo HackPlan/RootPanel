@@ -107,6 +107,12 @@ exports.joinPlan = (account, plan, callback) ->
       'attribute.plans': plan
   , {}, callback
 
+exports.leavePlan = (account, plan, callback) ->
+  exports.update _id: account._id,
+    $pull:
+      'attribute.plans': plan
+  , {}, callback
+
 exports.incBalance = (account, amount, callback) ->
   exports.update _id: account._id,
     $inc:
