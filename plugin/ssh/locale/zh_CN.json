@@ -1,3 +1,4 @@
 {
-  "name": "SSH"
+  "name": "SSH",
+  "description": "SSH 是 RootPanel 的基础服务，除了提供 SSH 登录之外，还负责监控其他各种资源的使用"
 }
