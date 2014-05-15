@@ -12,7 +12,7 @@ module.exports =
       res.redirect '/panel/'
 
     '/panel/': api.accountAuthenticateRender (req, res, account, renderer) ->
-      billing.calcBilling account, (account) ->
+      billing.checkBilling account, (account) ->
         plans = []
 
         for name, info of config.plans

@@ -2,6 +2,12 @@ config = require './config'
 
 mAccount = require './model/account'
 
+exports.checkBilling = (account, callback) ->
+  if (Date.now() - account.attribute.last_billing.getTime()) > 24 * 3600 * 1000
+    exports.calcBilling account, callback
+  else
+    callback account
+
 exports.calcBilling = (account, callback) ->
   amount = 0
 
@@ -33,7 +39,5 @@ exports.calcRemainingTime = (account) ->
     plan = config.plans[planName]
 
     price += plan.price / 30 / 24
-
-  console.log price
 
   return account.attribute.balance / price
