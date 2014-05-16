@@ -21,6 +21,8 @@ block content
               | #{t('ticket.')}
 
       .col-md-9
+        #page-alert.alert.alert-danger
+        #page-success.alert.alert-success
         .row
           header= t('panel.overview')
           p
@@ -30,13 +32,13 @@ block content
         .row
           header= t('plan.')
           table.table.table-hover
-            tbody
+            tbody#service
               for plan in plans
                 tr
                   td= plan.t_name
                   td= plan.t_service
                   td= plan.t_resources
-                  td
+                  td(data-type='#{plan.name}')
                     if plan.isEnable
                       button.btn.btn-danger.btn-sm= t('plan.unsubscribe')
                     else
@@ -45,3 +47,5 @@ block content
         for widget in widgets
           .row
             != widget.html
+append footer
+  script(src='/script/panel/panel.js')
