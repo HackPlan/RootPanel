@@ -14,4 +14,4 @@ $ ->
     .fail (reply) ->
       if reply.status is 400
         error = reply.responseJSON.error
-        ErrorHandle.flushError error
+        ErrorHandle.flushInfo 'error', error

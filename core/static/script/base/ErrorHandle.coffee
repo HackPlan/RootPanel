@@ -1,18 +1,21 @@
 $ ->
 	window.ErrorHandle =
-		addError: (error) ->
-			$('#page-alert').append "<p>#{error}</p>"
+		addInfo: (type, info) ->
+			$("#page-#{type}").append "<p>#{info}</p>"
 
-		clearError: ->
-			$('#page-alert').empty()
+		clearInfo: (type) ->
+			$("#page-#{type}").empty()
 
-		showError: ->
-			$('#page-alert').show()
+		showInfo: (type, callback) ->
+			$("#page-#{type}").show 400, if callback? then callback or null
 
-		hideError: ->
-			$('#page-alert').hide()
 
-		flushError: (error) ->
-			@clearError()
-			@addError error
-			@showError()
+		hideInfo: (type) ->
+			$("#page-#{type}").hide()
+
+		flushInfo: (type, error, callback = null) ->
+			@clearInfo type
+			@addInfo type, error
+			@showInfo type, callback
+
+
