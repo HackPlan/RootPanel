@@ -1,5 +1,3 @@
-jade = require 'jade'
-path = require 'path'
 
 module.exports =
   update_passwd:
@@ -13,7 +11,3 @@ module.exports =
   reset_permission:
     mode: 'alert'
     callback: ->
-
-  widget: (callback) ->
-    jade.renderFile path.join(__dirname, 'view/widget.jade'), {}, (err, html) ->
-      callback html
