@@ -47,7 +47,7 @@ exports.runWebServer = ->
     api.bind app
 
     plugin = require './plugin'
-    plugin.loadPlugins()
+    plugin.loadPlugins app
 
     app.listen config.web.port
 

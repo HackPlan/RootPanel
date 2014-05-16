@@ -18,7 +18,7 @@ module.exports =
     ]
 
   plugin:
-    availablePlugin: ['shadowsocks']
+    availablePlugin: ['ssh']
 
   plans:
     all:
