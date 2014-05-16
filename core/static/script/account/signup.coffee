@@ -2,7 +2,7 @@ $ ->
   $('.signup-btn').on 'click', (e) ->
     e.preventDefault()
     if $('#passwd').val() isnt $('#passwd2').val()
-      ErrorHandle.flushInfo 'error', '两次密码不一致'
+      ErrorHandle.flushInfo 'alert', '两次密码不一致'
     else
       data =
         username: $('#username').val()
@@ -17,4 +17,4 @@ $ ->
       .fail (reply) ->
         if reply.status is 400
           error = reply.responseJSON.error
-          ErrorHandle.flushInfo 'error', error
+          ErrorHandle.flushInfo 'alert', error
