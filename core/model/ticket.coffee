@@ -40,9 +40,10 @@ exports.createReply = (ticket, account, content, status, callback) ->
   exports.update _id: ticket._id,
     $push:
       replys: data
-    status: status
-    updated_at: new Date()
-  , ->
+    $set:
+      status: status
+      updated_at: new Date()
+  , {}, ->
     unless exports.getMember ticket, account
       exports.addMember ticket, account, ->
         callback data
