@@ -22,6 +22,9 @@ module.exports =
       unless req.body.passwd or not /^.+$/.test req.body.passwd
         return res.json 400, error: 'invalid_passwd'
 
+      if req.body.username in config.account.invalid_username
+        return res.json 400, error: 'username_exist'
+
       mAccount.byUsername req.body.username, (account) ->
         if account
           return res.json 400, error: 'username_exist'

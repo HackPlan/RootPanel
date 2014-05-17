@@ -6,10 +6,12 @@
     apt-get update
     apt-get upgrade
 
-
     apt-get install nodejs git mongodb memcached nginx postfix
     apt-get install python g++ make screen git wget zip unzip iftop unrar-free axel vim emacs subversion subversion-tools curl tmux mercurial
     apt-get install ntp quota quotatool
+
+    vi /etc/hostname
+    vi /etc/hosts
 
     adduser rpadmin
     usermod -G rpadmin -a www-data
