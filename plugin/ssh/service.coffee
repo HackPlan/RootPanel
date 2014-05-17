@@ -1,6 +1,7 @@
 child_process = require 'child_process'
 jade = require 'jade'
 path = require 'path'
+async = require 'async'
 
 module.exports =
   enable: (account, callback) ->
@@ -11,7 +12,13 @@ module.exports =
   pause: (account, callback) ->
 
   delete: (account, callback) ->
-    child_process.exec "sudo userdel -rf #{account.username}", (err, stdout, stderr) ->
+    async.series [
+      (callback) ->
+        child_process.exec "sudo pkill -u #{account.username}", callback
+
+      (callback) ->
+        child_process.exec "sudo userdel -rf #{account.username}", callback
+    ], (err) ->
       throw err if err
       callback()
 
