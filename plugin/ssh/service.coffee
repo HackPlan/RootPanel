@@ -14,10 +14,12 @@ module.exports =
   delete: (account, callback) ->
     async.series [
       (callback) ->
-        child_process.exec "sudo pkill -u #{account.username}", callback
+        child_process.exec "sudo pkill -u #{account.username}", ->
+          callback()
 
       (callback) ->
-        child_process.exec "sudo userdel -rf #{account.username}", callback
+        child_process.exec "sudo userdel -rf #{account.username}", ->
+          callback()
     ], (err) ->
       throw err if err
       callback()
