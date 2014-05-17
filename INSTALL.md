@@ -16,6 +16,11 @@
     su rpadmin
     cd ~
 
+    # create rpadmin mongodb user
+    vi /etc/mongodb.conf
+
+        auth = true
+
     git clone https://github.com/jysperm/RootPanel.git
     cd RootPanel
 
