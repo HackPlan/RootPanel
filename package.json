@@ -30,7 +30,7 @@
     "mongodb": "*",
     "underscore": "*",
     "jasmine-node": "~1.14.3",
-    "pm2": "*",
+    "forever": "*",
     "markdown": "*",
     "frisby": "*",
     "async": "*",

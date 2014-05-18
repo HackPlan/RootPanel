@@ -15,11 +15,11 @@ clean:
 run:
 	node node_modules/coffee-script/bin/coffee app.coffee
 
-start: install
-	node node_modules/pm2/bin/pm2 -n RootPanel start app.coffee
+start: build
+	node node_modules/forever/bin/forever start app.js
 
 restart:
-	node node_modules/pm2/bin/pm2 restart RootPanel
+	node node_modules/forever/bin/forever restart app.js
 
 stop:
-	node node_modules/pm2/bin/pm2 delete RootPanel
+	node node_modules/forever/bin/forever stop app.js
