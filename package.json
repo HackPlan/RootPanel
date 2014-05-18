@@ -1,7 +1,7 @@
 {
   "name": "RootPanel",
-  "version": "3.0.0",
-  "description": "A pluggable Linux virtual host selling system.",
+  "version": "0.1.0",
+  "description": "A linux virtual host management system with extensibility",
   "homepage": "http://rpvhost.net",
   "license": "GPL-3.0",
   "repository": {
