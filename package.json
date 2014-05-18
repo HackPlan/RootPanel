@@ -1,5 +1,5 @@
 {
-  "name": "RootPanel",
+  "name": "rootpanel",
   "version": "0.1.0",
   "description": "A linux virtual host management system with extensibility",
   "homepage": "http://rpvhost.net",
