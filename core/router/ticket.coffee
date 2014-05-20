@@ -89,12 +89,12 @@ exports.post '/create', requestAuthenticate, (req, res) ->
         return
 
       unless _.find(result, (item) -> item._id == req.account._id)
-        result.push account
+        result.push req.account
 
       createTicket result, 'open'
 
   else
-    createTicket [account], 'pending'
+    createTicket [req.account], 'pending'
 
 exports.post '/reply', requestAuthenticate, (req, res) ->
   mTicket.findId req.body.id, (ticket) ->
