@@ -8,6 +8,12 @@ config = require './config'
 db = require './db'
 i18n = require './i18n'
 
+bindRouters = (app) ->
+  app.use '/account', require './router/account'
+
+  plugin = require './plugin'
+  plugin.loadPlugins app
+
 exports.runWebServer = ->
   db.connect ->
     app = express()
@@ -30,24 +36,12 @@ exports.runWebServer = ->
 
       next()
 
-    app.use (req, res, next) ->
-      if req.headers['x-token']
-        req.token = req.headers['x-token']
-      else
-        req.token = req.cookies.token
-
-      next()
-
     app.use harp.mount(path.join(__dirname, 'static'))
 
     app.set 'views', path.join(__dirname, 'view')
     app.set 'view engine', 'jade'
 
-    api = require './api'
-    api.bind app
-
-    plugin = require './plugin'
-    plugin.loadPlugins app
+    bindRouters app
 
     app.listen config.web.port
 

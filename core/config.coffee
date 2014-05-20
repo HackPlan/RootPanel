@@ -53,4 +53,4 @@ module.exports =
     server: 'localhost'
     name: 'RootPanel'
     user: 'rpadmin'
-    passwd: 'passwd'
+    passwd: ''
