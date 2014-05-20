@@ -51,3 +51,19 @@ exports.requestAuthenticate = (req, res, next) ->
         res.redirect '/account/login/'
       else
         res.error 'auth_failed'
+
+exports.requestAdminAuthenticate = (req, res, next) ->
+  inject [exports.accountInfo, exports.errorHandling], req, res, ->
+    unless req.account
+      if req.method == 'GET'
+        return res.redirect '/account/login/'
+      else
+        return res.error 'auth_failed'
+
+    unless mAccount.inGroup req.account, 'root'
+      if req.method == 'GET'
+        return res.send 403
+      else
+        return res.error 'auth_failed'
+
+    next()
