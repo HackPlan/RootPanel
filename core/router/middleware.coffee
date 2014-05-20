@@ -1,12 +1,4 @@
-_ = require 'underscore'
-async = require 'async'
-
 mAccount = require '../model/account'
-
-inject = (dependency, req, res, callback) ->
-  async.eachSeries dependency, (item, callback) ->
-    item req, res, callback
-  , callback
 
 exports.parseToken = (req, res, next) ->
   if req.headers['x-token']
@@ -29,13 +21,13 @@ exports.errorHandling = (req, res, next) ->
   next()
 
 exports.accountInfo = (req, res, next) ->
-  inject [exports.parseToken], req, res, ->
+  req.inject [exports.parseToken], ->
     mAccount.authenticate req.token, (account) ->
       req.account = account
       next()
 
 exports.renderAccount = (req, res, next) ->
-  inject [exports.accountInfo], req, res, ->
+  req.inject [exports.accountInfo], ->
     old_render = res.render
     res.render = (name, options = {} , fn) ->
       options = _.extend {account: req.account}, options
@@ -43,7 +35,7 @@ exports.renderAccount = (req, res, next) ->
     next()
 
 exports.requestAuthenticate = (req, res, next) ->
-  inject [exports.accountInfo, exports.errorHandling], req, res, ->
+  req.inject [exports.accountInfo, exports.errorHandling], ->
     if req.account
       next()
     else
@@ -53,7 +45,7 @@ exports.requestAuthenticate = (req, res, next) ->
         res.error 'auth_failed'
 
 exports.requestAdminAuthenticate = (req, res, next) ->
-  inject [exports.accountInfo, exports.errorHandling], req, res, ->
+  req.inject [exports.accountInfo, exports.errorHandling], ->
     unless req.account
       if req.method == 'GET'
         return res.redirect '/account/login/'

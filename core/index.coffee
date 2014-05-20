@@ -1,5 +1,7 @@
 express = require 'express'
 connect = require 'connect'
+async = require 'async'
+_ = require 'underscore'
 path = require 'path'
 harp = require 'harp'
 fs = require 'fs'
@@ -9,8 +11,26 @@ db = require './db'
 i18n = require './i18n'
 
 bindRouters = (app) ->
+  app.use (req, res, next) ->
+    req.inject = (dependency, callback) ->
+      if req.injected
+        dependency = _.reject dependency, (item) ->
+          return item in req.injected
+
+      async.eachSeries dependency, (item, callback) ->
+        req.injected = [] unless req.injected
+        req.injected.push item
+        item req, res, callback
+      , callback
+
+    next()
+
   app.use '/account', require './router/account'
   app.use '/admin', require './router/admin'
+  app.use '/panel', require './router/panel'
+
+  app.get '/', (req, res) ->
+    res.redirect '/panel/'
 
   plugin = require './plugin'
   plugin.loadPlugins app
