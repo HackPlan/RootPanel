@@ -15,13 +15,13 @@ exports.get '/login', renderAccount, (req, res) ->
   res.render 'account/login'
 
 exports.post '/signup', errorHandling, (req, res) ->
-  unless utils.username.test req.body.username
+  unless utils.rx.username.test req.body.username
     return res.error 'invalid_username'
 
-  unless utils.email.test req.body.email
+  unless utils.rx.email.test req.body.email
     return res.error 'invalid_email'
 
-  unless utils.passwd.test req.body.passwd
+  unless utils.rx.passwd.test req.body.passwd
     return res.error 'invalid_passwd'
 
   if req.body.username in config.account.invalid_username
@@ -68,7 +68,7 @@ exports.post '/update_passwd', requestAuthenticate, (req, res) ->
   unless mAccount.matchPasswd account, req.body.old_passwd
     return res.error 'auth_failed'
 
-  unless utils.passwd.test req.body.passwd
+  unless utils.rx.passwd.test req.body.passwd
     return res.error 'invalid_passwd'
 
   mAccount.updatePasswd account, req.body.new_passwd, ->

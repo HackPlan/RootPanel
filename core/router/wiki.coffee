@@ -20,7 +20,6 @@ exports.use (req, res) ->
     unless filename[0..baseDir.length-1] == baseDir
       return res.json 404
 
-    console.log filename
     fs.readFile filename, (err, data) ->
       throw err if err
       res.render 'wiki',
