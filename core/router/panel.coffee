@@ -5,7 +5,7 @@ async = require 'async'
 config = require '../config'
 billing = require '../billing'
 plugin = require '../plugin'
-{renderAccount, errorHandling, requestAuthenticate} = require './middleware'
+{requestAuthenticate} = require './middleware'
 
 mAccount = require '../model/account'
 
