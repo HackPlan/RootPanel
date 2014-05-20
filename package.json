@@ -35,6 +35,7 @@
     "frisby": "*",
     "async": "*",
     "connect": "*",
-    "harp": "*"
+    "harp": "*",
+    "middleware-injector": "*"
   }
 }
