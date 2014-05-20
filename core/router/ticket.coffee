@@ -4,8 +4,7 @@ express = require 'express'
 
 db = require '../db'
 config = require '../config'
-api = require './index'
-{requestAuthenticate} = require './middleware'
+{requestAuthenticate, renderAccount} = require './middleware'
 
 mAccount = require '../model/account'
 mTicket = require '../model/ticket'
