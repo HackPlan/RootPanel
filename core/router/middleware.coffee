@@ -17,7 +17,7 @@ exports.getParam = (req, res, next) ->
   next()
 
 exports.errorHandling = (req, res, next) ->
-  res.error = (name, param) ->
+  res.error = (name, param = {}) ->
     param = _.extend param, error: name
     res.json 400, param
   next()
