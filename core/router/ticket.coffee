@@ -1,256 +1,241 @@
 async = require 'async'
 _ = require 'underscore'
+express = require 'express'
 
 db = require '../db'
 config = require '../config'
 api = require './index'
+{requestAuthenticate} = require './middleware'
 
 mAccount = require '../model/account'
 mTicket = require '../model/ticket'
 
-module.exports =
-  get:
-    list: api.accountAuthenticateRender (req, res, account, renderer) ->
-      mTicket.find
-        $or: [
-            account_id: account._id
-          ,
-            members: account._id
-        ]
-      ,
-        sort:
-          updated_at: -1
-      , (tickets) ->
-        renderer 'ticket/list',
-          tickets: tickets
+module.exports = exports = express.Router()
 
-    create: api.accountAuthenticateRender (req, res, account, renderer) ->
-      renderer 'ticket/create',
-        ticketTypes: config.ticket.availableType
+exports.get '/list', requestAuthenticate, renderAccount, (req, res) ->
+  mTicket.find
+    $or: [
+      account_id: req.account._id
+    ,
+      members: req.account._id
+    ]
+  ,
+    sort:
+      updated_at: -1
+  , (tickets) ->
+    res.render 'ticket/list',
+      tickets: tickets
 
-    view: api.accountAuthenticateRender (req, res, account, renderer) ->
-      mTicket.findId req.body.id, (ticket) ->
-        unless ticket
-          return res.send 404
+exports.get '/create', requestAuthenticate, renderAccount, (req, res) ->
+  res.render 'ticket/create',
+    ticketTypes: config.ticket.availableType
 
-        unless mAccount.inGroup account, 'root'
-          unless mTicket.getMember ticket, account
-            return res.send 403
+exports.get '/view', requestAuthenticate, renderAccount, (req, res) ->
+  mTicket.findId req.body.id, (ticket) ->
+    unless ticket
+      return res.send 404
 
-        async.map ticket.members, (member, callback) ->
-          mAccount.findId member, (member_account) ->
-            callback null, member_account
-        , (err, result) ->
-          ticket.members = result
+    unless mAccount.inGroup req.account, 'root'
+      unless mTicket.getMember ticket, req.account
+        return res.send 403
 
-          async.map ticket.replys, (reply, callback) ->
-            mAccount.findId reply.account_id, (reply_account) ->
-              reply.account = reply_account
-              callback null, reply
+    async.map ticket.members, (member, callback) ->
+      mAccount.findId member, (member_account) ->
+        callback null, member_account
+    , (err, result) ->
+      ticket.members = result
 
-          , (err, result) ->
-            ticket.replys = result
+      async.map ticket.replys, (reply, callback) ->
+        mAccount.findId reply.account_id, (reply_account) ->
+          reply.account = reply_account
+          callback null, reply
 
-            mAccount.findId ticket.account_id, (ticket_account) ->
-              ticket.account = ticket_account
+      , (err, result) ->
+        ticket.replys = result
 
-              renderer 'ticket/view',
-                ticket: ticket
+        mAccount.findId ticket.account_id, (ticket_account) ->
+          ticket.account = ticket_account
 
-  post:
-    create: (req, res) ->
-      mAccount.authenticate req.token, (account) ->
-        unless account
-          return res.json 400, error: 'auth_failed'
+          res.render 'ticket/view',
+            ticket: ticket
 
-        unless /^.+$/.test req.body.title
-          return res.json 400, error: 'invalid_title'
+exports.post '/create', requestAuthenticate, (req, res) ->
+  unless /^.+$/.test req.body.title
+    return res.error 'invalid_title'
 
-        unless req.body.type in config.ticket.availableType
-          return res.json 400, error: 'invalid_type'
+  unless req.body.type in config.ticket.availableType
+    return res.error 'invalid_type'
 
-        createTicket = (members, status) ->
-          mTicket.createTicket account, req.body.title, req.body.content, req.body.type, members, status, {}, (ticket) ->
-            return res.json
-              id: ticket._id
+  createTicket = (members, status) ->
+    mTicket.createTicket req.account, req.body.title, req.body.content, req.body.type, members, status, {}, (ticket) ->
+      return res.json
+        id: ticket._id
 
-        if mAccount.inGroup account, 'root'
-          tasks = []
+  if mAccount.inGroup req.account, 'root'
+    tasks = []
 
-          if req.body.members
-            for memberName in req.body.members
-              do (memberName = _.clone(memberName)) ->
-                tasks.push (callback) ->
-                  mAccount.byUsernameOrEmailOrId memberName, (member) ->
-                    unless member
-                      res.json 400, error: 'invalid_account', username: memberName
-                      callback true
+    if req.body.members
+      for memberName in req.body.members
+        do (memberName = _.clone(memberName)) ->
+          tasks.push (callback) ->
+            mAccount.byUsernameOrEmailOrId memberName, (member) ->
+              unless member
+                res.error 'invalid_account', username: memberName
+                callback true
 
-                    callback null, member
+              callback null, member
 
-          async.parallel tasks, (err, result) ->
-            if err
-              return
+    async.parallel tasks, (err, result) ->
+      if err
+        return
 
-            unless _.find(result, (item) -> item._id == account._id)
-              result.push account
+      unless _.find(result, (item) -> item._id == req.account._id)
+        result.push account
 
-            createTicket result, 'open'
+      createTicket result, 'open'
 
-        else
-          createTicket [account], 'pending'
+  else
+    createTicket [account], 'pending'
 
-    reply: (req, res) ->
-      mAccount.authenticate req.token, (account) ->
-        unless account
-          return res.json 400, error: 'auth_failed'
+exports.post '/reply', requestAuthenticate, (req, res) ->
+  mTicket.findId req.body.id, (ticket) ->
+    unless ticket
+      return res.error 'ticket_not_exist'
 
-        mTicket.findId req.body.id, (ticket) ->
-          unless ticket
-            return res.json 400, error: 'ticket_not_exist'
+    unless mTicket.getMember ticket, req.account
+      unless mAccount.inGroup req.account, 'root'
+        return res.error 'forbidden'
 
-          unless mTicket.getMember ticket, account
-            unless mAccount.inGroup account, 'root'
-              return res.json 400, error: 'forbidden'
+    status = if mAccount.inGroupr(req.account, 'root') then 'open' else 'pending'
+    mTicket.createReply ticket, req.account, req.body.content, status, (reply) ->
+      return res.json
+        id: reply._id
 
-          status = if mAccount.inGroup(account, 'root') then 'open' else 'pending'
-          mTicket.createReply ticket, account, req.body.content, status, (reply) ->
-            return res.json
-              id: reply._id
-
-    list: (req, res) ->
-      mAccount.authenticate req.token, (account) ->
-        unless account
-          return res.json 400, error: 'auth_failed'
-
-        mTicket.find do ->
-          selector =
-            $or: [
-                account_id: account._id
-              ,
-                members: account._id
-            ]
-
-          if req.body.type?.toLowerCase() in config.ticket.availableType
-            selector['type'] = req.body.type.toLowerCase()
-
-          if req.body.status?.toLowerCase() in ['open', 'pending', 'finish', 'closed']
-            selector['status'] = req.body.status.toLowerCase()
-
-          return selector
+exports.post '/list', requestAuthenticate, (req, res) ->
+  mTicket.find do ->
+    selector =
+      $or: [
+          account_id: req.account._id
         ,
-          sort:
-            updated_at: -1
-          limit: req.body.limit ? 30
-          skip: req.body.skip ? 0
-        , (tickets) ->
-          res.json _.map tickets, (item) ->
-            return {
-              id: item._id
-              title: item.title
-              type: item.type
-              status: item.status
-              updated_at: item.updated_at
-            }
+          members: req.account._id
+      ]
 
-    update: (req, res) ->
-      mAccount.authenticate req.token, (account) ->
-        unless account
-          return res.json 400, error: 'auth_failed'
+    if req.body.type?.toLowerCase() in config.ticket.availableType
+      selector['type'] = req.body.type.toLowerCase()
 
-        modifier = {}
+    if req.body.status?.toLowerCase() in ['open', 'pending', 'finish', 'closed']
+      selector['status'] = req.body.status.toLowerCase()
 
-        addToSetModifier = []
-        pullModifier = []
+    return selector
+  ,
+    sort:
+      updated_at: -1
+    limit: req.body.limit ? 30
+    skip: req.body.skip ? 0
+  , (tickets) ->
+    res.json _.map tickets, (item) ->
+      return {
+        id: item._id
+        title: item.title
+        type: item.type
+        status: item.status
+        updated_at: item.updated_at
+      }
 
-        mTicket.findId req.body.id, (ticket) ->
-          unless ticket
-            return res.json 400, error: 'ticket_not_exist'
+exports.post '/update', requestAuthenticate, (req, res) ->
+  modifier = {}
 
-          unless mTicket.getMember ticket, account
-            unless mAccount.inGroup account, 'root'
-              return res.json 400, error: 'forbidden'
+  addToSetModifier = []
+  pullModifier = []
 
-          if req.body.type
-            if req.body.type in config.ticket.availableType
-              modifier['type'] = req.body.type
-            else
-              return res.json 400, error: 'invalid_type'
+  mTicket.findId req.body.id, (ticket) ->
+    unless ticket
+      return res.error 'ticket_not_exist'
 
-          if req.body.status
-            if mAccount.inGroup account, 'root'
-              allow_status = ['open', 'pending', 'finish', 'closed']
-            else
-              allow_status = ['closed']
+    unless mTicket.getMember ticket, req.account
+      unless mAccount.inGroup req.account, 'root'
+        return res.error 'forbidden'
 
-            if req.body.status in allow_status
-              if ticket.status == req.body.status
-                return res.json 400, error: 'already_in_status'
-              else
-                modifier['status'] = req.body.status
-            else
-              return res.json 400, error: 'invalid_status'
+    if req.body.type
+      if req.body.type in config.ticket.availableType
+        modifier['type'] = req.body.type
+      else
+        return res.error 'invalid_type'
 
-          saveToDatabase = ->
-            async.parallel [
-              (callback) ->
-                unless _.isEmpty modifier
-                  mTicket.update _id: ticket._id,
-                    $set: modifier
-                  , {}, callback
-                else
-                  callback()
+    if req.body.status
+      if mAccount.inGroup req.account, 'root'
+        allow_status = ['open', 'pending', 'finish', 'closed']
+      else
+        allow_status = ['closed']
 
-              (callback) ->
-                unless _.isEmpty addToSetModifier
-                  mTicket.update _id: ticket._id,
-                    $addToSet:
-                      members:
-                        $each: addToSetModifier
-                  , {}, callback
-                else
-                  callback()
+      if req.body.status in allow_status
+        if ticket.status == req.body.status
+          return res.error 'already_in_status'
+        else
+          modifier['status'] = req.body.status
+      else
+        return res.error 'invalid_status'
 
-              (callback) ->
-                unless _.isEmpty pullModifier
-                  mTicket.update _id: ticket._id,
-                    $pullAll:
-                      members: pullModifier
-                  , {}, callback
-                else
-                  callback()
-            ], ->
-              return res.json {}
-
-          if mAccount.inGroup account, 'root'
-            if req.body.attribute
-              if req.body.attribute.public
-                modifier['attribute.public'] = true
-              else
-                modifier['attribute.public'] = false
-
-            if req.body.members
-              tasks = {}
-
-              member_name = _.filter _.union(req.body.members.add, req.body.members.remove), (item) -> item
-              for item in member_name
-                tasks[item] = do (item = _.clone(item)) ->
-                  return (callback) ->
-                    mAccount.byUsernameOrEmailOrId item, (result) ->
-                      callback null, result
-
-              async.parallel tasks, (err, result) ->
-                if req.body.members.add
-                  for item in req.body.members.add
-                    addToSetModifier.push result[item]._id
-
-                if req.body.members.remove
-                  for item in req.body.members.remove
-                    pullModifier.push result[item]._id
-
-                saveToDatabase()
-            else
-              saveToDatabase()
-
+    callback = ->
+      async.parallel [
+        (callback) ->
+          unless _.isEmpty modifier
+            mTicket.update _id: ticket._id,
+              $set: modifier
+            , {}, callback
           else
-            saveToDatabase()
+            callback()
+
+        (callback) ->
+          unless _.isEmpty addToSetModifier
+            mTicket.update _id: ticket._id,
+              $addToSet:
+                members:
+                  $each: addToSetModifier
+            , {}, callback
+          else
+            callback()
+
+        (callback) ->
+          unless _.isEmpty pullModifier
+            mTicket.update _id: ticket._id,
+              $pullAll:
+                members: pullModifier
+            , {}, callback
+          else
+            callback()
+      ], ->
+        return res.json {}
+
+    if mAccount.inGroup req.account, 'root'
+      if req.body.attribute
+        if req.body.attribute.public
+          modifier['attribute.public'] = true
+        else
+          modifier['attribute.public'] = false
+
+      if req.body.members
+        tasks = {}
+
+        member_name = _.filter _.union(req.body.members.add, req.body.members.remove), (item) -> item
+        for item in member_name
+          tasks[item] = do (item = _.clone(item)) ->
+            return (callback) ->
+              mAccount.byUsernameOrEmailOrId item, (result) ->
+                callback null, result
+
+        async.parallel tasks, (err, result) ->
+          if req.body.members.add
+            for item in req.body.members.add
+              addToSetModifier.push result[item]._id
+
+          if req.body.members.remove
+            for item in req.body.members.remove
+              pullModifier.push result[item]._id
+
+          callback()
+      else
+        callback()
+
+    else
+      callback()
