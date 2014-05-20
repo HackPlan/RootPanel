@@ -1,12 +1,12 @@
-api = require './index'
+express = require 'express'
+
+{renderAccount} = require './middleware'
 
 mAccount = require '../model/account'
 
-module.exports =
-  get:
-    '/admin/': api.accountAdminAuthenticateRender (req, res, account, renderer) ->
-      mAccount.find {}, {}, (accounts) ->
-        renderer 'admin/index',
-          accounts: accounts
+module.exports = exports = express.Router()
 
-  post:{}
+exports.get '/', renderAccount, (req, res) ->
+  mAccount.find {}, {}, (accounts) ->
+    res.render 'admin/index',
+      accounts: accounts

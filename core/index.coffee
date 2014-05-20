@@ -10,6 +10,7 @@ i18n = require './i18n'
 
 bindRouters = (app) ->
   app.use '/account', require './router/account'
+  app.use '/admin', require './router/admin'
 
   plugin = require './plugin'
   plugin.loadPlugins app

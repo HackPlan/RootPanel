@@ -8,13 +8,13 @@ mAccount = require '../model/account'
 
 module.exports = exports = express.Router()
 
-exports.get '/signup/', renderAccount, (req, res) ->
+exports.get '/signup', renderAccount, (req, res) ->
   res.render 'account/signup'
 
-exports.get '/login/', renderAccount, (req, res) ->
+exports.get '/login', renderAccount, (req, res) ->
   res.render 'account/login'
 
-exports.post '/signup/', errorHandling, (req, res) ->
+exports.post '/signup', errorHandling, (req, res) ->
   unless utils.username.test req.body.username
     return res.error 'invalid_username'
 
@@ -43,7 +43,7 @@ exports.post '/signup/', errorHandling, (req, res) ->
           res.json
             id: account._id
 
-exports.post '/login/', errorHandling, (req, res) ->
+exports.post '/login', errorHandling, (req, res) ->
   mAccount.byUsernameOrEmailOrId req.body.username, (account) ->
     unless account
       return res.error 'auth_failed'
@@ -59,16 +59,16 @@ exports.post '/login/', errorHandling, (req, res) ->
         id: account._id
         token: token
 
-exports.post '/logout/', requestAuthenticate, (req, res) ->
+exports.post '/logout', requestAuthenticate, (req, res) ->
   mAccount.removeToken req.token, ->
     res.clearCookie 'token'
     res.json {}
 
-exports.post '/update_passwd/', requestAuthenticate, (req, res) ->
+exports.post '/update_passwd', requestAuthenticate, (req, res) ->
   unless mAccount.matchPasswd account, req.body.old_passwd
     return res.error 'auth_failed'
 
-  unless req.body.new_passwd or not /^.+$/.test req.body.new_passwd
+  unless utils.passwd.test req.body.passwd
     return res.error 'invalid_passwd'
 
   mAccount.updatePasswd account, req.body.new_passwd, ->
