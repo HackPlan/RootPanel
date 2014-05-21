@@ -31,6 +31,9 @@ exports.post '/subscribe', requestAuthenticate, (req, res) ->
           $addToSet:
             'attribute.service': serviceName
         , {}, ->
+          if config.debug.mock_test
+            return callback()
+
           (plugin.get serviceName).service.enable account, ->
             callback()
       , ->
@@ -57,6 +60,9 @@ exports.post '/unsubscribe', requestAuthenticate, (req, res) ->
             $pull:
               'attribute.service': serviceName
           , {}, ->
+            if config.debug.mock_test
+              return callback()
+
             (plugin.get serviceName).service.delete account, ->
               callback()
       , ->

@@ -2,6 +2,9 @@ module.exports =
   web:
     port: 3000
 
+  debug:
+    mock_test: false
+
   admin:
     username: ['jysperm']
 
