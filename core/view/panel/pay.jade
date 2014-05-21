@@ -1,0 +1,70 @@
+extends ../layout
+
+prepend head
+  title 充值 | #{t('app.name')}
+  link(rel='stylesheet', href='/style/panel/pay.css')
+
+block main
+  .row
+    header 充值
+    div
+      h2 比特币
+      p 你可以直接向该地址发送比特币。在经过一次确认后，系统会实时地，自动为你折算使用时间。
+      p 实时汇率：10 CNY = 0.004 BTC
+      pre.bg-success 13v2BTCMZMHg5v87susgg86HFZqXERuwUd
+
+    div
+      h2 淘宝
+      p 拍下对应宝贝后付款即可，购买时注意选择服务器节点选项，备注填写你在 RP 主机的用户名。
+      a.btn.btn-success(href='http://item.taobao.com/item.htm?id=38370649858') 淘宝购买
+
+  .row
+    header 机房列表
+    table.table.table-hover
+      thead
+        tr
+          th 域名
+          th 位置
+          th.for-sale 用户量
+      tbody
+        tr
+          td
+            a(href='//jp1.rpvhost.net') jp1.rpvhost.net
+          td Linode Tokyo, JP
+          td
+            .progress
+              .progress-bar(role='progressbar', aria-valuenow='50', aria-valuemin='0', aria-valuemax='100', style='width: 50%;') 50%
+        tr
+          td
+            a(href='//us1.rpvhost.net') us1.rpvhost.net
+          td Linode Fremont, CA, USA
+          td
+            .progress
+              .progress-bar(role='progressbar', aria-valuenow='85', aria-valuemin='0', aria-valuemax='100', style='width: 85%;') 85%
+        tr.warning
+          td
+            a(href='//rp3.rpvhost.net') rp3.rpvhost.net (当前)
+          td Linode Fremont, CA, USA
+          td
+            .progress
+              .progress-bar(role='progressbar', aria-valuenow='10', aria-valuemin='0', aria-valuemax='100', style='width: 10%;') 10%
+
+  .row
+    header 充值记录
+    table.table.table-hover
+      thead
+        tr
+          th 时间
+          th 金额
+          th 方式
+      tbody
+        tr
+          td 2014-5-1 23:30:05
+          td 24 CNY
+          td 淘宝 62888888888
+        tr
+          td 2014-5-2 23:30:05
+          td 18.1 CNY
+          td
+            | 比特币 &nbsp;
+            a(href='https://blockchain.info/tx/a4178786707c3f4373be6ad1edb3761cbd4c6a5849c5981f7ceefb13b53cab64') 0.02 BTC

@@ -5,11 +5,14 @@ async = require 'async'
 config = require '../config'
 billing = require '../billing'
 plugin = require '../plugin'
-{requestAuthenticate} = require './middleware'
+{requestAuthenticate, renderAccount} = require './middleware'
 
 mAccount = require '../model/account'
 
 module.exports = exports = express.Router()
+
+exports.get '/pay', renderAccount, (req, res) ->
+  res.render 'panel/pay'
 
 exports.get '/', requestAuthenticate, (req, res) ->
   billing.checkBilling req.account, (account) ->
