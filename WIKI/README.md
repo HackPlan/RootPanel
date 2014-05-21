@@ -1,5 +1,7 @@
 ## RP WIKI
 
+* [服务条款](Terms.md)
+
 ### FAQ
 
 * [财务问题](FAQ/Billing.md)
