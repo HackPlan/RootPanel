@@ -11,6 +11,37 @@ db.buildModel module.exports, cAccount
 exports.byUsername = db.buildByXXOO 'username', cAccount
 exports.byEmail = db.buildByXXOO 'email', cAccount
 
+sample =
+  username: 'jysperm'
+  passwd: '53673f434686ce045477f066f30eded55a9bb535a6cec7b73a60972ccafddb2a'
+  passwd_salt: '53673f434686b535a6cec7b73a60ce045477f066f30eded55a9b972ccafddb2a'
+  email: 'jysperm@gmail.com'
+  signup_at: Date()
+
+  group: ['root']
+
+  setting:
+    avatar_url: 'http://ruby-china.org/avatar/efcc15b92617a95a09f514a9bff9e6c3?s=58'
+    language: 'zh_CN'
+    QQ: '184300584'
+
+  attribute:
+    service: ['shadowsocks']
+    plans: ['all']
+    balance: 100
+    last_billing: Date()
+    arrears_at: Date()
+
+  tokens: [
+    token: 'b535a6cec7b73a60c53673f434686e04972ccafddb2a5477f066f30eded55a9b'
+    available: true
+    created_at: Date()
+    updated_at: Date()
+    attribute:
+      ip: '123.184.237.163'
+      ua: 'Mozilla/5.0 (Intel Mac OS X) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.102'
+  ]
+
 exports.register = (username, email, passwd, callback = null) ->
   passwd_salt = auth.randomSalt()
 

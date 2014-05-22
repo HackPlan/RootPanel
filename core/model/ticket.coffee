@@ -8,6 +8,32 @@ cTicket = db.collection 'tickets'
 
 db.buildModel module.exports, cTicket
 
+sample =
+  account_id: ObjectID()
+  created_at: Date()
+  updated_at: Date()
+  title: 'Ticket Title'
+  content: 'Ticket Content(Markdown)'
+  content_html: 'Ticket Conetnt(HTML)'
+  type: 'linux'
+  status: 'open/pending/finish/closed'
+
+  attribute:
+    public: false
+
+  members: [
+    ObjectID()
+  ],
+
+  replys: [
+    _id: ObjectID()
+    account_id: ObjectID()
+    created_at: Date()
+    content: 'Reply Content(Markdown)'
+    content_html: 'Reply Conetnt(HTML)'
+    attribute: {}
+  ]
+
 exports.createTicket = (account, title, content, type, members, status, attribute, callback) ->
   membersID = []
 
