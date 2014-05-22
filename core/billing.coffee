@@ -4,11 +4,11 @@ mAccount = require './model/account'
 
 exports.checkBilling = (account, callback) ->
   if (Date.now() - account.attribute.last_billing_at.getTime()) > 24 * 3600 * 1000
-    exports.calcBilling account, callback
+    exports.calcBilling account, false, callback
   else
     callback account
 
-exports.calcBilling = (account, callback) ->
+exports.calcBilling = (account, isForce, callback) ->
   amount = 0
 
   for planName in account.attribute.plans
@@ -16,12 +16,17 @@ exports.calcBilling = (account, callback) ->
 
     price = plan.price / 30 / 24
     time = (Date.now() - account.attribute.last_billing_at.getTime()) / 1000 / 3600
-    time = Math.ceil time
-    amount += price * time
+
+    if isForce
+      billing_time = Math.ceil time
+    else
+      billing_time = Math.floor time
+
+    amount += price * billing_time
 
   modifier =
     $set:
-      'attribute.last_billing': new Date()
+      'attribute.last_billing_at': new Date account.attribute.last_billing_at.getTime() - billing_time * 60 * 1000
     $inc:
       'attribute.balance': -amount
 

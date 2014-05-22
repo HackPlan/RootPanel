@@ -18,7 +18,7 @@ exports.post '/subscribe', requestAuthenticate, (req, res) ->
   if req.body.plan in req.account.attribute.plans
     return res.error 'already_in_plan'
 
-  billing.calcBilling req.account, (account) ->
+  billing.calcBilling req.account, true, (account) ->
     if account.attribute.balance < 0
       return res.error 'insufficient_balance'
 
@@ -43,7 +43,7 @@ exports.post '/unsubscribe', requestAuthenticate, (req, res) ->
   unless req.body.plan in req.account.attribute.plans
     return res.error 'not_in_plan'
 
-  billing.calcBilling req.account, (account) ->
+  billing.calcBilling req.account, true, (account) ->
     mAccount.leavePlan account, req.body.plan, ->
       async.each config.plans[req.body.plan].service, (serviceName, callback) ->
         stillInService = do ->
