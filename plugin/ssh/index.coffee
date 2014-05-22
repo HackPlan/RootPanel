@@ -9,12 +9,7 @@ module.exports =
 
   action: action
   service: service
-  monitor: monitor
 
   panel_widgets: [
     service.widget
-  ]
-
-  resources: [
-    'storage', 'transfer', 'cpu', 'memory', 'diskio'
   ]

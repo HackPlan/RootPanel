@@ -28,9 +28,16 @@ sample =
   attribute:
     service: ['shadowsocks']
     plans: ['all']
+
     balance: 100
-    last_billing: Date()
+    last_billing_at: Date()
     arrears_at: Date()
+
+    resources_limit:
+      cpu: 144
+      storage: 520
+      transfer: 39
+      memory: 27
 
   tokens: [
     token: 'b535a6cec7b73a60c53673f434686e04972ccafddb2a5477f066f30eded55a9b'

@@ -26,7 +26,7 @@ module.exports =
     ]
 
   plugin:
-    availablePlugin: ['ssh']
+    availablePlugin: ['linux', 'ssh']
 
   plans:
     all:
@@ -36,6 +36,7 @@ module.exports =
       t_resources: '磁盘: 520MB, 内存: 27MB, 流量: 37GB'
       service: ['memcached', 'mongodb', 'mysql', 'nginx', 'phpfpm', 'pptp', 'shadowsocks', 'ssh']
       resources:
+        cpu: 144
         storage: 520
         transfer: 39
         memory: 27
@@ -45,8 +46,9 @@ module.exports =
       t_name: 'SSH'
       t_service: '仅 SSH'
       t_resources: '前期测试用'
-      service: ['ssh']
+      service: ['ssh', 'linux']
       resources:
+        cpu: 144
         storage: 520
         transfer: 39
         memory: 27

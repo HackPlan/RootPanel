@@ -3,7 +3,7 @@ config = require './config'
 mAccount = require './model/account'
 
 exports.checkBilling = (account, callback) ->
-  if (Date.now() - account.attribute.last_billing.getTime()) > 24 * 3600 * 1000
+  if (Date.now() - account.attribute.last_billing_at.getTime()) > 24 * 3600 * 1000
     exports.calcBilling account, callback
   else
     callback account
@@ -15,7 +15,7 @@ exports.calcBilling = (account, callback) ->
     plan = config.plans[planName]
 
     price = plan.price / 30 / 24
-    time = (Date.now() - account.attribute.last_billing.getTime()) / 1000 / 3600
+    time = (Date.now() - account.attribute.last_billing_at.getTime()) / 1000 / 3600
     time = Math.ceil time
     amount += price * time
 

@@ -9,8 +9,6 @@ module.exports =
       throw err if err
       callback()
 
-  pause: (account, callback) ->
-
   delete: (account, callback) ->
     async.series [
       (callback) ->
