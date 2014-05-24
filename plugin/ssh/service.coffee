@@ -25,3 +25,7 @@ module.exports =
   widget: (callback) ->
     jade.renderFile path.join(__dirname, 'view/widget.jade'), {}, (err, html) ->
       callback html
+
+  preview: (callback) ->
+    jade.renderFile path.join(__dirname, 'view/preview.jade'), {}, (err, html) ->
+      callback html

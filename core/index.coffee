@@ -19,6 +19,7 @@ bindRouters = (app) ->
   app.use '/plan', require './router/plan'
   app.use '/ticket', require './router/ticket'
   app.use '/wiki', require './router/wiki'
+  app.use '/public', require './router/public'
 
   app.get '/', (req, res) ->
     res.redirect '/panel/'

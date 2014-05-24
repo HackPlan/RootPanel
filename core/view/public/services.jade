@@ -1,0 +1,8 @@
+extends ../layout
+
+prepend head
+  title 服务支持 | #{t('app.name')}
+
+block main
+  for service in services
+    .row!= service
