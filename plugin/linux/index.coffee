@@ -1,11 +1,9 @@
-action = require './action'
 service = require './service'
 
 module.exports =
-  name: 'ssh'
+  name: 'linux'
   type: 'service'
 
-  action: action
   service: service
 
   panel_widgets: [
