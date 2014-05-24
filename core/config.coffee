@@ -46,7 +46,7 @@ module.exports =
       t_name: 'SSH'
       t_service: '仅 SSH'
       t_resources: '前期测试用'
-      service: ['ssh', 'linux']
+      service: ['linux', 'ssh']
       resources:
         cpu: 144
         storage: 520
