@@ -10,6 +10,7 @@ exports.loadPlugins = (app) ->
   for name in config.plugin.availablePlugin
     i18n.loadPlugin path.join(__dirname, "../plugin/#{name}/locale"), name
 
-    p = exports.get name
+    plugin = exports.get name
 
-    app.use ('/plugin/' + name), p.action
+    if plugin.action
+      app.use ('/plugin/' + name), plugin.action

@@ -67,7 +67,7 @@ exports.register = (username, email, passwd, callback = null) ->
       service: []
       plans: []
       balance: 0
-      last_billing: new Date()
+      last_billing_at: new Date()
       arrears_at: null
       resources_limit: []
     tokens: []
@@ -146,7 +146,8 @@ exports.joinPlan = (account, plan, callback) ->
   exports.update _id: account._id,
     $addToSet:
       'attribute.plans': plan
-    'attribute.resources_limit': billing.calcResourcesLimit account.attribute.plans
+    $set:
+      'attribute.resources_limit': billing.calcResourcesLimit account.attribute.plans
   , {}, callback
 
 exports.leavePlan = (account, plan, callback) ->
@@ -154,7 +155,8 @@ exports.leavePlan = (account, plan, callback) ->
   exports.update _id: account._id,
     $pull:
       'attribute.plans': plan
-    'attribute.resources_limit': billing.calcResourcesLimit account.attribute.plans
+    $set:
+      'attribute.resources_limit': billing.calcResourcesLimit account.attribute.plans
   , {}, callback
 
 exports.incBalance = (account, amount, callback) ->

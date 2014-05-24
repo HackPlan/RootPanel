@@ -26,12 +26,15 @@ exports.calcBilling = (account, isForce, callback) ->
 
   modifier =
     $set:
-      'attribute.last_billing_at': new Date account.attribute.last_billing_at.getTime() - billing_time * 60 * 1000
+      'attribute.last_billing_at': new Date account.attribute.last_billing_at.getTime() + billing_time * 3600 * 1000
     $inc:
       'attribute.balance': -amount
 
   if !account.attribute.arrears_at and account.attribute.balance < 0
     modifier.$set['attribute.arrears_at'] = new Date()
+
+  if account.attribute.balance > 0
+    modifier.$set['attribute.arrears_at'] = null
 
   mAccount.update _id: account._id, modifier, {}, ->
     mAccount.findId account._id, (account) ->

@@ -23,7 +23,7 @@ exports.get '/', requestAuthenticate, (req, res) ->
         name: name
         isEnable: name in req.account.attribute.plans
 
-    account.attribute.remaining_time = Math.ceil(billing.calcRemainingTime(req.account) / 24)
+    account.attribute.remaining_time = Math.ceil(billing.calcRemainingTime(account) / 24)
 
     widgets = []
     async.map req.account.attribute.service, (item, callback) ->
@@ -41,6 +41,6 @@ exports.get '/', requestAuthenticate, (req, res) ->
         widgets = widgets.concat item
 
       res.render 'panel',
-        account: req.account
+        account: account
         plans: plans
         widgets: widgets
