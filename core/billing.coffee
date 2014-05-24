@@ -46,3 +46,13 @@ exports.calcRemainingTime = (account) ->
     price += plan.price / 30 / 24
 
   return account.attribute.balance / price
+
+exports.calcResourcesLimit = (plans) ->
+  limit = {}
+
+  for plan in plans
+    for k, v of config.plans[plan].resources
+      limit[k] = 0 unless limit[k]
+      limit[k] += v
+
+  return limit

@@ -3,6 +3,7 @@ crypto = require 'crypto'
 
 auth = require '../auth'
 db = require '../db'
+billing = require '../billing'
 
 cAccount = db.collection 'accounts'
 
@@ -68,6 +69,7 @@ exports.register = (username, email, passwd, callback = null) ->
       balance: 0
       last_billing: new Date()
       arrears_at: null
+      resources_limit: []
     tokens: []
   , {}, callback
 
@@ -140,15 +142,19 @@ exports.inGroup = (account, group) ->
   return group in account.group
 
 exports.joinPlan = (account, plan, callback) ->
+  account.attribute.plans.push plan
   exports.update _id: account._id,
     $addToSet:
       'attribute.plans': plan
+    'attribute.resources_limit': billing.calcResourcesLimit account.attribute.plans
   , {}, callback
 
 exports.leavePlan = (account, plan, callback) ->
+  account.attribute.plans = _.reject account.attribute.plans, (i) -> i == plan
   exports.update _id: account._id,
     $pull:
       'attribute.plans': plan
+    'attribute.resources_limit': billing.calcResourcesLimit account.attribute.plans
   , {}, callback
 
 exports.incBalance = (account, amount, callback) ->
