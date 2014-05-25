@@ -1,12 +1,17 @@
-module.exports =
-  create_website:
-    mode: 'custom'
-    callback: ->
+child_process = require 'child_process'
+express = require 'express'
 
-  update_website:
-    mode: 'custom'
-    callback: ->
+mAccount = require '../../core/model/account'
 
-  delete_website:
-    mode: 'custom'
-    callback: ->
+module.exports = exports = express.Router()
+
+exports.use (req, res, next) ->
+  mAccount.authenticate req.token, (account) ->
+    unless account
+      return res.json 400, error: 'auth_failed'
+
+    unless 'phpfpm' in account.attribute.service
+      return res.json 400, error: 'not_in_service'
+
+    req.account = account
+    next()

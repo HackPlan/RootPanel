@@ -1,0 +1,4 @@
+{
+  "name": "Nginx",
+  "description": "Nginx 提供了自定义系统 80 端口上的 Nginx 的配置的功能"
+}

@@ -1,0 +1,26 @@
+header Nginx
+table.table.table-hover
+  thead
+    tr
+      th 域名
+      th 摘要
+      th
+        button.btn.btn-success.btn-xs
+          span.glyphicon.glyphicon-plus-sign
+  tbody
+    tr
+      td jybox.net
+      td fastcgi_pass: /home/user/web
+      td(style= 'width: 150px;')
+        button.btn.btn-info.btn-xs
+          span.glyphicon.glyphicon-edit
+        button.btn.btn-danger.btn-xs
+          span.glyphicon.glyphicon-remove-sign
+    tr
+      td node
+      td proxy_pass: http://127.0.0.1:9118
+      td
+        button.btn.btn-info.btn-xs
+          span.glyphicon.glyphicon-edit
+        button.btn.btn-danger.btn-xs
+          span.glyphicon.glyphicon-remove-sign

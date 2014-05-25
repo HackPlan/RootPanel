@@ -26,7 +26,7 @@ module.exports =
     ]
 
   plugin:
-    availablePlugin: ['linux', 'ssh', 'phpfpm', 'mysql']
+    availablePlugin: ['linux', 'ssh', 'phpfpm', 'mysql', 'nginx']
 
   plans:
     all:
