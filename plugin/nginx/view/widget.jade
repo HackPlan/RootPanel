@@ -5,7 +5,7 @@ table.table.table-hover
       th 域名
       th 摘要
       th
-        button.btn.btn-success.btn-xs
+        button.btn.btn-success.btn-xs(data-toggle='modal', data-target='#nginxModal')
           span.glyphicon.glyphicon-plus-sign
   tbody
     tr
@@ -24,3 +24,29 @@ table.table.table-hover
           span.glyphicon.glyphicon-edit
         button.btn.btn-danger.btn-xs
           span.glyphicon.glyphicon-remove-sign
+.modal.fade#nginxModal(tabindex='-1', role='dialog', aria-hidden='true', aria-labelledby='nginxModalLabel')
+  .modal-dialog
+    .modal-content
+      .modal-header
+        button.close(type='button', data-dismiss='modal', aria-hidden='true') &times;
+        h4.modal-title#nginxModalLabel Nginx配置
+      .modal-body
+        ul.nav.nav-tabs#nginxConfigType
+          li
+            a(href='#guide', data-toggle='tab') 向导
+          li.active
+            a(href='#json', data-toggle='tab') JSON
+          li
+            a(href='#nginx', data-toggle='tab') 原生
+        .tab-content
+          .tab-pane#guide
+            p 向导
+          .tab-pane.active#json
+            p json
+            form(role='form')
+              textarea.form-control(rows='10')
+          .tab-pane#nginx
+            p 原生
+      .modal-footer
+        button.btn.btn-danger(type='button', data-dismiss='modal') 关闭
+        button.btn.btn-success#nginxSave(type='button') 保存

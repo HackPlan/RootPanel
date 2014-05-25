@@ -1,4 +1,10 @@
 $ ->
+  $(document).ajaxError (e, reply) ->
+    console.log reply
+    if reply.status is 400
+      error = reply.responseJSON.error
+      ErrorHandle.flushInfo 'alert', error
+
   service = $ '#service'
   service.find 'button'
           .on 'click', (e) ->
@@ -10,10 +16,10 @@ $ ->
             }
             .success ->
               location.reload()
-            .fail (reply) ->
-              if reply.status is 400
-                error = reply.responseJSON.error
-                ErrorHandle.flushInfo 'alert', error
+            # .fail (reply) ->
+            #   if reply.status is 400
+            #     error = reply.responseJSON.error
+            #     ErrorHandle.flushInfo 'alert', error
 
   ssh = $ '#ssh-input'
   ssh.find 'button'
@@ -25,10 +31,10 @@ $ ->
         .success ->
           ErrorHandle.flushInfo 'success', '修改成功', ->
             location.reload t_resources
-        .fail (reply) ->
-          if reply.status is 400
-            error = reply.responseJSON.error
-            ErrorHandle.flushInfo 'alert', error
+        # .fail (reply) ->
+        #   if reply.status is 400
+        #     error = reply.responseJSON.error
+        #     ErrorHandle.flushInfo 'alert', error
 
   fpm = $ '#php-fpm'
   fpm.on 'click', (e) ->
@@ -39,7 +45,22 @@ $ ->
     }
     .success ->
       location.reload()
-    .fail (reply) ->
-      if reply.status is 400
-        error = reply.responseJSON.error
-        ErrorHandle.flushInfo 'alert', error
+    # .fail (reply) ->
+    #   if reply.status is 400
+    #     error = reply.responseJSON.error
+    #     ErrorHandle.flushInfo 'alert', error
+
+  $ '#nginxSave'
+    .on 'click', (e) ->
+      e.preventDefault()
+      $.post '/plugin/nginx/update_site/', {
+        action: 'create'
+        type: $('#nginxConfigType').find('.active a').attr('href').substr 1
+        config: JSON.parse $('#nginxModal').find('textarea').val()
+      }
+      .success ->
+        location.reload()
+      # .fail (reply) ->
+      #   if reply.status is 400
+      #     error = reply.responseJSON.error
+      #     ErrorHandle.flushInfo 'alert', error
