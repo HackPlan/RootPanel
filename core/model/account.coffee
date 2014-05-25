@@ -64,7 +64,7 @@ exports.register = (username, email, passwd, callback = null) ->
     setting:
       avatar_url: "//ruby-china.org/avatar/#{crypto.createHash('md5').update(email).digest('hex')}?s=58"
     attribute:
-      service: []
+      services: []
       plans: []
       balance: 0
       last_billing_at: new Date()
