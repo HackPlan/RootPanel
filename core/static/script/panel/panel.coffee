@@ -29,3 +29,17 @@ $ ->
           if reply.status is 400
             error = reply.responseJSON.error
             ErrorHandle.flushInfo 'alert', error
+
+  fpm = $ '#php-fpm'
+  fpm.on 'click', (e) ->
+    e.preventDefault()
+    enable = if fpm.hasClass 'btn-success' then true else false
+    $.post '/plugin/phpfpm/switch/', {
+      enable: enable
+    }
+    .success ->
+      location.reload()
+    .fail (reply) ->
+      if reply.status is 400
+        error = reply.responseJSON.error
+        ErrorHandle.flushInfo 'alert', error
