@@ -8,5 +8,6 @@ module.exports =
   action: action
   service: service
 
-  panel_widget:
-    content: action.widget
+  panel_widgets: [
+    service.widget
+  ]

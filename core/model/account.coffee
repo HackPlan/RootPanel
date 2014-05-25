@@ -27,7 +27,7 @@ sample =
     QQ: '184300584'
 
   attribute:
-    service: ['shadowsocks']
+    services: ['shadowsocks']
     plans: ['all']
 
     balance: 100

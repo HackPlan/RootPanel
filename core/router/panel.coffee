@@ -25,10 +25,9 @@ exports.get '/', requestAuthenticate, (req, res) ->
 
     account.attribute.remaining_time = Math.ceil(billing.calcRemainingTime(account) / 24)
 
-    widgets = []
-    async.map req.account.attribute.service, (item, callback) ->
+    async.map account.attribute.services, (item, callback) ->
       p = plugin.get item
-      async.map p.panel_widgets, (widgetBuilder, callback) ->
+      async.map (p.panel_widgets ? []), (widgetBuilder, callback) ->
         widgetBuilder (html) ->
           callback null,
             plugin: p

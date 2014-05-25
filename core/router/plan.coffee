@@ -23,8 +23,8 @@ exports.post '/subscribe', requestAuthenticate, (req, res) ->
       return res.error 'insufficient_balance'
 
     mAccount.joinPlan account, req.body.plan, ->
-      async.each config.plans[req.body.plan].service, (serviceName, callback) ->
-        if serviceName in account.attribute.service
+      async.each config.plans[req.body.plan].services, (serviceName, callback) ->
+        if serviceName in account.attribute.services
           return callback()
 
         mAccount.update _id: account._id,
@@ -45,10 +45,10 @@ exports.post '/unsubscribe', requestAuthenticate, (req, res) ->
 
   billing.calcBilling req.account, true, (account) ->
     mAccount.leavePlan account, req.body.plan, ->
-      async.each config.plans[req.body.plan].service, (serviceName, callback) ->
+      async.each config.plans[req.body.plan].services, (serviceName, callback) ->
         stillInService = do ->
           for item in _.without(account.attribute.plans, req.body.plan)
-            if serviceName in config.plans[req.body.plan].service
+            if serviceName in config.plans[req.body.plan].services
               return true
 
           return false
