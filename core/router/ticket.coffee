@@ -4,7 +4,7 @@ express = require 'express'
 
 db = require '../db'
 config = require '../config'
-{requestAuthenticate, renderAccount} = require './middleware'
+{requestAuthenticate, renderAccount, getParam} = require './middleware'
 
 mAccount = require '../model/account'
 mTicket = require '../model/ticket'
@@ -29,7 +29,7 @@ exports.get '/create', requestAuthenticate, renderAccount, (req, res) ->
   res.render 'ticket/create',
     ticketTypes: config.ticket.availableType
 
-exports.get '/view', requestAuthenticate, renderAccount, (req, res) ->
+exports.get '/view', requestAuthenticate, renderAccount, getParam, (req, res) ->
   mTicket.findId req.body.id, (ticket) ->
     unless ticket
       return res.send 404
