@@ -36,6 +36,7 @@
     "async": "*",
     "connect": "*",
     "harp": "*",
-    "middleware-injector": "*"
+    "middleware-injector": "*",
+    "tmp": "*"
   }
 }

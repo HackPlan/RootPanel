@@ -28,7 +28,7 @@ exports.get '/', requestAuthenticate, (req, res) ->
     async.map account.attribute.services, (item, callback) ->
       p = plugin.get item
       async.map (p.panel_widgets ? []), (widgetBuilder, callback) ->
-        widgetBuilder (html) ->
+        widgetBuilder account, (html) ->
           callback null,
             plugin: p
             html: html

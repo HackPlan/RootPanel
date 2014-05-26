@@ -34,6 +34,10 @@ sample =
     last_billing_at: Date()
     arrears_at: Date()
 
+    plugin:
+      phpfpm:
+        is_enbale: false
+
     resources_limit:
       cpu: 144
       storage: 520

@@ -13,3 +13,4 @@ No Response.
 Exception:
 
 * not_in_service
+* invalid_enable

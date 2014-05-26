@@ -22,7 +22,7 @@ module.exports =
       throw err if err
       callback()
 
-  widget: (callback) ->
+  widget: (account, callback) ->
     jade.renderFile path.join(__dirname, 'view/widget.jade'), {}, (err, html) ->
       callback html
 
