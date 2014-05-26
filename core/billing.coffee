@@ -24,9 +24,14 @@ exports.calcBilling = (account, isForce, callback) ->
 
     amount += price * billing_time
 
+  if isForce
+    new_last_billing_at = new Date()
+  else
+    new_last_billing_at = new Date account.attribute.last_billing_at.getTime() + billing_time * 3600 * 1000
+
   modifier =
     $set:
-      'attribute.last_billing_at': new Date account.attribute.last_billing_at.getTime() + billing_time * 3600 * 1000
+      'attribute.last_billing_at': new_last_billing_at
     $inc:
       'attribute.balance': -amount
 

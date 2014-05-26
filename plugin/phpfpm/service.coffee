@@ -17,7 +17,7 @@ module.exports =
       callback()
 
   delete: (account, callback) ->
-    if attribute.plugin.phpfpm.is_enable
+    if account.attribute.plugin.phpfpm.is_enable
       this.switch account, callback
     else
       callback()
