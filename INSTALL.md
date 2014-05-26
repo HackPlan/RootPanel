@@ -6,29 +6,23 @@
     apt-get update
     apt-get upgrade
 
+    vi /etc/hostname
+    vi /etc/hosts
+
     apt-get install nodejs git mongodb memcached nginx postfix
     apt-get install python g++ make screen git wget zip unzip iftop unrar-free axel vim emacs subversion subversion-tools curl tmux mercurial
     apt-get install ntp quota quotatool
 
-    vi /etc/hostname
-    vi /etc/hosts
+    mongo
 
-    adduser rpadmin
-    usermod -G rpadmin -a www-data
-    su rpadmin
-    cd ~
+        use admin
+        db.addUser({user: 'rpadmin', pwd: '', roles: ['readWriteAnyDatabase', 'userAdminAnyDatabase', 'dbAdminAnyDatabase', 'clusterAdmin']})
+        use RootPanel
+        db.addUser({user: 'rpadmin', pwd: '', roles: ['readWrite']})
 
-    # create rpadmin mongodb user
     vi /etc/mongodb.conf
 
         auth = true
-
-    git clone https://github.com/jysperm/RootPanel.git
-    cd RootPanel
-
-    vi core/config.coffee
-
-    npm install
 
     rm /etc/nginx/sites-enabled/default
     cat > /etc/nginx/sites-available/rpadmin
@@ -45,7 +39,13 @@
         }
 
     ln -s /etc/nginx/sites-available/rpadmin /etc/nginx/sites-enabled
-    service nginx restart
+
+    adduser rpadmin
+    usermod -G rpadmin -a www-data
+
+    vi /etc/sudoers
+
+        rpadmin ALL=(ALL) NOPASSWD: ALL
 
     vi /etc/fstab
 
@@ -57,11 +57,19 @@
     quotacheck -am
     quotaon -au
 
+    su rpadmin
+    cd ~
+
+    git clone https://github.com/jysperm/RootPanel.git
+    cd RootPanel
+
+    vi core/config.coffee
+
     make start
 
 ### Runtime
 
     apt-get install golang  
 
-    apt-get install python python3 python3-pip python-dev python3-dev
+    apt-get install python python3 python-pip python3-pip python-dev python3-dev
     pip install django tornado markdown python-memcached web.py mongo uwsgi virtualenv virtualenvwrapper flask gevent jinja2 requests
