@@ -18,13 +18,11 @@ exports.use (req, res, next) ->
 
 exports.post '/switch', (req, res) ->
   unless req.body.enable in [true, false]
-    return res.err 'invalid_enable'
+    return res.error 'invalid_enable'
 
-  mAccount.update _id: account._id,
+  mAccount.update _id: req.account._id,
     $set:
       'attribute.plugin.phpfpm.is_enable': false
   , ->
-    callback()
-
     service.switch req.account, req.body.enable, ->
       res.json {}

@@ -24,26 +24,22 @@ module.exports =
 
   switch: (account, is_enable, callback) ->
     callbackback = ->
-      child_process.exec 'service php5-fpm restart', ->
+      child_process.exec 'sudo service php5-fpm restart', (err) ->
+        throw err if err
         callback()
 
     if is_enable
-      async.series [
-        (callbacl) ->
-          tmp.file
-            mode: 0o750
-          , (err, filepath, fd) ->
-            config_content = _.template (fs.readFileSync path.join(__dirname, 'template/fpm-pool.conf')).toString(),
-              account: account
-            fs.writeSync fd, config_content, 0, 'utf8'
-            fs.closeSync fd
-            callback()
+      tmp.file
+        mode: 0o750
+      , (err, filepath, fd) ->
+        config_content = _.template (fs.readFileSync path.join(__dirname, 'template/fpm-pool.conf')).toString(),
+          account: account
+        fs.writeSync fd, config_content, 0, 'utf8'
+        fs.closeSync fd
 
-        (callback) ->
-          child_process.exec "sudo cp #{filepath} /etc/php5/fpm/pool.d/#{account.username}.conf", ->
-            callback()
-      ], ->
-        callbackback()
+        child_process.exec "sudo cp #{filepath} /etc/php5/fpm/pool.d/#{account.username}.conf", (err) ->
+          throw err if err
+          callbackback()
     else
       child_process.exec "sudo rm /etc/php5/fpm/pool.d/#{account.username}.conf", ->
         callbackback()

@@ -24,7 +24,9 @@
 
         auth = true
 
+    rm /etc/php5/fpm/pool.d/www.conf
     rm /etc/nginx/sites-enabled/default
+    
     cat > /etc/nginx/sites-available/rpadmin
 
         server {
