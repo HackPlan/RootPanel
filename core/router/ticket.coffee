@@ -105,7 +105,7 @@ exports.post '/reply', requestAuthenticate, (req, res) ->
       unless mAccount.inGroup req.account, 'root'
         return res.error 'forbidden'
 
-    status = if mAccount.inGroupr(req.account, 'root') then 'open' else 'pending'
+    status = if mAccount.inGroup(req.account, 'root') then 'open' else 'pending'
     mTicket.createReply ticket, req.account, req.body.content, status, (reply) ->
       return res.json
         id: reply._id
