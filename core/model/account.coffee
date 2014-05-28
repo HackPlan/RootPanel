@@ -83,7 +83,8 @@ exports.register = (username, email, passwd, callback) ->
       arrears_at: null
       resources_limit: []
     tokens: []
-  , callback
+  , (err, result) ->
+    callback err, result?[0]
 
 exports.updatePasswd = (account, passwd, callback) ->
   passwd_salt = exports.randomSalt()
@@ -104,9 +105,9 @@ exports.createToken = (account, attribute, callback) ->
       if result
         generateToken callback
       else
-        callback null, token
+        callback token
 
-  generateToken (err, token) ->
+  generateToken (token) ->
     exports.update _id: account._id,
       $push:
         tokens:
@@ -115,7 +116,7 @@ exports.createToken = (account, attribute, callback) ->
           created_at: new Date()
           updated_at: new Date()
           attribute: attribute
-    , ->
+    , (err) ->
       callback null, token
 
 exports.removeToken = (token, callback) ->

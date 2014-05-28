@@ -50,7 +50,8 @@ exports.createTicket = (account, title, content, type, members, status, attribut
     members: membersID
     attribute: attribute
     replys: []
-  , callback
+  , (err, result) ->
+    callback err, result?[0]
 
 exports.createReply = (ticket, account, content, status, callback) ->
   data =

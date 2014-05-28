@@ -20,9 +20,11 @@ exports.buildModel = (collection) ->
     if _.isString id
       id = exports.ObjectID id
 
-    mongo.findOne
+    model.findOne
       _id: id
     , callback
+
+  return model
 
 exports.ObjectID = (id) ->
   try
