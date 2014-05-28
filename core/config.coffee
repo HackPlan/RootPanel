@@ -42,3 +42,10 @@ module.exports =
         memory: 27
 
   mongodb: 'mongodb://localhost/RootPanel'
+
+  plugins:
+    mysql:
+      connection:
+        host: 'localhost'
+        user: 'rpadmin'
+        password: 'passwd'
