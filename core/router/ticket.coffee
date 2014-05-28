@@ -97,7 +97,7 @@ exports.post '/create', requestAuthenticate, (req, res) ->
     createTicket [req.account], 'pending'
 
 exports.post '/reply', requestAuthenticate, (req, res) ->
-  mTicket.findId req.body.id, (ticket) ->
+  mTicket.findId req.body.id, (errr, ticket) ->
     unless ticket
       return res.error 'ticket_not_exist'
 
@@ -147,7 +147,7 @@ exports.post '/update', requestAuthenticate, (req, res) ->
   addToSetModifier = []
   pullModifier = []
 
-  mTicket.findId req.body.id, (ticket) ->
+  mTicket.findId req.body.id, (err, ticket) ->
     unless ticket
       return res.error 'ticket_not_exist'
 

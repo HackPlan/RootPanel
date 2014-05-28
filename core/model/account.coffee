@@ -2,7 +2,7 @@ _ = require 'underscore'
 crypto = require 'crypto'
 
 db = require '../db'
-billing = require '../billing'
+config = require '../config'
 
 module.exports = exports = db.buildModel 'accounts'
 
@@ -158,7 +158,7 @@ exports.joinPlan = (account, plan, callback) ->
     $addToSet:
       'attribute.plans': plan
     $set:
-      'attribute.resources_limit': billing.calcResourcesLimit account.attribute.plans
+      'attribute.resources_limit': exports.calcResourcesLimit account.attribute.plans
   , callback
 
 exports.leavePlan = (account, plan, callback) ->
@@ -167,7 +167,7 @@ exports.leavePlan = (account, plan, callback) ->
     $pull:
       'attribute.plans': plan
     $set:
-      'attribute.resources_limit': billing.calcResourcesLimit account.attribute.plans
+      'attribute.resources_limit': exports.calcResourcesLimit account.attribute.plans
   , callback
 
 exports.incBalance = (account, amount, callback) ->
@@ -175,3 +175,13 @@ exports.incBalance = (account, amount, callback) ->
     $inc:
       'attribute.balance': amount
   , callback
+
+exports.calcResourcesLimit = (plans) ->
+  limit = {}
+
+  for plan in plans
+    for k, v of config.plans[plan].resources
+      limit[k] = 0 unless limit[k]
+      limit[k] += v
+
+  return limit

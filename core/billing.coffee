@@ -41,8 +41,8 @@ exports.calcBilling = (account, isForce, callback) ->
   if account.attribute.balance > 0
     modifier.$set['attribute.arrears_at'] = null
 
-  mAccount.update _id: account._id, modifier, {}, ->
-    mAccount.findId account._id, (account) ->
+  mAccount.update _id: account._id, modifier, ->
+    mAccount.findId account._id, (err, account) ->
       callback account
 
 exports.calcRemainingTime = (account) ->
@@ -54,13 +54,3 @@ exports.calcRemainingTime = (account) ->
     price += plan.price / 30 / 24
 
   return account.attribute.balance / price
-
-exports.calcResourcesLimit = (plans) ->
-  limit = {}
-
-  for plan in plans
-    for k, v of config.plans[plan].resources
-      limit[k] = 0 unless limit[k]
-      limit[k] += v
-
-  return limit
