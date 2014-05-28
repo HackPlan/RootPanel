@@ -1,12 +1,16 @@
 ## Admin API
 
-### POST /admin/update_account/
+### POST /admin/create_payment/
 
 Request:
 
     {
         "account_id": "525284cc2cebb6d0008b4567",
-        "amount_inc": -1
+        "type": "taobao",
+        "amount": "10",
+        "order_id": "560097131641814"
     }
 
-No Response.
+Response:
+
+    {}

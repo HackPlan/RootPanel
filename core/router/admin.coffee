@@ -1,12 +1,12 @@
 express = require 'express'
 
-{requestAdminAuthenticate} = require './middleware'
+{requestAdminAuthenticate, renderAccount} = require './middleware'
 
 mAccount = require '../model/account'
 
 module.exports = exports = express.Router()
 
-exports.get '/', requestAdminAuthenticate, (req, res) ->
+exports.get '/', requestAdminAuthenticate, renderAccount, (req, res) ->
   mAccount.find {}, {}, (accounts) ->
     res.render 'admin/index',
       accounts: accounts
