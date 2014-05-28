@@ -27,16 +27,16 @@ exports.post '/signup', errorHandling, (req, res) ->
   if req.body.username in config.account.invalid_username
     return res.error 'username_exist'
 
-  mAccount.byUsername req.body.username, (account) ->
+  mAccount.byUsername req.body.username, (err, account) ->
     if account
       return res.error 'username_exist'
 
-    mAccount.byEmail req.body.email, (account) ->
+    mAccount.byEmail req.body.email, (err, account) ->
       if account
         return res.error 'email_exist'
 
-      mAccount.register req.body.username, req.body.email, req.body.passwd, (account) ->
-        mAccount.createToken account, {}, (token)->
+      mAccount.register req.body.username, req.body.email, req.body.passwd, (err, account) ->
+        mAccount.createToken account, {}, (err, token)->
           res.cookie 'token', token,
             expires: new Date(Date.now() + config.account.cookie_time)
 
@@ -44,14 +44,14 @@ exports.post '/signup', errorHandling, (req, res) ->
             id: account._id
 
 exports.post '/login', errorHandling, (req, res) ->
-  mAccount.byUsernameOrEmailOrId req.body.username, (account) ->
+  mAccount.byUsernameOrEmailOrId req.body.username, (err, account) ->
     unless account
       return res.error 'auth_failed'
 
     unless mAccount.matchPasswd account, req.body.passwd
       return res.error 'auth_failed'
 
-    mAccount.createToken account, {}, (token) ->
+    mAccount.createToken account, {}, (err, token) ->
       res.cookie 'token', token,
         expires: new Date(Date.now() + config.account.cookie_time)
 

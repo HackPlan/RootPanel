@@ -21,7 +21,7 @@ exports.get '/list', requestAuthenticate, renderAccount, (req, res) ->
   ,
     sort:
       updated_at: -1
-  , (tickets) ->
+  .toArray (err, tickets) ->
     res.render 'ticket/list',
       tickets: tickets
 
@@ -30,7 +30,7 @@ exports.get '/create', requestAuthenticate, renderAccount, (req, res) ->
     ticketTypes: config.ticket.availableType
 
 exports.get '/view', requestAuthenticate, renderAccount, getParam, (req, res) ->
-  mTicket.findId req.body.id, (ticket) ->
+  mTicket.findId req.body.id, (err, ticket) ->
     unless ticket
       return res.send 404
 
@@ -39,20 +39,20 @@ exports.get '/view', requestAuthenticate, renderAccount, getParam, (req, res) ->
         return res.send 403
 
     async.map ticket.members, (member, callback) ->
-      mAccount.findId member, (member_account) ->
+      mAccount.findId member, (err, member_account) ->
         callback null, member_account
     , (err, result) ->
       ticket.members = result
 
       async.map ticket.replys, (reply, callback) ->
-        mAccount.findId reply.account_id, (reply_account) ->
+        mAccount.findId reply.account_id, (err, reply_account) ->
           reply.account = reply_account
           callback null, reply
 
       , (err, result) ->
         ticket.replys = result
 
-        mAccount.findId ticket.account_id, (ticket_account) ->
+        mAccount.findId ticket.account_id, (err, ticket_account) ->
           ticket.account = ticket_account
 
           res.render 'ticket/view',
@@ -66,7 +66,7 @@ exports.post '/create', requestAuthenticate, (req, res) ->
     return res.error 'invalid_type'
 
   createTicket = (members, status) ->
-    mTicket.createTicket req.account, req.body.title, req.body.content, req.body.type, members, status, {}, (ticket) ->
+    mTicket.createTicket req.account, req.body.title, req.body.content, req.body.type, members, status, {}, (err, ticket) ->
       return res.json
         id: ticket._id
 
@@ -77,7 +77,7 @@ exports.post '/create', requestAuthenticate, (req, res) ->
       for memberName in req.body.members
         do (memberName = _.clone(memberName)) ->
           tasks.push (callback) ->
-            mAccount.byUsernameOrEmailOrId memberName, (member) ->
+            mAccount.byUsernameOrEmailOrId memberName, (err, member) ->
               unless member
                 res.error 'invalid_account', username: memberName
                 callback true
@@ -106,7 +106,7 @@ exports.post '/reply', requestAuthenticate, (req, res) ->
         return res.error 'forbidden'
 
     status = if mAccount.inGroup(req.account, 'root') then 'open' else 'pending'
-    mTicket.createReply ticket, req.account, req.body.content, status, (reply) ->
+    mTicket.createReply ticket, req.account, req.body.content, status, (err, reply) ->
       return res.json
         id: reply._id
 
@@ -131,7 +131,7 @@ exports.post '/list', requestAuthenticate, (req, res) ->
       updated_at: -1
     limit: req.body.limit ? 30
     skip: req.body.skip ? 0
-  , (tickets) ->
+  .toArray (err, tickets) ->
     res.json _.map tickets, (item) ->
       return {
         id: item._id
@@ -181,7 +181,7 @@ exports.post '/update', requestAuthenticate, (req, res) ->
           unless _.isEmpty modifier
             mTicket.update _id: ticket._id,
               $set: modifier
-            , {}, callback
+            , callback
           else
             callback()
 
@@ -191,7 +191,7 @@ exports.post '/update', requestAuthenticate, (req, res) ->
               $addToSet:
                 members:
                   $each: addToSetModifier
-            , {}, callback
+            , callback
           else
             callback()
 
@@ -200,7 +200,7 @@ exports.post '/update', requestAuthenticate, (req, res) ->
             mTicket.update _id: ticket._id,
               $pullAll:
                 members: pullModifier
-            , {}, callback
+            , callback
           else
             callback()
       ], ->

@@ -4,9 +4,7 @@ _ = require 'underscore'
 
 db = require '../db'
 
-cTicket = db.collection 'tickets'
-
-db.buildModel module.exports, cTicket
+module.exports = exports = db.buildModel 'tickets'
 
 sample =
   account_id: ObjectID()
@@ -52,7 +50,7 @@ exports.createTicket = (account, title, content, type, members, status, attribut
     members: membersID
     attribute: attribute
     replys: []
-  , {}, callback
+  , callback
 
 exports.createReply = (ticket, account, content, status, callback) ->
   data =
@@ -69,12 +67,12 @@ exports.createReply = (ticket, account, content, status, callback) ->
     $set:
       status: status
       updated_at: new Date()
-  , {}, ->
+  , ->
     unless exports.getMember ticket, account
       exports.addMember ticket, account, ->
-        callback data
+        callback null, data
     else
-      callback data
+      callback null, data
 
 exports.addMember = (ticket, account, callback) ->
   exports.update

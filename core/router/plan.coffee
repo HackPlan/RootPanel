@@ -30,7 +30,7 @@ exports.post '/subscribe', requestAuthenticate, (req, res) ->
         mAccount.update _id: account._id,
           $addToSet:
             'attribute.services': serviceName
-        , {}, ->
+        , ->
           if config.debug.mock_test
             return callback()
 
@@ -59,7 +59,7 @@ exports.post '/unsubscribe', requestAuthenticate, (req, res) ->
           mAccount.update _id: account._id,
             $pull:
               'attribute.services': serviceName
-          , {}, ->
+          , ->
             if config.debug.mock_test
               return callback()
 

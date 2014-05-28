@@ -41,9 +41,4 @@ module.exports =
         transfer: 39
         memory: 27
 
-  db:
-    type: 'mongo'
-    server: 'localhost'
-    name: 'RootPanel'
-    user: 'rpadmin'
-    passwd: ''
+  mongodb: 'mongodb://localhost/RootPanel'

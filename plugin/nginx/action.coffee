@@ -6,7 +6,7 @@ mAccount = require '../../core/model/account'
 module.exports = exports = express.Router()
 
 exports.use (req, res, next) ->
-  mAccount.authenticate req.token, (account) ->
+  mAccount.authenticate req.token, (err, account) ->
     unless account
       return res.json 400, error: 'auth_failed'
 

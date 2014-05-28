@@ -24,7 +24,7 @@ exports.errorHandling = (req, res, next) ->
 
 exports.accountInfo = (req, res, next) ->
   req.inject [exports.parseToken], ->
-    mAccount.authenticate req.token, (account) ->
+    mAccount.authenticate req.token, (err, account) ->
       req.account = account
       next()
 

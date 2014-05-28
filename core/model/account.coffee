@@ -1,16 +1,13 @@
 _ = require 'underscore'
 crypto = require 'crypto'
 
-auth = require '../auth'
 db = require '../db'
 billing = require '../billing'
 
-cAccount = db.collection 'accounts'
+module.exports = exports = db.buildModel 'accounts'
 
-db.buildModel module.exports, cAccount
-
-exports.byUsername = db.buildByXXOO 'username', cAccount
-exports.byEmail = db.buildByXXOO 'email', cAccount
+exports.byUsername = db.buildByXXOO 'username', exports
+exports.byEmail = db.buildByXXOO 'email', exports
 
 sample =
   username: 'jysperm'
@@ -54,13 +51,24 @@ sample =
       ua: 'Mozilla/5.0 (Intel Mac OS X) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.102'
   ]
 
-exports.register = (username, email, passwd, callback = null) ->
-  passwd_salt = auth.randomSalt()
+exports.sha256 = (data) ->
+  if not data
+    return null
+  return crypto.createHash('sha256').update(data).digest('hex')
+
+exports.randomSalt = ->
+  return exports.sha256 crypto.randomBytes 256
+
+exports.hashPasswd = (passwd, passwd_salt) ->
+  return exports.sha256(exports.sha256(passwd) + passwd_salt)
+
+exports.register = (username, email, passwd, callback) ->
+  passwd_salt = exports.randomSalt()
 
   exports.insert
     _id: db.ObjectID()
     username: username
-    passwd: auth.hashPasswd(passwd, passwd_salt)
+    passwd: exports.hashPasswd(passwd, passwd_salt)
     passwd_salt: passwd_salt
     email: email
     signup_at: new Date()
@@ -75,32 +83,30 @@ exports.register = (username, email, passwd, callback = null) ->
       arrears_at: null
       resources_limit: []
     tokens: []
-  , {}, callback
+  , callback
 
 exports.updatePasswd = (account, passwd, callback) ->
-  passwd_salt = auth.randomSalt()
+  passwd_salt = exports.randomSalt()
 
   exports.update _id: account._id,
     $set:
-      passwd: auth.hashPasswd(passwd, passwd_salt)
+      passwd: exports.hashPasswd(passwd, passwd_salt)
       passwd_salt: passwd_salt
-  , {}, callback
+  , callback
 
-# @param callback(token)
 exports.createToken = (account, attribute, callback) ->
-  # @param callback(token)
   generateToken = (callback) ->
-    token = auth.randomSalt()
+    token = exports.randomSalt()
 
     exports.findOne
       'tokens.token': token
-    , {}, (result) ->
+    , (err, result) ->
       if result
         generateToken callback
       else
-        callback token
+        callback null, token
 
-  generateToken (token) ->
+  generateToken (err, token) ->
     exports.update _id: account._id,
       $push:
         tokens:
@@ -109,15 +115,15 @@ exports.createToken = (account, attribute, callback) ->
           created_at: new Date()
           updated_at: new Date()
           attribute: attribute
-    , {}, ->
-      callback token
+    , ->
+      callback null, token
 
 exports.removeToken = (token, callback) ->
   exports.update 'tokens.token': token,
     $pull:
       tokens:
         token: token
-  , {}, callback
+  , callback
 
 exports.authenticate = (token, callback) ->
   unless token
@@ -125,22 +131,22 @@ exports.authenticate = (token, callback) ->
 
   exports.findOne
     'tokens.token': token
-  , {}, callback
+  , callback
 
 exports.byUsernameOrEmailOrId = (username, callback) ->
-  exports.byUsername username, (account) ->
+  exports.byUsername username, (err, account) ->
     if account
-      return callback account
+      return callback null, account
 
-    exports.byEmail username, (account) ->
+    exports.byEmail username, (err, account) ->
       if account
-        return callback account
+        return callback null, account
 
-      exports.findId username, callback
+      exports.findId username, (err, account) ->
+        callback null, account
 
-# @return bool
 exports.matchPasswd = (account, passwd) ->
-  return auth.hashPasswd(passwd, account.passwd_salt) == account.passwd
+  return exports.hashPasswd(passwd, account.passwd_salt) == account.passwd
 
 exports.inGroup = (account, group) ->
   return group in account.group
@@ -152,7 +158,7 @@ exports.joinPlan = (account, plan, callback) ->
       'attribute.plans': plan
     $set:
       'attribute.resources_limit': billing.calcResourcesLimit account.attribute.plans
-  , {}, callback
+  , callback
 
 exports.leavePlan = (account, plan, callback) ->
   account.attribute.plans = _.reject account.attribute.plans, (i) -> i == plan
@@ -161,10 +167,10 @@ exports.leavePlan = (account, plan, callback) ->
       'attribute.plans': plan
     $set:
       'attribute.resources_limit': billing.calcResourcesLimit account.attribute.plans
-  , {}, callback
+  , callback
 
 exports.incBalance = (account, amount, callback) ->
   exports.update _id: account._id,
     $inc:
       'attribute.balance': amount
-  , {}, callback
+  , callback
