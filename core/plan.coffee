@@ -1,5 +1,5 @@
 async = require 'async'
-_ = require 'undersocre'
+_ = require 'underscore'
 
 config = require './config'
 plugin = require './plugin'
