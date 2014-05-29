@@ -1,4 +1,7 @@
+async = require 'async'
+
 config = require './config'
+plan = require './plan'
 
 mAccount = require './model/account'
 mBalance = require './model/balance'
@@ -39,8 +42,11 @@ exports.calcBilling = (account, isForce, callback) ->
     $inc:
       'attribute.balance': -amount
 
-  if !account.attribute.arrears_at and account.attribute.balance < 0
-    modifier.$set['attribute.arrears_at'] = new Date()
+  if account.attribute.balance < 0
+    unless account.attribute.arrears_at
+      modifier.$set['attribute.arrears_at'] = new Date()
+
+    exports.forceUnsubscribe account, ->
 
   if account.attribute.balance > 0
     modifier.$set['attribute.arrears_at'] = null
@@ -54,6 +60,13 @@ exports.calcBilling = (account, isForce, callback) ->
     , ->
       mAccount.findId account._id, (err, account) ->
         callback account
+
+exports.forceUnsubscribe = (account, callback) ->
+  async.mapSeries account.attribute.plans, (plan, callback) ->
+    mAccount.findId account._id, (err, account) ->
+      plan.leavePlan account, plan, callback
+  , ->
+    callback()
 
 exports.calcRemainingTime = (account) ->
   price = 0
