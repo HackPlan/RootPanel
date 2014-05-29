@@ -14,3 +14,7 @@ Request:
 Response:
 
     {}
+
+Exception:
+
+* account_not_exist
