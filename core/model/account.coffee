@@ -4,6 +4,8 @@ crypto = require 'crypto'
 db = require '../db'
 config = require '../config'
 
+mBalance = require './balance'
+
 module.exports = exports = db.buildModel 'accounts'
 
 exports.byUsername = db.buildByXXOO 'username', exports
@@ -170,11 +172,13 @@ exports.leavePlan = (account, plan, callback) ->
       'attribute.resources_limit': exports.calcResourcesLimit account.attribute.plans
   , callback
 
-exports.incBalance = (account, amount, callback) ->
+exports.incBalance = (account, type, amount, attribute, callback) ->
   exports.update _id: account._id,
     $inc:
       'attribute.balance': amount
-  , callback
+  , ->
+    mBalance.create account, type, amount, attribute, (err, balance_log) ->
+      callback balance_log
 
 exports.calcResourcesLimit = (plans) ->
   limit = {}

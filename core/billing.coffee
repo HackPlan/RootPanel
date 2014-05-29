@@ -1,6 +1,7 @@
 config = require './config'
 
 mAccount = require './model/account'
+mBalance = require './model/balance'
 
 exports.checkBilling = (account, callback) ->
   if (Date.now() - account.attribute.last_billing_at.getTime()) > 24 * 3600 * 1000
@@ -24,6 +25,9 @@ exports.calcBilling = (account, isForce, callback) ->
 
     amount += price * billing_time
 
+  unless amount
+    callback account
+
   if isForce
     new_last_billing_at = new Date()
   else
@@ -42,8 +46,14 @@ exports.calcBilling = (account, isForce, callback) ->
     modifier.$set['attribute.arrears_at'] = null
 
   mAccount.update _id: account._id, modifier, ->
-    mAccount.findId account._id, (err, account) ->
-      callback account
+    mBalance.create account, 'consumptions', -amount,
+      plans: account.attribute.plans
+      billing_time: billing_time
+      is_force: isForce
+      last_billing_at: last_billing_at
+    , ->
+      mAccount.findId account._id, (err, account) ->
+        callback account
 
 exports.calcRemainingTime = (account) ->
   price = 0
