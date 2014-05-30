@@ -3,6 +3,7 @@ crypto = require 'crypto'
 
 db = require '../db'
 config = require '../config'
+bitcoind = require '../bitcoin'
 
 mBalance = require './balance'
 
@@ -26,6 +27,9 @@ sample =
     QQ: '184300584'
 
   attribute:
+    bitcoin_deposit_address: '13v2BTCMZMHg5v87susgg86HFZqXERuwUd'
+    blockchain_secret: '53673f434686b535a6cec7b73a60ce045477f066f30eded55a9b972ccafddb2a'
+
     services: ['shadowsocks']
     plans: ['all']
 
@@ -54,7 +58,7 @@ sample =
   ]
 
 exports.sha256 = (data) ->
-  if not data
+  unless data
     return null
   return crypto.createHash('sha256').update(data).digest('hex')
 
@@ -66,29 +70,33 @@ exports.hashPasswd = (passwd, passwd_salt) ->
 
 exports.register = (username, email, passwd, callback) ->
   passwd_salt = exports.randomSalt()
+  blockchain_secret = exports.randomSalt()
 
-  exports.insert
-    _id: db.ObjectID()
-    username: username
-    passwd: exports.hashPasswd(passwd, passwd_salt)
-    passwd_salt: passwd_salt
-    email: email
-    signup_at: new Date()
-    group: []
-    setting:
-      avatar_url: "//ruby-china.org/avatar/#{crypto.createHash('md5').update(email).digest('hex')}?s=58"
-    attribute:
-      services: []
-      plans: []
-      balance: 0
-      last_billing_at: new Date()
-      arrears_at: null
-      resources_limit: []
+  bitcoin.genAddress blockchain_secret, (address) ->
+    exports.insert
+      _id: db.ObjectID()
+      username: username
+      passwd: exports.hashPasswd(passwd, passwd_salt)
+      passwd_salt: passwd_salt
+      email: email
+      signup_at: new Date()
+      group: []
+      setting:
+        avatar_url: "//ruby-china.org/avatar/#{crypto.createHash('md5').update(email).digest('hex')}?s=58"
+      attribute:
+        bitcoin_deposit_address: address
+        blockchain_secret: blockchain_secret
+        services: []
+        plans: []
+        balance: 0
+        last_billing_at: new Date()
+        arrears_at: null
+        resources_limit: []
 
-      plugin: {}
-    tokens: []
-  , (err, result) ->
-    callback err, result?[0]
+        plugin: {}
+      tokens: []
+    , (err, result) ->
+      callback err, result?[0]
 
 exports.updatePasswd = (account, passwd, callback) ->
   passwd_salt = exports.randomSalt()

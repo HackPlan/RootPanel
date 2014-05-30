@@ -1,5 +1,6 @@
 module.exports =
   web:
+    url: 'http://rp3.rpvhost.net'
     port: 3000
 
   debug:
@@ -42,6 +43,9 @@ module.exports =
         memory: 27
 
   mongodb: 'mongodb://localhost/RootPanel'
+
+  bitcoin:
+    forward_to: '1FjhhWrzAvb9YD4tVdbE6wrSoHSwxMJoWe'
 
   plugins:
     mysql:
