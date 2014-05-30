@@ -20,6 +20,7 @@ bindRouters = (app) ->
   app.use '/ticket', require './router/ticket'
   app.use '/wiki', require './router/wiki'
   app.use '/public', require './router/public'
+  app.use '/bitcoin', require './router/bitcoin'
 
   app.get '/', (req, res) ->
     res.redirect '/panel/'

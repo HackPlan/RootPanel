@@ -39,6 +39,7 @@
     "middleware-injector": "*",
     "tmp": "*",
     "mysql": "*",
-    "moment": "*"
+    "moment": "*",
+    "request": "*"
   }
 }
