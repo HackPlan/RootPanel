@@ -7,8 +7,8 @@ plugin = require './plugin'
 mAccount = require './model/account'
 
 exports.joinPlan = (account, plan, callback) ->
-  mAccount.joinPlan account, req.body.plan, ->
-    async.each config.plans[req.body.plan].services, (serviceName, callback) ->
+  mAccount.joinPlan account, plan, ->
+    async.each config.plans[plan].services, (serviceName, callback) ->
       if serviceName in account.attribute.services
         return callback()
 
@@ -23,11 +23,11 @@ exports.joinPlan = (account, plan, callback) ->
           callback()
 
 exports.leavePlan = (account, plan, callback) ->
-  mAccount.leavePlan account, req.body.plan, ->
-    async.each config.plans[req.body.plan].services, (serviceName, callback) ->
+  mAccount.leavePlan account, plan, ->
+    async.each config.plans[plan].services, (serviceName, callback) ->
       stillInService = do ->
-        for item in _.without(account.attribute.plans, req.body.plan)
-          if serviceName in config.plans[req.body.plan].services
+        for item in _.without(account.attribute.plans, plan)
+          if serviceName in config.plans[plan].services
             return true
 
         return false
