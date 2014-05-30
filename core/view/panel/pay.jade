@@ -58,16 +58,11 @@ block main
           th 金额
           th 方式
       tbody
-        tr
-          td 2014-5-1 23:30:05
-          td 24 CNY
-          td 淘宝 62888888888
-        tr
-          td 2014-5-2 23:30:05
-          td 18.1 CNY
-          td
-            | 比特币 &nbsp;
-            a(href='https://blockchain.info/tx/a4178786707c3f4373be6ad1edb3761cbd4c6a5849c5981f7ceefb13b53cab64') 0.02 BTC
+        for item in deposit_log
+          tr
+            td= moment(item.created_at).format('YYYY-MM-DD HH:mm:ss')
+            td #{item.amount.toFixed(2)} CNY
+            td #{item.attribute.type} #{item.attribute.order_id}
 
   .row
     header 扣费记录
@@ -78,7 +73,8 @@ block main
           td 金额
           td 摘要
       tbody
-        tr
-          td 2014-5-1 23:30:05
-          td 0.25 CNY
-          td all, 23 hours, force
+        for item in billing_log
+          tr
+            td= moment(item.created_at).format('YYYY-MM-DD HH:mm:ss')
+            td #{item.amount.toFixed(2)} CNY
+            td #{item.attribute.plans.join(', ')} | #{item.attribute.billing_time} hours #{item.attribute.is_force ? '| force' : ''}

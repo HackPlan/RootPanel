@@ -52,7 +52,7 @@ exports.calcBilling = (account, isForce, callback) ->
     modifier.$set['attribute.arrears_at'] = null
 
   mAccount.update _id: account._id, modifier, ->
-    mBalance.create account, 'consumptions', -amount,
+    mBalance.create account, 'billing', -amount,
       plans: account.attribute.plans
       billing_time: billing_time
       is_force: isForce
