@@ -7,4 +7,3 @@ plugin = require '../plugin'
 module.exports = exports = express.Router()
 
 exports.get '/blockchain_callback', (req, res) ->
-  
