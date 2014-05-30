@@ -23,7 +23,7 @@ exports.post '/switch', (req, res) ->
 
   mAccount.update _id: req.account._id,
     $set:
-      'attribute.plugin.phpfpm.is_enable': false
+      'attribute.plugin.phpfpm.is_enable': req.body.enable
   , ->
     plugin.systemOperate (callback) ->
       service.switch req.account, req.body.enable, callback

@@ -3,19 +3,17 @@ express = require 'express'
 
 plugin = require '../../core/plugin'
 
+{requestAuthenticate} = require '../../core/router/middleware'
+
 mAccount = require '../../core/model/account'
 
 module.exports = exports = express.Router()
 
 exports.use (req, res, next) ->
-  mAccount.authenticate req.token, (account) ->
-    unless account
-      return res.json 400, error: 'auth_failed'
+  req.inject [requestAuthenticate], ->
+    unless 'ssh' in req.account.attribute.services
+      return res.error 'not_in_service'
 
-    unless 'ssh' in account.attribute.service
-      return res.json 400, error: 'not_in_service'
-
-    req.account = account
     next()
 
 exports.post '/update_passwd/', (req, res) ->
