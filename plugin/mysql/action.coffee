@@ -1,6 +1,8 @@
 express = require 'express'
 mysql = require 'mysql'
 
+plugin = require '../../core/plugin'
+
 mAccount = require '../../core/model/account'
 
 module.exports = exports = express.Router()
@@ -20,10 +22,13 @@ exports.post '/update_passwd/', (req, res) ->
   unless req.body.passwd or not /^[A-Za-z0-9\-_]+$/.test req.body.passwd
     return res.json 400, error: 'invalid_passwd'
 
-  connection = mysql.createConnection config.plugins.mysql.connection
-  connection.connect()
+  plugin.systemOperate (callback) ->
+    connection = mysql.createConnection config.plugins.mysql.connection
+    connection.connect()
 
-  connection.query "SET PASSWORD FOR '#{req.account.username}'@'localhost' = PASSWORD('#{req.body.passwd}');", (err, rows, fields) ->
-    throw err if err
-    connection.end()
+    connection.query "SET PASSWORD FOR '#{req.account.username}'@'localhost' = PASSWORD('#{req.body.passwd}');", (err, rows, fields) ->
+      throw err if err
+      connection.end()
+      callback()
+  , ->
     res.json {}

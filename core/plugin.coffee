@@ -14,3 +14,9 @@ exports.loadPlugins = (app) ->
 
     if plugin.action
       app.use ('/plugin/' + name), plugin.action
+
+exports.systemOperate = (operator, callback) ->
+  if config.debug.mock_test
+    callback()
+  else
+    operator callback

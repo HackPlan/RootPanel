@@ -1,6 +1,8 @@
 child_process = require 'child_process'
 express = require 'express'
 
+plugin = require '../../core/plugin'
+
 mAccount = require '../../core/model/account'
 
 module.exports = exports = express.Router()
@@ -20,6 +22,9 @@ exports.post '/update_passwd/', (req, res) ->
   unless req.body.passwd or not /^[A-Za-z0-9\-_]+$/.test req.body.passwd
     return res.json 400, error: 'invalid_passwd'
 
-  child_process.exec "echo '#{req.account.username}:#{req.body.passwd}' | sudo chpasswd", (err, stdout, stderr) ->
-    throw err if err
+  plugin.systemOperate (callback) ->
+    child_process.exec "echo '#{req.account.username}:#{req.body.passwd}' | sudo chpasswd", (err, stdout, stderr) ->
+      throw err if err
+      callback()
+  , ->
     res.json {}

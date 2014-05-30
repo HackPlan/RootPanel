@@ -2,6 +2,7 @@ child_process = require 'child_process'
 express = require 'express'
 
 service = require './service'
+plugin = require '../../core/plugin'
 
 {requestAuthenticate} = require '../../core/router/middleware'
 
@@ -24,5 +25,7 @@ exports.post '/switch', (req, res) ->
     $set:
       'attribute.plugin.phpfpm.is_enable': false
   , ->
-    service.switch req.account, req.body.enable, ->
+    plugin.systemOperate (callback) ->
+      service.switch req.account, req.body.enable, callback
+    , ->
       res.json {}
