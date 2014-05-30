@@ -2,7 +2,7 @@ $ ->
   id = $('#ticketid').data 'id'
   #return a promise
   changeStatus = (status) ->
-    $.post '/ticket/update/', {
+    $.post '/ticket/update/', JSON.stringify {
       id: id
       status: status
     }
@@ -15,24 +15,13 @@ $ ->
   $('#reply-btn').on 'click', (e) ->
     e.preventDefault()
     return unless checkContent()
-    data = {
+
+    $.post '/ticket/reply/', JSON.stringify {
       id: id
       content: $('#reply-content').val()
     }
-    console.log data
-    $.ajax {
-      method: 'post'
-      url: '/ticket/reply/'
-      data: data
-    }
-
-    .done (r) ->
+    .success ->
       location.reload true
-    .fail (r) ->
-      if reply.status is 400
-        error = reply.responseJSON.error
-        ErrorHandle.flushInfo 'alert', error
-
 
   $('#close-btn').on 'click', (e) ->
     e.preventDefault()

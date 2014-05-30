@@ -4,17 +4,10 @@ $ ->
     if $('#passwd').val() isnt $('#passwd2').val()
       ErrorHandle.flushInfo 'alert', '两次密码不一致'
     else
-      data =
+      $.post '/account/signup/', JSON.stringify {
         username: $('#username').val()
         passwd: $('#passwd').val()
         email: $('#email').val()
-      $.ajax
-        method: 'post'
-        url: '/account/signup/'
-        data: data
-      .done (reply) ->
+      }
+      .success ->
         location.href = '/'
-      .fail (reply) ->
-        if reply.status is 400
-          error = reply.responseJSON.error
-          ErrorHandle.flushInfo 'alert', error

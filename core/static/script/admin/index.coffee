@@ -1,12 +1,4 @@
 $ ->
-  $(document).ajaxError (e, reply) ->
-    if reply.status is 400
-      error = reply.responseJSON.error
-      ErrorHandle.flushInfo 'alert', error
-  $.ajaxSetup {
-    contentType: 'application/json; charset=UTF-8'
-  }
-
   #充值记录
   $ '.create-payment'
     .on 'click', (e) ->
