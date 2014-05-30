@@ -1,7 +1,7 @@
 db = require '../db'
 {ObjectID} = require 'mongodb'
 
-module.exports = exports = db.buildModel 'accounts'
+module.exports = exports = db.buildModel 'balance_log'
 
 sample =
   account_id: new ObjectID()
@@ -18,5 +18,6 @@ exports.create = (account, type, amount, attribute, callback) ->
     type: type
     amount: amount
     attribute: attribute
+    created_at: new Date()
   , (err, result) ->
     callback err, result?[0]
