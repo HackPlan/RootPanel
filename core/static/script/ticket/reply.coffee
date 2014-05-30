@@ -23,17 +23,12 @@ $ ->
     .success ->
       location.reload true
 
-  $('#close-btn').on 'click', (e) ->
+  $('.change-status').on 'click', (e) ->
     e.preventDefault()
-    changeStatus 'closed'
-      .done (r) ->
-        ErrorHandle.flushInfo 'success', '关闭工单成功', ->
-          location.reload true
+    status = $(this).data 'status'
+    changeStatus status
+      .done ->
+        ErrorHandle.flushInfo 'success', "#{status}工单成功", ->
+        location.reload true
 
-  $('#reopen-btn').on 'click', (e) ->
-    e.preventDefault()
-    changeStatus 'open'
-      .done (r) ->
-        ErrorHandle.flushInfo 'success', '重开工单成功', ->
-          location.reload true
 
