@@ -38,6 +38,7 @@
     "harp": "*",
     "middleware-injector": "*",
     "tmp": "*",
-    "mysql": "*"
+    "mysql": "*",
+    "moment": "*"
   }
 }
