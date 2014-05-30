@@ -29,7 +29,7 @@ $ ->
         }
         .success ->
           ErrorHandle.flushInfo 'success', '修改成功', ->
-            location.reload t_resources
+            location.reload()
 
   fpm = $ '#php-fpm'
   fpm.on 'click', (e) ->
@@ -42,10 +42,21 @@ $ ->
   $ '#nginxSave'
     .on 'click', (e) ->
       e.preventDefault()
-      $.post '/plugin/nginx/update_site/', {
+      $.post '/plugin/nginx/update_site/', JSON.stringify {
         action: 'create'
         type: $('#nginxConfigType').find('.active a').attr('href').substr 1
         config: JSON.parse $('#nginxModal').find('textarea').val()
+      }
+      .success ->
+        location.reload()
+
+  #mysql插件
+  mysql = $ '#mysql-input'
+  mysql.find 'button'
+    .on 'click', (e) ->
+      e.preventDefault()
+      $.post '/plugin/mysql/update_passwd/', JSON.stringify {
+        passwd: (mysql.find 'input').val()
       }
       .success ->
         location.reload()
