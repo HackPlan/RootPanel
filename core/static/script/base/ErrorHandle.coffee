@@ -7,7 +7,7 @@ $ ->
 			$("#page-#{type}").empty()
 
 		showInfo: (type, callback) ->
-			$("#page-#{type}").show 400, if callback? then callback or null
+			$("#page-#{type}").show 1000, if callback? then callback or null
 
 
 		hideInfo: (type) ->

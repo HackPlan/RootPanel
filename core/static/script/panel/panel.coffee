@@ -1,13 +1,4 @@
 $ ->
-  $(document).ajaxError (e, reply) ->
-    console.log reply
-    if reply.status is 400
-      error = reply.responseJSON.error
-      ErrorHandle.flushInfo 'alert', error
-  $.ajaxSetup {
-    contentType: 'application/json; charset=UTF-8'
-  }
-
   service = $ '#service'
   service.find 'button'
           .on 'click', (e) ->
