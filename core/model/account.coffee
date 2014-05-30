@@ -84,6 +84,8 @@ exports.register = (username, email, passwd, callback) ->
       last_billing_at: new Date()
       arrears_at: null
       resources_limit: []
+
+      plugin: {}
     tokens: []
   , (err, result) ->
     callback err, result?[0]
