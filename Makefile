@@ -6,9 +6,6 @@ install:
 build: install
 	node node_modules/coffee-script/bin/coffee -c .
 
-test: build
-	bash run-test.bash
-
 clean:
 	find . -path './node_modules' -prune -o -name '*.js' -exec rm -fr {} \;
 
