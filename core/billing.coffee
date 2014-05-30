@@ -56,7 +56,7 @@ exports.calcBilling = (account, isForce, callback) ->
       plans: account.attribute.plans
       billing_time: billing_time
       is_force: isForce
-      last_billing_at: last_billing_at
+      last_billing_at: account.attribute.last_billing_at
     , ->
       mAccount.findId account._id, (err, account) ->
         callback account
