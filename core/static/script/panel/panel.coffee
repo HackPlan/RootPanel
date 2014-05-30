@@ -4,6 +4,9 @@ $ ->
     if reply.status is 400
       error = reply.responseJSON.error
       ErrorHandle.flushInfo 'alert', error
+  $.ajaxSetup {
+    contentType: 'application/json; charset=UTF-8'
+  }
 
   service = $ '#service'
   service.find 'button'
@@ -11,7 +14,7 @@ $ ->
             e.preventDefault()
             button = $ @
             prehead = if button.hasClass 'btn-success' then '' else 'un'
-            $.post "/plan/#{prehead}subscribe/", {
+            $.post "/plan/#{prehead}subscribe/", JSON.stringify {
               plan: button.parent().data 'type'
             }
             .success ->
@@ -21,7 +24,7 @@ $ ->
   ssh.find 'button'
       .on 'click', (e) ->
         e.preventDefault()
-        $.post '/plugin/ssh/update_passwd/', {
+        $.post '/plugin/ssh/update_passwd/', JSON.stringify {
           passwd: ssh.find('input').val()
         }
         .success ->
@@ -32,9 +35,7 @@ $ ->
   fpm.on 'click', (e) ->
     e.preventDefault()
     enable = if fpm.hasClass 'btn-success' then true else false
-    $.post '/plugin/phpfpm/switch/', {
-      enable: enable
-    }
+    $.post '/plugin/phpfpm/switch/', JSON.stringify {enable: enable}
     .success ->
       location.reload()
 
