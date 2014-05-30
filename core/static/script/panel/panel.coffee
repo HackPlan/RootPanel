@@ -1,26 +1,26 @@
 $ ->
   service = $ '#service'
   service.find 'button'
-          .on 'click', (e) ->
-            e.preventDefault()
-            button = $ @
-            prehead = if button.hasClass 'btn-success' then '' else 'un'
-            $.post "/plan/#{prehead}subscribe/", JSON.stringify {
-              plan: button.parent().data 'type'
-            }
-            .success ->
-              location.reload()
+    .on 'click', (e) ->
+      e.preventDefault()
+      button = $ @
+      prehead = if button.hasClass 'btn-success' then '' else 'un'
+      $.post "/plan/#{prehead}subscribe/", JSON.stringify {
+        plan: button.parent().data 'type'
+      }
+      .success ->
+        location.reload()
 
   ssh = $ '#ssh-input'
   ssh.find 'button'
-      .on 'click', (e) ->
-        e.preventDefault()
-        $.post '/plugin/ssh/update_passwd/', JSON.stringify {
-          passwd: ssh.find('input').val()
-        }
-        .success ->
-          ErrorHandle.flushInfo 'success', '修改成功', ->
-            location.reload()
+    .on 'click', (e) ->
+      e.preventDefault()
+      $.post '/plugin/ssh/update_passwd/', JSON.stringify {
+        passwd: ssh.find('input').val()
+      }
+      .success ->
+        ErrorHandle.flushInfo 'success', '修改成功', ->
+          location.reload()
 
   fpm = $ '#php-fpm'
   fpm.on 'click', (e) ->
