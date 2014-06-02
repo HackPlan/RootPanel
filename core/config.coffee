@@ -46,6 +46,8 @@ module.exports =
 
   bitcoin:
     forward_to: '1FjhhWrzAvb9YD4tVdbE6wrSoHSwxMJoWe'
+    confirmations: 1
+    sbtc2cny: 25000
 
   plugins:
     mysql:

@@ -11,6 +11,7 @@ module.exports = exports = db.buildModel 'accounts'
 
 exports.byUsername = db.buildByXXOO 'username', exports
 exports.byEmail = db.buildByXXOO 'email', exports
+exports.byDepositAddress = db.buildByXXOO 'bitcoin_deposit_address', exports
 
 sample =
   username: 'jysperm'
@@ -58,8 +59,7 @@ sample =
   ]
 
 exports.sha256 = (data) ->
-  unless data
-    return null
+  return null unless data
   return crypto.createHash('sha256').update(data).digest('hex')
 
 exports.randomSalt = ->
