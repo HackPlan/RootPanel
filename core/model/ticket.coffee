@@ -4,7 +4,7 @@ _ = require 'underscore'
 
 {app} = require '..'
 
-module.exports = exports = app.buildModel 'tickets'
+module.exports = exports = app.db.buildModel 'tickets'
 
 sample =
   account_id: ObjectID()

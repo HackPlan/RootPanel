@@ -2,7 +2,6 @@ async = require 'async'
 _ = require 'underscore'
 express = require 'express'
 
-db = require '../db'
 config = require '../config'
 {requestAuthenticate, renderAccount, getParam} = require './middleware'
 

@@ -5,12 +5,10 @@ _ = require 'underscore'
 path = require 'path'
 harp = require 'harp'
 fs = require 'fs'
+mongomin = require 'mongo-min'
 
 config = require './config'
-db = require './db'
 i18n = require './i18n'
-
-
 
 bindRouters = (app) ->
   app.use require 'middleware-injector'
@@ -33,7 +31,7 @@ bindRouters = (app) ->
 exports.runWebServer = ->
   exports.app = app = express()
 
-  db.connect config.mongodb, (db) ->
+  mongomin config.mongodb, (db) ->
     app.db = db
 
     i18n.init
