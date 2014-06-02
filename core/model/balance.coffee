@@ -1,7 +1,8 @@
-db = require '../db'
 {ObjectID} = require 'mongodb'
 
-module.exports = exports = db.buildModel 'balance_log'
+{app} = require '..'
+
+module.exports = exports = app.db.buildModel 'balance_log'
 
 sample =
   account_id: new ObjectID()

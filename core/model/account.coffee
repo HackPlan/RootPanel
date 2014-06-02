@@ -1,17 +1,17 @@
 _ = require 'underscore'
 crypto = require 'crypto'
 
-db = require '../db'
+{app} = require '..'
 config = require '../config'
-bitcoind = require '../bitcoin'
+bitcoin = require '../bitcoin'
 
 mBalance = require './balance'
 
-module.exports = exports = db.buildModel 'accounts'
+module.exports = exports = app.db.buildModel 'accounts'
 
-exports.byUsername = db.buildByXXOO 'username', exports
-exports.byEmail = db.buildByXXOO 'email', exports
-exports.byDepositAddress = db.buildByXXOO 'bitcoin_deposit_address', exports
+exports.byUsername = exports.buildByXXOO 'username', exports
+exports.byEmail = exports.buildByXXOO 'email', exports
+exports.byDepositAddress = exports.buildByXXOO 'bitcoin_deposit_address', exports
 
 sample =
   username: 'jysperm'

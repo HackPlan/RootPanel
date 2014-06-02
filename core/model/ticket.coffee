@@ -2,9 +2,9 @@ markdown = require('markdown').markdown
 ObjectID = require('mongodb').ObjectID
 _ = require 'underscore'
 
-db = require '../db'
+{app} = require '..'
 
-module.exports = exports = db.buildModel 'tickets'
+module.exports = exports = app.buildModel 'tickets'
 
 sample =
   account_id: ObjectID()

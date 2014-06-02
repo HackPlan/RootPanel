@@ -1,40 +1,39 @@
-MongoClient = (require 'mongodb').MongoClient
-ObjectID = require('mongodb').ObjectID
+{MongoClient, ObjectID} = require 'mongodb'
 _ = require 'underscore'
 
-config = require './config'
+exports.connect = (url, callback) ->
+  db = {}
 
-exports.db = {}
-
-exports.connect = (callback) ->
-  MongoClient.connect config.mongodb, {}, (err, db) ->
+  MongoClient.connect url, {}, (err, client) ->
     throw err if err
-    exports.mongo = db
+
+    db =
+      mongo: client
+
+    db.ObjectID = (id) ->
+      try
+        return new ObjectID id
+      catch e
+        return null
+
+    db.buildModel = (collection) ->
+      model = db.mongo.collection collection
+
+      model.findId = (id, callback) ->
+        if _.isString id
+          id = db.ObjectID id
+
+        model.findOne
+          _id: id
+        , callback
+
+      model.buildByXXOO = (xxoo) ->
+        return (value, callback) ->
+          selector = {}
+          selector[xxoo] = value
+
+          model.findOne selector, callback
+
+      return model
 
     callback db
-
-exports.buildModel = (collection) ->
-  model = exports.mongo.collection collection
-
-  model.findId = (id, callback) ->
-    if _.isString id
-      id = exports.ObjectID id
-
-    model.findOne
-      _id: id
-    , callback
-
-  return model
-
-exports.ObjectID = (id) ->
-  try
-    return new ObjectID id
-  catch e
-    return null
-
-exports.buildByXXOO = (xxoo, mongo) ->
-  return (value, callback) ->
-    selector = {}
-    selector[xxoo] = value
-
-    mongo.findOne selector, callback

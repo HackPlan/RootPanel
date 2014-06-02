@@ -10,6 +10,8 @@ config = require './config'
 db = require './db'
 i18n = require './i18n'
 
+
+
 bindRouters = (app) ->
   app.use require 'middleware-injector'
 
@@ -29,8 +31,10 @@ bindRouters = (app) ->
   plugin.loadPlugins app
 
 exports.runWebServer = ->
-  db.connect ->
-    app = express()
+  exports.app = app = express()
+
+  db.connect config.mongodb, (db) ->
+    app.db = db
 
     i18n.init
       default_language: 'zh_CN'
