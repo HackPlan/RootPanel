@@ -128,11 +128,11 @@ exports.createToken = (account, attribute, callback) ->
           created_at: new Date()
           updated_at: new Date()
           attribute: attribute
-    , (err) ->
+    , ->
       callback null, token
 
 exports.removeToken = (token, callback) ->
-  exports.update 'tokens.token': token,
+  exports.update {'tokens.token': token},
     $pull:
       tokens:
         token: token
