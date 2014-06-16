@@ -1,4 +1,5 @@
 express = require 'express'
+_ = require 'underscore'
 
 {requestAdminAuthenticate, renderAccount} = require './middleware'
 
@@ -16,7 +17,10 @@ exports.post '/create_payment', requestAdminAuthenticate, (req, res) ->
     unless account
       return res.error 'account_not_exist'
 
-    mAccount.incBalance account, 'deposit', parseFloat(req.body.amount),
+    amount = parseFloat req.body.amount
+    amount = 0 unless _.isNaN amount
+
+    mAccount.incBalance account, 'deposit', amount,
       type: req.body.type
       order_id: req.body.order_id
     , ->
