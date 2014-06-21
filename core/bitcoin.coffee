@@ -30,13 +30,14 @@ exports.doCallback = (data, callback) ->
     unless data.secret == account.blockchain_secret
       return callback 'Invalid Secret'
 
-    if data.confirmations > config.bitcoin.confirmations
-      amount = parseFloat(data.value) / config.bitcoin.sbtc2cny
+    exports.getExchangeRate (rate) ->
+      if data.confirmations > config.bitcoin.confirmations
+        amount = parseFloat(data.value) / 100000000 / rate
 
-      mAccount.incBalance account, 'deposit', amount,
-        type: 'bitcoin'
-        order_id: data.input_transaction_hash
-      , ->
-        callback '*OK*'
-    else
-      callback 'Confirmations Insufficient'
+        mAccount.incBalance account, 'deposit', amount,
+          type: 'bitcoin'
+          order_id: data.input_transaction_hash
+        , ->
+          callback '*OK*'
+      else
+        callback 'Confirmations Insufficient'
