@@ -1,6 +1,5 @@
 jade = require 'jade'
 path = require 'path'
-async = require 'async'
 mysql = require 'mysql'
 
 config = require '../../core/config'

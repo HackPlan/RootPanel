@@ -1,7 +1,6 @@
 child_process = require 'child_process'
 jade = require 'jade'
 path = require 'path'
-async = require 'async'
 
 plugin = require '../../core/plugin'
 

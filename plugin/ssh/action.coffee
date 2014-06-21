@@ -1,5 +1,4 @@
 child_process = require 'child_process'
-express = require 'express'
 
 plugin = require '../../core/plugin'
 

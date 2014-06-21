@@ -1,4 +1,3 @@
-express = require 'express'
 mysql = require 'mysql'
 
 plugin = require '../../core/plugin'
