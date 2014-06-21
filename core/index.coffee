@@ -3,6 +3,7 @@ path = require 'path'
 harp = require 'harp'
 fs = require 'fs'
 mongomin = require 'mongo-min'
+redis = require 'redis'
 
 global._ = require 'underscore'
 global.ObjectID = require('mongodb').ObjectID
@@ -30,11 +31,22 @@ bindRouters = (app) ->
   plugin = require './plugin'
   plugin.loadPlugins app
 
+exports.connectDatabase = (callback) ->
+  if global.app?.db
+    return callback null, app.db
+
+  app.redis = redis.createClient()
+
+  mongomin config.mongodb, (err, db) ->
+    global.app ?= {}
+    app.db = db
+    callback err, db
+
 exports.runWebServer = ->
   global.app = exports.app = express()
 
-  mongomin config.mongodb, (db) ->
-    app.db = db
+  exports.connectDatabase (err) ->
+    throw err if err
 
     i18n.init
       default_language: 'zh_CN'

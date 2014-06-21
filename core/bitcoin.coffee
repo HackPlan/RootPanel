@@ -13,6 +13,18 @@ exports.genAddress = (blockchain_secret, callback) ->
 
     callback body.input_address
 
+exports.getExchangeRate = (callback) ->
+  app.redis.get 'rp:exchange_rate:cnybtc', (err, rate) ->
+    if rate
+      callback rate
+    else
+      request 'https://blockchain.info/ticker', (err, res, body) ->
+        body = JSON.parse body
+        rate = 1 / parseFloat(body['CNY']['15m'])
+
+        app.redis.setex 'rp:exchange_rate:cnybtc', 60, rate, ->
+          callback parseFloat rate
+
 exports.doCallback = (data, callback) ->
   mAccount.byDepositAddress data.input_address, (err, account) ->
     unless data.secret == account.blockchain_secret

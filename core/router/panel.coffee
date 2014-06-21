@@ -1,6 +1,7 @@
 config = require '../config'
 billing = require '../billing'
 plugin = require '../plugin'
+bitcoin = require '../bitcoin'
 {requestAuthenticate, renderAccount} = require './middleware'
 
 mAccount = require '../model/account'
@@ -9,12 +10,14 @@ mBalance = require '../model/balance'
 module.exports = exports = express.Router()
 
 exports.get '/pay', requestAuthenticate, renderAccount, (req, res) ->
-  mBalance.find
-    account_id: req.account._id
-  .toArray (err, balance_log) ->
-    res.render 'panel/pay',
-      deposit_log: _.filter(balance_log, (i) -> i.type == 'deposit')
-      billing_log: _.filter(balance_log, (i) -> i.type == 'billing')
+  bitcoin.getExchangeRate (rate) ->
+    mBalance.find
+      account_id: req.account._id
+    .toArray (err, balance_log) ->
+      res.render 'panel/pay',
+        exchange_rate: rate
+        deposit_log: _.filter(balance_log, (i) -> i.type == 'deposit')
+        billing_log: _.filter(balance_log, (i) -> i.type == 'billing')
 
 exports.get '/', requestAuthenticate, (req, res) ->
   billing.checkBilling req.account, (account) ->

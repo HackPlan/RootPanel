@@ -39,6 +39,7 @@
     "mysql": "*",
     "moment": "*",
     "request": "*",
-    "mongo-min": "*"
+    "mongo-min": "*",
+    "redis": "*"
   }
 }
