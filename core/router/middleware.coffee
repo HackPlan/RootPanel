@@ -1,5 +1,3 @@
-_ = require 'underscore'
-
 mAccount = require '../model/account'
 
 exports.parseToken = (req, res, next) ->

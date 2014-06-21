@@ -1,11 +1,13 @@
-express = require 'express'
 connect = require 'connect'
-async = require 'async'
-_ = require 'underscore'
 path = require 'path'
 harp = require 'harp'
 fs = require 'fs'
 mongomin = require 'mongo-min'
+
+global._ = require 'underscore'
+global.ObjectID = require('mongodb').ObjectID
+global.express = require 'express'
+global.async = require 'async'
 
 config = require './config'
 i18n = require './i18n'
@@ -29,7 +31,7 @@ bindRouters = (app) ->
   plugin.loadPlugins app
 
 exports.runWebServer = ->
-  exports.app = app = express()
+  global.app = exports.app = express()
 
   mongomin config.mongodb, (db) ->
     app.db = db

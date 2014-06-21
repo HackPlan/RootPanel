@@ -1,7 +1,3 @@
-_ = require 'underscore'
-express = require 'express'
-async = require 'async'
-
 config = require '../config'
 billing = require '../billing'
 plugin = require '../plugin'

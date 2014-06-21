@@ -1,5 +1,3 @@
-express = require 'express'
-
 config = require '../config'
 utils = require './utils'
 {renderAccount, errorHandling, requestAuthenticate} = require './middleware'

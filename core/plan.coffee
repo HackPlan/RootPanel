@@ -1,6 +1,3 @@
-async = require 'async'
-_ = require 'underscore'
-
 plugin = require './plugin'
 
 mAccount = require './model/account'

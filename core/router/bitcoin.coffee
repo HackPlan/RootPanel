@@ -1,6 +1,3 @@
-express = require 'express'
-async = require 'async'
-
 config = require '../config'
 plugin = require '../plugin'
 bitcoin = require '../bitcoin'

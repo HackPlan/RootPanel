@@ -1,4 +1,3 @@
-express = require 'express'
 markdown = require('markdown').markdown
 path = require 'path'
 fs = require 'fs'

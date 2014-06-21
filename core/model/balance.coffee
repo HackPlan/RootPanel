@@ -1,7 +1,3 @@
-{ObjectID} = require 'mongodb'
-
-{app} = require '..'
-
 module.exports = exports = app.db.buildModel 'balance_log'
 
 sample =

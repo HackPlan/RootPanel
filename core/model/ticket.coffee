@@ -1,8 +1,4 @@
 markdown = require('markdown').markdown
-ObjectID = require('mongodb').ObjectID
-_ = require 'underscore'
-
-{app} = require '..'
 
 module.exports = exports = app.db.buildModel 'tickets'
 

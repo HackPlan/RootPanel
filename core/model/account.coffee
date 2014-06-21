@@ -1,7 +1,5 @@
-_ = require 'underscore'
 crypto = require 'crypto'
 
-{app} = require '..'
 config = require '../config'
 bitcoin = require '../bitcoin'
 
@@ -74,7 +72,7 @@ exports.register = (username, email, passwd, callback) ->
 
   bitcoin.genAddress blockchain_secret, (address) ->
     exports.insert
-      _id: db.ObjectID()
+      _id: new ObjectID()
       username: username
       passwd: exports.hashPasswd(passwd, passwd_salt)
       passwd_salt: passwd_salt

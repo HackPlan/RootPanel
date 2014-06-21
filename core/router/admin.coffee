@@ -1,6 +1,3 @@
-express = require 'express'
-_ = require 'underscore'
-
 {requestAdminAuthenticate, renderAccount} = require './middleware'
 
 mAccount = require '../model/account'

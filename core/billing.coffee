@@ -1,5 +1,3 @@
-async = require 'async'
-
 config = require './config'
 plan = require './plan'
 
