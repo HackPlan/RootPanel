@@ -1,4 +1,4 @@
-config = require './config'
+config = require './../config'
 plan = require './plan'
 
 mAccount = require './model/account'

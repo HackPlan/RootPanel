@@ -65,7 +65,7 @@
     git clone https://github.com/jysperm/RootPanel.git
     cd RootPanel
 
-    vi core/config.coffee
+    vi config.coffee
 
     make start
 

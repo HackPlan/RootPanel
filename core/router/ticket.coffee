@@ -1,4 +1,4 @@
-config = require '../config'
+config = require '../../config'
 {requestAuthenticate, renderAccount, getParam} = require './middleware'
 
 mAccount = require '../model/account'

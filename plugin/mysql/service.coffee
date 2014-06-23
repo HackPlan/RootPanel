@@ -2,7 +2,7 @@ jade = require 'jade'
 path = require 'path'
 mysql = require 'mysql'
 
-config = require '../../core/config'
+config = require '../../config'
 plugin = require '../../core/plugin'
 
 mAccount = require '../../core/model/account'

@@ -10,7 +10,7 @@ global.ObjectID = require('mongodb').ObjectID
 global.express = require 'express'
 global.async = require 'async'
 
-config = require './config'
+config = require './../config'
 i18n = require './i18n'
 
 bindRouters = (app) ->

@@ -1,4 +1,4 @@
-config = require '../config'
+config = require '../../config'
 billing = require '../billing'
 plugin = require '../plugin'
 bitcoin = require '../bitcoin'

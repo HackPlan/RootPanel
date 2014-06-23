@@ -1,4 +1,4 @@
-config = require '../config'
+config = require '../../config'
 utils = require './utils'
 {renderAccount, errorHandling, requestAuthenticate} = require './middleware'
 

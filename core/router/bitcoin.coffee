@@ -1,4 +1,4 @@
-config = require '../config'
+config = require '../../config'
 plugin = require '../plugin'
 bitcoin = require '../bitcoin'
 {getParam} = require './middleware'

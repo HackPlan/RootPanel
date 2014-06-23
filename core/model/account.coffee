@@ -1,6 +1,6 @@
 crypto = require 'crypto'
 
-config = require '../config'
+config = require '../../config'
 bitcoin = require '../bitcoin'
 
 mBalance = require './balance'

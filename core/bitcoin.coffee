@@ -1,6 +1,6 @@
 request = require 'request'
 
-config = require './config'
+config = require './../config'
 
 mAccount = require './model/account'
 
