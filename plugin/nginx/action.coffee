@@ -10,7 +10,7 @@ exports.use (req, res, next) ->
     unless account
       return res.json 400, error: 'auth_failed'
 
-    unless 'phpfpm' in account.attribute.service
+    unless 'nginx' in account.attribute.service
       return res.json 400, error: 'not_in_service'
 
     req.account = account

@@ -2,7 +2,7 @@ action = require './action'
 service = require './service'
 
 module.exports =
-  name: 'phpfpm'
+  name: 'nginx'
   type: 'service'
 
   action: action
