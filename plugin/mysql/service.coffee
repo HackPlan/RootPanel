@@ -1,6 +1,7 @@
 jade = require 'jade'
 path = require 'path'
 mysql = require 'mysql'
+async = require 'async'
 
 config = require '../../config'
 plugin = require '../../core/plugin'
@@ -13,7 +14,7 @@ module.exports =
       connection = mysql.createConnection config.plugins.mysql.connection
       connection.connect()
 
-      connection.query "CREATE USER '#{account.username}'@'localhost' IDENTIFIED BY '#{mAccount.randomSalt()}';", (err, rows, fields) ->
+      connection.query "CREATE USER '#{account.username}'@'localhost' IDENTIFIED BY '#{mAccount.randomSalt()}';", (err, rows) ->
         throw err if err
         connection.end()
         callback()
@@ -24,10 +25,25 @@ module.exports =
       connection = mysql.createConnection config.plugins.mysql.connection
       connection.connect()
 
-      connection.query "GRANT ALL PRIVILEGES ON `#{account.username}\\_%%` . * TO '#{account.username}'@'localhost';", (err, rows, fields) ->
+      connection.query "DROP USER '#{account.username}'@'localhost';", (err, rows) ->
         throw err if err
-        connection.end()
-        callback()
+
+        connection.query 'show databases;', (err, rows) ->
+          throw err if err
+
+          databases_to_delete = _.filter _.pluck(rows, 'Database'), (item) ->
+            if item[..account.username.length] == "#{account.username}_"
+              return true
+            else
+              return false
+
+          async.each databases_to_delete, (name, callback) ->
+            connection.query "DROP DATABASE `#{name}`;", (err, rows) ->
+              throw err if err
+              callback()
+          , ->
+            connection.end()
+            callback()
     , callback
 
   widget: (account, callback) ->
