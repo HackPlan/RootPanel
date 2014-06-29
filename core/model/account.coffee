@@ -40,6 +40,9 @@ sample =
       phpfpm:
         is_enbale: false
 
+      nginx:
+        sites: []
+
     resources_limit:
       cpu: 144
       storage: 520

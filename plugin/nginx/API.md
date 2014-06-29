@@ -19,4 +19,5 @@ Exception:
 * not_in_service
 * invalid_action
 * invalid_type
+* forbidden
 
