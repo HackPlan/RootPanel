@@ -21,3 +21,9 @@ Exception:
 * invalid_type
 * forbidden
 
+* invalid_listen
+* invalid_server_name
+* invalid_index
+* invalid_root
+* invalid_location
+* fastcgi_index

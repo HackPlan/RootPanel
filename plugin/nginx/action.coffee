@@ -1,5 +1,6 @@
 child_process = require 'child_process'
 
+utils = require '../../core/router/utils'
 plugin = require '../../core/plugin'
 
 {requestAuthenticate} = require '../../core/router/middleware'
@@ -19,14 +20,11 @@ sample =
   index: ['index.html']
   # required
   root: '/home/user/web'
-  # default []
+  # default {}
   location:
     '/':
       fastcgi_pass: 'unix:///home/user/phpfpm.sock'
       fastcgi_index: ['index.php']
-
-assertJsonConfig = (config) ->
-
 
 exports.use (req, res, next) ->
   req.inject [requestAuthenticate], ->
@@ -38,6 +36,45 @@ exports.use (req, res, next) ->
 exports.post '/update_site/', (req, res) ->
   unless req.body.action in ['create', 'update', 'delete']
     return res.error 'invalid_action'
+
+  assertJsonConfig = (config) ->
+    checkHomeFile = (file) ->
+
+    unless config.listen in [80]
+      return 'invalid_listen'
+
+    for domain in config.server_name
+      unless utils.rx.test domain
+        return 'invalid_server_name'
+
+    if config.auto_index
+      config.auto_index = if config.auto_index then true else false
+
+    config.index ?= ['index']
+
+    for file in config.index
+      unless utils.rx.test file
+        return 'invalid_index'
+
+    unless checkHomeFile config.root
+      return 'invalid_root'
+
+    config.location ?= {}
+
+    for path, rules of config.location
+      unless path in ['/']
+        return 'invalid_location'
+
+      for name, value of rules
+        if name == 'fastcgi_pass'
+          # TODO: check unix socket path
+
+        if name == 'fastcgi_index'
+          for file in value
+            unless utils.rx.test file
+              return 'fastcgi_index'
+
+    return null
 
   checkSite = (callback) ->
     if req.body.action == 'create'
