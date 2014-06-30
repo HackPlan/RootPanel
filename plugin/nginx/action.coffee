@@ -38,7 +38,25 @@ exports.post '/update_site/', (req, res) ->
     return res.error 'invalid_action'
 
   assertJsonConfig = (config) ->
-    checkHomeFile = (file) ->
+    checkHomeFilePath = (path) ->
+      home_dir = "/home/#{req.account.username}/"
+
+      unless /^[/A-Za-z0-9_\-\.]+\/?$/.test path
+        return false
+
+      unless path.slice(0, home_dir.length) == homedir
+        return false
+
+      unless path.length < 512
+        return false
+
+      unless path.slice(-3) == '/..'
+        return false
+
+      unless path.indexOf('/../') != -1
+        return false
+
+      return true
 
     unless config.listen in [80]
       return 'invalid_listen'
@@ -56,7 +74,7 @@ exports.post '/update_site/', (req, res) ->
       unless utils.rx.test file
         return 'invalid_index'
 
-    unless checkHomeFile config.root
+    unless checkHomeFilePath config.root
       return 'invalid_root'
 
     config.location ?= {}
@@ -67,12 +85,18 @@ exports.post '/update_site/', (req, res) ->
 
       for name, value of rules
         if name == 'fastcgi_pass'
-          # TODO: check unix socket path
+          fastcgi_prefix = 'unix://'
+
+          unless value.slice(0, fastcgi_prefix.length) == fastcgi_prefix
+            return 'invalid_fastcgi_pass'
+
+          unless checkHomeFilePath value.slice fastcgi_prefix.length
+            return 'invalid_fastcgi_pass'
 
         if name == 'fastcgi_index'
           for file in value
             unless utils.rx.test file
-              return 'fastcgi_index'
+              return 'invalid_fastcgi_index'
 
     return null
 

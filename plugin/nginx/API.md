@@ -26,4 +26,5 @@ Exception:
 * invalid_index
 * invalid_root
 * invalid_location
-* fastcgi_index
+* invalid_fastcgi_index
+* invalid_fastcgi_pass
