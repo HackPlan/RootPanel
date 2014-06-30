@@ -10,6 +10,9 @@ module.exports =
   delete: (account, callback) ->
     callback()
 
+  writeConfig: (account, callback) ->
+    callback()
+
   widget: (account, callback) ->
     jade.renderFile path.join(__dirname, 'view/widget.jade'), {}, (err, html) ->
       callback html

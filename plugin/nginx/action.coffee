@@ -1,5 +1,6 @@
 child_process = require 'child_process'
 
+service = require './service'
 utils = require '../../core/router/utils'
 plugin = require '../../core/plugin'
 
@@ -156,4 +157,5 @@ exports.post '/update_site/', (req, res) ->
           removeSite callback
 
       execModification ->
-        res.json {}
+        service.writeConfig req.account, ->
+          res.json {}

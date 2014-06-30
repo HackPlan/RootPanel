@@ -24,7 +24,5 @@ exports.post '/switch', (req, res) ->
     $set:
       'attribute.plugin.phpfpm.is_enable': req.body.enable
   , ->
-    plugin.systemOperate (callback) ->
-      service.switch req.account, req.body.enable, callback
-    , ->
+    service.switch req.account, req.body.enable, ->
       res.json {}
