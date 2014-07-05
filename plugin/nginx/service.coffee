@@ -3,6 +3,8 @@ jade = require 'jade'
 path = require 'path'
 async = require 'async'
 
+mAccount = require '../../core/model/account'
+
 module.exports =
   enable: (account, callback) ->
     callback()
@@ -11,7 +13,13 @@ module.exports =
     callback()
 
   writeConfig: (account, callback) ->
-    callback()
+    mAccount.findId account._id, (err, account) ->
+      unless account.attribute.plugin.nginx.sites
+        return callback()
+
+      for site in account.attribute.plugin.nginx.sites
+        
+      callback()
 
   widget: (account, callback) ->
     jade.renderFile path.join(__dirname, 'view/widget.jade'), {}, (err, html) ->

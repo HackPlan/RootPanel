@@ -63,6 +63,7 @@ exports.post '/update_site/', (req, res) ->
       return 'invalid_listen'
 
     for domain in config.server_name
+      # 检测域名冲突
       unless utils.rx.test domain
         return 'invalid_server_name'
 
