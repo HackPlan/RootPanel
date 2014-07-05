@@ -15,7 +15,8 @@ module.exports =
     callback()
 
   delete: (account, callback) ->
-    callback()
+    child_process.exec "sudo rm /etc/nginx/sites-enabled/#{account.username}.conf", ->
+      callback()
 
   writeConfig: (account, callback) ->
     mAccount.findId account._id, (err, account) ->
