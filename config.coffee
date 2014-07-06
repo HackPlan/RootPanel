@@ -49,6 +49,9 @@ module.exports =
     confirmations: 1
 
   plugins:
+    linux:
+      cycle: 30 * 1000
+
     mysql:
       connection:
         host: 'localhost'

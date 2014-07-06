@@ -1,4 +1,5 @@
 service = require './service'
+monitor = require './monitor'
 
 module.exports =
   name: 'linux'
@@ -9,3 +10,5 @@ module.exports =
   panel_widgets: [
     service.widget
   ]
+
+monitor.run()
