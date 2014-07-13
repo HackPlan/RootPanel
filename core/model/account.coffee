@@ -13,8 +13,8 @@ exports.byDepositAddress = exports.buildByXXOO 'bitcoin_deposit_address', export
 
 sample =
   username: 'jysperm'
-  passwd: '53673f434686ce045477f066f30eded55a9bb535a6cec7b73a60972ccafddb2a'
-  passwd_salt: '53673f434686b535a6cec7b73a60ce045477f066f30eded55a9b972ccafddb2a'
+  password: '53673f434686ce045477f066f30eded55a9bb535a6cec7b73a60972ccafddb2a'
+  password_salt: '53673f434686b535a6cec7b73a60ce045477f066f30eded55a9b972ccafddb2a'
   email: 'jysperm@gmail.com'
   signup_at: Date()
 
@@ -66,19 +66,19 @@ exports.sha256 = (data) ->
 exports.randomSalt = ->
   return exports.sha256 crypto.randomBytes 256
 
-exports.hashPasswd = (passwd, passwd_salt) ->
-  return exports.sha256(exports.sha256(passwd) + passwd_salt)
+exports.hashPassword = (password, password_salt) ->
+  return exports.sha256(exports.sha256(password) + password_salt)
 
-exports.register = (username, email, passwd, callback) ->
-  passwd_salt = exports.randomSalt()
+exports.register = (username, email, password, callback) ->
+  password_salt = exports.randomSalt()
   blockchain_secret = exports.randomSalt()
 
   bitcoin.genAddress blockchain_secret, (address) ->
     exports.insert
       _id: new ObjectID()
       username: username
-      passwd: exports.hashPasswd(passwd, passwd_salt)
-      passwd_salt: passwd_salt
+      password: exports.hashPassword(password, password_salt)
+      password_salt: password_salt
       email: email
       signup_at: new Date()
       group: []
@@ -99,13 +99,13 @@ exports.register = (username, email, passwd, callback) ->
     , (err, result) ->
       callback err, result?[0]
 
-exports.updatePasswd = (account, passwd, callback) ->
-  passwd_salt = exports.randomSalt()
+exports.updatePassword = (account, password, callback) ->
+  password_salt = exports.randomSalt()
 
   exports.update _id: account._id,
     $set:
-      passwd: exports.hashPasswd(passwd, passwd_salt)
-      passwd_salt: passwd_salt
+      password: exports.hashPassword(password, password_salt)
+      password_salt: password_salt
   , callback
 
 exports.createToken = (account, attribute, callback) ->
@@ -159,8 +159,8 @@ exports.byUsernameOrEmailOrId = (username, callback) ->
       exports.findId username, (err, account) ->
         callback null, account
 
-exports.matchPasswd = (account, passwd) ->
-  return exports.hashPasswd(passwd, account.passwd_salt) == account.passwd
+exports.matchPassword = (account, password) ->
+  return exports.hashPassword(password, account.password_salt) == account.password
 
 exports.inGroup = (account, group) ->
   return group in account.group

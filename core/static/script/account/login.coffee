@@ -3,7 +3,7 @@ $ ->
     e.preventDefault()
     $.post '/account/login/', JSON.stringify {
       username : $('#username').val()
-      passwd : $('#passwd').val()
+      password : $('#password').val()
     }
     .success ->
       location.href '/'

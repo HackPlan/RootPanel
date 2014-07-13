@@ -56,4 +56,4 @@ module.exports =
       connection:
         host: 'localhost'
         user: 'rpadmin'
-        password: 'passwd'
+        password: 'password'

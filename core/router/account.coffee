@@ -19,8 +19,8 @@ exports.post '/signup', errorHandling, (req, res) ->
   unless utils.rx.email.test req.body.email
     return res.error 'invalid_email'
 
-  unless utils.rx.passwd.test req.body.passwd
-    return res.error 'invalid_passwd'
+  unless utils.rx.password.test req.body.password
+    return res.error 'invalid_password'
 
   if req.body.username in config.account.invalid_username
     return res.error 'username_exist'
@@ -33,7 +33,7 @@ exports.post '/signup', errorHandling, (req, res) ->
       if account
         return res.error 'email_exist'
 
-      mAccount.register req.body.username, req.body.email, req.body.passwd, (err, account) ->
+      mAccount.register req.body.username, req.body.email, req.body.password, (err, account) ->
         mAccount.createToken account, {}, (err, token)->
           res.cookie 'token', token,
             expires: new Date(Date.now() + config.account.cookie_time)
@@ -46,7 +46,7 @@ exports.post '/login', errorHandling, (req, res) ->
     unless account
       return res.error 'auth_failed'
 
-    unless mAccount.matchPasswd account, req.body.passwd
+    unless mAccount.matchPassword account, req.body.password
       return res.error 'auth_failed'
 
     mAccount.createToken account, {}, (err, token) ->
@@ -62,12 +62,12 @@ exports.post '/logout', requestAuthenticate, (req, res) ->
     res.clearCookie 'token'
     res.json {}
 
-exports.post '/update_passwd', requestAuthenticate, (req, res) ->
-  unless mAccount.matchPasswd account, req.body.old_passwd
+exports.post '/update_password', requestAuthenticate, (req, res) ->
+  unless mAccount.matchPassword account, req.body.old_password
     return res.error 'auth_failed'
 
-  unless utils.rx.passwd.test req.body.passwd
-    return res.error 'invalid_passwd'
+  unless utils.rx.password.test req.body.password
+    return res.error 'invalid_password'
 
-  mAccount.updatePasswd account, req.body.new_passwd, ->
+  mAccount.updatePassword account, req.body.new_password, ->
     res.json {}

@@ -15,8 +15,8 @@ $ ->
   ssh.find 'button'
     .on 'click', (e) ->
       e.preventDefault()
-      $.post '/plugin/ssh/update_passwd/', JSON.stringify {
-        passwd: ssh.find('input').val()
+      $.post '/plugin/ssh/update_password/', JSON.stringify {
+        password: ssh.find('input').val()
       }
       .success ->
         ErrorHandle.flushInfo 'success', '修改成功', ->
@@ -46,8 +46,8 @@ $ ->
   mysql.find 'button'
     .on 'click', (e) ->
       e.preventDefault()
-      $.post '/plugin/mysql/update_passwd/', JSON.stringify {
-        passwd: (mysql.find 'input').val()
+      $.post '/plugin/mysql/update_password/', JSON.stringify {
+        password: (mysql.find 'input').val()
       }
       .success ->
         location.reload()

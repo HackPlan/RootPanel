@@ -7,7 +7,7 @@ Request:
     {
         "username": "jysperm",
         "email": "jysperm@gmail.com",
-        "passwd": "passwd"
+        "password": "password"
     }
 
 Response:
@@ -26,7 +26,7 @@ Exception:
 * email_exist
 * invalid_username `/^[0-9a-z_]+$/`
 * invalid_email `/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/`
-* invalid_passwd `/^.+$/`
+* invalid_password `/^.+$/`
 
 ### POST /account/login/
 
@@ -35,7 +35,7 @@ Request:
     {
         // username or email
         "username": "jysperm",
-        "passwd": "passwd"
+        "password": "password"
     }
 
 Response:
@@ -67,13 +67,13 @@ Exception:
 
 * auth_failed
 
-### POST /account/update_passwd/
+### POST /account/update_password/
 
 Request:
 
     {
-        "old_passwd": "123456",
-        "new_passwd": "abcdef"
+        "old_password": "123456",
+        "new_password": "abcdef"
     }
 
 No Response.

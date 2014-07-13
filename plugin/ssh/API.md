@@ -1,16 +1,16 @@
 ## SSH Plugin API
 
-### POST /plugin/ssh/update_passwd/
+### POST /plugin/ssh/update_password/
 
 Request:
 
     {
-        "passwd": "123123"
+        "password": "123123"
     }
 
 No Response.
 
 Exception:
 
-* invalid_passwd
+* invalid_password
 * not_in_service

@@ -10,26 +10,26 @@ REDIS_OVERVIEW = 'rp:linux:overview'
 ITEM_IN_RESOURCES_LIST = 3600 * 1000 / config.plugins.linux.monitor_cycle
 
 last_plist = []
-passwd_cache = {}
+password_cache = {}
 
 exports.run = ->
   setInterval exports.monitoring, config.plugins.linux.monitor_cycle
 
-exports.loadPasswd = (callback) ->
-  fs.readFile '/etc/passwd', (err, content) ->
+exports.loadpassword = (callback) ->
+  fs.readFile '/etc/password', (err, content) ->
     content = content.toString().split '\n'
 
-    passwd_cache = {}
+    password_cache = {}
 
     for line in content
       if line
-        [username, passwd, uid] = line.split ':'
-        passwd_cache[uid] = username
+        [username, password, uid] = line.split ':'
+        password_cache[uid] = username
 
     callback()
 
 exports.monitoring = ->
-  exports.loadPasswd ->
+  exports.loadpassword ->
     child_process.exec "ps awufx", (err, stdout, stderr) ->
       plist = stdout.split('\n')[1...-1]
 
@@ -41,8 +41,8 @@ exports.monitoring = ->
         result = rx.exec item
         return {
           user: ->
-            if passwd_cache[result[1]]
-              return passwd_cache[result[1]]
+            if password_cache[result[1]]
+              return password_cache[result[1]]
             else
               return result[1]
           pid: result[2]

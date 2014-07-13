@@ -18,7 +18,7 @@
     "login": "登录",
     "username": "用户名",
     "email": "邮箱",
-    "passwd": "密码",
+    "password": "密码",
     "logout": "注销"
   },
   "panel": {
@@ -63,7 +63,7 @@
       "navigation": "展开导航"
     },
     "account": {
-      "passwd2": "重复",
+      "password2": "重复",
       "already_signup": "已有帐号？",
       "no_account": "还没有账户？"
     }

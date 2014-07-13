@@ -18,7 +18,7 @@
     "login": "Login",
     "username": "Username",
     "email": "E-Mail",
-    "passwd": "Password",
+    "password": "Password",
     "logout": "Logout"
   },
   "panel": {
@@ -50,7 +50,7 @@
       "navigation": "Show Navigation"
     },
     "account": {
-      "passwd2": "Repeat Password",
+      "password2": "Repeat Password",
       "already_signup": "Need an account?",
       "no_account": "Don't have an account?"
     }
