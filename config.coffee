@@ -50,7 +50,7 @@ module.exports =
 
   plugins:
     linux:
-      cycle: 30 * 1000
+      monitor_cycle: 30 * 1000
 
     mysql:
       connection:

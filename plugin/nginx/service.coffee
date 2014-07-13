@@ -7,8 +7,8 @@ fs = require 'fs'
 mAccount = require '../../core/model/account'
 
 template =
-  site_configure: fs.readFileSync './template/site_configure'
-  user_configure: fs.readFileSync './template/user_configure'
+  site_configure: fs.readFileSync "#{__dirname}/template/site_configure.conf"
+  user_configure: fs.readFileSync "#{__dirname}/template/user_configure.conf"
 
 module.exports =
   enable: (account, callback) ->
