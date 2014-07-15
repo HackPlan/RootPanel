@@ -9,17 +9,17 @@ build: install
 clean:
 	find . -path './node_modules' -prune -o -name '*.js' -exec rm -fr {} \;
 
-run:
+clean_socket:
 	rm ../rootpanel.sock
-	node node_modules/coffee-script/bin/coffee app.coffee
 
-start: build
-	rm ../rootpanel.sock
-	node node_modules/forever/bin/forever start app.js
+run: clean_socket
+	node start.js
 
-restart:
-	rm ../rootpanel.sock
-	node node_modules/forever/bin/forever restart app.js
+start: clean_socket
+	node node_modules/forever/bin/forever start start.js
+
+restart: clean_socket
+	node node_modules/forever/bin/forever restart start.js
 
 stop:
-	node node_modules/forever/bin/forever stop app.js
+	node node_modules/forever/bin/forever stop start.js
