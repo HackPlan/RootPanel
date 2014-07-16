@@ -27,7 +27,7 @@ exports.calcBilling = (account, isForce, callback) ->
     amount += price * billing_time
 
   unless amount
-    callback account
+    return callback account
 
   if isForce
     new_last_billing_at = new Date()

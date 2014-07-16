@@ -10,8 +10,9 @@ global.ObjectID = require('mongodb').ObjectID
 global.express = require 'express'
 global.async = require 'async'
 
-config = require './../config'
-i18n = require './i18n'
+global.app = express()
+global.config = require './../config'
+global.i18n = require './i18n'
 
 bindRouters = (app) ->
   app.use require 'middleware-injector'
@@ -43,8 +44,6 @@ exports.connectDatabase = (callback) ->
     callback err, db
 
 exports.runWebServer = ->
-  global.app = exports.app = express()
-
   exports.connectDatabase (err) ->
     throw err if err
 

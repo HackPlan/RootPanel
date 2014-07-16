@@ -34,11 +34,11 @@ block main
           button(disabled).btn.btn-lg.btn-primary 已关闭
         else
           button.btn.btn-lg.btn-primary#reply-btn(type='submit')= t('ticket.create_reply')
-          button(type='button').btn.btn-lg.btn-danger.change-status(data-status='closed')= t('ticket.close_ticket')
+          button(type='button', data-status='closed').btn.btn-lg.btn-danger.change-status= t('ticket.close_ticket')
         if mAccount.inGroup(account, 'root') && (ticket.status == 'open' || ticket.status == 'pending')
-          button(type='button').btn.btn-lg.btn-success.change-status(data-status='finish')= t('ticket.finish_ticket')
+          button(type='button', data-status='finish').btn.btn-lg.btn-success.change-status= t('ticket.finish_ticket')
         if mAccount.inGroup(account, 'root') && ticket.status == 'closed'
-          button(type='button').btn.btn-lg.btn-success.change-status(data-status='open')= t('ticket.reopen_ticket')
+          button(type='button', data-status='open').btn.btn-lg.btn-success.change-status= t('ticket.reopen_ticket')
 
 prepend sidebar
   .row

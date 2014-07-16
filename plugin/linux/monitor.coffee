@@ -13,10 +13,11 @@ last_plist = []
 passwd_cache = {}
 
 exports.run = ->
-  setInterval exports.monitoring, config.plugins.linux.monitor_cycle
+  #setInterval exports.monitoring, config.plugins.linux.monitor_cycle
 
 exports.loadpassword = (callback) ->
-  fs.readFile '/etc/password', (err, content) ->
+  fs.readFile '/etc/passwd', (err, content) ->
+    throw err if err
     content = content.toString().split '\n'
 
     passwd_cache = {}
@@ -59,14 +60,14 @@ exports.monitoring = ->
           command: result[11]
         }
 
-      async.parallel [
+      async.parallel
         cpu: (callback) ->
           exports.monitoringCpu plist, callback
 
         memory: (callback) ->
           exports.monitoringMemory plist, callback
 
-      ], (err, result) ->
+      , (err, result) ->
         app.redis.get REDIS_KEY, (err, resources_usage_list) ->
           resources_usage_list = JSON.parse resources_usage_list
           resources_usage_list.push result
@@ -123,7 +124,7 @@ exports.monitoringCpu = (plist, callback) ->
   exist_process = _.filter plist, (item) ->
     return findLastProcess item
 
-  new_process = _.fliter plist, (item) ->
+  new_process = _.filter plist, (item) ->
     return not findLastProcess item
 
   for item in exist_process

@@ -28,7 +28,8 @@ block content
           header= t('panel.overview')
           p
             | #{t('plan.balance')}: #{account.attribute.balance.toFixed(2)} #{t('plan.currency.cny')}
-            | #{t('plan.remaining_time')}: #{account.attribute.remaining_time} #{t('time.day')}
+            if account.attribute.remaining_time && account.attribute.remaining_time != Infinity
+              |  |  #{t('plan.remaining_time')}: #{account.attribute.remaining_time} #{t('time.day')}
           p
             a(href= '/panel/pay/').btn.btn-success 充值
 
