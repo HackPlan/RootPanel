@@ -10,7 +10,7 @@ clean:
 	find . -path './node_modules' -prune -o -name '*.js' -exec rm -fr {} \;
 
 clean_socket:
-	rm ../rootpanel.sock
+	-rm ../rootpanel.sock
 
 run: clean_socket
 	node start.js
