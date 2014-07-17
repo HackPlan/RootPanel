@@ -31,7 +31,7 @@ module.exports =
 
   plans:
     all:
-      price: 8
+      price: 10
       t_name: '所有服务(默认)'
       t_service: '支持所有服务'
       t_resources: '磁盘: 520MB, 内存: 27MB, 流量: 37GB'

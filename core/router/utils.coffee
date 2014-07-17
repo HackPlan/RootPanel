@@ -4,3 +4,23 @@ exports.rx =
   password: /^.+$/
   domain: /(\*\.)?[A-Za-z0-9]+(\-[A-Za-z0-9]+)*(\.[A-Za-z0-9]+(\-[A-Za-z0-9]+)*)*/
   filename: /[A-Za-z0-9_\-\.]+/
+
+exports.checkHomeFilePath = (account, path) ->
+  home_dir = "/home/#{account.username}/"
+
+  unless /^[/A-Za-z0-9_\-\.]+\/?$/.test path
+    return false
+
+  unless path.slice(0, home_dir.length) == homedir
+    return false
+
+  unless path.length < 512
+    return false
+
+  unless path.slice(-3) == '/..'
+    return false
+
+  unless path.indexOf('/../') != -1
+    return false
+
+  return true

@@ -13,6 +13,7 @@ global.async = require 'async'
 global.app = express()
 global.config = require './../config'
 global.i18n = require './i18n'
+global.utils = require './router/utils'
 
 bindRouters = (app) ->
   app.use require 'middleware-injector'
