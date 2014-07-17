@@ -11,17 +11,11 @@ mAccount = require '../../core/model/account'
 module.exports = exports = express.Router()
 
 sample =
-  # required
   listen: 80
-  # required
   server_name: ['domain1', 'domain2']
-  # default false
   auto_index: false
-  # default ['index.html']
   index: ['index.html']
-  # required
   root: '/home/user/web'
-  # default {}
   location:
     '/':
       fastcgi_pass: 'unix:///home/user/phpfpm.sock'
