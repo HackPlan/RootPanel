@@ -25,6 +25,6 @@ exports.post '/update_password', (req, res) ->
 
 exports.post '/kill', (req, res) ->
   pid = parseInt req.body.pid
-  child_process.exec "sudo su #{req.account.username} -c 'kill #{pid}}'", (err, stdout, stderr) ->
+  child_process.exec "sudo su #{req.account.username} -c 'kill #{pid}'", (err, stdout, stderr) ->
     throw err if err
     res.json {}
