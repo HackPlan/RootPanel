@@ -14,3 +14,13 @@ Exception:
 
 * invalid_password
 * not_in_service
+
+### POST /plugin/ssh/kill
+
+Request:
+
+    {
+        "pid": 1234
+    }
+ 
+No Response.
