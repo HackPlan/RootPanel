@@ -17,15 +17,10 @@ header SSH
         td CPU
         td 操作
     tbody
-      tr
-        td sshd
-        td 5M
-        td 1%
-        td
-          button.btn.btn-danger.btn-xs Kill
-      tr
-        td node
-        td 10M
-        td 2%
-        td
-          button.btn.btn-danger.btn-xs Kill
+      for process in plist
+        tr(data-id= '#{process.pid}')
+          td= process.command
+          td #{(process.rss / 1024).toFixed(1)}M
+          td #{process.cpu_per}%
+          td
+            button.btn.btn-danger.btn-xs Kill

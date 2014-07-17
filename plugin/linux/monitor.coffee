@@ -15,51 +15,66 @@ passwd_cache = {}
 exports.run = ->
   #setInterval exports.monitoring, config.plugins.linux.monitor_cycle
 
-exports.loadpassword = (callback) ->
-  fs.readFile '/etc/passwd', (err, content) ->
-    throw err if err
-    content = content.toString().split '\n'
+exports.loadPasswd = (callback) ->
+  app.redis.get 'rp:passwd_cache', (err, passwd_cache) ->
+    if passwd_cache
+      callback()
+    else
+      fs.readFile '/etc/passwd', (err, content) ->
+        throw err if err
+        content = content.toString().split '\n'
 
-    passwd_cache = {}
+        passwd_cache = {}
 
-    for line in content
-      if line
-        [username, password, uid] = line.split ':'
-        passwd_cache[uid] = username
+        for line in content
+          if line
+            [username, password, uid] = line.split ':'
+            passwd_cache[uid] = username
 
-    callback()
+        app.redis.setex 'rp:passwd_cache', 120, JSON.stringify(passwd_cache), ->
+          callback()
+
+exports.getProcessList = (callback) ->
+  app.redis.get 'rp:process_list', (err, plist) ->
+    if plist
+      callback JSON.parse plist
+    else
+      exports.loadPasswd ->
+        child_process.exec "ps awufx", (err, stdout, stderr) ->
+          plist = stdout.split('\n')[1...-1]
+
+          plist = _.reject plist, (item) ->
+            return item[..3] == 'root'
+
+          plist = _.map plist, (item) ->
+            rx = /^(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(.+)$/
+            result = rx.exec item
+            return {
+              user: do ->
+                if passwd_cache[result[1]]
+                  return passwd_cache[result[1]]
+                else
+                  return result[1]
+              pid: parseInt result[2]
+              cpu_per: parseInt result[3]
+              mem_per: result[4]
+              vsz: result[5]
+              rss: parseInt result[6]
+              tty: result[7]
+              stat: result[8]
+              start: result[9]
+              time: do ->
+                [minute, second] = result[10].split ':'
+                return parseInt(minute) * 60 + parseInt(second)
+              command: result[11]
+            }
+
+          app.redis.setex 'rp:process_list', 10, JSON.stringify(plist), ->
+            callback plist
 
 exports.monitoring = ->
-  exports.loadpassword ->
-    child_process.exec "ps awufx", (err, stdout, stderr) ->
-      plist = stdout.split('\n')[1...-1]
-
-      plist = _.reject plist, (item) ->
-        return item[..3] == 'root'
-
-      plist = _.map plist, (item) ->
-        rx = /^(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(.+)$/
-        result = rx.exec item
-        return {
-          user: ->
-            if passwd_cache[result[1]]
-              return passwd_cache[result[1]]
-            else
-              return result[1]
-          pid: result[2]
-          cpu_per: result[3]
-          mem_per: result[4]
-          vsz: result[5]
-          rss: parseInt result[6]
-          tty: result[7]
-          stat: result[8]
-          start: result[9]
-          time: do ->
-            [minute, second] = result[10].split ':'
-            return parseInt(minute) * 60 + parseInt(second)
-          command: result[11]
-        }
-
+  exports.loadPasswd ->
+    exports.getProcessList (plist) ->
       async.parallel
         cpu: (callback) ->
           exports.monitoringCpu plist, callback
