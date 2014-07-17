@@ -1,4 +1,4 @@
-## RP WIKI
+## RootPanel WIKI
 
 * [服务条款](Terms.md)
 

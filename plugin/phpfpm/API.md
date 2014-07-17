@@ -1,6 +1,6 @@
 ## PHP-FPM Plugin API
 
-### POST /plugin/phpfpm/switch/
+### POST /plugin/phpfpm/switch
 
 Request:
 

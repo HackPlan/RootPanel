@@ -1,6 +1,6 @@
 ## SSH Plugin API
 
-### POST /plugin/ssh/update_password/
+### POST /plugin/ssh/update_password
 
 Request:
 

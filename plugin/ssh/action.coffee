@@ -15,7 +15,7 @@ exports.use (req, res, next) ->
 
     next()
 
-exports.post '/update_password/', (req, res) ->
+exports.post '/update_password', (req, res) ->
   unless req.body.password or not /^[A-Za-z0-9\-_]+$/.test req.body.password
     return res.error 'invalid_password'
 
