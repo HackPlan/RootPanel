@@ -15,12 +15,15 @@ exports.joinPlan = (account, plan, callback) ->
         (plugin.get serviceName).service.enable account, ->
           callback()
 
+    , ->
+      callback()
+
 exports.leavePlan = (account, plan, callback) ->
   mAccount.leavePlan account, plan, ->
     async.each config.plans[plan].services, (serviceName, callback) ->
       stillInService = do ->
         for item in _.without(account.attribute.plans, plan)
-          if serviceName in config.plans[plan].services
+          if serviceName in config.plans[item].services
             return true
 
         return false
@@ -34,3 +37,6 @@ exports.leavePlan = (account, plan, callback) ->
         , ->
           (plugin.get serviceName).service.delete account, ->
             callback()
+
+    , ->
+      callback()

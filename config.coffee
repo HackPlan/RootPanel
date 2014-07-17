@@ -42,7 +42,7 @@ module.exports =
         transfer: 39
         memory: 27
 
-  mongodb: 'mongodb://localhost/RootPanel'
+  mongodb: 'mongodb://rpadmin:password@localhost/RootPanel'
 
   bitcoin:
     forward_to: '1FjhhWrzAvb9YD4tVdbE6wrSoHSwxMJoWe'

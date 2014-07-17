@@ -51,7 +51,7 @@ exports.createTicket = (account, title, content, type, members, status, attribut
 
 exports.createReply = (ticket, account, content, status, callback) ->
   data =
-    _id: db.ObjectID()
+    _id: new ObjectID()
     account_id: account._id
     created_at: new Date()
     content: content
