@@ -38,11 +38,11 @@ block content
           table.table.table-hover
             tbody#service
               for plan in plans
-                tr
+                tr(data-type='#{plan.name}')
                   td= plan.t_name
                   td= plan.t_service
                   td= plan.t_resources
-                  td(data-type='#{plan.name}')
+                  td
                     if plan.isEnable
                       button.btn.btn-danger.btn-sm= t('plan.unsubscribe')
                     else
@@ -51,5 +51,6 @@ block content
         for widget in widgets
           .row
             != widget.html
+
 append footer
   script(src='/script/panel/panel.js')

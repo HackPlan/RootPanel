@@ -6,7 +6,7 @@ $ ->
       button = $ @
       prehead = if button.hasClass 'btn-success' then '' else 'un'
       $.post "/plan/#{prehead}subscribe/", JSON.stringify {
-        plan: button.parent().data 'type'
+        plan: button.parent().parent().data 'type'
       }
       .success ->
         location.reload()
