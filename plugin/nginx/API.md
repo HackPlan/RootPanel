@@ -1,6 +1,31 @@
 ## Nginx Plugin API
 
-### POST /plugin/nginx/update_site/
+### GET /plugin/nginx/site_config
+
+Request:
+
+    {
+        "id": "53c96734c2dad7d6208a0fbe"
+    }
+    
+Response:
+
+    {
+        "id": "53c96734c2dad7d6208a0fbe",
+        "listen": 80,
+        "server_name": ["domain1.com", "domain2.net"],
+        "auto_index": false,
+        "index": ["index.html"],
+        "root": "/home/user/web",
+        "location": {
+            "/": {
+                "fastcgi_pass": "unix:///home/user/phpfpm.sock",
+                "fastcgi_index": ["index.php"]
+            }
+        }
+    }
+
+### POST /plugin/nginx/update_site
 
 Request:
 

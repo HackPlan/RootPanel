@@ -4,7 +4,7 @@ service = require './service'
 plugin = require '../../core/plugin'
 configure = require './configure'
 
-{requestAuthenticate} = require '../../core/router/middleware'
+{requestAuthenticate, getParam} = require '../../core/router/middleware'
 
 mAccount = require '../../core/model/account'
 
@@ -28,7 +28,16 @@ exports.use (req, res, next) ->
 
     next()
 
-exports.post '/update_site/', (req, res) ->
+exports.all '/site_config', getParam, (req, res) ->
+  site = _.find req.account.attribute.plugin.nginx.sites, (i) ->
+    return i._id.toString() == req.body.id
+
+  site.id = site._id
+  delete site._id
+
+  res.json site
+
+exports.post '/update_site', (req, res) ->
   unless req.body.action in ['create', 'update', 'delete']
     return res.error 'invalid_action'
 
