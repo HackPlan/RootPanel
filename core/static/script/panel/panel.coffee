@@ -29,23 +29,31 @@ $ ->
     $.post '/plugin/phpfpm/switch/', JSON.stringify {enable: enable}
     .success ->
       location.reload()
-  #nginx
-  # $ '.nginx-edit-button'
-  #   .on 'click', (e) ->
-  #     ($ '#nginxModal').modal 'show'
+  nginx
+  $ '.nginx-edit-btn'
+    .on 'click', (e) ->
+      e.preventDefault()
+      id = ($(@).closest 'tr').data 'id'
+      $.post '/plugin/nginx/site_config', JSON.stringify {
+        id: id
+      }
+      .success (data) ->
+
+      ($ '#nginxModal').modal 'show'
 
 
   $ '.nginx-remove-btn'
     .on 'click', (e) ->
-      e.preventDefault()
-      id = ($(@).closest 'tr').data 'id'
-      $.post '/plugin/nginx/update_site', JSON.stringify {
-        action: 'delete'
-        id: id
-        type: $('#nginxConfigType').find('.active a').attr('href').substr 1
-      }
-      .success ->
-        location.reload()
+      if window.confirm('确认删除?')
+        e.preventDefault()
+        id = ($(@).closest 'tr').data 'id'
+        $.post '/plugin/nginx/update_site', JSON.stringify {
+          action: 'delete'
+          id: id
+          type: $('#nginxConfigType').find('.active a').attr('href').substr 1
+        }
+        .success ->
+          location.reload()
 
   $ '#nginxSave'
     .on 'click', (e) ->
