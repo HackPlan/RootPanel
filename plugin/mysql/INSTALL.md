@@ -1,6 +1,6 @@
 ## MySQL
 
-    apt-get install mysql-server mysql-client
+    apt-get install mariadb-server
 
     mysql -u root -p
     
