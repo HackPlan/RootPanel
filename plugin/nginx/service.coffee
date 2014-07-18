@@ -1,8 +1,9 @@
 child_process = require 'child_process'
 jade = require 'jade'
 path = require 'path'
-tmp = require 'tmp'
 fs = require 'fs'
+
+plugin = require '../../core/plugin'
 
 mAccount = require '../../core/model/account'
 
@@ -36,18 +37,10 @@ module.exports =
       user_configure = _.template template.user_configure,
         sites: sites_configure
 
-      tmp.file
-        mode: 0o750
-      , (err, filepath, fd) ->
-        fs.writeSync fd, user_configure, 0, 'utf8'
-        fs.closeSync fd
-
-        child_process.exec "sudo cp #{filepath} /etc/nginx/sites-enabled/#{account.username}.conf", (err) ->
+      plugin.writeConfig "/etc/nginx/sites-enabled/#{account.username}.conf", user_configure, ->
+        child_process.exec 'sudo service nginx reload', (err) ->
           throw err if err
-
-          child_process.exec 'sudo service nginx reload', (err) ->
-            throw err if err
-            callback()
+          callback()
 
   widget: (account, callback) ->
     jade.renderFile path.join(__dirname, 'view/widget.jade'),

@@ -1,7 +1,6 @@
 child_process = require 'child_process'
 
 service = require './service'
-plugin = require '../../core/plugin'
 {assertInService} = require '../../core/router/middleware'
 
 mAccount = require '../../core/model/account'

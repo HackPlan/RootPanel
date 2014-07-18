@@ -1,7 +1,6 @@
 child_process = require 'child_process'
 
 service = require './service'
-plugin = require '../../core/plugin'
 configure = require './configure'
 
 {requestAuthenticate, getParam} = require '../../core/router/middleware'
