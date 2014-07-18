@@ -11,6 +11,7 @@ mAccount = require '../../core/model/account'
 module.exports = exports = express.Router()
 
 sample =
+  _id: '53c96734c2dad7d6208a0fbe'
   listen: 80
   server_name: ['domain1', 'domain2']
   auto_index: false
@@ -69,7 +70,7 @@ exports.post '/update_site', (req, res) ->
 
     checkSiteConfig (err) ->
       if err
-        return res.json err
+        return res.error err
 
       removeSite = (callback) ->
         mAccount.update _id: account._id,
@@ -79,6 +80,7 @@ exports.post '/update_site', (req, res) ->
 
       addSite = (callback) ->
         req.body.config._id = new ObjectID()
+        req.body.config = _.pick req.body.config, _.keys(sample)
         mAccount.update _id: req.account._id,
           $push:
             'attribute.plugin.nginx.sites': req.body.config
