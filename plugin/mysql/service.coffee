@@ -8,23 +8,19 @@ plugin = require '../../core/plugin'
 
 mAccount = require '../../core/model/account'
 
+connection = mysql.createConnection config.plugins.mysql.connection
+connection.connect()
+
 module.exports =
   enable: (account, callback) ->
-    connection = mysql.createConnection config.plugins.mysql.connection
-    connection.connect()
-
     connection.query "CREATE USER '#{account.username}'@'localhost' IDENTIFIED BY '#{mAccount.randomSalt()}';", (err, rows) ->
       throw err if err
 
       connection.query "GRANT ALL PRIVILEGES ON  `#{account.username}\\_%%` . * TO  '#{account.username}'@'localhost';", (err, rows) ->
         throw err if err
-        connection.end()
         callback()
 
   delete: (account, callback) ->
-    connection = mysql.createConnection config.plugins.mysql.connection
-    connection.connect()
-
     connection.query "DROP USER '#{account.username}'@'localhost';", (err, rows) ->
       throw err if err
 
@@ -42,7 +38,6 @@ module.exports =
             throw err if err
             callback()
         , ->
-          connection.end()
           callback()
 
   widget: (account, callback) ->
