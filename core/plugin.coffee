@@ -30,4 +30,4 @@ exports.writeConfig = (path, content, callback) ->
       throw err if err
 
       fs.unlink path, ->
-        callback
+        callback()
