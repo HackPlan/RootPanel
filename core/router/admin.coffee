@@ -5,7 +5,7 @@ mAccount = require '../model/account'
 module.exports = exports = express.Router()
 
 exports.get '/', requestAdminAuthenticate, renderAccount, (req, res) ->
-  mAccount.find({}).toArray (err, accounts) ->
+  mAccount.find().toArray (err, accounts) ->
     res.render 'admin/index',
       accounts: accounts
 
@@ -15,7 +15,9 @@ exports.post '/create_payment', requestAdminAuthenticate, (req, res) ->
       return res.error 'account_not_exist'
 
     amount = parseFloat req.body.amount
-    amount = 0 unless _.isNaN amount
+
+    if _.isNaN amount
+      return res.error 'invalid_amount'
 
     mAccount.incBalance account, 'deposit', amount,
       type: req.body.type

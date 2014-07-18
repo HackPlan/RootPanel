@@ -3,12 +3,6 @@ module.exports =
     url: 'http://rp3.rpvhost.net'
     port: 3000
 
-  debug:
-    mock_test: false
-
-  admin:
-    username: ['jysperm']
-
   account:
     invalid_username: [
       'root', 'daemon', 'bin', 'sys', 'sync', 'games', 'man', 'lp', 'mail', 'colord', 'nobody',

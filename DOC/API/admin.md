@@ -11,10 +11,7 @@ Request:
         "order_id": "560097131641814"
     }
 
-Response:
-
-    {}
-
 Exception:
 
 * account_not_exist
+* invalid_amount

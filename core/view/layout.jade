@@ -32,6 +32,9 @@ html
                   a= account.username
                 li
                   a(href='/panel/')= t('panel.')
+                if mAccount.inGroup(account, 'root')
+                  li
+                    a(href='/admin/') 管理员面板
                 li
                   a#logout(href='/account/logout/')= t('account.logout')
               else
