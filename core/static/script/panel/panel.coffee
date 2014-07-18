@@ -38,7 +38,7 @@ $ ->
   $ '.nginx-remove-btn'
     .on 'click', (e) ->
       e.preventDefault()
-      id = ($(@).closet 'tr').data 'id'
+      id = ($(@).closest 'tr').data 'id'
       $.post '/plugin/nginx/update_site', JSON.stringify {
         action: 'delete'
         id: id
