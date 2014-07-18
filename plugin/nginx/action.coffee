@@ -69,6 +69,7 @@ exports.post '/update_site/', (req, res) ->
         , callback
 
       addSite = (callback) ->
+        req.body.config._id = new ObjectID()
         mAccount.update _id: req.account._id,
           $push:
             'attribute.plugin.nginx.sites': req.body.config

@@ -20,7 +20,7 @@ exports.assert = (account, config, site_id, callback) ->
       site = _.find result.attribute.plugin.nginx.sites, (i) ->
         return domain in i.server_name
 
-      if site._id.toString() == site_id.toString()
+      if site._id.toString() == site_id?.toString()
         callback null
       else
         callback 'unavailable_server_name'
