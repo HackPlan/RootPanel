@@ -20,11 +20,9 @@ RP3 的核心功能包括：
     make install    # 安装依赖
     make run        # 直接运行
     make test       # 运行测试
-    make build      # 生成 .js
-    make clean      # 删除生成的 .js
-    make start      # 以 pm2 启动
-    make restart    # 重启 pm2 进程
-    make stop       # 停止 pm2 进程
+    make start      # 以 forever 启动
+    make restart    # 重启 forever 进程
+    make stop       # 停止 forever 进程
 
 ## 技术构成
 
