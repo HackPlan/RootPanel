@@ -29,6 +29,23 @@ $ ->
     $.post '/plugin/phpfpm/switch/', JSON.stringify {enable: enable}
     .success ->
       location.reload()
+  #nginx
+  # $ '.nginx-edit-button'
+  #   .on 'click', (e) ->
+  #     ($ '#nginxModal').modal 'show'
+
+
+  $ '.nginx-remove-btn'
+    .on 'click', (e) ->
+      e.preventDefault()
+      id = ($(@).closet 'tr').data 'id'
+      $.post '/plugin/nginx/update_site', JSON.stringify {
+        action: 'delete'
+        id: id
+        type: $('#nginxConfigType').find('.active a').attr('href').substr 1
+      }
+      .success ->
+        location.reload()
 
   $ '#nginxSave'
     .on 'click', (e) ->

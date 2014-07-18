@@ -13,9 +13,9 @@ table.table.table-hover
         td= site.server_name.join(', ')
         td fastcgi_pass: ~#{site.location['/'].fastcgi_pass.match(/unix:\/\/\/home\/[^\/]+(.*)/)[1]}
         td(style= 'width: 150px;')
-          button.btn.btn-info.btn-xs
+          button.nginx-edit-btn.btn.btn-info.btn-xs
             span.glyphicon.glyphicon-edit
-          button.btn.btn-danger.btn-xs
+          button.nginx-remove-btn.btn.btn-danger.btn-xs
             span.glyphicon.glyphicon-remove-sign
 
 .modal.fade#nginxModal(tabindex='-1', role='dialog', aria-hidden='true', aria-labelledby='nginxModalLabel')
