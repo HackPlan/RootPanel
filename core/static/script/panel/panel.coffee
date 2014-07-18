@@ -22,7 +22,7 @@ $ ->
         ErrorHandle.flushInfo 'success', '修改成功', ->
           location.reload()
 
-  fpm = $ '#php-fpm'
+  fpm = $ '#phpfpm'
   fpm.on 'click', (e) ->
     e.preventDefault()
     enable = if fpm.hasClass 'btn-success' then true else false
@@ -38,7 +38,7 @@ $ ->
         id: id
       }
       .success (data) ->
-        $('#json').find('textarea').val JSON.stringify(data, null. " ")
+        $('#json').find('textarea').val JSON.stringify(data, null, " ")
         ($ '#nginxModal').modal 'show'
 
 
@@ -58,13 +58,19 @@ $ ->
   $ '#nginxSave'
     .on 'click', (e) ->
       e.preventDefault()
-      $.post '/plugin/nginx/update_site/', JSON.stringify {
-        action: 'create'
-        type: $('#nginxConfigType').find('.active a').attr('href').substr 1
-        config: JSON.parse $('#nginxModal').find('textarea').val()
-      }
-      .success ->
-        location.reload()
+      type = $('#nginxConfigType').find('.active a').attr('href').substr 1
+      try
+        $.post '/plugin/nginx/update_site/', JSON.stringify {
+          action: 'create'
+          type: type
+          config: JSON.parse($("##{type}").find('textarea').val())
+        }
+        .success ->
+          location.reload()
+      catch e
+        alert '配置文件格式不正确'
+
+
 
   #mysql插件
   mysql = $ '#mysql-input'
