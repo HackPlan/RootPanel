@@ -1,19 +1,11 @@
 child_process = require 'child_process'
 
 plugin = require '../../core/plugin'
-
-{requestAuthenticate} = require '../../core/router/middleware'
-
-mAccount = require '../../core/model/account'
+{assertInService} = require '../../core/router/middleware'
 
 module.exports = exports = express.Router()
 
-exports.use (req, res, next) ->
-  req.inject [requestAuthenticate], ->
-    unless 'ssh' in req.account.attribute.services
-      return res.error 'not_in_service'
-
-    next()
+exports.use assertInService 'ssh'
 
 exports.post '/update_password', (req, res) ->
   unless req.body.password or not /^[A-Za-z0-9\-_]+$/.test req.body.password

@@ -2,19 +2,13 @@ child_process = require 'child_process'
 
 service = require './service'
 plugin = require '../../core/plugin'
-
-{requestAuthenticate} = require '../../core/router/middleware'
+{assertInService} = require '../../core/router/middleware'
 
 mAccount = require '../../core/model/account'
 
 module.exports = exports = express.Router()
 
-exports.use (req, res, next) ->
-  req.inject [requestAuthenticate], ->
-    unless 'phpfpm' in req.account.attribute.services
-      return res.error 'not_in_service'
-
-    next()
+exports.use assertInService 'phpfpm'
 
 exports.post '/switch', (req, res) ->
   unless req.body.enable in [true, false]

@@ -15,8 +15,11 @@ module.exports =
 
     connection.query "CREATE USER '#{account.username}'@'localhost' IDENTIFIED BY '#{mAccount.randomSalt()}';", (err, rows) ->
       throw err if err
-      connection.end()
-      callback()
+
+      connection.query "GRANT ALL PRIVILEGES ON  `#{account.username}\\_%%` . * TO  '#{account.username}'@'localhost';", (err, rows) ->
+        throw err if err
+        connection.end()
+        callback()
 
   delete: (account, callback) ->
     connection = mysql.createConnection config.plugins.mysql.connection

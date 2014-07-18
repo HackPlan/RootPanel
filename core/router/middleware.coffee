@@ -53,3 +53,11 @@ exports.requestAdminAuthenticate = (req, res, next) ->
         return res.error 'auth_failed'
 
     next()
+
+exports.assertInService = (service_name) ->
+  return (req, res, next) ->
+    req.inject [exports.requestAuthenticate], ->
+      unless service_name in req.account.attribute.services
+        return res.error 'not_in_service'
+
+      next()
