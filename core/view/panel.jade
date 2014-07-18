@@ -48,13 +48,13 @@ block content
                     else
                       button.btn.btn-success.btn-sm= t('plan.subscribe')
 
-        .row
+        #service-switch.row
           header 服务开关
           for name in plugin.switchButton
             if account.attribute.plugin[name].is_enable
-              button(id= name).btn.btn-danger #{t('plugins.' + name + '.name')}(已关闭)
+              button(data-name= name).btn.btn-danger 关闭 #{t('plugins.' + name + '.name')}
             else
-              button(id= name).btn.btn-success #{t('plugins.' + name + '.name')}(正在运行)
+              button(data-name= name).btn.btn-success 开启 #{t('plugins.' + name + '.name')}
 
         for widget in widgets
           .row

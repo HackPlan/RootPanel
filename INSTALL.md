@@ -9,7 +9,7 @@
     vi /etc/hostname
     vi /etc/hosts
 
-    apt-get install nodejs git mongodb memcached nginx postfix redis-server
+    apt-get install nodejs git mongodb nginx postfix redis-server
     apt-get install python g++ make screen git wget zip unzip iftop unrar-free axel vim emacs subversion subversion-tools curl tmux mercurial
     apt-get install ntp quota quotatool
 
