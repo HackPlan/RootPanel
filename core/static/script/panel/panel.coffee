@@ -22,7 +22,7 @@ $ ->
         ErrorHandle.flushInfo 'success', '修改成功', ->
           location.reload()
 
-  fpm = $ '#php-fpm'
+  fpm = $ '#phpfpm'
   fpm.on 'click', (e) ->
     e.preventDefault()
     enable = if fpm.hasClass 'btn-success' then true else false
