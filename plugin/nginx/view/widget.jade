@@ -8,22 +8,15 @@ table.table.table-hover
         button.btn.btn-success.btn-xs(data-toggle='modal', data-target='#nginxModal')
           span.glyphicon.glyphicon-plus-sign
   tbody
-    tr
-      td jybox.net
-      td fastcgi_pass: /home/user/web
-      td(style= 'width: 150px;')
-        button.btn.btn-info.btn-xs
-          span.glyphicon.glyphicon-edit
-        button.btn.btn-danger.btn-xs
-          span.glyphicon.glyphicon-remove-sign
-    tr
-      td node
-      td proxy_pass: http://127.0.0.1:9118
-      td
-        button.btn.btn-info.btn-xs
-          span.glyphicon.glyphicon-edit
-        button.btn.btn-danger.btn-xs
-          span.glyphicon.glyphicon-remove-sign
+    for site in account.attribute.plugin.nginx.sites
+      tr(data-id= '#{site._id}')
+        td= site.server_name.join(', ')
+        td fastcgi_pass: ~#{site.location['/'].fastcgi_pass.match(/unix:\/\/\/home\/[^\/]+(.*)/)[1]}
+        td(style= 'width: 150px;')
+          button.btn.btn-info.btn-xs
+            span.glyphicon.glyphicon-edit
+          button.btn.btn-danger.btn-xs
+            span.glyphicon.glyphicon-remove-sign
 
 .modal.fade#nginxModal(tabindex='-1', role='dialog', aria-hidden='true', aria-labelledby='nginxModalLabel')
   .modal-dialog

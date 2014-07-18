@@ -8,12 +8,15 @@ exports.assert = (account, config, site_id, callback) ->
     return callback 'invalid_listen'
 
   async.each config.server_name, (domain, callback) ->
-    unless utils.rx.test domain
+    unless utils.rx.domain.test domain
       return callback 'invalid_server_name'
 
     mAccount.findOne
       'attribute.plugin.nginx.sites.server_name': domain
     , (err, result) ->
+      unless result
+        return callback null
+
       site = _.find result.attribute.plugin.nginx.sites, (i) ->
         return domain in i.server_name
 

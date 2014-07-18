@@ -7,12 +7,16 @@ fs = require 'fs'
 mAccount = require '../../core/model/account'
 
 template =
-  site_configure: fs.readFileSync "#{__dirname}/template/site_configure.conf"
-  user_configure: fs.readFileSync "#{__dirname}/template/user_configure.conf"
+  site_configure: fs.readFileSync("#{__dirname}/template/site_configure.conf").toString()
+  user_configure: fs.readFileSync("#{__dirname}/template/user_configure.conf").toString()
 
 module.exports =
   enable: (account, callback) ->
-    callback()
+    mAccount.update _id: account._id,
+      $set:
+        'attribute.plugin.nginx.sites': []
+    , ->
+      callback()
 
   delete: (account, callback) ->
     child_process.exec "sudo rm /etc/nginx/sites-enabled/#{account.username}.conf", ->
@@ -46,7 +50,10 @@ module.exports =
             callback()
 
   widget: (account, callback) ->
-    jade.renderFile path.join(__dirname, 'view/widget.jade'), {}, (err, html) ->
+    jade.renderFile path.join(__dirname, 'view/widget.jade'),
+      account: account
+    , (err, html) ->
+      throw err if err
       callback html
 
   preview: (callback) ->

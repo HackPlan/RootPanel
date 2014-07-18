@@ -47,7 +47,7 @@ exports.post '/update_site/', (req, res) ->
   checkSiteConfig = (callback) ->
     unless req.body.action == 'delete'
       if req.body.type == 'json'
-        configure.assert req.body.config, req.body.id, (err) ->
+        configure.assert req.account, req.body.config, req.body.id, (err) ->
           callback err
       else
         callback 'invalid_type'
