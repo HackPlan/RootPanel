@@ -29,7 +29,7 @@ $ ->
     $.post '/plugin/phpfpm/switch/', JSON.stringify {enable: enable}
     .success ->
       location.reload()
-  nginx
+  #nginx
   $ '.nginx-edit-btn'
     .on 'click', (e) ->
       e.preventDefault()
@@ -38,8 +38,8 @@ $ ->
         id: id
       }
       .success (data) ->
-
-      ($ '#nginxModal').modal 'show'
+        $('#json').find('textarea').val JSON.stringify(data)
+        ($ '#nginxModal').modal 'show'
 
 
   $ '.nginx-remove-btn'
