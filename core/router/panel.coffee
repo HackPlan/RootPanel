@@ -10,14 +10,35 @@ mBalance = require '../model/balance'
 module.exports = exports = express.Router()
 
 exports.get '/pay', requestAuthenticate, renderAccount, (req, res) ->
-  bitcoin.getExchangeRate (rate) ->
-    mBalance.find
-      account_id: req.account._id
-    .toArray (err, balance_log) ->
-      res.render 'panel/pay',
-        exchange_rate: rate
-        deposit_log: _.filter(balance_log, (i) -> i.type == 'deposit')
-        billing_log: _.filter(balance_log, (i) -> i.type == 'billing')
+  LIMIT = 10
+
+  async.parallel
+    exchange_rate: (callback) ->
+      bitcoin.getExchangeRate (rate) ->
+        callback null, rate
+
+    deposit_log: (callback) ->
+      mBalance.find
+        account_id: req.account._id
+        type: 'deposit'
+      ,
+        sort:
+          created_at: -1
+        limit: LIMIT
+      .toArray callback
+
+    billing_log: (callback) ->
+      mBalance.find
+        account_id: req.account._id
+        type: 'billing'
+      ,
+        sort:
+          created_at: -1
+        limit: LIMIT
+      .toArray callback
+
+  , (err, result) ->
+    res.render 'panel/pay', result
 
 exports.get '/', requestAuthenticate, (req, res) ->
   billing.checkBilling req.account, (account) ->

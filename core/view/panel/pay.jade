@@ -9,9 +9,9 @@ block main
     header 充值
     div
       h2 比特币
-      p 你可以直接向该地址发送比特币。在经过一次确认后，系统会实时地，自动为你折算使用时间。
+      p 你可以直接向该地址发送比特币。在经过一次确认后，系统会实时地，自动为你折算充值金额。
       p 实时汇率：10 CNY = #{(exchange_rate * 10).toFixed(4)} BTC
-      pre.bg-success= account.attribute.bitcoin_deposit_address
+      pre= account.attribute.bitcoin_deposit_address
 
     div
       h2 淘宝

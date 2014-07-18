@@ -26,7 +26,7 @@ exports.calcBilling = (account, isForce, callback) ->
 
     amount += price * billing_time
 
-  unless amount
+  if amount <= 0
     return callback account
 
   if isForce
