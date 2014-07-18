@@ -8,6 +8,4 @@ module.exports =
   action: action
   service: service
 
-  panel_widgets: [
-    service.widget
-  ]
+  switch: true

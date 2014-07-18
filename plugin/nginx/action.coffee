@@ -72,9 +72,10 @@ exports.post '/update_site', (req, res) ->
         return res.error err
 
       removeSite = (callback) ->
-        mAccount.update _id: account._id,
+        mAccount.update _id: req.account._id,
           $pull:
-            'attribute.plugin.nginx.sites': new ObjectID req.body.id
+            'attribute.plugin.nginx.sites':
+              '_id': new ObjectID req.body.id
         , callback
 
       addSite = (callback) ->
@@ -86,12 +87,12 @@ exports.post '/update_site', (req, res) ->
         , callback
 
       execModification = (callback) ->
-        if req.body.action = 'create'
+        if req.body.action == 'create'
           addSite callback
-        else if req.body.action = 'update'
+        else if req.body.action == 'update'
           removeSite ->
             addSite callback
-        else if req.body.action = 'delete'
+        else if req.body.action == 'delete'
           removeSite callback
 
       execModification ->

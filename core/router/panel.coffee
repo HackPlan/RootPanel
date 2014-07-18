@@ -66,6 +66,7 @@ exports.get '/', requestAuthenticate, (req, res) ->
         widgets = widgets.concat item
 
       res.render 'panel',
+        plugin: plugin
         account: account
         plans: plans
         widgets: widgets
