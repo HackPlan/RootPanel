@@ -9,3 +9,4 @@ module.exports =
   service: service
 
   switch: true
+  switch_status: service.switch_status

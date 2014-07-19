@@ -7,8 +7,6 @@ i18n = require './i18n'
 config = require './../config'
 {requestAuthenticate} = require './router/middleware'
 
-exports.switchButton = []
-
 exports.get = (name) ->
   return require path.join(__dirname, "../plugin/#{name}")
 
@@ -17,9 +15,6 @@ exports.loadPlugins = (app) ->
     i18n.loadPlugin path.join(__dirname, "../plugin/#{name}/locale"), name
 
     plugin = exports.get name
-
-    if plugin.switch
-      exports.switchButton.push name
 
     if plugin.action
       app.use ('/plugin/' + name), plugin.action
@@ -36,3 +31,6 @@ exports.writeConfig = (path, content, callback) ->
 
       fs.unlink path, ->
         callback()
+
+exports.sudoSu = (account, command) ->
+  return "sudo su #{account.username} -c '#{command}'"

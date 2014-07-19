@@ -69,7 +69,7 @@ exports.getProcessList = (callback) ->
               command: result[11]
             }
 
-          app.redis.setex 'rp:process_list', 10, JSON.stringify(plist), ->
+          app.redis.setex 'rp:process_list', 5, JSON.stringify(plist), ->
             callback plist
 
 exports.monitoring = ->

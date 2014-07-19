@@ -51,21 +51,41 @@ exports.get '/', requestAuthenticate, (req, res) ->
 
     account.attribute.remaining_time = Math.ceil(billing.calcRemainingTime(account) / 24)
 
-    async.map account.attribute.services, (item, callback) ->
-      p = plugin.get item
-      async.map (p.panel_widgets ? []), (widgetBuilder, callback) ->
-        widgetBuilder account, (html) ->
-          callback null,
-            plugin: p
-            html: html
-      , (err, result) ->
-        callback null, result
+    switch_buttons = []
+
+    async.map account.attribute.services, (service_name, callback) ->
+      service_plugin = plugin.get service_name
+
+      if service_plugin.switch
+        switch_buttons.push service_name
+
+      async.parallel
+        widgets: (callback) ->
+          async.map (service_plugin.panel_widgets ? []), (widgetBuilder, callback) ->
+            widgetBuilder account, (html) ->
+              callback null,
+                plugin: service_plugin
+                html: html
+          , (err, result) ->
+            callback null, result
+
+        switch_status: (callback) ->
+          if service_plugin.switch_status
+            service_plugin.switch_status account, (is_enable) ->
+              account.attribute.plugin[service_name].is_enable = is_enable
+              callback()
+          else
+            callback()
+
+      , callback
     , (err, result) ->
       widgets = []
+
       for item in result
-        widgets = widgets.concat item
+        widgets = widgets.concat item.widgets
 
       res.render 'panel',
+        switch_buttons: switch_buttons
         plugin: plugin
         account: account
         plans: plans
