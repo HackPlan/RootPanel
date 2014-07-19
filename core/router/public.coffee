@@ -1,4 +1,3 @@
-config = require '../../config'
 plugin = require '../plugin'
 {renderAccount} = require './middleware'
 

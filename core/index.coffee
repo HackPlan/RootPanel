@@ -21,6 +21,7 @@ if fs.existsSync(config.web.listen)
 bindRouters = (app) ->
   app.use require 'middleware-injector'
 
+  app.use '/', require './router/index'
   app.use '/account', require './router/account'
   app.use '/admin', require './router/admin'
   app.use '/panel', require './router/panel'
@@ -29,9 +30,6 @@ bindRouters = (app) ->
   app.use '/wiki', require './router/wiki'
   app.use '/public', require './router/public'
   app.use '/bitcoin', require './router/bitcoin'
-
-  app.get '/', (req, res) ->
-    res.redirect '/panel/'
 
   plugin = require './plugin'
   plugin.loadPlugins app
@@ -57,6 +55,8 @@ exports.runWebServer = ->
       available_language: ['zh_CN']
 
     i18n.load path.join(__dirname, 'locale')
+
+    app.package = require '../package.json'
 
     app.use connect.json()
     app.use connect.urlencoded()
