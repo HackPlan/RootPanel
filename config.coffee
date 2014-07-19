@@ -1,7 +1,7 @@
 module.exports =
   web:
     url: 'http://rp3.rpvhost.net'
-    port: 3000
+    listen: 3000
 
   account:
     invalid_username: [
@@ -37,6 +37,7 @@ module.exports =
         memory: 27
 
   mongodb: 'mongodb://rpadmin:password@localhost/RootPanel'
+  redis_password: 'password'
 
   bitcoin:
     forward_to: '1FjhhWrzAvb9YD4tVdbE6wrSoHSwxMJoWe'

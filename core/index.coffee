@@ -15,6 +15,9 @@ global.config = require './../config'
 global.i18n = require './i18n'
 global.utils = require './router/utils'
 
+if fs.existsSync(config.web.listen)
+  fs.unlinkSync config.web.listen
+
 bindRouters = (app) ->
   app.use require 'middleware-injector'
 
@@ -37,7 +40,8 @@ exports.connectDatabase = (callback) ->
   if global.app?.db
     return callback null, app.db
 
-  app.redis = redis.createClient()
+  app.redis = redis.createClient 6379, '127.0.0.1',
+    auth_pass: config.redis_password
 
   mongomin config.mongodb, (err, db) ->
     global.app ?= {}
@@ -74,7 +78,7 @@ exports.runWebServer = ->
 
     bindRouters app
 
-    app.listen config.web.port
+    app.listen config.web.listen
 
 unless module.parent
   exports.runWebServer()

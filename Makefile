@@ -3,16 +3,13 @@ all: install
 install:
 	npm install
 
-clean_socket:
-	-rm ../rootpanel.sock
-
-run: clean_socket
+run:
 	node start.js
 
-start: clean_socket
+start:
 	node node_modules/forever/bin/forever start start.js
 
-restart: clean_socket
+restart:
 	node node_modules/forever/bin/forever restart start.js
 
 stop:
