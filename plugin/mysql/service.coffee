@@ -41,8 +41,11 @@ module.exports =
           callback()
 
   widget: (account, callback) ->
-    jade.renderFile path.join(__dirname, 'view/widget.jade'), {}, (err, html) ->
-      callback html
+    connection.query "SELECT `table_schema` 'name', sum(`data_length` + `index_length`) / 1024 / 1024 'size', sum(`data_free`) / 1024 / 1024 'free' FROM `information_schema`.`TABLES` WHERE `TABLE_SCHEMA` LIKE '#{account.username}_%' GROUP BY table_schema;", (err, rows) ->
+      jade.renderFile path.join(__dirname, 'view/widget.jade'),
+        dbs: rows
+      , (err, html) ->
+        callback html
 
   preview: (callback) ->
     jade.renderFile path.join(__dirname, 'view/preview.jade'), {}, (err, html) ->

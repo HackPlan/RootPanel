@@ -8,3 +8,16 @@ header MySQL
         input.form-control(type='password')
         span.input-group-btn
           button.btn.btn-default(type='button') 提交
+.col-md-6
+  table(style= 'table-layout: fixed;').table.table-hover
+    thead
+      tr
+        td(style= 'width: 200px;') 数据库
+        td 体积
+        td 磁盘占用
+    tbody
+      for db in dbs
+        tr
+          td(style= 'white-space: nowrap; overflow: hidden;', title= db.name)= db.name
+          td #{db.size.toFixed(1)}M
+          td #{(db.size + db.free).toFixed(1)}M
