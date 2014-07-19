@@ -11,7 +11,7 @@ table.table.table-hover
     for site in account.attribute.plugin.nginx.sites
       tr(data-id= '#{site._id}')
         td= site.server_name.join(', ')
-        td fastcgi_pass: ~#{site.location['/'].fastcgi_pass.match(/unix:\/\/\/home\/[^\/]+(.*)/)[1]}
+        td root: ~#{site.root.match(/\/home\/[^\/]+(.*)/)[1]}, fastcgi_pass: ~#{site.location['/'].fastcgi_pass.match(/unix:\/\/\/home\/[^\/]+(.*)/)[1]}
         td(style= 'width: 150px;')
           button.nginx-edit-btn.btn.btn-info.btn-xs
             span.glyphicon.glyphicon-edit

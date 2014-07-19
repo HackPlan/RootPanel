@@ -30,7 +30,7 @@ module.exports =
         return i.user == account.username
 
       for item in plist
-        item.command = (/[^A-Za-z0.9//]+(.*)/.exec(item.command))[1]
+        item.command = (/^[^A-Za-z0.9//]*(.*)/.exec(item.command))[1]
 
       jade.renderFile path.join(__dirname, 'view/widget.jade'),
         plist: plist

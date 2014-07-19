@@ -9,17 +9,17 @@ header SSH
         span.input-group-btn
           button.btn.btn-default(type='button') 提交
 .col-md-6
-  table.table.table-hover
+  table(style= 'table-layout: fixed;').table.table-hover
     thead
       tr
-        td 进程名
+        td(style= 'width: 250px;') 进程名
         td 内存
         td CPU
         td 操作
     tbody
       for process in plist
         tr(data-id= '#{process.pid}')
-          td= process.command
+          td(style= 'white-space: nowrap; overflow: hidden;', title= process.command)= process.command
           td #{(process.rss / 1024).toFixed(1)}M
           td #{process.cpu_per}%
           td
