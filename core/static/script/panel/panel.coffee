@@ -1,4 +1,11 @@
 $ ->
+  $('#service-switch button').click ->
+    is_enable = if $(@).hasClass 'btn-success' then true else false
+    $.post "/plugin/#{$(@).data('name')}/switch/", JSON.stringify
+      enable: is_enable
+    .success ->
+      location.reload()
+
   service = $ '#service'
   service.find 'button'
     .on 'click', (e) ->
@@ -22,14 +29,6 @@ $ ->
         ErrorHandle.flushInfo 'success', '修改成功', ->
           location.reload()
 
-  fpm = $ '#phpfpm'
-  fpm.on 'click', (e) ->
-    e.preventDefault()
-    enable = if fpm.hasClass 'btn-success' then true else false
-    $.post '/plugin/phpfpm/switch/', JSON.stringify {enable: enable}
-    .success ->
-      location.reload()
-  #nginx
   $ '.nginx-edit-btn'
     .on 'click', (e) ->
       e.preventDefault()
@@ -70,9 +69,6 @@ $ ->
       catch e
         alert '配置文件格式不正确'
 
-
-
-  #mysql插件
   mysql = $ '#mysql-input'
   mysql.find 'button'
     .on 'click', (e) ->
