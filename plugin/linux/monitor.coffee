@@ -13,7 +13,8 @@ last_plist = []
 passwd_cache = {}
 
 exports.run = ->
-  #setInterval exports.monitoring, config.plugins.linux.monitor_cycle
+  exports.monitoring()
+  setInterval exports.monitoring, config.plugins.linux.monitor_cycle
 
 exports.loadPasswd = (callback) ->
   app.redis.get 'rp:passwd_cache', (err, passwd_cache) ->
@@ -73,7 +74,7 @@ exports.monitoring = ->
   exports.loadPasswd ->
     exports.getProcessList (plist) ->
       plist = _.reject plist, (item) ->
-        return item[..3] == 'root'
+        return item.user == 'root'
 
       async.parallel
         cpu: (callback) ->
@@ -84,7 +85,7 @@ exports.monitoring = ->
 
       , (err, result) ->
         app.redis.get REDIS_KEY, (err, resources_usage_list) ->
-          resources_usage_list = JSON.parse resources_usage_list
+          resources_usage_list = JSON.parse(resources_usage_list) ? []
           resources_usage_list.push result
           resources_usage_list = _.last resources_usage_list, ITEM_IN_RESOURCES_LIST
 
@@ -96,7 +97,7 @@ exports.monitoring = ->
             if account_usage[account_name][type]
               account_usage[account_name][type] += value
             else
-              account_usage[account_name][type] += value
+              account_usage[account_name][type] = value
 
           for item in resources_usage_list
             for account_name, cpu_usage of item.cpu
@@ -109,13 +110,16 @@ exports.monitoring = ->
             usage.memory = usage.memory / (resources_usage_list.length * config.plugins.linux.monitor_cycle * 1000)
 
           app.redis.setex REDIS_OVERVIEW, 60, JSON.stringify(account_usage), ->
-            async.each _.keys(account_usage), (account_name) ->
+            async.each _.keys(account_usage), (account_name, callback) ->
               mAccount.byUsername account_name, (err, account) ->
+                unless account
+                  return callback()
+
                 if account_usage[account_name].cpu > account.attribute.resources_limit.cpu
-                  child_process.exec "pkill -SIGKILL -u #{account_name}", ->
+                  child_process.exec "sudo pkill -SIGKILL -u #{account_name}", ->
 
                 if account_usage[account_name].memory > account.attribute.resources_limit.memory
-                  child_process.exec "pkill -SIGKILL -u #{account_name}", ->
+                  child_process.exec "sudo pkill -SIGKILL -u #{account_name}", ->
 
                 callback()
             , ->
@@ -151,7 +155,7 @@ exports.monitoringCpu = (plist, callback) ->
   callback null, total_time
 
 exports.monitoringMemory = (plist, callback) ->
-  total_memory = 0
+  total_memory = {}
 
   addMemory = (account_name, menory) ->
     if total_memory[account_name]
@@ -160,6 +164,6 @@ exports.monitoringMemory = (plist, callback) ->
       total_memory[account_name] = menory
 
   for item in plist
-    addMemory item.user, ((item.rss / 1024) * config.plugins.linux.monitor_cycle / 1000).toFixed()
+    addMemory item.user, parseInt ((item.rss / 1024) * config.plugins.linux.monitor_cycle / 1000).toFixed()
 
   callback null, total_memory
