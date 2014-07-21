@@ -39,7 +39,7 @@ exports.assert = (account, config, site_id, callback) ->
       return callback 'invalid_root'
 
     for path, rules of config.location
-      unless path in ['/']
+      unless path in ['/', '~ \\.php$']
         return callback 'invalid_location'
 
       for name, value of rules
@@ -51,10 +51,18 @@ exports.assert = (account, config, site_id, callback) ->
 
           unless utils.checkHomeFilePath account, value.slice fastcgi_prefix.length
             return callback 'invalid_fastcgi_pass'
-
-        if name == 'fastcgi_index'
+        else if name == 'fastcgi_index'
           for file in value
             unless utils.rx.test file
               return callback 'invalid_fastcgi_index'
+        else if name == 'include'
+          unless value == 'fastcgi_params'
+            return callback 'invalid_include'
+        else if name == 'try_files'
+          for item in value
+            unless item in ['$uri', '$uri/', '/index.php?$args']
+              return callback 'invalid_try_files'
+        else
+          return callback 'unknown_command'
 
     callback null

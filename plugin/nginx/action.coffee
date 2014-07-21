@@ -14,12 +14,16 @@ sample =
   listen: 80
   server_name: ['domain1', 'domain2']
   auto_index: false
-  index: ['index.html']
+  index: ['index.html', 'index.html']
   root: '/home/user/web'
   location:
     '/':
+      try_files: ['$uri', '$uri/', '/index.php?$args']
+
+    '~ \\.php$':
       fastcgi_pass: 'unix:///home/user/phpfpm.sock'
       fastcgi_index: ['index.php']
+      include: 'fastcgi_params'
 
 exports.use (req, res, next) ->
   req.inject [requestAuthenticate], ->

@@ -2,7 +2,7 @@ request = require 'request'
 
 config = require './../config'
 
-exports.genAddress = (blockchain_secret, callback) ->
+exports.genAddress = (callback) ->
   request 'https://coinbase.com/api/v1/account/generate_receive_address',
     method: 'POST'
     json:

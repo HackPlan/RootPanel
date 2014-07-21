@@ -65,15 +65,17 @@ $ ->
       e.preventDefault()
       type = $('#nginxConfigType').find('.active a').attr('href').substr 1
       try
-        $.post '/plugin/nginx/update_site/', JSON.stringify {
-          action: 'create'
-          type: type
-          config: JSON.parse($("##{type}").find('textarea').val())
-        }
-        .success ->
-          location.reload()
+        config = JSON.parse($("##{type}").find('textarea').val())
       catch e
-        alert '配置文件格式不正确'
+        return alert '配置文件格式不正确'
+
+      $.post '/plugin/nginx/update_site/', JSON.stringify
+        action: if config.id then 'update' else 'create'
+        id: config.id
+        type: type
+        config: config
+      .success ->
+        location.reload()
 
   mysql = $ '#mysql-input'
   mysql.find 'button'

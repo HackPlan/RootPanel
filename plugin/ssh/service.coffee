@@ -8,8 +8,8 @@ monitor = require '../linux/monitor'
 module.exports =
   enable: (account, callback) ->
     child_process.exec "sudo useradd -m -s /bin/bash #{account.username}", (err, stdout, stderr) ->
-      throw err if err
-      callback()
+      child_process.exec "sudo usermod -G #{account.username} -a www-data", (err, stdout, stderr) ->
+        callback()
 
   delete: (account, callback) ->
     async.series [

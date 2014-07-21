@@ -5,14 +5,24 @@
 
     {
         "listen": 80,
-        "server_name": ["domain1.com", "domain2.net"],
+        "server_name": [
+            "domain1.com",
+            "domain2.net"
+        ],
         "auto_index": false,
-        "index": ["index.html"],
+        "index": [
+            "index.php",
+            "index.html"
+        ],
         "root": "/home/user/web",
         "location": {
             "/": {
-                "fastcgi_pass": "unix:///home/user/phpfpm.sock",
-                "fastcgi_index": ["index.php"]
+                "try_files": ["$uri", "$uri/", "/index.php?$args"]
+            },
+            "~ \\.php$": {
+                "fastcgi_pass": "unix:///home/user/web",
+                "fastcgi_index": ["index.php"],
+                "include": "fastcgi_params"
             }
         }
     }
@@ -78,7 +88,11 @@
 
     * 站点路径匹配规则
     * 对象，默认 `{}`
-    * 键名只能为 `/`
+    * 键名目前支持 `/`, `~ \.php$`
+    
+* location - try_files
+
+* location - include
     
 * location - fastcgi_pass
 

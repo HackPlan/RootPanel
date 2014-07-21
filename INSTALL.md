@@ -10,7 +10,7 @@
     vi /etc/hosts
 
     apt-get install nodejs git mongodb nginx postfix redis-server
-    apt-get install python g++ make screen git wget zip unzip iftop unrar-free axel vim emacs subversion subversion-tools curl tmux mercurial
+    apt-get install python g++ make screen git wget zip unzip iftop unrar-free axel vim emacs subversion subversion-tools curl tmux mercurial htop
     apt-get install ntp quota quotatool
 
     mongo
@@ -26,6 +26,10 @@
 
     rm /etc/php5/fpm/pool.d/www.conf
     rm /etc/nginx/sites-enabled/default
+    
+    vi /etc/nginx/fastcgi_params
+    
+        fastcgi_param   SCRIPT_FILENAME         $document_root$fastcgi_script_name;
     
     cat > /etc/nginx/sites-available/rpadmin
 

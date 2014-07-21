@@ -71,7 +71,7 @@ exports.hashPassword = (password, password_salt) ->
 exports.register = (username, email, password, callback) ->
   password_salt = exports.randomSalt()
 
-  bitcoin.genAddress blockchain_secret, (address) ->
+  bitcoin.genAddress (address) ->
     exports.insert
       _id: new ObjectID()
       username: username
