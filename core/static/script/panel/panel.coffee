@@ -43,7 +43,7 @@ $ ->
         id: id
       }
       .success (data) ->
-        $('#json').find('textarea').val JSON.stringify(data, null, " ")
+        $('#json').find('textarea').val JSON.stringify(data, null, '    ')
         ($ '#nginxModal').modal 'show'
 
 
