@@ -6,6 +6,12 @@ $ ->
     .success ->
       location.reload()
 
+  $('.btn-kill').click ->
+    $.post '/plugin/ssh/kill/', JSON.stringify
+      pid: $(@).parents('tr').data 'id'
+    .success ->
+      location.reload()
+
   service = $ '#service'
   service.find 'button'
     .on 'click', (e) ->

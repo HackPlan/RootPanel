@@ -19,4 +19,5 @@ exports.post '/kill', (req, res) ->
   pid = parseInt req.body.pid
   child_process.exec "sudo su #{req.account.username} -c 'kill #{pid}'", (err, stdout, stderr) ->
     throw err if err
-    res.json {}
+    app.redis.del 'rp:process_list', ->
+      res.json {}
