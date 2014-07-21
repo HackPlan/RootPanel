@@ -11,16 +11,16 @@ exports.checkHomeFilePath = (account, path) ->
   unless /^[/A-Za-z0-9_\-\.]+\/?$/.test path
     return false
 
-  unless path.slice(0, home_dir.length) == homedir
+  unless path.slice(0, home_dir.length) == home_dir
     return false
 
   unless path.length < 512
     return false
 
-  unless path.slice(-3) == '/..'
+  unless path.slice(-3) != '/..'
     return false
 
-  unless path.indexOf('/../') != -1
+  unless path.indexOf('/../') == -1
     return false
 
   return true

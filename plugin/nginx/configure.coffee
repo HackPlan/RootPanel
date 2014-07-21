@@ -26,13 +26,14 @@ exports.assert = (account, config, site_id, callback) ->
         callback 'unavailable_server_name'
 
   , (err) ->
-    return callback err
+    if err
+      return callback err
 
     if config.auto_index
       config.auto_index = if config.auto_index then true else false
 
     for file in config.index
-      unless utils.rx.test file
+      unless utils.rx.filename.test file
         return callback 'invalid_index'
 
     unless utils.checkHomeFilePath account, config.root
@@ -53,7 +54,7 @@ exports.assert = (account, config, site_id, callback) ->
             return callback 'invalid_fastcgi_pass'
         else if name == 'fastcgi_index'
           for file in value
-            unless utils.rx.test file
+            unless utils.rx.filename.test file
               return callback 'invalid_fastcgi_index'
         else if name == 'include'
           unless value == 'fastcgi_params'

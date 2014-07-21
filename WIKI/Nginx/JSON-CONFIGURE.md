@@ -20,7 +20,7 @@
                 "try_files": ["$uri", "$uri/", "/index.php?$args"]
             },
             "~ \\.php$": {
-                "fastcgi_pass": "unix:///home/user/web",
+                "fastcgi_pass": "unix:///home/user/phpfpm.sock",
                 "fastcgi_index": ["index.php"],
                 "include": "fastcgi_params"
             }
