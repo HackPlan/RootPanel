@@ -1,8 +1,2 @@
 node_modules
-
-*.js
-*.css
 /.DS_Store
-/config.codekit
-
-/reports/*
