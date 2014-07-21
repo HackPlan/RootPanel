@@ -2,16 +2,15 @@ request = require 'request'
 
 config = require './../config'
 
-mAccount = require './model/account'
-
 exports.genAddress = (blockchain_secret, callback) ->
-  callback_url = "#{config.web.url}/bitcoin/blockchain_callback?secret=#{blockchain_secret}"
-  url = "https://blockchain.info/api/receive?method=create&address=#{config.bitcoin.forward_to}&callback=#{encodeURI(callback_url)}"
-
-  request url, (err, res, body) ->
-    body = JSON.parse body
-
-    callback body.input_address
+  request 'https://coinbase.com/api/v1/account/generate_receive_address',
+    method: 'POST'
+    json:
+      api_key: config.bitcoin.coinbase_api_key
+      address:
+        callback_url: "#{config.web.url}/bitcoin/coinbase_callback"
+  , (err, res, body) ->
+    callback body.address
 
 exports.getExchangeRate = (callback) ->
   app.redis.get 'rp:exchange_rate:cnybtc', (err, rate) ->
@@ -24,20 +23,3 @@ exports.getExchangeRate = (callback) ->
 
         app.redis.setex 'rp:exchange_rate:cnybtc', 60, rate, ->
           callback parseFloat rate
-
-exports.doCallback = (data, callback) ->
-  mAccount.byDepositAddress data.input_address, (err, account) ->
-    unless data.secret == account.blockchain_secret
-      return callback 'Invalid Secret'
-
-    exports.getExchangeRate (rate) ->
-      if data.confirmations > config.bitcoin.confirmations
-        amount = parseFloat(data.value) / 100000000 / rate
-
-        mAccount.incBalance account, 'deposit', amount,
-          type: 'bitcoin'
-          order_id: data.input_transaction_hash
-        , ->
-          callback '*OK*'
-      else
-        callback 'Confirmations Insufficient'

@@ -9,7 +9,7 @@ block main
     header 充值
     div
       h2 比特币
-      p 你可以直接向该地址发送比特币。在经过一次确认后，系统会实时地，自动为你折算充值金额。
+      p 你可以直接向该地址发送比特币。在经过一次确认后，系统会实时地，自动为你折算充值金额，最小支付金额 0.0005。
       p 实时汇率：10 CNY = #{(exchange_rate * 10).toFixed(4)} BTC
       pre= account.attribute.bitcoin_deposit_address
 
@@ -62,7 +62,14 @@ block main
           tr
             td= moment(item.created_at).format('YYYY-MM-DD HH:mm:ss')
             td #{item.amount.toFixed(2)} CNY
-            td #{item.attribute.type} #{item.attribute.order_id}
+            if item.attribute.type == 'taobao'
+              td 淘宝支付 订单号：#{item.attribute.order_id}
+            else if item.attribute.type == 'bitcoin'
+              td
+                | 比特币支付 &nbsp;
+                a(href= 'https://blockchain.info/tx/#{item.attribute.order_id}')= item.attribute.order_id.slice(0, 40)
+            else
+              td #{item.attribute.type} #{item.attribute.order_id}
 
   .row
     header 扣费记录

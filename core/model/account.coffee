@@ -7,9 +7,9 @@ mBalance = require './balance'
 
 module.exports = exports = app.db.buildModel 'accounts'
 
-exports.byUsername = exports.buildByXXOO 'username', exports
-exports.byEmail = exports.buildByXXOO 'email', exports
-exports.byDepositAddress = exports.buildByXXOO 'bitcoin_deposit_address', exports
+exports.byUsername = exports.buildByXXOO 'username'
+exports.byEmail = exports.buildByXXOO 'email'
+exports.byDepositAddress = exports.buildByXXOO 'attribute.bitcoin_deposit_address'
 
 sample =
   username: 'jysperm'
@@ -27,7 +27,6 @@ sample =
 
   attribute:
     bitcoin_deposit_address: '13v2BTCMZMHg5v87susgg86HFZqXERuwUd'
-    blockchain_secret: '53673f434686b535a6cec7b73a60ce045477f066f30eded55a9b972ccafddb2a'
 
     services: ['shadowsocks']
     plans: ['all']
@@ -71,7 +70,6 @@ exports.hashPassword = (password, password_salt) ->
 
 exports.register = (username, email, password, callback) ->
   password_salt = exports.randomSalt()
-  blockchain_secret = exports.randomSalt()
 
   bitcoin.genAddress blockchain_secret, (address) ->
     exports.insert
@@ -86,7 +84,6 @@ exports.register = (username, email, password, callback) ->
         avatar_url: "//ruby-china.org/avatar/#{crypto.createHash('md5').update(email).digest('hex')}?s=58"
       attribute:
         bitcoin_deposit_address: address
-        blockchain_secret: blockchain_secret
         services: []
         plans: []
         balance: 0

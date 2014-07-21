@@ -43,9 +43,6 @@ exports.getProcessList = (callback) ->
         child_process.exec "ps awufx", (err, stdout, stderr) ->
           plist = stdout.split('\n')[1...-1]
 
-          plist = _.reject plist, (item) ->
-            return item[..3] == 'root'
-
           plist = _.map plist, (item) ->
             rx = /^(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(.+)$/
             result = rx.exec item
@@ -75,6 +72,9 @@ exports.getProcessList = (callback) ->
 exports.monitoring = ->
   exports.loadPasswd ->
     exports.getProcessList (plist) ->
+      plist = _.reject plist, (item) ->
+        return item[..3] == 'root'
+
       async.parallel
         cpu: (callback) ->
           exports.monitoringCpu plist, callback
@@ -97,7 +97,6 @@ exports.monitoring = ->
               account_usage[account_name][type] += value
             else
               account_usage[account_name][type] += value
-
 
           for item in resources_usage_list
             for account_name, cpu_usage of item.cpu

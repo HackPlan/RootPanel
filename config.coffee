@@ -40,8 +40,7 @@ module.exports =
   redis_password: 'password'
 
   bitcoin:
-    forward_to: '1FjhhWrzAvb9YD4tVdbE6wrSoHSwxMJoWe'
-    confirmations: 1
+    coinbase_api_key: null
 
   plugins:
     linux:
