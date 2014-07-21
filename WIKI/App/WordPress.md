@@ -21,9 +21,9 @@
 
     mysql -p
 
-    创建数据库(补全你的用户名):
+(在 MySQL 中) 创建数据库(补全你的用户名):
 
-        CREATE DATABASE `<用户名>_wordpress`;
+    CREATE DATABASE `<用户名>_wordpress`;
 
 回到面板添加 Nginx 站点(补全你的用户名):
 
@@ -34,7 +34,7 @@
             "index.php",
             "index.html"
         ],
-        "root": "/home/<用户名>/web",
+        "root": "/home/<用户名>/wordpress",
         "location": {
             "/": {
                 "try_files": ["$uri", "$uri/", "/index.php?$args"]
