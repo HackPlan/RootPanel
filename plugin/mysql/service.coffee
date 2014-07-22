@@ -24,10 +24,10 @@ module.exports =
     connection.query "DROP USER '#{account.username}'@'localhost';", (err, rows) ->
       throw err if err
 
-      connection.query 'show databases;', (err, rows) ->
+      connection.query "SHOW DATABASES LIKE '#{account.username}_%';", (err, rows) ->
         throw err if err
 
-        databases_to_delete = _.filter _.pluck(rows, 'Database'), (item) ->
+        databases_to_delete = _.filter _.pluck(rows, "Database (#{account.username}_%)"), (item) ->
           if item[..account.username.length] == "#{account.username}_"
             return true
           else
