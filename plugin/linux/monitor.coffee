@@ -12,6 +12,8 @@ ITEM_IN_RESOURCES_LIST = 3600 * 1000 / config.plugins.linux.monitor_cycle
 last_plist = []
 passwd_cache = {}
 
+exports.resources_usage = {}
+
 exports.run = ->
   exports.monitoring()
   setInterval exports.monitoring, config.plugins.linux.monitor_cycle
@@ -107,7 +109,9 @@ exports.monitoring = ->
               addAccountUsage account_name, 'memory', memory_usage
 
           for account_name, usage of account_usage
-            usage.memory = usage.memory / (resources_usage_list.length * config.plugins.linux.monitor_cycle * 1000)
+            usage.memory = usage.memory / resources_usage_list.length / config.plugins.linux.monitor_cycle * 1000
+
+          exports.resources_usage = account_usage
 
           app.redis.setex REDIS_OVERVIEW, 60, JSON.stringify(account_usage), ->
             async.each _.keys(account_usage), (account_name, callback) ->
@@ -147,7 +151,7 @@ exports.monitoringCpu = (plist, callback) ->
 
   for item in exist_process
     last_process = findLastProcess item
-    addTime item.user, last_process.time - item.time
+    addTime item.user, item.time - last_process.time
 
   for item in new_process
     addTime item.user, item.time
