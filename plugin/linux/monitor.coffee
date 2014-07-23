@@ -19,8 +19,9 @@ exports.run = ->
   setInterval exports.monitoring, config.plugins.linux.monitor_cycle
 
 exports.loadPasswd = (callback) ->
-  app.redis.get 'rp:passwd_cache', (err, passwd_cache) ->
-    if passwd_cache
+  app.redis.get 'rp:passwd_cache', (err, result) ->
+    if result
+      passwd_cache = JSON.parse result
       callback()
     else
       fs.readFile '/etc/passwd', (err, content) ->
@@ -43,11 +44,11 @@ exports.getProcessList = (callback) ->
       callback JSON.parse plist
     else
       exports.loadPasswd ->
-        child_process.exec "ps awufx", (err, stdout, stderr) ->
+        child_process.exec "ps awufxn", (err, stdout, stderr) ->
           plist = stdout.split('\n')[1...-1]
 
           plist = _.map plist, (item) ->
-            rx = /^(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(.+)$/
+            rx = /^\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(.+)$/
             result = rx.exec item
             return {
               user: do ->
