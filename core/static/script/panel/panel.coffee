@@ -12,6 +12,27 @@ $ ->
     .success ->
       location.reload()
 
+  $('#widget-mongodb button.create-database').click ->
+    $.post '/plugin/mongodb/create_database', JSON.stringify
+      name: $(@).parents('.input-group').find('input').val()
+    .success ->
+      location.reload()
+
+  $('#widget-mongodb button.delete-database').click ->
+    if window.confirm 'Are you sure?'
+      $.post '/plugin/mongodb/delete_database', JSON.stringify
+        name: $(@).parents('tr').data 'name'
+      .success ->
+        location.reload()
+
+  $('#widget-mongodb button.update-password').click ->
+    $.post '/plugin/mongodb/update_password', JSON.stringify
+      password: $(@).parents('.input-group').find('input').val()
+    .success ->
+      location.reload()
+
+  # refactored above
+
   service = $ '#service'
   service.find 'button'
     .on 'click', (e) ->

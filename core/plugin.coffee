@@ -7,6 +7,8 @@ i18n = require './i18n'
 config = require './../config'
 {requestAuthenticate} = require './router/middleware'
 
+app.plugins = {}
+
 exports.get = (name) ->
   return require path.join(__dirname, "../plugin/#{name}")
 

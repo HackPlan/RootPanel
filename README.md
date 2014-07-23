@@ -26,7 +26,7 @@ RP3 的核心功能包括：
 
 ## 技术构成
 
-* 前端：Bootstrap3, jQuery, Jade, Less
+* 前端：Bootstrap(3), jQuery, Jade, Less
 * 后端：Express, Coffee
-* 数据库：MongoDB, redis
+* 数据库：MongoDB(2.4), Redis
 * 操作系统支持：Ubuntu 14.04

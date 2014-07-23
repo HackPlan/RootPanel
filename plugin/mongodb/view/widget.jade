@@ -4,18 +4,19 @@ header MongoDB
     .panel-heading
       h3.panel-title 新建数据库
     .panel-body
-      .input-group#mongodb-create
+      .input-group
         input.form-control(value='#{account.username}_')
         span.input-group-btn
-          button.btn.btn-default(type='button') 提交
+          button.create-database.btn.btn-default(type='button') 提交
   .panel.panel-warning
     .panel-heading
       h3.panel-title 设置 MongoDB 密码
     .panel-body
-      .input-group#mongodb-input
+      .input-group
         input.form-control(type='password')
         span.input-group-btn
-          button.btn.btn-default(type='button') 提交
+          button.update-password.btn.btn-default(type='button') 提交
+
 .col-md-6
   table(style= 'table-layout: fixed;').table.table-hover
     thead
@@ -29,5 +30,5 @@ header MongoDB
           td(style= 'white-space: nowrap; overflow: hidden;', title= db.name)= db.name
           td #{(db.sizeOnDisk / 1024 / 1024).toFixed(1)}M
           td
-            button.nginx-remove-btn.btn.btn-danger.btn-xs
+            button.delete-database.btn.btn-danger.btn-xs
               span.glyphicon.glyphicon-remove-sign

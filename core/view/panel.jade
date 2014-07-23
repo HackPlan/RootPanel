@@ -58,7 +58,7 @@ block content
                 button(data-name= name).btn.btn-success 开启 #{t('plugins.' + name + '.name')}
 
         for widget in widgets
-          .row
+          .row(id='widget-#{widget.plugin.name}')
             != widget.html
 
 append footer

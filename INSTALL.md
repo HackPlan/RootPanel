@@ -16,7 +16,9 @@
     mongo
 
         use admin
-        db.addUser({user: 'rpadmin', pwd: 'password', roles: ['readWriteAnyDatabase', 'userAdminAnyDatabase', 'dbAdminAnyDatabase']})
+        db.addUser({user: 'rpadmin', pwd: 'password', roles: ['userAdminAnyDatabase', 'dbAdminAnyDatabase']})
+        use RootPanel
+        db.addUser({user: 'rpadmin', pwd: 'password', roles: ['readWrite']})
 
     vi /etc/mongodb.conf
 

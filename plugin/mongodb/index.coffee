@@ -1,3 +1,5 @@
+app.plugins.mongodb = {}
+
 action = require './action'
 service = require './service'
 
