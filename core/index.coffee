@@ -41,7 +41,8 @@ exports.connectDatabase = (callback) ->
   app.redis = redis.createClient 6379, '127.0.0.1',
     auth_pass: config.redis_password
 
-  mongomin config.mongodb, (err, db) ->
+  {user, password, host, name} = config.mongodb
+  mongomin "mongodb://#{user}:#{password}@#{host}/#{name}", (err, db) ->
     global.app ?= {}
     app.db = db
     callback err, db

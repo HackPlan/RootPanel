@@ -36,7 +36,12 @@ module.exports =
         transfer: 39
         memory: 27
 
-  mongodb: 'mongodb://rpadmin:password@localhost/RootPanel'
+  mongodb:
+    user: 'rpadmin'
+    password: 'password'
+    host: 'localhost'
+    name: 'RootPanel'
+
   redis_password: 'password'
 
   bitcoin:
