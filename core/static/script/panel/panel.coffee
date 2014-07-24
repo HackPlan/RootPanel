@@ -49,6 +49,29 @@ $ ->
       else
         $("#nginx-modal .option-#{item}").addClass 'hide'
 
+  $('#nginx-modal .modal-footer button.btn-success').click ->
+    type = $('#nginx-modal ul.config-type').find('.active a').attr('href')['#nginx-type-'.length..]
+
+    if type == 'guide'
+      config = {}
+
+    else if type == 'json'
+      try
+        config = JSON.parse($('#nginx-type-json textarea').val())
+      catch e
+        return alert 'Invalid JSON'
+
+    else
+      return alert 'Coming Soon'
+
+    $.post '/plugin/nginx/update_site/', JSON.stringify
+      action: if config.id then 'update' else 'create'
+      id: config.id
+      type: type
+      config: config
+    .success ->
+      location.reload()
+
   # refactored above
 
   service = $ '#service'
@@ -97,23 +120,6 @@ $ ->
         }
         .success ->
           location.reload()
-
-  $ '#nginxSave'
-    .on 'click', (e) ->
-      e.preventDefault()
-      type = $('#nginxConfigType').find('.active a').attr('href').substr 1
-      try
-        config = JSON.parse($("##{type}").find('textarea').val())
-      catch e
-        return alert '配置文件格式不正确'
-
-      $.post '/plugin/nginx/update_site/', JSON.stringify
-        action: if config.id then 'update' else 'create'
-        id: config.id
-        type: type
-        config: config
-      .success ->
-        location.reload()
 
   mysql = $ '#mysql-input'
   mysql.find 'button'

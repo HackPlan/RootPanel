@@ -31,8 +31,9 @@ module.exports =
       sites_configure = []
 
       for site in account.attribute.plugin.nginx.sites
-        sites_configure.push _.template template.site_configure,
-          site: site
+        if site.is_enable
+          sites_configure.push _.template template.site_configure,
+            site: site
 
       user_configure = _.template template.user_configure,
         sites: sites_configure

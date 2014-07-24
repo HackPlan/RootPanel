@@ -11,6 +11,7 @@ module.exports = exports = express.Router()
 
 sample =
   _id: '53c96734c2dad7d6208a0fbe'
+  is_enable: true
   listen: 80
   server_name: ['domain1', 'domain2']
   auto_index: false

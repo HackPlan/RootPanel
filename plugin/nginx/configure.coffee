@@ -4,6 +4,9 @@ exports.assert = (account, config, site_id, callback) ->
   config.index ?= ['index']
   config.location ?= {}
 
+  if config.is_enable == undefined
+    config.is_enable = true
+
   unless config.listen in [80]
     return callback 'invalid_listen'
 
