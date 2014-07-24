@@ -5,7 +5,7 @@ table.table.table-hover
       th 域名
       th 摘要
       th
-        button.btn.btn-success.btn-xs(data-toggle='modal', data-target='#nginxModal')
+        button.btn.btn-success.btn-xs(data-toggle='modal', data-target='#nginx-modal')
           span.glyphicon.glyphicon-plus-sign
   tbody
     for site in account.attribute.plugin.nginx.sites
@@ -18,29 +18,61 @@ table.table.table-hover
           button.nginx-remove-btn.btn.btn-danger.btn-xs
             span.glyphicon.glyphicon-remove-sign
 
-.modal.fade#nginxModal(tabindex='-1', role='dialog', aria-hidden='true', aria-labelledby='nginxModalLabel')
+.modal.fade#nginx-modal(tabindex='-1', role='dialog', aria-hidden='true', aria-labelledby='nginx-modal-label')
   .modal-dialog
     .modal-content
       .modal-header
         button.close(type='button', data-dismiss='modal', aria-hidden='true') &times;
-        h4.modal-title#nginxModalLabel Nginx配置
+        h4.modal-title#nginx-modal-label Nginx
       .modal-body
-        ul.nav.nav-tabs#nginxConfigType
-          li
-            a(href='#guide', data-toggle='tab') 向导
+        ul.nav.nav-tabs.config-type
           li.active
-            a(href='#json', data-toggle='tab') JSON
+            a(href='#nginx-type-guide', data-toggle='tab') 向导
           li
-            a(href='#nginx', data-toggle='tab') 原生
+            a(href='#nginx-type-json', data-toggle='tab') JSON
+          li
+            a(href='#nginx-type-original', data-toggle='tab') 原生
         .tab-content
-          .tab-pane#guide
-            p 向导
-          .tab-pane.active#json
-            p json
+          .tab-pane.active#nginx-type-guide
+            form.form-horizontal(role='form')
+              h3 常规
+              .form-group
+                label.col-sm-2.control-label »
+                .checkbox.col-sm-10
+                  label
+                    input(type='checkbox')
+                    | 启用站点
+              .form-group
+                label.col-sm-2.control-label 域名
+                .col-sm-10
+                  input.form-control(type='text', placeholder='example.com example.net')
+
+              h3 类型
+              .form-group
+                label.col-sm-2.control-label »
+                .controls.col-sm-10
+                  .radio
+                    label
+                      input(type='radio', name='site-type', value='fastcgi')
+                      | fastcgi (PHP)
+                  .radio
+                    label
+                      input(type='radio', name='site-type', value='proxy')
+                      | proxy (反向代理)
+                  .radio
+                    label
+                      input(type='radio', name='site-type', value='uwsgi')
+                      | uwsgi (Python)
+                  .radio
+                    label
+                      input(type='radio', name='site-type', value='static')
+                      | static (静态文件)
+
+          .tab-pane#nginx-type-json
             form(role='form')
-              textarea.form-control(rows='10')
-          .tab-pane#nginx
-            p 原生
+              textarea.form-control(rows='18')
+          .tab-pane#nginx-type-original
+            p 即将支持
       .modal-footer
         button.btn.btn-danger(type='button', data-dismiss='modal') 关闭
         button.btn.btn-success#nginxSave(type='button') 保存

@@ -65,8 +65,7 @@ $ ->
       }
       .success (data) ->
         $('#json').find('textarea').val JSON.stringify(data, null, '    ')
-        ($ '#nginxModal').modal 'show'
-
+        ($ '#nginx-modal').modal 'show'
 
   $ '.nginx-remove-btn'
     .on 'click', (e) ->
