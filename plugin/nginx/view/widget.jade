@@ -68,6 +68,20 @@ table.table.table-hover
                       input(type='radio', name='site-type', value='static')
                       | static (静态文件)
 
+              h3 选项
+              .form-group.option-root.hide
+                label.col-sm-2.control-label 根目录
+                .col-sm-10
+                  input.form-control(type='text', placeholder='/home/#{account.username}/web')
+              .form-group.option-proxy.hide
+                label.col-sm-2.control-label 源地址
+                .col-sm-10
+                  input.form-control(type='text', placeholder='http://127.0.0.1')
+              .form-group.option-uwsgi.hide
+                label.col-sm-2.control-label 源地址
+                .col-sm-10
+                  input.form-control(type='text', placeholder='/home/#{account.username}/uwsgi.sock')
+
           .tab-pane#nginx-type-json
             form(role='form')
               textarea.form-control(rows='18')

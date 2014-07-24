@@ -31,6 +31,24 @@ $ ->
     .success ->
       location.reload()
 
+  $('#nginx-modal .radio input').click ->
+    console.log $(@).val()
+    options = ['root', 'proxy', 'uwsgi']
+
+    mapping_table =
+      fastcgi: ['root']
+      proxy: ['proxy']
+      uwsgi: ['uwsgi']
+      static: ['root']
+
+    options_to_show = mapping_table[$(@).val()]
+
+    for item in options
+      if item in options_to_show
+        $("#nginx-modal .option-#{item}").removeClass 'hide'
+      else
+        $("#nginx-modal .option-#{item}").addClass 'hide'
+
   # refactored above
 
   service = $ '#service'
