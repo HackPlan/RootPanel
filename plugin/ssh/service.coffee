@@ -8,6 +8,7 @@ monitor = require '../linux/monitor'
 module.exports =
   enable: (account, callback) ->
     child_process.exec "sudo useradd -m -s /bin/bash #{account.username}", (err, stdout, stderr) ->
+      throw err if err
       child_process.exec "sudo usermod -G #{account.username} -a www-data", (err, stdout, stderr) ->
         callback()
 
@@ -19,6 +20,10 @@ module.exports =
 
       (callback) ->
         child_process.exec "sudo userdel -rf #{account.username}", ->
+          callback()
+
+      (callback) ->
+        child_process.exec "sudo groupdel #{account.username}", ->
           callback()
     ], (err) ->
       throw err if err

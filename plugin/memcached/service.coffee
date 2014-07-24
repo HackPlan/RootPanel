@@ -13,11 +13,7 @@ MEMCACHED_FLAGS = '-d -m 16'
 
 module.exports =
   enable: (account, callback) ->
-    mAccount.update _id: account._id,
-      $set:
-        'attribute.plugin.memcached.is_enable': false
-    , ->
-      callback()
+    callback()
 
   delete: (account, callback) ->
     callback()
@@ -29,8 +25,10 @@ module.exports =
           if is_act_enable
             return callback()
 
-          child_process.exec plugin.sudoSu(account, "memcached #{MEMCACHED_FLAGS} -s ~/memcached.sock"), ->
-            callback()
+          child_process.exec plugin.sudoSu(account, "memcached #{MEMCACHED_FLAGS} -s ~/memcached.sock"), (err) ->
+            throw err if err
+            app.redis.del 'rp:process_list', ->
+              callback()
     else
       child_process.exec plugin.sudoSu(account, "pkill -exf -u #{account.username} \"memcached #{MEMCACHED_FLAGS} -s /home/#{account.username}/memcached.sock\""), ->
         callback()

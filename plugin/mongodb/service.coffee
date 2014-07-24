@@ -24,7 +24,6 @@ module.exports =
       pwd: pwd
       roles: []
     , (err, result) ->
-      console.log err, result
       callback()
 
   delete: (account, callback) ->
