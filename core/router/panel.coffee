@@ -72,6 +72,7 @@ exports.get '/', requestAuthenticate, (req, res) ->
         switch_status: (callback) ->
           if service_plugin.switch_status
             service_plugin.switch_status account, (is_enable) ->
+              account.attribute.plugin[service_name] ?= {}
               account.attribute.plugin[service_name].is_enable = is_enable
               callback()
           else
