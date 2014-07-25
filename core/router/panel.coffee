@@ -52,12 +52,17 @@ exports.get '/', requestAuthenticate, (req, res) ->
     account.attribute.remaining_time = Math.ceil(billing.calcRemainingTime(account) / 24)
 
     switch_buttons = []
+    panel_script = []
 
     async.map account.attribute.services, (service_name, callback) ->
       service_plugin = plugin.get service_name
 
       if service_plugin.switch
         switch_buttons.push service_name
+
+      if service_plugin.panel_script
+        for item in service_plugin.panel_script
+          panel_script.push "/plugin/#{service_name}#{item}"
 
       async.parallel
         widgets: (callback) ->
@@ -87,6 +92,7 @@ exports.get '/', requestAuthenticate, (req, res) ->
 
       res.render 'panel',
         switch_buttons: switch_buttons
+        panel_script: panel_script
         plugin: plugin
         account: account
         plans: plans

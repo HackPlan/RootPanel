@@ -1,4 +1,6 @@
 child_process = require 'child_process'
+path = require 'path'
+harp = require 'harp'
 
 service = require './service'
 configure = require './configure'
@@ -8,6 +10,8 @@ configure = require './configure'
 mAccount = require '../../core/model/account'
 
 module.exports = exports = express.Router()
+
+app.use harp.mount(path.join(__dirname, 'static'))
 
 sample =
   _id: '53c96734c2dad7d6208a0fbe'

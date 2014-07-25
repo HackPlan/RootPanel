@@ -11,3 +11,7 @@ module.exports =
   panel_widgets: [
     service.widget
   ]
+
+  panel_script: [
+    '/static/script/panel.js'
+  ]

@@ -63,3 +63,5 @@ block content
 
 append footer
   script(src='/script/panel.js')
+  for path in panel_script
+    script(src= path)
