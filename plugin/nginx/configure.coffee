@@ -49,7 +49,7 @@ exports.assert = (account, config, site_id, callback) ->
       for name, value of rules
         switch name
           when 'fastcgi_pass'
-            config.location['fastcgi_index'] ?= ['index.php']
+            rules['fastcgi_index'] ?= ['index.php']
             unless utils.checkHomeUnixSocket account, value
               return callback 'invalid_fastcgi_pass'
 

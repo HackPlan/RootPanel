@@ -7,10 +7,11 @@ $ ->
       location.reload()
 
   $('.btn-kill').click ->
-    $.post '/plugin/ssh/kill/', JSON.stringify
-      pid: $(@).parents('tr').data 'id'
-    .success ->
-      location.reload()
+    if window.confirm 'Are you sure?'
+      $.post '/plugin/ssh/kill/', JSON.stringify
+        pid: $(@).parents('tr').data 'id'
+      .success ->
+        location.reload()
 
   $('#widget-mongodb button.create-database').click ->
     $.post '/plugin/mongodb/create_database', JSON.stringify
@@ -70,9 +71,8 @@ $ ->
       when 'static'
         config['root'] = $('.option-root input').val() or $('.option-root input').prop('placeholder')
 
-    json = JSON.stringify(config, null, '    ')
-    $('#nginx-type-json textarea').val json
-    return json
+    $('#nginx-type-json textarea').val JSON.stringify(config, null, '    ')
+    return config
 
   $('#nginx-type-json textarea').on 'change keyup paste', ->
     try
@@ -164,9 +164,21 @@ $ ->
       type: 'json'
       config: config
     .fail (jqXHR) ->
-      alert jqXHR.responseJSON.error
+      if jqXHR.responseJSON?.error
+        alert jqXHR.responseJSON.error
+      else
+        alert jqXHR.statusText
+
     .done ->
       location.reload()
+
+  $('#widget-nginx button.btn-danger').click ->
+    if window.confirm 'Are you sure?'
+      $.post '/plugin/nginx/update_site', JSON.stringify
+        action: 'delete'
+        id: $(@).parents('tr').data 'id'
+      .success ->
+        location.reload()
 
   # refactored above
 
@@ -203,19 +215,6 @@ $ ->
       .success (data) ->
         $('#json').find('textarea').val JSON.stringify(data, null, '    ')
         ($ '#nginx-modal').modal 'show'
-
-  $ '.nginx-remove-btn'
-    .on 'click', (e) ->
-      if window.confirm('确认删除?')
-        e.preventDefault()
-        id = ($(@).closest 'tr').data 'id'
-        $.post '/plugin/nginx/update_site', JSON.stringify {
-          action: 'delete'
-          id: id
-          type: $('#nginxConfigType').find('.active a').prop('href').substr 1
-        }
-        .success ->
-          location.reload()
 
   mysql = $ '#mysql-input'
   mysql.find 'button'
