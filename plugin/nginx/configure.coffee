@@ -1,7 +1,7 @@
 mAccount = require '../../core/model/account'
 
 exports.assert = (account, config, site_id, callback) ->
-  config.index ?= ['index']
+  config.index ?= ['index.html']
   config.location ?= {}
 
   unless config.is_enable == false
@@ -39,8 +39,9 @@ exports.assert = (account, config, site_id, callback) ->
       unless utils.rx.filename.test file
         return callback 'invalid_index'
 
-    unless utils.checkHomeFilePath account, config.root
-      return callback 'invalid_root'
+    if config.root
+      unless utils.checkHomeFilePath account, config.root
+        return callback 'invalid_root'
 
     for path, rules of config.location
       unless path in ['/', '~ \\.php$']
@@ -58,7 +59,7 @@ exports.assert = (account, config, site_id, callback) ->
               return callback 'invalid_fastcgi_pass'
 
           when 'proxy_pass'
-            config.location['proxy_redirect'] = false
+            rules['proxy_redirect'] ?= false
             unless utils.checkHomeUnixSocket(account, value) or utils.rx.url.test value
               return callback 'invalid_proxy_pass'
 
@@ -72,7 +73,7 @@ exports.assert = (account, config, site_id, callback) ->
                   return callback 'invalid_proxy_set_header'
 
           when 'proxy_redirect'
-            config.location['proxy_redirect'] = if value then true else false
+            rules['proxy_redirect'] = if value then true else false
 
           when 'fastcgi_index'
             for file in value

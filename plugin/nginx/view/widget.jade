@@ -11,19 +11,24 @@ table.table.table-hover
     for site in account.attribute.plugin.nginx.sites
       tr(data-id= '#{site._id}')
         td= site.server_name.join(', ')
-        td root: ~#{site.root.match(/\/home\/[^\/]+(.*)/)[1]}
+        if site.root
+          td root: ~#{site.root.match(/\/home\/[^\/]+(.*)/)[1]}
+        else
+          td root: null
         td(style= 'width: 150px;')
           button.btn.btn-info.btn-xs
             span.glyphicon.glyphicon-edit
           button.btn.btn-danger.btn-xs
             span.glyphicon.glyphicon-remove-sign
 
-.modal.fade#nginx-modal(tabindex='-1', role='dialog', aria-hidden='true', aria-labelledby='nginx-modal-label')
+.modal.fade#nginx-modal(tabindex='-1', role='dialog', aria-hidden='true')
   .modal-dialog
     .modal-content
       .modal-header
         button.close(type='button', data-dismiss='modal', aria-hidden='true') &times;
-        h4.modal-title#nginx-modal-label Nginx
+        h3.modal-title
+          | Nginx &nbsp;
+          span.small.site-id
       .modal-body
         ul.nav.nav-tabs.config-type
           li.active

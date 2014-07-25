@@ -48,6 +48,7 @@ $ ->
     switch $('.option-type :radio:checked').val()
       when 'fastcgi'
         config['root'] = $('.option-root input').val() or $('.option-root input').prop('placeholder')
+        config['index'] ['index.php', 'index.html']
         config['location'] ?= {}
         config['location']['/'] =
           try_files: ['$uri', '$uri/', '/index.php?$args']
@@ -69,10 +70,50 @@ $ ->
           include: 'uwsgi_params'
 
       when 'static'
+        config['index'] ?= 'index.html'
         config['root'] = $('.option-root input').val() or $('.option-root input').prop('placeholder')
 
     $('#nginx-type-json textarea').val JSON.stringify(config, null, '    ')
     return config
+
+  syncToGuide = ->
+    $('.json-error').parent().addClass 'hide'
+
+    try
+      config = JSON.parse($('#nginx-type-json textarea').val())
+    catch e
+      return
+
+    $('.option-is-enable input').prop 'checked', config['is_enable']
+    $('.option-server-name input').val config['server_name']?.join ' '
+    $('.option-root input').val config['root']
+
+    type = do ->
+      unless config['location']['/']
+        return 'static'
+
+      if config['location']['/']['proxy_pass']
+        return 'proxy'
+
+      if config['location']['/']['uwsgi_pass']
+        return 'uwsgi'
+
+      if config['location']['/']?['try_files']
+        for item in config['location']['/']['try_files']
+          if item.match(/\.php/)
+            return 'factcgi'
+
+      return 'static'
+
+    $("#nginx-modal :radio[value=#{type}]").click()
+
+    switch type
+      when 'proxy'
+        $('.option-proxy input').val config['location']['/']['proxy_pass']
+      when 'uwsgi'
+        $('.option-uwsgi input').val config['location']['/']['uwsgi_pass']
+      when 'static', 'fastcgi'
+        $('.option-root input').val config['root']
 
   $('#nginx-type-json textarea').on 'change keyup paste', ->
     try
@@ -88,43 +129,7 @@ $ ->
       when 'json'
         syncToJSON()
       when 'guide'
-        $('.json-error').parent().addClass 'hide'
-
-        try
-          config = JSON.parse($('#nginx-type-json textarea').val())
-        catch e
-          return
-
-        $('.option-is-enable input').prop 'checked', config['is_enable']
-        $('.option-server-name input').val config['server_name']?.join ' '
-        $('.option-root input').val config['root']
-
-        type = do ->
-          unless config['location']['/']
-            return 'static'
-
-          if config['location']['/']['proxy_pass']
-            return 'proxy'
-
-          if config['location']['/']['uwsgi_pass']
-            return 'uwsgi'
-
-          if config['location']['/']?['try_files']
-            for item in config['location']['/']['try_files']
-              if item.match(/\.php/)
-                return 'factcgi'
-
-          return 'static'
-
-        $("#nginx-modal :radio[value=#{type}]").click()
-
-        switch type
-          when 'proxy'
-            $('.option-proxy input').val config['location']['/']['proxy_pass']
-          when 'uwsgi'
-            $('.option-uwsgi input').val config['location']['/']['uwsgi_pass']
-          when 'static', 'fastcgi'
-            $('.option-root input').val config['root']
+        syncToGuide()
 
   $('#nginx-modal .radio input').click ->
     options = ['root', 'proxy', 'uwsgi']
@@ -172,13 +177,25 @@ $ ->
     .done ->
       location.reload()
 
-  $('#widget-nginx button.btn-danger').click ->
+  $('#widget-nginx .btn-danger.glyphicon-remove-sign').click ->
     if window.confirm 'Are you sure?'
       $.post '/plugin/nginx/update_site', JSON.stringify
         action: 'delete'
         id: $(@).parents('tr').data 'id'
       .success ->
         location.reload()
+
+  $('#widget-nginx th .btn-success').click ->
+    $('#nginx-modal .site-id').text ''
+
+  $('#widget-nginx button.btn-info').click ->
+    $.post '/plugin/nginx/site_config', JSON.stringify
+      id: $(@).parents('tr').data 'id'
+    .success (data) ->
+      $('#nginx-type-json textarea').val JSON.stringify(data, null, '    ')
+      syncToGuide()
+      $('#nginx-modal .site-id').text data.id
+      $('#nginx-modal').modal 'show'
 
   # refactored above
 
@@ -204,17 +221,6 @@ $ ->
       .success ->
         ErrorHandle.flushInfo 'success', '修改成功', ->
           location.reload()
-
-  $ '.nginx-edit-btn'
-    .on 'click', (e) ->
-      e.preventDefault()
-      id = ($(@).closest 'tr').data 'id'
-      $.post '/plugin/nginx/site_config', JSON.stringify {
-        id: id
-      }
-      .success (data) ->
-        $('#json').find('textarea').val JSON.stringify(data, null, '    ')
-        ($ '#nginx-modal').modal 'show'
 
   mysql = $ '#mysql-input'
   mysql.find 'button'
