@@ -31,10 +31,14 @@ exports.leavePlan = (account, plan, callback) ->
       if stillInService
         callback()
       else
-        mAccount.update _id: account._id,
+        modifier =
           $pull:
             'attribute.services': serviceName
-        , ->
+          $unset: {}
+
+        modifier['$unset']["attribute.plugin.#{plan}"] = ''
+
+        mAccount.update _id: account._id, modifier, ->
           (plugin.get serviceName).service.delete account, ->
             callback()
 
