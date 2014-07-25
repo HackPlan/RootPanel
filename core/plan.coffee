@@ -38,7 +38,10 @@ exports.leavePlan = (account, plan, callback) ->
 
         modifier['$unset']["attribute.plugin.#{plan}"] = ''
 
-        mAccount.update _id: account._id, modifier, ->
+        console.log modifier
+
+        mAccount.update _id: account._id, modifier, (err) ->
+          throw err if err
           (plugin.get serviceName).service.delete account, ->
             callback()
 

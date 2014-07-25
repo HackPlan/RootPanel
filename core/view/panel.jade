@@ -21,9 +21,6 @@ block content
               | #{t('ticket.')}
 
       .col-md-9
-        #page-alert.alert.alert-danger
-        #page-success.alert.alert-success
-
         .row
           header= t('panel.overview')
           p
@@ -35,10 +32,10 @@ block content
 
         .row
           header= t('plan.')
-          table.table.table-hover
-            tbody#service
+          table.table.table-hover.plan-list
+            tbody
               for plan in plans
-                tr(data-type='#{plan.name}')
+                tr(data-name='#{plan.name}')
                   td= plan.t_name
                   td= plan.t_service
                   td= plan.t_resources

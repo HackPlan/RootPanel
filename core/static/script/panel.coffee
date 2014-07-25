@@ -197,37 +197,27 @@ $ ->
       $('#nginx-modal .site-id').text data.id
       $('#nginx-modal').modal 'show'
 
-  # refactored above
-
-  service = $ '#service'
-  service.find 'button'
-    .on 'click', (e) ->
-      e.preventDefault()
-      button = $ @
-      prehead = if button.hasClass 'btn-success' then '' else 'un'
-      $.post "/plan/#{prehead}subscribe/", JSON.stringify {
-        plan: button.parents('tr').data 'type'
-      }
+  $('.plan-list .btn-danger').click ->
+    if window.confirm 'Are you sure?'
+      $.post "/plan/unsubscribe/", JSON.stringify
+        plan: $(@).parents('tr').data 'name'
       .success ->
         location.reload()
 
-  ssh = $ '#ssh-input'
-  ssh.find 'button'
-    .on 'click', (e) ->
-      e.preventDefault()
-      $.post '/plugin/ssh/update_password/', JSON.stringify {
-        password: ssh.find('input').val()
-      }
-      .success ->
-        ErrorHandle.flushInfo 'success', '修改成功', ->
-          location.reload()
+  $('.plan-list .btn-success').click ->
+    $.post "/plan/subscribe/", JSON.stringify
+      plan: $(@).parents('tr').data 'name'
+    .success ->
+      location.reload()
 
-  mysql = $ '#mysql-input'
-  mysql.find 'button'
-    .on 'click', (e) ->
-      e.preventDefault()
-      $.post '/plugin/mysql/update_password/', JSON.stringify {
-        password: (mysql.find 'input').val()
-      }
-      .success ->
-        location.reload()
+  $('#widget-ssh .update-password button').click ->
+    $.post '/plugin/ssh/update_password/', JSON.stringify
+      password: $('#widget-ssh .update-password input').val()
+    .success ->
+      location.reload()
+
+  $('#widget-mysql .update-password button').click ->
+    $.post '/plugin/mysql/update_password/', JSON.stringify
+      password: $('#widget-mysql .update-password input').val()
+    .success ->
+      location.reload()
