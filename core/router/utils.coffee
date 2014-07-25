@@ -4,6 +4,7 @@ exports.rx =
   password: /^.+$/
   domain: /(\*\.)?[A-Za-z0-9]+(\-[A-Za-z0-9]+)*(\.[A-Za-z0-9]+(\-[A-Za-z0-9]+)*)*/
   filename: /[A-Za-z0-9_\-\.]+/
+  url: /^https?:\/\/[^\s;]*$/
 
 exports.checkHomeFilePath = (account, path) ->
   home_dir = "/home/#{account.username}/"
@@ -21,6 +22,17 @@ exports.checkHomeFilePath = (account, path) ->
     return false
 
   unless path.indexOf('/../') == -1
+    return false
+
+  return true
+
+exports.checkHomeUnixSocket = (account, path) ->
+  fastcgi_prefix = 'unix://'
+
+  unless path.slice(0, fastcgi_prefix.length) == fastcgi_prefix
+    return false
+
+  unless exports.checkHomeFilePath account, path.slice fastcgi_prefix.length
     return false
 
   return true

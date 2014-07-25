@@ -4,7 +4,7 @@ exports.assert = (account, config, site_id, callback) ->
   config.index ?= ['index']
   config.location ?= {}
 
-  if config.is_enable == undefined
+  unless config.is_enable == false
     config.is_enable = true
 
   unless config.listen in [80]
@@ -47,26 +47,43 @@ exports.assert = (account, config, site_id, callback) ->
         return callback 'invalid_location'
 
       for name, value of rules
-        if name == 'fastcgi_pass'
-          fastcgi_prefix = 'unix://'
+        switch name
+          when 'fastcgi_pass'
+            config.location['fastcgi_index'] ?= ['index.php']
+            unless utils.checkHomeUnixSocket account, value
+              return callback 'invalid_fastcgi_pass'
 
-          unless value.slice(0, fastcgi_prefix.length) == fastcgi_prefix
-            return callback 'invalid_fastcgi_pass'
+          when 'uwsgi_pass'
+            unless utils.checkHomeUnixSocket account, value
+              return callback 'invalid_fastcgi_pass'
 
-          unless utils.checkHomeFilePath account, value.slice fastcgi_prefix.length
-            return callback 'invalid_fastcgi_pass'
-        else if name == 'fastcgi_index'
-          for file in value
-            unless utils.rx.filename.test file
-              return callback 'invalid_fastcgi_index'
-        else if name == 'include'
-          unless value == 'fastcgi_params'
-            return callback 'invalid_include'
-        else if name == 'try_files'
-          for item in value
-            unless item in ['$uri', '$uri/', '/index.php?$args']
-              return callback 'invalid_try_files'
-        else
-          return callback 'unknown_command'
+          when 'proxy_pass'
+            config.location['proxy_redirect'] = false
+            unless utils.checkHomeUnixSocket(account, value) or utils.rx.url.test value
+              return callback 'invalid_proxy_pass'
+
+          when 'proxy_set_header'
+            unless value == '$host' or utils.rx.domain.test value
+              return callback 'proxy_set_header'
+
+          when 'proxy_redirect'
+            config.location['proxy_redirect'] = if value then true else false
+
+          when 'fastcgi_index'
+            for file in value
+              unless utils.rx.filename.test file
+                return callback 'invalid_fastcgi_index'
+
+          when 'include'
+            unless value in ['fastcgi_params', 'uwsgi_params']
+              return callback 'invalid_include'
+
+          when 'try_files'
+            for item in value
+              unless item in ['$uri', '$uri/', '/index.php?$args']
+                return callback 'invalid_try_files'
+
+          else
+            return callback 'unknown_command'
 
     callback null

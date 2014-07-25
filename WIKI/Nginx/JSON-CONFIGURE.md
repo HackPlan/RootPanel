@@ -5,6 +5,7 @@
 
     {
         "listen": 80,
+        "is_enable": true,
         "server_name": [
             "domain1.com",
             "domain2.net"
@@ -52,7 +53,7 @@
 * Unix Socket
 
     类似于 `unix:///home/user/phpfpm.sock`, 必须以 `unix://` 开头，后面是一个路径。
-
+    
 ### 指令
 
 * listen
@@ -60,6 +61,11 @@
     * 该站点监听的端口号
     * 数字，必须指令
     * 只能为 80
+    
+* is_enable
+
+    * 是否启用该站点，RP 主机特有功能
+    * 布尔值，默认 false
     
 * server_name
     
@@ -91,12 +97,20 @@
     * 键名目前支持 `/`, `~ \.php$`
     
 * location - try_files
+    
+    * 尝试文件列表
+    * 字符串数组，可选指令
+    * 值目前支持 `$uri`, `$uri/`, `/index.php?$args`
 
 * location - include
+
+    * 包含 Nginx 的默认配置文件
+    * 字符串，可选指令
+    * 值只能为 `fastcgi_params`, `uwsgi_params`
     
 * location - fastcgi_pass
 
-    * 转发请求至 factcgi
+    * 转发请求至 factcgi 服务器
     * 字符串，可选指令
     * 值必须是一个 Home 下的 Unix Socket
     
@@ -105,3 +119,26 @@
     * 设置 factcgi 的首页文件
     * 字符串数组，当出现 fastcgi_pass 时，默认为 `["index.php"]`
     * 每一项必须为文件名
+
+* location - uwsgi_pass
+
+    * 转发请求至 uwsgi 服务器
+    * 字符串，可选指令
+    * 值必须是一个 Home 下的 Unix Socket
+    
+* location - proxy_pass
+
+    * 转发请求至 http 服务器
+    * 字符串，可选指令
+    * 值为一个 Home 下的 Unix Socket 或一个 URL
+    
+* location - proxy_set_header
+
+    * 在转发至 http 服务器时设置 HTTP 头
+    * 字符串，可选指令
+    * 值为一个域名或 `$host`
+    
+* location - proxy_redirect
+
+    * 在转发至 http 服务器时是否跟随 HTTP 重定向
+    * 布尔值，当出现 fastcgi_pass 时默认 false
