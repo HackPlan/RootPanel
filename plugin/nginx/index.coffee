@@ -13,5 +13,5 @@ module.exports =
   ]
 
   panel_script: [
-    '/static/script/panel.js'
+    '/script/panel.js'
   ]
