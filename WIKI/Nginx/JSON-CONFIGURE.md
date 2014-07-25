@@ -135,8 +135,8 @@
 * location - proxy_set_header
 
     * 在转发至 http 服务器时设置 HTTP 头
-    * 字符串，可选指令
-    * 值为一个域名或 `$host`
+    * 对象，可选指令
+    * 键名为 `Host` 时，值为一个域名或 `$host`
     
 * location - proxy_redirect
 

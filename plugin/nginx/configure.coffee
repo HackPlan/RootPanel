@@ -63,8 +63,13 @@ exports.assert = (account, config, site_id, callback) ->
               return callback 'invalid_proxy_pass'
 
           when 'proxy_set_header'
-            unless value == '$host' or utils.rx.domain.test value
-              return callback 'proxy_set_header'
+            for header_name, header_value of value
+              switch header_name
+                when 'Host'
+                  unless header_value == '$host' or utils.rx.domain.test header_value
+                    return callback 'invalid_proxy_set_header'
+                else
+                  return callback 'invalid_proxy_set_header'
 
           when 'proxy_redirect'
             config.location['proxy_redirect'] = if value then true else false

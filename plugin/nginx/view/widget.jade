@@ -36,24 +36,24 @@ table.table.table-hover
           .tab-pane.active#nginx-type-guide
             form.form-horizontal(role='form')
               h3 常规
-              .form-group
+              .form-group.option-is-enable
                 label.col-sm-2.control-label »
                 .checkbox.col-sm-10
                   label
-                    input(type='checkbox')
+                    input(type='checkbox', checked)
                     | 启用站点
-              .form-group
+              .form-group.option-server-name
                 label.col-sm-2.control-label 域名
                 .col-sm-10
                   input.form-control(type='text', placeholder='example.com example.net')
 
               h3 类型
-              .form-group
+              .form-group.option-type
                 label.col-sm-2.control-label »
                 .controls.col-sm-10
                   .radio
                     label
-                      input(type='radio', name='site-type', value='fastcgi')
+                      input(type='radio', name='site-type', value='fastcgi', checked)
                       | fastcgi (PHP)
                   .radio
                     label
@@ -69,7 +69,7 @@ table.table.table-hover
                       | static (静态文件)
 
               h3 选项
-              .form-group.option-root.hide
+              .form-group.option-root
                 label.col-sm-2.control-label 根目录
                 .col-sm-10
                   input.form-control(type='text', placeholder='/home/#{account.username}/web')
@@ -88,5 +88,9 @@ table.table.table-hover
           .tab-pane#nginx-type-original
             p 即将支持
       .modal-footer
+        p.pull-left.hide
+          span.glyphicon.glyphicon-warning-sign
+          | &nbsp;
+          span.json-error.text-danger 错误信息
         button.btn.btn-danger(type='button', data-dismiss='modal') 关闭
         button.btn.btn-success(type='button') 保存

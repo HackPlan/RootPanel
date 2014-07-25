@@ -31,8 +31,99 @@ $ ->
     .success ->
       location.reload()
 
+  $('#nginx-type-json textarea').on 'change keyup paste', ->
+    try
+      JSON.parse($('#nginx-type-json textarea').val())
+      $('.json-error').parent().addClass 'hide'
+    catch err
+      console.log err
+      $('.json-error').text err.toString()
+      $('.json-error').parent().removeClass 'hide'
+
+  syncToJSON = ->
+    username = $('.nav.navbar-nav.navbar-right li:first a').text()
+
+    try
+      config = JSON.parse($('#nginx-type-json textarea').val())
+    catch e
+      config = {}
+
+    config['is_enable'] = $('.option-is-enable input').prop('checked')
+    config['server_name'] = $('.option-server-name input').val().split ' '
+
+    switch $('.option-type :radio:checked').val()
+      when 'fastcgi'
+        config['root'] = $('.option-root input').val() or $('.option-root input').prop('placeholder')
+        config['location'] ?= {}
+        config['location']['/'] =
+          try_files: ['$uri', '$uri/', '/index.php?$args']
+        config['location']['~ \\.php$'] =
+          fastcgi_pass: "unix:///home/#{username}/phpfpm.sock"
+          include: 'fastcgi_params'
+
+      when 'proxy'
+        config['location'] ?= {}
+        config['location']['/'] =
+          proxy_pass: $('.option-proxy input').val() or $('.option-proxy input').prop('placeholder')
+          proxy_set_header:
+            Host: '$host'
+
+      when 'uwsgi'
+        config['location'] ?= {}
+        config['location']['/'] =
+          uwsgi_pass: $('.option-uwsgi input').val() or $('.option-uwsgi input').prop('placeholder')
+          include: 'uwsgi_params'
+
+      when 'static'
+        config['root'] = $('.option-root input').val() or $('.option-root input').prop('placeholder')
+
+    json = $('#nginx-type-json textarea').val JSON.stringify(config, null, '    ')
+    return json
+
+  $('#nginx-modal ul li a').click ->
+    switch $(@).prop('href').match(/.*#nginx-type-(.*)/)[1]
+      when 'json'
+        syncToJSON()
+      when 'guide'
+        $('.json-error').parent().addClass 'hide'
+
+        try
+          config = JSON.parse($('#nginx-type-json textarea').val())
+        catch e
+          return
+
+        $('.option-is-enable input').prop 'checked', config['is_enable']
+        $('.option-server-name input').val config['server_name']?.join ' '
+        $('.option-root input').val config['root']
+
+        type = do ->
+          unless config['location']['/']
+            return 'static'
+
+          if config['location']['/']['proxy_pass']
+            return 'proxy'
+
+          if config['location']['/']['uwsgi_pass']
+            return 'uwsgi'
+
+          if config['location']['/']?['try_files']
+            for item in config['location']['/']['try_files']
+              if item.match(/\.php/)
+                return 'factcgi'
+
+          return 'static'
+
+        $("#nginx-modal :radio[value=#{type}]").click()
+
+        switch type
+          when 'proxy'
+            $('.option-proxy input').val config['location']['/']['proxy_pass']
+          when 'uwsgi'
+            $('.option-uwsgi input').val config['location']['/']['uwsgi_pass']
+          when 'static', 'fastcgi'
+            $('.option-root input').val config['root']
+
   $('#nginx-modal .radio input').click ->
-    console.log $(@).val()
     options = ['root', 'proxy', 'uwsgi']
 
     mapping_table =
@@ -50,10 +141,10 @@ $ ->
         $("#nginx-modal .option-#{item}").addClass 'hide'
 
   $('#nginx-modal .modal-footer button.btn-success').click ->
-    type = $('#nginx-modal ul.config-type').find('.active a').attr('href')['#nginx-type-'.length..]
+    type = $('#nginx-modal ul.config-type').find('.active a').prop('href')['#nginx-type-'.length..]
 
     if type == 'guide'
-      config = {}
+      config = syncToJSON()
 
     else if type == 'json'
       try
@@ -116,7 +207,7 @@ $ ->
         $.post '/plugin/nginx/update_site', JSON.stringify {
           action: 'delete'
           id: id
-          type: $('#nginxConfigType').find('.active a').attr('href').substr 1
+          type: $('#nginxConfigType').find('.active a').prop('href').substr 1
         }
         .success ->
           location.reload()
