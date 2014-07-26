@@ -48,7 +48,7 @@ $ ->
     switch $('.option-type :radio:checked').val()
       when 'fastcgi'
         config['root'] = $('.option-root input').val() or $('.option-root input').prop('placeholder')
-        config['index'] ['index.php', 'index.html']
+        config['index'] ?= ['index.php', 'index.html']
         config['location'] ?= {}
         config['location']['/'] =
           try_files: ['$uri', '$uri/', '/index.php?$args']

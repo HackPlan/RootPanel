@@ -16,33 +16,33 @@
     mongo
 
         use admin
-        db.addUser({user: 'rpadmin', pwd: 'password', roles: ['userAdminAnyDatabase', 'dbAdminAnyDatabase']})
+        db.addUser({user: 'rpadmin', pwd: 'password', roles: ['readWriteAnyDatabase', 'userAdminAnyDatabase', 'dbAdminAnyDatabase', 'clusterAdmin']})
         use RootPanel
         db.addUser({user: 'rpadmin', pwd: 'password', roles: ['readWrite']})
 
     vi /etc/mongodb.conf
 
         auth = true
+        smallfiles = true
+        
+    vi /etc/redis/redis.conf
+        
+        requirepass password
 
-    rm /etc/php5/fpm/pool.d/www.conf
     rm /etc/nginx/sites-enabled/default
-    
-    vi /etc/nginx/fastcgi_params
-    
-        fastcgi_param   SCRIPT_FILENAME         $document_root$fastcgi_script_name;
     
     cat > /etc/nginx/sites-available/rpadmin
 
-        server {
-            listen 80 default_server;
-            listen [::]:80 default_server ipv6only=on;
+    server {
+        listen 80 default_server;
+        listen [::]:80 default_server ipv6only=on;
 
-            server_name DOMAIN;
+        server_name DOMAIN;
 
-            location / {
-                proxy_pass http://unix:/home/rpadmin/rootpanel.sock:/;
-            }
+        location / {
+            proxy_pass http://unix:/home/rpadmin/rootpanel.sock:/;
         }
+    }
 
     ln -s /etc/nginx/sites-available/rpadmin /etc/nginx/sites-enabled
 
@@ -71,6 +71,7 @@
 
     vi config.coffee
 
+    make install
     make start
 
 ### Runtime

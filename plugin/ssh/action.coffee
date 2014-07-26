@@ -13,7 +13,7 @@ exports.post '/update_password', (req, res) ->
 
   child_process.exec "echo '#{req.account.username}:#{req.body.password}' | sudo chpasswd", (err, stdout, stderr) ->
     throw err if err
-    res.json 200, {}
+    res.json {}
 
 exports.post '/kill', (req, res) ->
   pid = parseInt req.body.pid
