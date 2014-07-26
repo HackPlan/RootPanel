@@ -28,7 +28,6 @@ module.exports =
             app.redis.del 'rp:process_list', ->
               callback()
     else
-      console.log plugin.sudoSu(account, "pkill -xf -u #{account.username} \"redis-server *:0\"")
       child_process.exec plugin.sudoSu(account, "pkill -ef -u #{account.username} redis-server"), ->
         callback()
 
