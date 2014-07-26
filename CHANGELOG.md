@@ -1,3 +1,15 @@
+## v0.3.0 (2014.7.26)
+用于 2014.7.26 的第二次测试，不提供从 v0.2.0 的迁移脚本。
+
+* (新增) 支持了 uwsgi, proxy 等 Nginx 指令
+* (新增) 实现了 MongoDB 插件
+* (新增) 实现了 Nginx 向导模式
+* (新增) 实现了 Redis 插件
+* (改进) 重写了全部前端逻辑
+* (改进) 测试了资源限制并在面板上显示
+
+25 commits, 54 changed files with 882 additions and 269 deletions, by 1 contributors: jysperm.
+
 ## v0.2.0 (2014.7.21)
 用于 2014.7.21 的第二次测试，不提供从 v0.1.0 的迁移脚本。
 
@@ -14,7 +26,7 @@
 * (改进) 优化了路由绑定，重构了 Model 模型
 * (废弃) 删除了原 API 测试
 
-168 commits, 146 changed files with 2,761 additions and 1,459 deletions, by 2 contributors: jysperm, yudong
+168 commits, 146 changed files with 2,761 additions and 1,459 deletions, by 2 contributors: jysperm, yudong.
 
 ## v0.1.0 (2014.5.18)
 
