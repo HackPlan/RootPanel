@@ -3,6 +3,11 @@ $ ->
     is_enable = if $(@).hasClass 'btn-success' then true else false
     $.post "/plugin/#{$(@).data('name')}/switch/", JSON.stringify
       enable: is_enable
+    .fail (jqXHR) ->
+      if jqXHR.responseJSON?.error
+        alert jqXHR.responseJSON.error
+      else
+        alert jqXHR.statusText
     .success ->
       location.reload()
 
@@ -10,12 +15,22 @@ $ ->
     if window.confirm 'Are you sure?'
       $.post '/plugin/ssh/kill/', JSON.stringify
         pid: $(@).parents('tr').data 'id'
+      .fail (jqXHR) ->
+        if jqXHR.responseJSON?.error
+          alert jqXHR.responseJSON.error
+        else
+          alert jqXHR.statusText
       .success ->
         location.reload()
 
   $('#widget-mongodb button.create-database').click ->
     $.post '/plugin/mongodb/create_database', JSON.stringify
       name: $(@).parents('.input-group').find('input').val()
+    .fail (jqXHR) ->
+      if jqXHR.responseJSON?.error
+        alert jqXHR.responseJSON.error
+      else
+        alert jqXHR.statusText
     .success ->
       location.reload()
 
@@ -23,12 +38,22 @@ $ ->
     if window.confirm 'Are you sure?'
       $.post '/plugin/mongodb/delete_database', JSON.stringify
         name: $(@).parents('tr').data 'name'
+      .fail (jqXHR) ->
+        if jqXHR.responseJSON?.error
+          alert jqXHR.responseJSON.error
+        else
+          alert jqXHR.statusText
       .success ->
         location.reload()
 
   $('#widget-mongodb button.update-password').click ->
     $.post '/plugin/mongodb/update_password', JSON.stringify
       password: $(@).parents('.input-group').find('input').val()
+    .fail (jqXHR) ->
+      if jqXHR.responseJSON?.error
+        alert jqXHR.responseJSON.error
+      else
+        alert jqXHR.statusText
     .success ->
       location.reload()
 
@@ -182,6 +207,11 @@ $ ->
       $.post '/plugin/nginx/update_site', JSON.stringify
         action: 'delete'
         id: $(@).parents('tr').data 'id'
+      .fail (jqXHR) ->
+        if jqXHR.responseJSON?.error
+          alert jqXHR.responseJSON.error
+        else
+          alert jqXHR.statusText
       .success ->
         location.reload()
 
@@ -191,6 +221,11 @@ $ ->
   $('#widget-nginx button.btn-info').click ->
     $.post '/plugin/nginx/site_config', JSON.stringify
       id: $(@).parents('tr').data 'id'
+    .fail (jqXHR) ->
+      if jqXHR.responseJSON?.error
+        alert jqXHR.responseJSON.error
+      else
+        alert jqXHR.statusText
     .success (data) ->
       $('#nginx-type-json textarea').val JSON.stringify(data, null, '    ')
       syncToGuide()
@@ -201,23 +236,43 @@ $ ->
     if window.confirm 'Are you sure?'
       $.post "/plan/unsubscribe/", JSON.stringify
         plan: $(@).parents('tr').data 'name'
+      .fail (jqXHR) ->
+        if jqXHR.responseJSON?.error
+          alert jqXHR.responseJSON.error
+        else
+          alert jqXHR.statusText
       .success ->
         location.reload()
 
   $('.plan-list .btn-success').click ->
     $.post "/plan/subscribe/", JSON.stringify
       plan: $(@).parents('tr').data 'name'
+    .fail (jqXHR) ->
+      if jqXHR.responseJSON?.error
+        alert jqXHR.responseJSON.error
+      else
+        alert jqXHR.statusText
     .success ->
       location.reload()
 
   $('#widget-ssh .update-password button').click ->
     $.post '/plugin/ssh/update_password/', JSON.stringify
       password: $('#widget-ssh .update-password input').val()
+    .fail (jqXHR) ->
+      if jqXHR.responseJSON?.error
+        alert jqXHR.responseJSON.error
+      else
+        alert jqXHR.statusText
     .success ->
       location.reload()
 
   $('#widget-mysql .update-password button').click ->
     $.post '/plugin/mysql/update_password/', JSON.stringify
       password: $('#widget-mysql .update-password input').val()
+    .fail (jqXHR) ->
+      if jqXHR.responseJSON?.error
+        alert jqXHR.responseJSON.error
+      else
+        alert jqXHR.statusText
     .success ->
       location.reload()

@@ -5,7 +5,7 @@ prepend head
   link(rel='stylesheet', href='/style/ticket.css')
 
 block main
-  .row#ticketid(data-id= '#{ticket._id}')
+  .row.content(data-id= '#{ticket._id}')
     header= ticket.title
     p!= ticket.content_html
 
@@ -33,7 +33,7 @@ block main
         if ticket.status == 'closed'
           button(disabled).btn.btn-lg.btn-primary 已关闭
         else
-          button.btn.btn-lg.btn-primary#reply-btn(type='submit')= t('ticket.create_reply')
+          button.btn.btn-lg.btn-primary.action-reply(type='button')= t('ticket.create_reply')
           button(type='button', data-status='closed').btn.btn-lg.btn-danger.change-status= t('ticket.close_ticket')
         if mAccount.inGroup(account, 'root') && (ticket.status == 'open' || ticket.status == 'pending')
           button(type='button', data-status='finish').btn.btn-lg.btn-success.change-status= t('ticket.finish_ticket')
@@ -61,4 +61,4 @@ prepend sidebar
         img(src= member.setting.avatar_url, alt= member.username)
 
 append footer
-  script(src='/script/ticket/reply.js')
+  script(src='/script/ticket/view.js')

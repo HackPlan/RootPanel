@@ -69,6 +69,7 @@
     git clone https://github.com/jysperm/RootPanel.git
     cd RootPanel
 
+    chmod 750 config.coffee
     vi config.coffee
 
     make install
