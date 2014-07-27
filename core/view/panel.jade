@@ -5,6 +5,8 @@ prepend head
 
 append head
   link(rel='stylesheet', href='/style/panel.css')
+  for path in style
+    link(rel='stylesheet', href=path)
 
 block content
   #content.container
@@ -40,7 +42,7 @@ block content
                   td= plan.t_service
                   td= plan.t_resources
                   td
-                    if plan.isEnable
+                    if plan.is_enable
                       button.btn.btn-danger.btn-sm= t('plan.unsubscribe')
                     else
                       button.btn.btn-success.btn-sm= t('plan.subscribe')
@@ -60,3 +62,5 @@ block content
 
 append footer
   script(src='/script/panel.js')
+  for path in script
+    script(src= path)

@@ -1,5 +1,6 @@
 child_process = require 'child_process'
 path = require 'path'
+harp = require 'harp'
 tmp = require 'tmp'
 fs = require 'fs'
 
@@ -17,6 +18,8 @@ exports.loadPlugins = (app) ->
     i18n.loadPlugin path.join(__dirname, "../plugin/#{name}/locale"), name
 
     plugin = exports.get name
+
+    app.use harp.mount('/plugin/' + name, path.join(path.join(__dirname, "../plugin/#{name}"), 'static'))
 
     if plugin.action
       app.use ('/plugin/' + name), plugin.action

@@ -10,6 +10,6 @@ module.exports =
   action: action
   service: service
 
-  panel_widgets: [
-    service.widget
-  ]
+  panel:
+    widget: service.widget
+    script: '/script/panel.js'

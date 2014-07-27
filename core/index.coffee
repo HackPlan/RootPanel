@@ -72,12 +72,12 @@ exports.runWebServer = ->
 
       next()
 
-    app.use harp.mount(path.join(__dirname, 'static'))
-
     app.set 'views', path.join(__dirname, 'view')
     app.set 'view engine', 'jade'
 
     bindRouters app
+
+    app.use harp.mount(path.join(__dirname, 'static'))
 
     app.listen config.web.listen
 

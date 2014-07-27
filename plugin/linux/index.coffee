@@ -7,8 +7,8 @@ module.exports =
 
   service: service
 
-  panel_widgets: [
-    service.widget
-  ]
+  panel:
+    widget: service.widget
+    style:'/style/panel.css'
 
 monitor.run()

@@ -42,34 +42,45 @@ exports.get '/pay', requestAuthenticate, renderAccount, (req, res) ->
 
 exports.get '/', requestAuthenticate, (req, res) ->
   billing.checkBilling req.account, (account) ->
-    plans = []
+    result =
+      account: account
+      plans: []
+      switch_buttons: []
+      widgets: []
+      script: []
+      style: []
 
     for name, info of config.plans
-      plans.push _.extend info,
+      result.plans.push _.extend info,
         name: name
-        isEnable: name in req.account.attribute.plans
+        is_enable: name in req.account.attribute.plans
 
     account.attribute.remaining_time = Math.ceil(billing.calcRemainingTime(account) / 24)
-
-    switch_buttons = []
 
     async.map account.attribute.services, (service_name, callback) ->
       service_plugin = plugin.get service_name
 
       if service_plugin.switch
-        switch_buttons.push service_name
+        result.switch_buttons.push service_name
 
-      async.parallel
-        widgets: (callback) ->
-          async.map (service_plugin.panel_widgets ? []), (widgetBuilder, callback) ->
-            widgetBuilder account, (html) ->
-              callback null,
-                plugin: service_plugin
-                html: html
-          , (err, result) ->
-            callback null, result
+      if service_plugin.panel?.script
+        result.script.push "/plugin/#{service_name}#{service_plugin.panel.script}"
 
-        switch_status: (callback) ->
+      if service_plugin.panel?.style
+        result.style.push "/plugin/#{service_name}#{service_plugin.panel.style}"
+
+      async.parallel [
+        (callback) ->
+          unless service_plugin.panel?.widget
+            return callback()
+
+          service_plugin.panel.widget account, (html) ->
+            result.widgets.push
+              plugin: service_plugin
+              html: html
+            callback()
+
+        (callback) ->
           if service_plugin.switch_status
             service_plugin.switch_status account, (is_enable) ->
               account.attribute.plugin[service_name] ?= {}
@@ -77,17 +88,7 @@ exports.get '/', requestAuthenticate, (req, res) ->
               callback()
           else
             callback()
+      ], callback
 
-      , callback
-    , (err, result) ->
-      widgets = []
-
-      for item in result
-        widgets = widgets.concat item.widgets
-
-      res.render 'panel',
-        switch_buttons: switch_buttons
-        plugin: plugin
-        account: account
-        plans: plans
-        widgets: widgets
+    , ->
+      res.render 'panel', result
