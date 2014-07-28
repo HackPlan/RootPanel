@@ -6,7 +6,8 @@ $ ->
     if $(@).attr('href') == location.pathname
       $(@).parent().addClass('active')
 
-  $('#logout').click ->
+  $('#logout').click (e) ->
+    e.preventDefault()
     $.post '/account/logout/', {}
     .success ->
       location.reload()

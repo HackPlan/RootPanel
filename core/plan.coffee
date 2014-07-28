@@ -8,10 +8,12 @@ exports.joinPlan = (account, plan, callback) ->
       if serviceName in account.attribute.services
         return callback()
 
-      mAccount.update _id: account._id,
+      mAccount.findAndModify _id: account._id, {},
         $addToSet:
           'attribute.services': serviceName
-      , ->
+      ,
+        new: true
+      , (err, account)->
         (plugin.get serviceName).service.enable account, ->
           callback()
 

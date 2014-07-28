@@ -9,7 +9,19 @@ module.exports =
   enable: (account, callback) ->
     child_process.exec "sudo useradd -m -s /bin/bash #{account.username}", (err, stdout, stderr) ->
       throw err if err
-      child_process.exec "sudo usermod -G #{account.username} -a www-data", (err, stdout, stderr) ->
+      async.parallel [
+        (callback) ->
+          child_process.exec "sudo usermod -G #{account.username} -a www-data", callback
+
+        (callback) ->
+          soft_limit = (account.attribute.resources_limit.storage * 1024 * 0.8).toFixed()
+          hard_limit = (account.attribute.resources_limit.storage * 1024 * 1.2).toFixed()
+          soft_inode_limit = (account.attribute.resources_limit.storage * 64 * 0.8).toFixed()
+          hard_inode_limit = (account.attribute.resources_limit.storage * 64 * 1.2).toFixed()
+          child_process.exec "sudo setquota -u #{account.username} #{soft_limit} #{hard_limit} #{soft_inode_limit} #{hard_inode_limit} -a", callback
+
+      ], (err) ->
+        throw err if err
         callback()
 
   delete: (account, callback) ->
