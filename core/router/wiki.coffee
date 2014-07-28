@@ -20,7 +20,8 @@ exports.use (req, res) ->
       return res.json 404
 
     fs.readFile filename, (err, data) ->
-      throw err if err
+      if err
+        return res.status(404).send err.toString()
       res.render 'wiki',
         title: url
         content: markdown.toHTML data.toString()
