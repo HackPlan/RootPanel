@@ -131,6 +131,36 @@ exports.monitoring = ->
               app.redis.set REDIS_KEY, JSON.stringify(resources_usage_list), ->
                 last_plist = plist
 
+exports.monitoringStorage = (callback) ->
+  app.redis.get 'rp:storage_usage', (err, result) ->
+    if result
+      callback JSON.parse result
+    else
+      child_process.exec "sudo repquota -a", (err, stdout, stderr) ->
+        lines = stdout.split('\n')[5...-1]
+        lines = _.filter lines, (i) -> i
+
+        lines = _.map lines, (line) ->
+          fields = _.filter line.split(' '), (i) -> i and i != ' '
+          [username, __, size_used, size_soft, size_hard, inode_used, inode_soft, inode_hard, inode_grace] = fields
+
+          if /days/.test inode_used
+            [size_grace, inode_used, inode_soft, inode_hard, inode_grace] = [inode_used, inode_soft, inode_hard, inode_grace]
+
+          return {
+            username: username
+            size_used: size_used
+            inode_used: inode_used
+          }
+
+        exports.resources_usage.storage = {}
+
+        for item in lines
+          exports.resources_usage.storage[item.username] = item
+
+        app.redis.setex 'rp:storage_usage', 3, JSON.stringify(exports.resources_usage.storage), ->
+          callback()
+
 exports.monitoringCpu = (plist, callback) ->
   total_time = {}
 

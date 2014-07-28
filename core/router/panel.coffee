@@ -57,7 +57,7 @@ exports.get '/', requestAuthenticate, (req, res) ->
 
     account.attribute.remaining_time = Math.ceil(billing.calcRemainingTime(account) / 24)
 
-    async.map account.attribute.services, (service_name, callback) ->
+    async.eachSeries account.attribute.services, (service_name, callback) ->
       service_plugin = plugin.get service_name
 
       if service_plugin.switch
