@@ -1,6 +1,6 @@
 crypto = require 'crypto'
 
-{assertInService} = require '../../core/router/middleware'
+{requireInService} = require '../../core/router/middleware'
 
 mongodb = app.plugins.mongodb
 
@@ -8,7 +8,7 @@ mAccount = require '../../core/model/account'
 
 module.exports = exports = express.Router()
 
-exports.use assertInService 'mongodb'
+exports.use requireInService 'mongodb'
 
 exports.post '/update_password', (req, res) ->
   unless req.body.password or /^[A-Za-z0-9\-_]+$/.test req.body.password

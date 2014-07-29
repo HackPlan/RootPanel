@@ -1,12 +1,11 @@
-config = require '../../config'
-{requestAuthenticate, renderAccount, getParam} = require './middleware'
+{requireAuthenticate, renderAccount, getParam} = require './middleware'
 
 mAccount = require '../model/account'
 mTicket = require '../model/ticket'
 
 module.exports = exports = express.Router()
 
-exports.get '/list', requestAuthenticate, renderAccount, (req, res) ->
+exports.get '/list', requireAuthenticate, renderAccount, (req, res) ->
   mTicket.find
     $or: [
       account_id: req.account._id
@@ -20,10 +19,10 @@ exports.get '/list', requestAuthenticate, renderAccount, (req, res) ->
     res.render 'ticket/list',
       tickets: tickets
 
-exports.get '/create', requestAuthenticate, renderAccount, (req, res) ->
+exports.get '/create', requireAuthenticate, renderAccount, (req, res) ->
   res.render 'ticket/create'
 
-exports.get '/view', requestAuthenticate, renderAccount, getParam, (req, res) ->
+exports.get '/view', requireAuthenticate, renderAccount, getParam, (req, res) ->
   mTicket.findId req.body.id, (err, ticket) ->
     unless ticket
       return res.send 404
@@ -52,7 +51,7 @@ exports.get '/view', requestAuthenticate, renderAccount, getParam, (req, res) ->
           res.render 'ticket/view',
             ticket: ticket
 
-exports.post '/create', requestAuthenticate, (req, res) ->
+exports.post '/create', requireAuthenticate, (req, res) ->
   unless /^.+$/.test req.body.title
     return res.error 'invalid_title'
 
@@ -87,7 +86,7 @@ exports.post '/create', requestAuthenticate, (req, res) ->
   else
     createTicket [req.account], 'pending'
 
-exports.post '/reply', requestAuthenticate, (req, res) ->
+exports.post '/reply', requireAuthenticate, (req, res) ->
   mTicket.findId req.body.id, (errr, ticket) ->
     unless ticket
       return res.error 'ticket_not_exist'
@@ -101,7 +100,7 @@ exports.post '/reply', requestAuthenticate, (req, res) ->
       return res.json
         id: reply._id
 
-exports.post '/list', requestAuthenticate, (req, res) ->
+exports.post '/list', requireAuthenticate, (req, res) ->
   mTicket.find do ->
     selector =
       $or: [
@@ -128,7 +127,7 @@ exports.post '/list', requestAuthenticate, (req, res) ->
         updated_at: item.updated_at
       }
 
-exports.post '/update', requestAuthenticate, (req, res) ->
+exports.post '/update', requireAuthenticate, (req, res) ->
   modifier = {}
 
   addToSetModifier = []

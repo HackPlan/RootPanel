@@ -1,6 +1,6 @@
 config = require '../../config'
 utils = require './utils'
-{renderAccount, errorHandling, requestAuthenticate} = require './middleware'
+{renderAccount, errorHandling, requireAuthenticate} = require './middleware'
 
 mAccount = require '../model/account'
 
@@ -58,12 +58,12 @@ exports.post '/login', errorHandling, (req, res) ->
         id: account._id
         token: token
 
-exports.post '/logout', requestAuthenticate, (req, res) ->
+exports.post '/logout', requireAuthenticate, (req, res) ->
   mAccount.removeToken req.token, ->
     res.clearCookie 'token'
     res.json {}
 
-exports.post '/update_password', requestAuthenticate, (req, res) ->
+exports.post '/update_password', requireAuthenticate, (req, res) ->
   unless mAccount.matchPassword account, req.body.old_password
     return res.error 'auth_failed'
 

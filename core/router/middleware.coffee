@@ -34,7 +34,7 @@ exports.renderAccount = (req, res, next) ->
       old_render.call res, name, options, fn
     next()
 
-exports.requestAuthenticate = (req, res, next) ->
+exports.requireAuthenticate = (req, res, next) ->
   req.inject [exports.accountInfo, exports.errorHandling], ->
     if req.account
       next()
@@ -44,8 +44,8 @@ exports.requestAuthenticate = (req, res, next) ->
       else
         res.error 'auth_failed'
 
-exports.requestAdminAuthenticate = (req, res, next) ->
-  req.inject [exports.requestAuthenticate], ->
+exports.requireAdminAuthenticate = (req, res, next) ->
+  req.inject [exports.requireAuthenticate], ->
     unless mAccount.inGroup req.account, 'root'
       if req.method == 'GET'
         return res.status(403).end()
@@ -54,9 +54,9 @@ exports.requestAdminAuthenticate = (req, res, next) ->
 
     next()
 
-exports.assertInService = (service_name) ->
+exports.requireInService = (service_name) ->
   return (req, res, next) ->
-    req.inject [exports.requestAuthenticate], ->
+    req.inject [exports.requireAuthenticate], ->
       unless service_name in req.account.attribute.services
         return res.error 'not_in_service'
 

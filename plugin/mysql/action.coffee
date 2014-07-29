@@ -1,14 +1,14 @@
 mysql = require 'mysql'
 
 plugin = require '../../core/plugin'
-{assertInService} = require '../../core/router/middleware'
+{requireInService} = require '../../core/router/middleware'
 
 connection = mysql.createConnection config.plugins.mysql.connection
 connection.connect()
 
 module.exports = exports = express.Router()
 
-exports.use assertInService 'mysql'
+exports.use requireInService 'mysql'
 
 exports.post '/update_password', (req, res) ->
   unless req.body.password or /^[A-Za-z0-9\-_]+$/.test req.body.password

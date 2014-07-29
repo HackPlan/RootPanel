@@ -70,7 +70,7 @@ exports.createReply = (ticket, account, content, status, callback) ->
       callback null, data
 
 exports.addMember = (ticket, account, callback) ->
-  exports.update _id: ticker._id,
+  exports.update _id: ticket._id,
     $push:
       members: account._id
     updated_at: new Date()

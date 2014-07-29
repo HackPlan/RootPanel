@@ -1,13 +1,13 @@
 child_process = require 'child_process'
 
 service = require './service'
-{assertInService} = require '../../core/router/middleware'
+{requireInService} = require '../../core/router/middleware'
 
 mAccount = require '../../core/model/account'
 
 module.exports = exports = express.Router()
 
-exports.use assertInService 'redis'
+exports.use requireInService 'redis'
 
 exports.post '/switch', (req, res) ->
   unless req.body.enable in [true, false]

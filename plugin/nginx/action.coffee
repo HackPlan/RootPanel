@@ -3,11 +3,13 @@ child_process = require 'child_process'
 service = require './service'
 configure = require './configure'
 
-{requestAuthenticate, getParam} = require '../../core/router/middleware'
+{requireInService, getParam} = require '../../core/router/middleware'
 
 mAccount = require '../../core/model/account'
 
 module.exports = exports = express.Router()
+
+exports.use requireInService 'nginx'
 
 sample =
   _id: '53c96734c2dad7d6208a0fbe'
@@ -25,13 +27,6 @@ sample =
       fastcgi_pass: 'unix:///home/user/phpfpm.sock'
       fastcgi_index: ['index.php']
       include: 'fastcgi_params'
-
-exports.use (req, res, next) ->
-  req.inject [requestAuthenticate], ->
-    unless 'nginx' in req.account.attribute.services
-      return res.error 'not_in_service'
-
-    next()
 
 exports.all '/site_config', getParam, (req, res) ->
   site = _.find req.account.attribute.plugin.nginx.sites, (i) ->

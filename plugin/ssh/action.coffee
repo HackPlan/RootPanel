@@ -1,11 +1,11 @@
 child_process = require 'child_process'
 
 plugin = require '../../core/plugin'
-{assertInService} = require '../../core/router/middleware'
+{requireInService} = require '../../core/router/middleware'
 
 module.exports = exports = express.Router()
 
-exports.use assertInService 'ssh'
+exports.use requireInService 'ssh'
 
 exports.post '/update_password', (req, res) ->
   unless req.body.password or not /^[A-Za-z0-9\-_]+$/.test req.body.password

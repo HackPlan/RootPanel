@@ -2,14 +2,14 @@ config = require '../../config'
 billing = require '../billing'
 plugin = require '../plugin'
 bitcoin = require '../bitcoin'
-{requestAuthenticate, renderAccount} = require './middleware'
+{requireAuthenticate, renderAccount} = require './middleware'
 
 mAccount = require '../model/account'
 mBalance = require '../model/balance'
 
 module.exports = exports = express.Router()
 
-exports.get '/pay', requestAuthenticate, renderAccount, (req, res) ->
+exports.get '/pay', requireAuthenticate, renderAccount, (req, res) ->
   LIMIT = 10
 
   async.parallel
@@ -40,7 +40,7 @@ exports.get '/pay', requestAuthenticate, renderAccount, (req, res) ->
   , (err, result) ->
     res.render 'panel/pay', result
 
-exports.get '/', requestAuthenticate, (req, res) ->
+exports.get '/', requireAuthenticate, (req, res) ->
   billing.checkBilling req.account, (account) ->
     result =
       account: account

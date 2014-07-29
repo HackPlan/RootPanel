@@ -6,7 +6,6 @@ fs = require 'fs'
 
 i18n = require './i18n'
 config = require './../config'
-{requestAuthenticate} = require './router/middleware'
 
 app.plugins = {}
 
