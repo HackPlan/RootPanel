@@ -22,24 +22,25 @@ exports.post '/signup', errorHandling, (req, res) ->
   unless utils.rx.password.test req.body.password
     return res.error 'invalid_password'
 
-  if req.body.username in config.account.invalid_username
-    return res.error 'username_exist'
-
-  mAccount.byUsername req.body.username, (err, account) ->
-    if account
+  require('../../plugin/linux/monitor').loadPasswd (passwd_cache) ->
+    if req.body.username in _.values(passwd_cache)
       return res.error 'username_exist'
 
-    mAccount.byEmail req.body.email, (err, account) ->
+    mAccount.byUsername req.body.username, (err, account) ->
       if account
-        return res.error 'email_exist'
+        return res.error 'username_exist'
 
-      mAccount.register req.body.username, req.body.email, req.body.password, (err, account) ->
-        mAccount.createToken account, {}, (err, token)->
-          res.cookie 'token', token,
-            expires: new Date(Date.now() + config.account.cookie_time)
+      mAccount.byEmail req.body.email, (err, account) ->
+        if account
+          return res.error 'email_exist'
 
-          res.json
-            id: account._id
+        mAccount.register req.body.username, req.body.email, req.body.password, (err, account) ->
+          mAccount.createToken account, {}, (err, token)->
+            res.cookie 'token', token,
+              expires: new Date(Date.now() + config.account.cookie_time)
+
+            res.json
+              id: account._id
 
 exports.post '/login', errorHandling, (req, res) ->
   mAccount.byUsernameOrEmailOrId req.body.username, (err, account) ->

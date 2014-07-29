@@ -22,7 +22,7 @@ exports.loadPasswd = (callback) ->
   app.redis.get 'rp:passwd_cache', (err, result) ->
     if result
       passwd_cache = JSON.parse result
-      callback()
+      callback passwd_cache
     else
       fs.readFile '/etc/passwd', (err, content) ->
         throw err if err
@@ -36,7 +36,7 @@ exports.loadPasswd = (callback) ->
             passwd_cache[uid] = username
 
         app.redis.setex 'rp:passwd_cache', 120, JSON.stringify(passwd_cache), ->
-          callback()
+          callback passwd_cache
 
 exports.getProcessList = (callback) ->
   app.redis.get 'rp:process_list', (err, plist) ->

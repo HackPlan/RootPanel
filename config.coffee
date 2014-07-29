@@ -4,11 +4,6 @@ module.exports =
     listen: 3000
 
   account:
-    invalid_username: [
-      'root', 'daemon', 'bin', 'sys', 'sync', 'games', 'man', 'lp', 'mail', 'colord', 'nobody',
-      'syslog', 'sshd', 'ntp', 'memcache', 'mongodb', 'rpadmin', 'postfix', 'libuuid', 'mysql',
-      'news', 'uucp', 'proxy', 'www-data', 'backup', 'list', 'irc', 'gnats', 'messagebus'
-    ]
     cookie_time: 30 * 24 * 3600 * 1000
 
   i18n:
