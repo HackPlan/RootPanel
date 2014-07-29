@@ -21,8 +21,7 @@ exports.get '/list', requestAuthenticate, renderAccount, (req, res) ->
       tickets: tickets
 
 exports.get '/create', requestAuthenticate, renderAccount, (req, res) ->
-  res.render 'ticket/create',
-    ticketTypes: config.ticket.availableType
+  res.render 'ticket/create'
 
 exports.get '/view', requestAuthenticate, renderAccount, getParam, (req, res) ->
   mTicket.findId req.body.id, (err, ticket) ->
@@ -57,11 +56,8 @@ exports.post '/create', requestAuthenticate, (req, res) ->
   unless /^.+$/.test req.body.title
     return res.error 'invalid_title'
 
-  unless req.body.type in config.ticket.availableType
-    return res.error 'invalid_type'
-
   createTicket = (members, status) ->
-    mTicket.createTicket req.account, req.body.title, req.body.content, req.body.type, members, status, {}, (err, ticket) ->
+    mTicket.createTicket req.account, req.body.title, req.body.content, members, status, {}, (err, ticket) ->
       return res.json
         id: ticket._id
 
@@ -114,9 +110,6 @@ exports.post '/list', requestAuthenticate, (req, res) ->
           members: req.account._id
       ]
 
-    if req.body.type?.toLowerCase() in config.ticket.availableType
-      selector['type'] = req.body.type.toLowerCase()
-
     if req.body.status?.toLowerCase() in ['open', 'pending', 'finish', 'closed']
       selector['status'] = req.body.status.toLowerCase()
 
@@ -131,7 +124,6 @@ exports.post '/list', requestAuthenticate, (req, res) ->
       return {
         id: item._id
         title: item.title
-        type: item.type
         status: item.status
         updated_at: item.updated_at
       }
@@ -149,12 +141,6 @@ exports.post '/update', requestAuthenticate, (req, res) ->
     unless mTicket.getMember ticket, req.account
       unless mAccount.inGroup req.account, 'root'
         return res.error 'forbidden'
-
-    if req.body.type
-      if req.body.type in config.ticket.availableType
-        modifier['type'] = req.body.type
-      else
-        return res.error 'invalid_type'
 
     if req.body.status
       if mAccount.inGroup req.account, 'root'

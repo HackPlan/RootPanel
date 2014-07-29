@@ -10,11 +10,6 @@ module.exports =
     defaultLanguage: 'zh_CN'
     availableLanguage: ['zh_CN']
 
-  ticket:
-    availableType: [
-      'linux', 'nodejs', 'php', 'python', 'rootpanel'
-    ]
-
   plugin:
     availablePlugin: ['linux', 'ssh', 'phpfpm', 'mysql', 'nginx', 'memcached', 'mongodb', 'redis']
 

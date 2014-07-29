@@ -9,7 +9,6 @@ sample =
   title: 'Ticket Title'
   content: 'Ticket Content(Markdown)'
   content_html: 'Ticket Conetnt(HTML)'
-  type: 'linux'
   status: 'open/pending/finish/closed'
 
   attribute:
@@ -28,7 +27,7 @@ sample =
     attribute: {}
   ]
 
-exports.createTicket = (account, title, content, type, members, status, attribute, callback) ->
+exports.createTicket = (account, title, content, members, status, attribute, callback) ->
   membersID = []
 
   for member in members
@@ -41,7 +40,6 @@ exports.createTicket = (account, title, content, type, members, status, attribut
     title: title
     content: content
     content_html: markdown.toHTML content
-    type: type
     status: status
     members: membersID
     attribute: attribute

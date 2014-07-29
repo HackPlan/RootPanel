@@ -9,13 +9,11 @@ block main
   table.table.table-hover
     thead
       tr
-        th= t('ticket.type')
         th= t('ticket.title')
         th= t('ticket.status')
     tbody
       for ticket in tickets
         tr(data-id= '#{ticket._id}')
-          td= ticket.type
           td
             a(href='/ticket/view/?id=#{ticket._id}')= ticket.title
           td= ticket.status

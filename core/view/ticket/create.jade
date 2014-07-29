@@ -7,13 +7,8 @@ prepend head
 block main
   header= t('ticket.create_ticket')
   form.form-horizontal(method='post', role='form')
-    .form-group
-      .col-sm-3
-        select#type.form-control(name='type')
-          for type in ticketTypes
-            option(value=type)= type
-      .col-sm-9
-        input#title.form-control(type='text', name='title', required)
+    .form-group.padding
+      input#title.form-control(type='text', name='title', placeholder= t('ticket.title'),required)
     .form-group.padding
       textarea#content.form-control(name='content', rows='15', required)
     .form-group.padding
