@@ -1,5 +1,25 @@
 extends ../layout
 
+mixin displayTicketStatus(status)
+  if status == 'closed'
+    span.text-muted 已关闭
+  else if status == 'open'
+    span.text-primary 开放的
+  else if status == 'pending'
+    span.text-warning 等待处理
+  else if status == 'finish'
+    span.text-success 已完成
+  else
+    | #{status}
+
+mixin showTickets(tickets)
+  for ticket in tickets
+    tr(data-id= '#{ticket._id}')
+      td
+        a(href='/ticket/view/?id=#{ticket._id}')= ticket.title
+      td
+        mixin displayTicketStatus(ticket.status)
+
 prepend head
   title #{t('ticket.ticket_list')} | #{t('app.name')}
 
@@ -12,20 +32,25 @@ block main
         th= t('ticket.title')
         th= t('ticket.status')
     tbody
-      for ticket in tickets
-        tr(data-id= '#{ticket._id}')
-          td
-            a(href='/ticket/view/?id=#{ticket._id}')= ticket.title
-          td
-            if ticket.status == 'closed'
-              span.small.text-muted 已关闭
-            else if ticket.status == 'open'
-              span.small.text-primary 开放的
-            else if ticket.status == 'pending'
-              span.small.text-warning 等待处理
-            else if ticket.status == 'finish'
-              span.small.text-success 已完成
+      if tickets
+        mixin showTickets(tickets)
+
+      if pending
+        mixin showTickets(pending)
+
+      if open
+        mixin showTickets(open)
+
+      if finish
+        mixin showTickets(finish)
+
+      if closed
+        mixin showTickets(closed)
+
 
 prepend sidebar
   .row
-    a.btn.btn-lg.btn-success(href='/ticket/create/')= t('ticket.create_ticket')
+    if tickets
+      a.btn.btn-lg.btn-success(href='/ticket/create/')= t('ticket.create_ticket')
+    else
+      a.btn.btn-lg.btn-success(href='/admin/ticket/')= t('ticket.create_ticket')
