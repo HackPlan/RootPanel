@@ -16,7 +16,15 @@ block main
         tr(data-id= '#{ticket._id}')
           td
             a(href='/ticket/view/?id=#{ticket._id}')= ticket.title
-          td= ticket.status
+          td
+            if ticket.status == 'closed'
+              span.small.text-muted 已关闭
+            else if ticket.status == 'open'
+              span.small.text-primary 开放的
+            else if ticket.status == 'pending'
+              span.small.text-warning 等待处理
+            else if ticket.status == 'finish'
+              span.small.text-success 已完成
 
 prepend sidebar
   .row

@@ -6,7 +6,17 @@ prepend head
 
 block main
   .row.content(data-id= '#{ticket._id}')
-    header= ticket.title
+    header
+      | #{ticket.title} &nbsp;
+      if ticket.status == 'closed'
+        span.small.text-muted 已关闭
+      else if ticket.status == 'open'
+        span.small.text-primary 开放的
+      else if ticket.status == 'pending'
+        span.small.text-warning 等待处理
+      else if ticket.status == 'finish'
+        span.small.text-success 已完成
+
     p!= ticket.content_html
 
   .row
