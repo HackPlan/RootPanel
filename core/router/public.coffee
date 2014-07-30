@@ -11,4 +11,5 @@ exports.get '/services', renderAccount, (req, res) ->
 
   , (err, result) ->
     res.render 'public/services',
+      plans: _.values(config.plans)
       services: result

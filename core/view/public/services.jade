@@ -4,5 +4,22 @@ prepend head
   title 服务支持 | #{t('app.name')}
 
 block main
+  .row
+    header 套餐列表
+    table.table.table-hover
+      thead
+        tr
+          th 套餐
+          th 价格
+          th 服务支持
+          th 资源限制
+      tbody
+        for plan in plans
+          tr
+            td= plan.t_name
+            td #{plan.price} CNY
+            td= plan.services.join(', ')
+            td= plan.t_resources
+
   for service in services
     .row!= service
