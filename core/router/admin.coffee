@@ -3,12 +3,24 @@
 mAccount = require '../model/account'
 mTicket = require '../model/ticket'
 
+plugin = require '../plugin'
+
 module.exports = exports = express.Router()
 
 exports.get '/', requireAdminAuthenticate, renderAccount, (req, res) ->
   mAccount.find().toArray (err, accounts) ->
+    sites = []
+
+    for account in accounts
+      if account.attribute.plugin?.nginx?.sites
+        for site in account.attribute.plugin.nginx.sites
+          sites.push _.extend site,
+            account: account
+
     res.render 'admin/index',
       accounts: accounts
+      sites: sites
+      siteSummary: plugin.get('nginx').service.siteSummary
 
 exports.get '/ticket', requireAdminAuthenticate, renderAccount, (req, res) ->
   async.parallel

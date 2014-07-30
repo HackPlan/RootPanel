@@ -11,10 +11,7 @@ table.table.table-hover
     for site in account.attribute.plugin.nginx.sites
       tr(data-id= '#{site._id}')
         td= site.server_name.join(', ')
-        if site.root
-          td root: ~#{site.root.match(/\/home\/[^\/]+(.*)/)[1]}
-        else
-          td root: null
+        td= siteSummary(site)
         td(style= 'width: 150px;')
           button.btn.btn-info.btn-xs
             span.glyphicon.glyphicon-edit

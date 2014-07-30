@@ -11,6 +11,32 @@ template =
   site_configure: fs.readFileSync("#{__dirname}/template/site_configure.conf").toString()
   user_configure: fs.readFileSync("#{__dirname}/template/user_configure.conf").toString()
 
+siteSummary = (site) ->
+  type = do ->
+    unless site['location']['/']
+      return 'static'
+
+    if site['location']['/']['proxy_pass']
+      return 'proxy'
+
+    if site['location']['/']['uwsgi_pass']
+      return 'uwsgi'
+
+    if site['location']['/']?['try_files']
+      for item in site['location']['/']['try_files']
+        if item.match(/\.php/)
+          return 'factcgi'
+
+    return 'static'
+
+  switch type
+    when 'static', 'factcgi'
+      return "#{type}; root: #{site['root']}"
+    when 'proxy'
+      return "#{type}; url: #{site['location']['/']['proxy_pass']}"
+    when 'uwsgi'
+      return "#{type}; socket: #{site['location']['/']['uwsgi_pass']}"
+
 module.exports =
   enable: (account, callback) ->
     mAccount.update _id: account._id,
@@ -43,9 +69,12 @@ module.exports =
           throw err if err
           callback()
 
+  siteSummary: siteSummary
+
   widget: (account, callback) ->
     jade.renderFile path.join(__dirname, 'view/widget.jade'),
       account: account
+      siteSummary: siteSummary
     , (err, html) ->
       throw err if err
       callback html

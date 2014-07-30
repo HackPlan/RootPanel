@@ -4,30 +4,55 @@ prepend head
   title #{t('admin.admin_panel')} | #{t('app.name')}
 
 block main
-  header= t('admin.admin_panel')
-  table.table.table-hover
-    thead
-      tr
-        th= t('account.username')
-        th= t('account.email')
-        th 套餐
-        th 余额
-        th 操作
-    tbody
-      for account in accounts
-        tr(data-id='#{account._id}')
-          td= account.username
-          td= account.email
-          td= account.attribute.plans.join(', ')
-          td= account.attribute.balance.toFixed(2)
-          td
-            .btn-group
-              button(type='button', data-toggle='dropdown').btn.btn-info.btn-sm.dropdown-toggle
-                | 操作 &nbsp;
-                span.caret
-              ul.dropdown-menu
-                li
-                  a.action-create-payment(href='#') 创建充值记录
+  .row
+    header 用户列表
+    table.table.table-hover
+      thead
+        tr
+          th= t('account.username')
+          th= t('account.email')
+          th 套餐
+          th 余额
+          th 操作
+      tbody
+        for account in accounts
+          tr(data-id='#{account._id}')
+            td= account.username
+            td= account.email
+            td= account.attribute.plans.join(', ')
+            td= account.attribute.balance.toFixed(2)
+            td
+              .btn-group
+                button(type='button', data-toggle='dropdown').btn.btn-info.btn-sm.dropdown-toggle
+                  | 操作 &nbsp;
+                  span.caret
+                ul.dropdown-menu
+                  li
+                    a.action-create-payment(href='#') 创建充值记录
+
+  .row
+    header 网站列表
+    table.table.table-hover
+      thead
+        tr
+          th 用户名
+          th 域名
+          th 摘要
+          th 操作
+      tbody
+        for site in sites
+          tr(data-id='#{site._id}')
+            td= site.account.username
+            td= site.server_name.join(', ')
+            td= siteSummary(site)
+            td
+              .btn-group
+                button(type='button', data-toggle='dropdown').btn.btn-info.btn-sm.dropdown-toggle
+                  | 操作 &nbsp;
+                  span.caret
+                ul.dropdown-menu
+                  li
+                    a(href='#') 禁用
 
   #create-payment-modal.modal.fade
     .modal-dialog
