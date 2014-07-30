@@ -64,7 +64,7 @@ exports.get '/monitor', renderAccount, (req, res) ->
             used: parseInt used?.match(/\d+/)
             available: available
             used_per: used_per
-            
+
         root_disk = disks['/']
 
         used = root_disk.used
