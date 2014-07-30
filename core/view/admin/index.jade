@@ -52,7 +52,10 @@ block main
                   span.caret
                 ul.dropdown-menu
                   li
-                    a(href='#') 禁用
+                    if site.is_enable
+                      a.action-disable-site(href='#') 禁用
+                    else
+                      a.action-enable-site(href='#') 启用
 
   #create-payment-modal.modal.fade
     .modal-dialog

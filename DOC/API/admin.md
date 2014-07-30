@@ -1,6 +1,6 @@
 ## Admin API
 
-### POST /admin/create_payment/
+### POST /admin/create_payment
 
 Request:
 
@@ -15,3 +15,12 @@ Exception:
 
 * account_not_exist
 * invalid_amount
+
+### POST /admin/update_site
+
+Request:
+
+    {
+        "site_id": "525284cc2cebb6d0008b4567",
+        "is_enable": false
+    }

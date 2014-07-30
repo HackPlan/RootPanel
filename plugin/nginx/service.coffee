@@ -29,13 +29,15 @@ siteSummary = (site) ->
 
     return 'static'
 
+  prefix = "(#{if site.is_enable then '√' else 'x'}) #{type};"
+
   switch type
     when 'static', 'factcgi'
-      return "#{type}; root: #{site['root']}"
+      return "#{prefix} root: #{site['root']}"
     when 'proxy'
-      return "#{type}; url: #{site['location']['/']['proxy_pass']}"
+      return "#{prefix} url: " + site['location']['/']['proxy_pass']
     when 'uwsgi'
-      return "#{type}; socket: #{site['location']['/']['uwsgi_pass']}"
+      return "#{prefix} socket: " + site['location']['/']['uwsgi_pass']
 
 module.exports =
   enable: (account, callback) ->

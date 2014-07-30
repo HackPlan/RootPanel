@@ -81,3 +81,16 @@ exports.post '/create_payment', requireAdminAuthenticate, (req, res) ->
       order_id: req.body.order_id
     , ->
       res.json {}
+
+exports.post '/update_site', requireAdminAuthenticate, (req, res) ->
+  mAccount.findOne
+    'attribute.plugin.nginx.sites._id': new ObjectID req.body.site_id
+  , (err, account) ->
+    mAccount.update
+      'attribute.plugin.nginx.sites._id': new ObjectID req.body.site_id
+    ,
+      $set:
+        'attribute.plugin.nginx.sites.$.is_enable': if req.body.is_enable then true else false
+    , ->
+      plugin.get('nginx').service.writeConfig account, ->
+        res.json {}
