@@ -38,7 +38,8 @@ exports.get '/pay', requireAuthenticate, renderAccount, (req, res) ->
       .toArray callback
 
   , (err, result) ->
-    res.render 'panel/pay', result
+    res.render 'panel/pay', _.extend result,
+      nodes: _.values(config.nodes)
 
 exports.get '/', requireAuthenticate, (req, res) ->
   billing.checkBilling req.account, (account) ->

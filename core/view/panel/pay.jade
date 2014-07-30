@@ -27,27 +27,15 @@ block main
           th 位置
           th.for-sale 用户量
       tbody
-        tr
-          td
-            a(href='//jp1.rpvhost.net') jp1.rpvhost.net
-          td Linode Tokyo, JP
-          td
-            .progress
-              .progress-bar(role='progressbar', aria-valuenow='50', aria-valuemin='0', aria-valuemax='100', style='width: 50%;') 50%
-        tr
-          td
-            a(href='//us1.rpvhost.net') us1.rpvhost.net
-          td Linode Fremont, CA, USA
-          td
-            .progress
-              .progress-bar(role='progressbar', aria-valuenow='85', aria-valuemin='0', aria-valuemax='100', style='width: 85%;') 85%
-        tr.warning
-          td
-            a(href='//rp3.rpvhost.net') rp3.rpvhost.net (当前)
-          td Linode Fremont, CA, USA
-          td
-            .progress
-              .progress-bar(role='progressbar', aria-valuenow='10', aria-valuemin='0', aria-valuemax='100', style='width: 10%;') 10%
+        for node in nodes
+          tr
+            td
+              a(href='//#{node.domain}')= node.domain
+            td= node.location
+            td
+              .progress
+                .progress-bar(role='progressbar', aria-valuenow='0', aria-valuemin='0', aria-valuemax='100', style='width: 0%;')
+                  span 0%
 
   .row
     header 充值记录

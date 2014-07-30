@@ -26,6 +26,19 @@ module.exports =
         transfer: 39
         memory: 27
 
+  nodes:
+    us1:
+      domain: 'us1.rpvhost.net'
+      location: 'Linode Fremont, CA, USA'
+
+    jp1:
+      domain: 'jp1.rpvhost.net'
+      location: 'Linode Tokyo, JP'
+
+    rp3:
+      domain: 'rp3.rpvhost.net'
+      location: 'Linode Fremont, CA, USA'
+
   mongodb:
     user: 'rpadmin'
     password: 'password'
