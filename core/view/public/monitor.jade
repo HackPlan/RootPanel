@@ -30,7 +30,7 @@ block content
                 td= system.time
               tr
                 td Uptime
-                td= system.uptime
+                td #{(system.uptime / 3600).toFixed(1)} hours
               tr
                 td Loadavg
                 td= system.loadavg
@@ -53,7 +53,7 @@ block content
                 span(title= '#{memory.buffers}M') #{memory.buffers_per}%
               .progress-bar.blank(role='progressbar', style='width: #{memory.free_per}%;')
                 span(title= '#{memory.free}M') #{memory.free_per}%
-            p SAWP
+            p SWAP
             .progress.multi-progress
               .progress-bar.progress-bar-warning(role='progressbar', style='width: #{memory.swap_used_per}%;')
                 span(title= '#{memory.swap_used_per}M') #{memory.swap_used_per}%
