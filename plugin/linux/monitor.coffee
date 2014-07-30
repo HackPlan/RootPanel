@@ -9,10 +9,11 @@ REDIS_KEY = 'rp:linux:resources_usage'
 REDIS_OVERVIEW = 'rp:linux:overview'
 ITEM_IN_RESOURCES_LIST = 3600 * 1000 / config.plugins.linux.monitor_cycle
 
-last_plist = []
+exports.last_plist = []
 passwd_cache = {}
 
 exports.resources_usage = {}
+exports.storage_usage = {}
 
 exports.run = ->
   exports.monitoring()
@@ -77,7 +78,7 @@ exports.monitoring = ->
   exports.loadPasswd ->
     exports.getProcessList (plist) ->
       plist = _.reject plist, (item) ->
-        return item.user == 'root'
+        return item.rss == 0
 
       async.parallel
         cpu: (callback) ->
@@ -129,7 +130,7 @@ exports.monitoring = ->
                 callback()
             , ->
               app.redis.set REDIS_KEY, JSON.stringify(resources_usage_list), ->
-                last_plist = plist
+                exports.last_plist = plist
 
 exports.monitoringStorage = (callback) ->
   app.redis.get 'rp:storage_usage', (err, result) ->
@@ -153,19 +154,19 @@ exports.monitoringStorage = (callback) ->
             inode_used: inode_used
           }
 
-        exports.resources_usage.storage = {}
+        exports.storage_usage = {}
 
         for item in lines
-          exports.resources_usage.storage[item.username] = item
+          exports.storage_usage[item.username] = item
 
-        app.redis.setex 'rp:storage_usage', 3, JSON.stringify(exports.resources_usage.storage), ->
+        app.redis.setex 'rp:storage_usage', 3, JSON.stringify(exports.storage_usage), ->
           callback()
 
 exports.monitoringCpu = (plist, callback) ->
   total_time = {}
 
   findLastProcess = (process) ->
-    return _.find last_plist, (i) ->
+    return _.find exports.last_plist, (i) ->
       return i.pid == process.pid and i.user == process.user and i.command == process.command
 
   addTime = (account_name, time) ->

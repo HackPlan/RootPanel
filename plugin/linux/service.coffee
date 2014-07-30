@@ -27,7 +27,7 @@ module.exports =
           }
 
         storage_usage: do ->
-          usage = monitor.resources_usage['storage'][account.username]
+          usage = monitor.storage_usage[account.username]
           now_per = (usage.size_used / 1000 / account.attribute.resources_limit.storage * 100).toFixed()
           return {
             now_per: now_per
