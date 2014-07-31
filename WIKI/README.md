@@ -28,6 +28,7 @@
 * Memcached
 * Redis
 * MongoDB
+* MySQL
 
 ### App
 

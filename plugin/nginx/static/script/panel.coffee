@@ -144,7 +144,7 @@ $ ->
     .done ->
       location.reload()
 
-  $('#widget-nginx .btn-danger.glyphicon-remove-sign').click ->
+  $('#widget-nginx .btn-danger').click ->
     if window.confirm 'Are you sure?'
       $.post '/plugin/nginx/update_site', JSON.stringify
         action: 'delete'

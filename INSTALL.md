@@ -102,7 +102,7 @@
 
 ### Runtime
 
-    apt-get install golang  
+    apt-get install golang golang-go.tools
 
     apt-get install python python3 python-pip python3-pip python-dev python3-dev
     pip install django tornado markdown python-memcached web.py mongo uwsgi virtualenv virtualenvwrapper flask gevent jinja2 requests

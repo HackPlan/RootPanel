@@ -18,7 +18,8 @@ exports.loadPlugins = (app) ->
 
     plugin = exports.get name
 
-    app.use harp.mount('/plugin/' + name, path.join(path.join(__dirname, "../plugin/#{name}"), 'static'))
+    if fs.existsSync path.join(path.join(__dirname, "../plugin/#{name}"), 'static')
+      app.use harp.mount('/plugin/' + name, path.join(path.join(__dirname, "../plugin/#{name}"), 'static'))
 
     if plugin.action
       app.use ('/plugin/' + name), plugin.action
