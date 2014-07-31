@@ -34,4 +34,4 @@
 
 * [WordPress](App/WordPress.md)
 * [Ghost](App/Ghost.md)
-
+* [Typecho](App/Typecho.md)
