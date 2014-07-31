@@ -3,7 +3,7 @@ os = require 'os'
 fs = require 'fs'
 
 plugin = require '../plugin'
-{renderAccount} = require './middleware'
+{renderAccount, requireAuthenticate} = require './middleware'
 
 monitor = require '../../plugin/linux/monitor'
 
@@ -20,7 +20,7 @@ exports.get '/services', renderAccount, (req, res) ->
       plans: _.values(config.plans)
       services: result
 
-exports.get '/monitor', renderAccount, (req, res) ->
+exports.get '/monitor', renderAccount, requireAuthenticate, (req, res) ->
   async.parallel
     resources_usage: (callback) ->
       monitor.monitoringStorage ->
