@@ -51,6 +51,15 @@ module.exports =
       , (err, html) ->
         callback html
 
+  storage: (account, callback) ->
+    mongodb.admin.listDatabases (err, result) ->
+      dbs = _.filter result.databases, (i) ->
+        return i.name[..account.username.length] == "#{account.username}_"
+
+      callback null, _.reduce dbs, (memo, db) ->
+        return memo + db.sizeOnDisk / 1024 / 1024
+      , 0
+
   preview: (callback) ->
     jade.renderFile path.join(__dirname, 'view/preview.jade'), {}, (err, html) ->
       callback html

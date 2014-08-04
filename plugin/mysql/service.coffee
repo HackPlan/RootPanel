@@ -47,6 +47,12 @@ module.exports =
       , (err, html) ->
         callback html
 
+  storage: (account, callback) ->
+    connection.query "SELECT `table_schema` 'name', sum(`data_length` + `index_length`) / 1024 / 1024 'size', sum(`data_free`) / 1024 / 1024 'free' FROM `information_schema`.`TABLES` WHERE `TABLE_SCHEMA` LIKE '#{account.username}_%' GROUP BY table_schema;", (err, rows) ->
+      callback null, _.reduce rows, (memo, db) ->
+        return memo + db.size
+      , 0
+
   preview: (callback) ->
     jade.renderFile path.join(__dirname, 'view/preview.jade'), {}, (err, html) ->
       callback html
