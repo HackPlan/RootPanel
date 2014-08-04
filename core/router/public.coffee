@@ -82,41 +82,7 @@ exports.get '/monitor', renderAccount, requireAuthenticate, (req, res) ->
           used_per: used_per
           free_per: free_per
 
-    memory: (callback) ->
-      fs.readFile '/proc/meminfo', (err, content) ->
-        mapping = {}
-
-        for line in content.toString().split('\n')
-          [key, value] = line.split ':'
-          if value
-            mapping[key.trim()] = parseInt (parseInt(value.trim().match(/\d+/)) / 1024).toFixed()
-
-        used = mapping['MemTotal'] - mapping['MemFree'] - mapping['Buffers'] - mapping['Cached']
-        used_per = (used / mapping['MemTotal'] * 100).toFixed()
-        cached_per = (mapping['Cached'] / mapping['MemTotal'] * 100).toFixed()
-        buffers_per = (mapping['Buffers'] / mapping['MemTotal'] * 100).toFixed()
-        free_per = 100 - used_per - cached_per - buffers_per
-
-        swap_free_per = (mapping['SwapFree'] / mapping['SwapTotal'] * 100).toFixed()
-        swap_used_per = 100 - swap_free_per
-
-        callback null,
-          used: used
-          cached: mapping['Cached']
-          buffers: mapping['Buffers']
-          free: mapping['MemFree']
-          total: mapping['MemTotal']
-          swap_used: mapping['SwapTotal'] - mapping['SwapFree']
-          swap_free: mapping['SwapFree']
-          swap_total: mapping['SwapTotal']
-
-          used_per: used_per
-          cached_per: cached_per
-          buffers_per: buffers_per
-          free_per: free_per
-
-          swap_used_per: swap_used_per
-          swap_free_per: swap_free_per
+    memory: monitor.loadMemoryInfo
 
   , (err, result) ->
     res.render 'public/monitor', _.extend result,

@@ -1,4 +1,5 @@
 child_process = require 'child_process'
+os = require 'os'
 fs = require 'fs'
 
 config = require '../../config.coffee'
@@ -18,6 +19,42 @@ exports.storage_usage = {}
 exports.run = ->
   exports.monitoring()
   setInterval exports.monitoring, config.plugins.linux.monitor_cycle
+
+exports.loadMemoryInfo = (callback) ->
+  fs.readFile '/proc/meminfo', (err, content) ->
+    mapping = {}
+
+    for line in content.toString().split('\n')
+      [key, value] = line.split ':'
+      if value
+        mapping[key.trim()] = parseInt (parseInt(value.trim().match(/\d+/)) / 1024).toFixed()
+
+    used = mapping['MemTotal'] - mapping['MemFree'] - mapping['Buffers'] - mapping['Cached']
+    used_per = (used / mapping['MemTotal'] * 100).toFixed()
+    cached_per = (mapping['Cached'] / mapping['MemTotal'] * 100).toFixed()
+    buffers_per = (mapping['Buffers'] / mapping['MemTotal'] * 100).toFixed()
+    free_per = 100 - used_per - cached_per - buffers_per
+
+    swap_free_per = (mapping['SwapFree'] / mapping['SwapTotal'] * 100).toFixed()
+    swap_used_per = 100 - swap_free_per
+
+    callback null,
+      used: used
+      cached: mapping['Cached']
+      buffers: mapping['Buffers']
+      free: mapping['MemFree']
+      total: mapping['MemTotal']
+      swap_used: mapping['SwapTotal'] - mapping['SwapFree']
+      swap_free: mapping['SwapFree']
+      swap_total: mapping['SwapTotal']
+
+      used_per: used_per
+      cached_per: cached_per
+      buffers_per: buffers_per
+      free_per: free_per
+
+      swap_used_per: swap_used_per
+      swap_free_per: swap_free_per
 
 exports.loadPasswd = (callback) ->
   app.redis.get 'rp:passwd_cache', (err, result) ->
@@ -121,11 +158,14 @@ exports.monitoring = ->
                 unless account
                   return callback()
 
-                if account_usage[account_name].cpu > account.attribute.resources_limit.cpu
-                  child_process.exec "sudo pkill -SIGKILL -u #{account_name}", ->
+                if os.loadavg()[0] > 1
+                  if account_usage[account_name].cpu > account.attribute.resources_limit.cpu
+                    child_process.exec "sudo pkill -SIGKILL -u #{account_name}", ->
 
-                if account_usage[account_name].memory > account.attribute.resources_limit.memory
-                  child_process.exec "sudo pkill -SIGKILL -u #{account_name}", ->
+                exports.loadMemoryInfo (err, memory_info) ->
+                  if account_usage[account_name].memory > account.attribute.resources_limit.memory
+                    if memory_info.used_per > 70
+                      child_process.exec "sudo pkill -SIGKILL -u #{account_name}", ->
 
                 callback()
             , ->
