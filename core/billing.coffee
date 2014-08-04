@@ -4,6 +4,17 @@ plan = require './plan'
 mAccount = require './model/account'
 mBalance = require './model/balance'
 
+exports.dailyBilling = ->
+  mAccount.find
+    'attribute.plans.0':
+      $exists: true
+  .toArray (err, accounts) ->
+    for account in accounts
+      exports.calcBilling account, false, ->
+
+exports.dailyBilling()
+setInterval exports.dailyBilling, 3600 * 1000
+
 exports.checkBilling = (account, callback) ->
   if (Date.now() - account.attribute.last_billing_at.getTime()) > 24 * 3600 * 1000
     exports.calcBilling account, false, callback
