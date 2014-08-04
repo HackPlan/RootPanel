@@ -32,10 +32,15 @@
     rm /etc/nginx/sites-enabled/default
     
     cat > /etc/nginx/sites-available/rpadmin
-
+    
     server {
         listen 80 default_server;
         listen [::]:80 default_server ipv6only=on;
+        rewrite ^/(.*)$ http://DOMAIN/#redirect permanent;
+    }
+
+    server {
+        listen 80;
 
         server_name DOMAIN;
 

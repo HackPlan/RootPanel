@@ -6,6 +6,9 @@ $ ->
     if $(@).attr('href') == location.pathname
       $(@).parent().addClass('active')
 
+  if window.location.hash == '#redirect'
+    $('#site-not-exist').modal 'show'
+
   $('#logout').click (e) ->
     e.preventDefault()
     $.post '/account/logout/', {}

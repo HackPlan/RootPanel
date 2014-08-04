@@ -66,3 +66,15 @@ block content
         | by &nbsp;
         a(href= 'http://jysperm.me') jysperm
         | , yudong
+
+  #site-not-exist.modal
+    .modal-dialog
+      .modal-content
+        .modal-header
+          button.close(type='button', data-dismiss='modal', aria-hidden='true') &times;
+          h4.modal-title 您访问的站点不存在
+        .modal-body
+          p 因为您要访问的站点不存在，所以我们将页面重定向到了 RP 主机首页。
+          p 很可能是由于这个站点的所有者删除或修改了这个站点。
+        .modal-footer
+          button.btn.btn-danger(type='button', data-dismiss='modal') 关闭
