@@ -112,4 +112,4 @@
     apt-get install python python3 python-pip python3-pip python-dev python3-dev
     pip install django tornado markdown python-memcached web.py mongo uwsgi virtualenv virtualenvwrapper flask gevent jinja2 requests
 
-    npm install forever -g
+    npm install forever coffee-script gulp mocha -g
