@@ -1,3 +1,11 @@
+## v0.5.0(2014.8.7)
+用于 2014.8.7, 新版 us1.rpvhost.net 上线。
+
+* (改进) 在面板磁盘占用中记入数据库体积
+* (改进) 细化结算机制
+
+11 commits, 13 changed files with 202 additions and 114 deletions, by 1 contributors: jysperm.
+
 ## v0.4.0 (2014.7.31)
 用于 2014.7.31 的第四次测试，不提供从 v0.3.0 的迁移脚本。
 
