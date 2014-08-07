@@ -89,7 +89,7 @@ exports.register = (username, email, password, callback) ->
         balance: 0
         last_billing_at: new Date()
         arrears_at: null
-        resources_limit: []
+        resources_limit: {}
 
         plugin: {}
       tokens: []
