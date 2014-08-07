@@ -66,7 +66,7 @@ exports.randomSalt = ->
   return exports.sha256 crypto.randomBytes 256
 
 exports.hashPassword = (password, password_salt) ->
-  return exports.sha256(exports.sha256(password) + password_salt)
+  return exports.sha256(password_salt + exports.sha256(password))
 
 exports.register = (username, email, password, callback) ->
   password_salt = exports.randomSalt()
