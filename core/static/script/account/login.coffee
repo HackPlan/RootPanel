@@ -10,3 +10,7 @@ $ ->
         alert jqXHR.statusText
     .success ->
       location.href = '/panel/'
+
+  $('#password').keypress (e) ->
+    if e.keyCode == 13
+      $('.action-login').click()
