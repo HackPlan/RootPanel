@@ -141,8 +141,6 @@ exports.authenticate = (token, callback) ->
   exports.findAndModify 'tokens.token': token, {},
     $set:
       'tokens.$.updated_at': new Date()
-  ,
-    new: true
   , callback
 
 exports.byUsernameOrEmailOrId = (username, callback) ->

@@ -3,6 +3,7 @@ utils = require './utils'
 {renderAccount, errorHandling, requireAuthenticate} = require './middleware'
 
 mAccount = require '../model/account'
+mSecurityLog = require '../model/security_log'
 
 module.exports = exports = express.Router()
 
@@ -56,7 +57,10 @@ exports.post '/login', errorHandling, (req, res) ->
     unless mAccount.matchPassword account, req.body.password
       return res.error 'wrong_password'
 
-    mAccount.createToken account, {}, (err, token) ->
+    mAccount.createToken account,
+      ip: req.headers['x-real-ip']
+      ua: req.headers['user-agent']
+    , (err, token) ->
       res.cookie 'token', token,
         expires: new Date(Date.now() + config.account.cookie_time)
 
@@ -77,4 +81,10 @@ exports.post '/update_password', requireAuthenticate, (req, res) ->
     return res.error 'invalid_password'
 
   mAccount.updatePassword req.account, req.body.password, ->
-    res.json {}
+    token = _.first _.where req.account.tokens,
+      token: req.token
+
+    mSecurityLog.create req.account, 'update_password',
+      token: _.omit(token, 'updated_at')
+    , ->
+      res.json {}
