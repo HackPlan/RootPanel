@@ -50,7 +50,6 @@ sample =
 
   tokens: [
     token: 'b535a6cec7b73a60c53673f434686e04972ccafddb2a5477f066f30eded55a9b'
-    available: true
     created_at: Date()
     updated_at: Date()
     attribute:
@@ -122,7 +121,6 @@ exports.createToken = (account, attribute, callback) ->
       $push:
         tokens:
           token: token
-          available: true
           created_at: new Date()
           updated_at: new Date()
           attribute: attribute
@@ -140,8 +138,11 @@ exports.authenticate = (token, callback) ->
   unless token
     return callback true, null
 
-  exports.findOne
-    'tokens.token': token
+  exports.findAndModify 'tokens.token': token, {},
+    $set:
+      'tokens.$.updated_at': new Date()
+  ,
+    new: true
   , callback
 
 exports.byUsernameOrEmailOrId = (username, callback) ->

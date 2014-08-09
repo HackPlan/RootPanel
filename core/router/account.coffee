@@ -38,7 +38,10 @@ exports.post '/signup', errorHandling, (req, res) ->
           return res.error 'email_exist'
 
         mAccount.register req.body.username, req.body.email, req.body.password, (err, account) ->
-          mAccount.createToken account, {}, (err, token)->
+          mAccount.createToken account,
+            ip: req.headers['x-real-ip']
+            ua: req.headers['user-agent']
+          , (err, token)->
             res.cookie 'token', token,
               expires: new Date(Date.now() + config.account.cookie_time)
 
