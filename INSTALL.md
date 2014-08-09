@@ -23,6 +23,7 @@
     vi /etc/mongodb.conf
 
         auth = true
+        noprealloc = true
         smallfiles = true
         
     vi /etc/redis/redis.conf
@@ -103,7 +104,6 @@
     vi /etc/nginx/fastcgi_params
         
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-
 
 ### Runtime
 

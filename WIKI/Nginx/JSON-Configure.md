@@ -132,7 +132,7 @@
     * 字符串，可选指令
     * 值为一个 Home 下的 Unix Socket 或一个 URL
     
-* location - proxy_set_header
+* location - `proxy_set_header`
 
     * 在转发至 http 服务器时设置 HTTP 头
     * 对象，可选指令
