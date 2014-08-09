@@ -140,3 +140,13 @@ exports.all '/coupon_info', requireAuthenticate, (req, res) ->
     res.json
       message: mCouponCode.codeMessage coupon_code
 
+exports.post '/use_coupon', requireAuthenticate, (req, res) ->
+  mCouponCode.getCode req.body.code, (coupon_code) ->
+    unless !coupon_code.expired or Date.now() < coupon_code.expired.getTime()
+      return res.error 'code_expired'
+
+    unless coupon_code.available_times > 0
+      return res.error 'code_not_available'
+
+    mCouponCode.applyCode req.account, coupon_code, ->
+      res.json {}
