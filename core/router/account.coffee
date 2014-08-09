@@ -48,10 +48,10 @@ exports.post '/signup', errorHandling, (req, res) ->
 exports.post '/login', errorHandling, (req, res) ->
   mAccount.byUsernameOrEmailOrId req.body.username, (err, account) ->
     unless account
-      return res.error 'auth_failed'
+      return res.error 'wrong_password'
 
     unless mAccount.matchPassword account, req.body.password
-      return res.error 'auth_failed'
+      return res.error 'wrong_password'
 
     mAccount.createToken account, {}, (err, token) ->
       res.cookie 'token', token,
@@ -67,11 +67,11 @@ exports.post '/logout', requireAuthenticate, (req, res) ->
     res.json {}
 
 exports.post '/update_password', requireAuthenticate, (req, res) ->
-  unless mAccount.matchPassword account, req.body.old_password
-    return res.error 'auth_failed'
+  unless mAccount.matchPassword req.account, req.body.old_password
+    return res.error 'wrong_password'
 
   unless utils.rx.password.test req.body.password
     return res.error 'invalid_password'
 
-  mAccount.updatePassword account, req.body.new_password, ->
+  mAccount.updatePassword req.account, req.body.password, ->
     res.json {}
