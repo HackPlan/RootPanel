@@ -10,3 +10,12 @@ $ ->
       alert jqXHR.responseJSON?.error ? jqXHR.statusText
     .success ->
       alert 'Success!'
+
+  $('.action-save').click ->
+    $.post '/account/update_setting/', JSON.stringify
+      name: 'qq'
+      value : $(':input[name=qq]').val()
+    .fail (jqXHR) ->
+      alert jqXHR.responseJSON?.error ? jqXHR.statusText
+    .success ->
+      alert 'Success!'

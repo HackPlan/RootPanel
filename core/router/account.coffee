@@ -88,3 +88,15 @@ exports.post '/update_password', requireAuthenticate, (req, res) ->
       token: _.omit(token, 'updated_at')
     , ->
       res.json {}
+
+exports.post '/update_setting', requireAuthenticate, (req, res) ->
+  unless req.body.name in ['qq']
+    return res.error 'invalid_name'
+
+  modifiers =
+    $set: {}
+
+  modifiers.$set["setting.#{req.body.name}"] = req.body.value
+
+  mAccount.update _id: req.account._id, modifiers, ->
+    res.json {}
