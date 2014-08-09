@@ -89,6 +89,27 @@ exports.post '/update_password', requireAuthenticate, (req, res) ->
     , ->
       res.json {}
 
+exports.post '/update_email', requireAuthenticate, (req, res) ->
+  unless mAccount.matchPassword req.account, req.body.password
+    return res.error 'wrong_password'
+
+  unless utils.rx.email.test req.body.email
+    return res.error 'invalid_email'
+
+  mAccount.update _id: req.account._id,
+    $set:
+      email: req.body.email
+  , ->
+    token = _.first _.where req.account.tokens,
+      token: req.token
+
+    mSecurityLog.create req.account, 'update_email',
+      old_email: req.account.email
+      email: req.body.email
+      token: _.omit(token, 'updated_at')
+    , ->
+      res.json {}
+
 exports.post '/update_setting', requireAuthenticate, (req, res) ->
   unless req.body.name in ['qq']
     return res.error 'invalid_name'
@@ -99,4 +120,13 @@ exports.post '/update_setting', requireAuthenticate, (req, res) ->
   modifiers.$set["setting.#{req.body.name}"] = req.body.value
 
   mAccount.update _id: req.account._id, modifiers, ->
-    res.json {}
+    token = _.first _.where req.account.tokens,
+      token: req.token
+
+    mSecurityLog.create req.account, 'update_setting',
+      name: req.body.name
+      old_value: req.account.setting[req.body.name]
+      value: req.body.value
+      token: _.omit(token, 'updated_at')
+    , ->
+      res.json {}

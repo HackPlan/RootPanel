@@ -2,7 +2,7 @@ module.exports = exports = app.db.buildModel 'security_log'
 
 sample =
   account_id: new ObjectID()
-  type: 'update_password'
+  type: 'update_password/update_setting/update_email'
   created_at: new Date()
   attribute:
     token:

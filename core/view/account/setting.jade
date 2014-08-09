@@ -49,6 +49,10 @@ block main
     header 修改邮箱
     form.form-email.form-horizontal
       .form-group
+        label.col-sm-2.col-md-offset-1.control-label 当前邮箱
+        .col-sm-5
+          input.form-control(value=account.email, disabled)
+      .form-group
         label.col-sm-2.col-md-offset-1.control-label 密码
         .col-sm-5
           input.form-control(type='password', name='password')
