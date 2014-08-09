@@ -4,6 +4,7 @@ utils = require './utils'
 
 mAccount = require '../model/account'
 mSecurityLog = require '../model/security_log'
+mCouponCode = require '../model/coupon_code'
 
 module.exports = exports = express.Router()
 
@@ -130,3 +131,12 @@ exports.post '/update_setting', requireAuthenticate, (req, res) ->
       token: _.omit(token, 'updated_at')
     , ->
       res.json {}
+
+exports.all '/coupon_info', requireAuthenticate, (req, res) ->
+  mCouponCode.getCode req.body.code, (coupon_code) ->
+    unless coupon_code
+      return res.error 'code_not_exist'
+
+    res.json
+      message: mCouponCode.codeMessage coupon_code
+

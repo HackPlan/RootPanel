@@ -28,3 +28,17 @@ $ ->
       alert jqXHR.responseJSON?.error ? jqXHR.statusText
     .success ->
       alert 'Success!'
+
+  $('.action-use').click ->
+    $.post '/account/coupon_info/', JSON.stringify
+      code: $(':input[name=coupon_code]').val()
+    .fail (jqXHR) ->
+      alert jqXHR.responseJSON?.error ? jqXHR.statusText
+    .success (data) ->
+      if window.confirm data.message
+        $.post '/account/use_coupon/', JSON.stringify
+          code: $(':input[name=coupon_code]').val()
+        .fail (jqXHR) ->
+          alert jqXHR.responseJSON?.error ? jqXHR.statusText
+        .success ->
+          alert 'Success!'
