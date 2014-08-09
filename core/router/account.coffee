@@ -12,6 +12,9 @@ exports.get '/signup', renderAccount, (req, res) ->
 exports.get '/login', renderAccount, (req, res) ->
   res.render 'account/login'
 
+exports.get '/setting', requireAuthenticate, renderAccount, (req, res) ->
+  res.render 'account/setting'
+
 exports.post '/signup', errorHandling, (req, res) ->
   unless utils.rx.username.test req.body.username
     return res.error 'invalid_username'

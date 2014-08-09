@@ -29,7 +29,7 @@ html
             ul.nav.navbar-nav.navbar-right
               if account
                 li
-                  a= account.username
+                  a(href='/account/setting/')= account.username
                 li
                   a(href='/panel/')= t('panel.')
                 if mAccount.inGroup(account, 'root')

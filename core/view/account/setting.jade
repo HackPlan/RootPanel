@@ -1,0 +1,65 @@
+extends ../layout
+
+prepend head
+  title 个人信息 | #{t('app.name')}
+
+block main
+  .row
+    header 信息设置
+    form.form-setting.form-horizontal
+      .form-group
+        label.col-sm-2.col-md-offset-1.control-label QQ
+        .col-sm-5
+          input.form-control(type='text', name='qq')
+      .form-group
+        .col-sm-offset-3
+          button.action-save.btn.btn-lg.btn-success(type='button') 保存
+
+  .row
+    header 兑换代码
+    form.form-promo.form-horizontal
+      .form-group
+        label.col-sm-2.col-md-offset-1.control-label 代码
+        .col-sm-5
+          input.form-control(type='text', name='promo_code', required)
+      .form-group
+        .col-sm-offset-3
+          button.action-use.btn.btn-lg.btn-success(type='button') 使用
+
+  .row
+    header 修改密码
+    form.form-password.form-horizontal(method='post', role='form')
+      .form-group
+        label.col-sm-2.col-md-offset-1.control-label 原密码
+        .col-sm-5
+          input.form-control(type='password', name='old_password')
+      .form-group
+        label.col-sm-2.col-md-offset-1.control-label 新密码
+        .col-sm-5
+          input.form-control(type='password', name='password')
+      .form-group
+        label.col-sm-2.col-md-offset-1.control-label 重复密码
+        .col-sm-5
+          input.form-control(type='password', name='password2')
+      .form-group
+        .col-sm-offset-3
+          button.action-update-password.btn.btn-lg.btn-info(type='button') 修改
+
+  .row
+    header 修改邮箱
+    form.form-email.form-horizontal
+      .form-group
+        label.col-sm-2.col-md-offset-1.control-label 密码
+        .col-sm-5
+          input.form-control(type='password', name='password')
+      .form-group
+        label.col-sm-2.col-md-offset-1.control-label 新邮箱
+        .col-sm-5
+          input.form-control(type='text', name='email', required)
+      .form-group
+        .col-sm-offset-3
+          button.action-update-email.btn.btn-lg.btn-info(type='button') 修改
+
+
+append footer
+  script(src='/script/account/setting.js')
