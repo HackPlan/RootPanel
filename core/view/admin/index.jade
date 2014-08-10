@@ -29,6 +29,9 @@ block main
                 ul.dropdown-menu
                   li
                     a.action-create-payment(href='#') 创建充值记录
+                  if account.attribute.balance <= 0 && account.attribute.plans.length == 0
+                    li
+                      a.action-delete-account(href='#') 删除账户
 
   .row
     header 网站列表

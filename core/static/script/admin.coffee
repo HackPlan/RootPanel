@@ -3,6 +3,13 @@ $ ->
     $('#account_id').html $(@).parents('tr').data 'id'
     $('#create-payment-modal').modal 'show'
 
+  $('.action-delete-account').click (e) ->
+    e.preventDefault()
+    $.post '/admin/delete_account/', JSON.stringify
+      account_id: $(@).parents('tr').data 'id'
+    .success ->
+      location.reload()
+
   $('.action-disable-site').click (e) ->
     e.preventDefault()
     $.post '/admin/update_site/', JSON.stringify

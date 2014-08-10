@@ -82,6 +82,20 @@ exports.post '/create_payment', requireAdminAuthenticate, (req, res) ->
     , ->
       res.json {}
 
+exports.post '/delete_account', requireAdminAuthenticate, (req, res) ->
+  mAccount.findId req.body.account_id, (err, account) ->
+    unless account
+      return res.error 'account_not_exist'
+
+    unless _.isEmpty account.attribute.plans
+      return res.error 'aleady_in_plan'
+
+    unless account.attribute.balance <= 0
+      return res.error 'balance_not_empty'
+
+    mAccount.remove _id: account._id, ->
+      res.json {}
+
 exports.post '/update_site', requireAdminAuthenticate, (req, res) ->
   mAccount.findOne
     'attribute.plugin.nginx.sites._id': new ObjectID req.body.site_id
