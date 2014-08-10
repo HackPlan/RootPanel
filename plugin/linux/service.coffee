@@ -34,8 +34,8 @@ module.exports =
             }
 
           storage_usage: do ->
-            usage = monitor.storage_usage[account.username]
-            usage.size_used = parseInt(usage.size_used) + plugin_storage.mysql * 1000 + plugin_storage.mongodb * 1000
+            usage = monitor.storage_usage[account.username] ? {}
+            usage.size_used = parseInt(usage?.size_used ? 0) + plugin_storage.mysql * 1000 + plugin_storage.mongodb * 1000
             now_per = (usage.size_used / 1000 / account.attribute.resources_limit.storage * 100).toFixed()
             return {
               now_per: now_per
