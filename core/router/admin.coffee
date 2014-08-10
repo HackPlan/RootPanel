@@ -43,7 +43,7 @@ exports.get '/ticket', requireAdminAuthenticate, renderAccount, (req, res) ->
 
     finish: (callback) ->
       mTicket.find
-        status: 'open'
+        status: 'finish'
       ,
         sort:
           updated_at: -1
