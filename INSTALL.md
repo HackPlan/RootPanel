@@ -11,6 +11,7 @@
 
     apt-get install nodejs git mongodb nginx postfix redis-server
     apt-get install python g++ make screen git wget zip unzip iftop unrar-free axel vim emacs subversion subversion-tools curl tmux mercurial htop
+    apt-get install libcurl4-openssl-dev
     apt-get install ntp quota quotatool
 
     mongo
