@@ -10,7 +10,7 @@
     vi /etc/hosts
 
     apt-get install nodejs git mongodb nginx postfix redis-server
-    apt-get install python g++ make screen git wget zip unzip iftop unrar-free axel vim emacs subversion subversion-tools curl tmux mercurial htop
+    apt-get install python g++ make screen git wget zip unzip iftop unrar-free axel vim emacs subversion subversion-tools curl tmux mercurial htop iptraf nethogs
     apt-get install libcurl4-openssl-dev
     apt-get install ntp quota quotatool
 
@@ -114,4 +114,4 @@
     apt-get install python python3 python-pip python3-pip python-dev python3-dev
     pip install django tornado markdown python-memcached web.py mongo uwsgi virtualenv virtualenvwrapper flask gevent jinja2 requests
 
-    npm install forever coffee-script gulp mocha -g
+    npm install forever coffee-script gulp mocha harp bower -g
