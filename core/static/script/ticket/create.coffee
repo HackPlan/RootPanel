@@ -3,7 +3,7 @@ $ ->
     $.post '/ticket/create/', JSON.stringify
       type: $('#type').val()
       title: $('#title').val()
-      content: $('#content').val()
+      content: $(':input[name=content]').val()
     .fail (jqXHR) ->
       if jqXHR.responseJSON?.error
         alert jqXHR.responseJSON.error

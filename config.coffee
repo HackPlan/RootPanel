@@ -47,6 +47,15 @@ module.exports =
 
   redis_password: 'password'
 
+  email:
+    send_from: 'robot@rpvhost.net'
+
+    account:
+      service: 'Postmark'
+      auth:
+        user: 'postmark-api-token'
+        pass: 'postmark-api-token'
+
   bitcoin:
     coinbase_api_key: null
 

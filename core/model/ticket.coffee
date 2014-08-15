@@ -1,5 +1,7 @@
 markdown = require('markdown').markdown
 
+mAccount = require './account'
+
 module.exports = exports = app.db.buildModel 'tickets'
 
 sample =
@@ -73,8 +75,18 @@ exports.addMember = (ticket, account, callback) ->
   exports.update _id: ticket._id,
     $push:
       members: account._id
-    updated_at: new Date()
-  , callback
+    $set:
+      updated_at: new Date()
+  , (err) ->
+    throw err if err
+    callback()
 
 exports.getMember = (ticket, account) ->
   return _.find(ticket.members, (member) -> member.equals(account._id))
+
+exports.sendMailToAdmins = (title, content) ->
+  mAccount.find
+    group: 'root'
+  .toArray (err, accounts) ->
+    for account in accounts
+      mAccount.sendEmail account, title, content

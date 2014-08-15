@@ -55,10 +55,11 @@ exports.post '/create', requireAuthenticate, (req, res) ->
   unless /^.+$/.test req.body.title
     return res.error 'invalid_title'
 
-  createTicket = (members, status) ->
+  createTicket = (members, status, callback) ->
     mTicket.createTicket req.account, req.body.title, req.body.content, members, status, {}, (err, ticket) ->
-      return res.json
+      res.json
         id: ticket._id
+      callback ticket
 
   if mAccount.inGroup req.account, 'root'
     tasks = []
@@ -81,10 +82,11 @@ exports.post '/create', requireAuthenticate, (req, res) ->
       unless _.find(result, (item) -> item._id == req.account._id)
         result.push req.account
 
-      createTicket result, 'open'
+      createTicket result, 'open', ->
 
   else
-    createTicket [req.account], 'pending'
+    createTicket [req.account], 'pending', (ticket) ->
+      mTicket.sendMailToAdmins "TK Create | #{req.account.username} | #{req.body.title}", "#{req.body.content}\n<br /><br />\n<a href='#{config.web.url}/ticket/view/?id=#{ticket._id}'>#{ticket._id}</a>"
 
 exports.post '/reply', requireAuthenticate, (req, res) ->
   mTicket.findId req.body.id, (errr, ticket) ->
@@ -96,9 +98,21 @@ exports.post '/reply', requireAuthenticate, (req, res) ->
         return res.error 'forbidden'
 
     status = if mAccount.inGroup(req.account, 'root') then 'open' else 'pending'
-    mTicket.createReply ticket, req.account, req.body.content, status, (err, reply) ->
-      return res.json
-        id: reply._id
+
+    async.each ticket.members, (member_id, callback) ->
+      if member_id.toString() == req.account._id.toString()
+        return callback()
+
+      mAccount.findOne
+        _id: member_id
+      , (err, account) ->
+          mAccount.sendEmail account, "TK Reply | #{req.account.username} | #{ticket.title}", "#{req.body.content}\n<br /><br />\n<a href='#{config.web.url}/ticket/view/?id=#{ticket._id}'>#{ticket._id}</a>"
+          callback()
+
+    , ->
+      mTicket.createReply ticket, req.account, req.body.content, status, (err, reply) ->
+        return res.json
+          id: reply._id
 
 exports.post '/list', requireAuthenticate, (req, res) ->
   mTicket.find do ->

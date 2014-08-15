@@ -1,4 +1,5 @@
 crypto = require 'crypto'
+nodemailer = require 'nodemailer'
 
 config = require '../../config'
 bitcoin = require '../bitcoin'
@@ -196,3 +197,15 @@ exports.calcResourcesLimit = (plans) ->
       limit[k] += v
 
   return limit
+
+exports.sendEmail = (account, title, content) ->
+  mailer = nodemailer.createTransport 'SMTP', config.email.account
+
+  mail =
+    from: config.email.send_from
+    to: account.email
+    subject: title
+    html: content
+
+  mailer.sendMail mail, (err) ->
+    throw err if err

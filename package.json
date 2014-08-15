@@ -47,6 +47,7 @@
     "moment": "*",
     "request": "*",
     "mongo-min": "*",
-    "redis": "*"
+    "redis": "*",
+    "nodemailer": "~0.7.0"
   }
 }
