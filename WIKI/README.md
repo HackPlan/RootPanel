@@ -6,10 +6,7 @@
 
 * [财务问题](FAQ/Billing.md)
 * [域名问题](FAQ/Domain.md)
-
-### Support
-
-* [QQ 群](Support/Qun.md)
+* [用户支持](FAQ/Support.md)
 
 ### Linux
 
@@ -22,7 +19,7 @@
 
 ### Runtime
 
-* PHP
+* [PHP](Runtime/PHP.md)
 * Python
 * Node.js
 * Golang
