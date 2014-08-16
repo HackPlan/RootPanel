@@ -30,7 +30,7 @@ block main
             p!= reply.content_html
             p
               span.label.label-info= reply.account.username
-              span.label.label-default= reply.created_at
+              span.label.label-default(title= reply.created_at)= moment(reply.created_at).fromNow()
 
   .row
     if ticket.status != 'closed'
@@ -62,7 +62,7 @@ prepend sidebar
       p
         span.label.label-info= ticket.account.username
         br
-        span.label.label-default= ticket.created_at.toJSON()
+        span.label.label-default(title= ticket.created_at)= moment(ticket.created_at).fromNow()
 
   .row
     header= t('ticket.members')

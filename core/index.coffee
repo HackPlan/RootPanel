@@ -2,6 +2,7 @@ connect = require 'connect'
 path = require 'path'
 harp = require 'harp'
 fs = require 'fs'
+moment = require 'moment'
 mongomin = require 'mongo-min'
 redis = require 'redis'
 
@@ -64,9 +65,11 @@ exports.runWebServer = ->
     app.use connect.cookieParser()
     app.use connect.logger('dev')
 
+    moment.locale 'zh_CN'
+
     app.use (req, res, next) ->
       res.locals.app = app
-      res.locals.moment = require 'moment'
+      res.locals.moment = moment
       res.locals.t = i18n.getTranslator 'zh_CN'
       res.locals.mAccount = require './model/account'
 
