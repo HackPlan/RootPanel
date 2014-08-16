@@ -86,7 +86,7 @@ exports.post '/create', requireAuthenticate, (req, res) ->
 
   else
     createTicket [req.account], 'pending', (ticket) ->
-      mTicket.sendMailToAdmins "TK Create | #{req.account.username} | #{req.body.title}", "#{req.body.content}\n<br /><br />\n<a href='#{config.web.url}/ticket/view/?id=#{ticket._id}'>#{ticket._id}</a>"
+      mTicket.sendMailToAdmins "Ticket | #{req.body.title}", "#{req.body.content_html}\n<br /><br />\n#{req.account.username} <a href='#{config.web.url}/ticket/view/?id=#{ticket._id}'>#{ticket._id}</a>"
 
 exports.post '/reply', requireAuthenticate, (req, res) ->
   mTicket.findId req.body.id, (errr, ticket) ->
@@ -106,7 +106,7 @@ exports.post '/reply', requireAuthenticate, (req, res) ->
       mAccount.findOne
         _id: member_id
       , (err, account) ->
-          mAccount.sendEmail account, "TK Reply | #{req.account.username} | #{ticket.title}", "#{req.body.content}\n<br /><br />\n<a href='#{config.web.url}/ticket/view/?id=#{ticket._id}'>#{ticket._id}</a>"
+          mAccount.sendEmail account, "Ticket | #{ticket.title}", "#{req.body.content_html}\n<br /><br />\n#{req.account.username} <a href='#{config.web.url}/ticket/view/?id=#{ticket._id}'>#{ticket._id}</a>"
           callback()
 
     , ->
