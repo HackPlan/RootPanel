@@ -35,6 +35,9 @@ exports.assert = (account, config, site_id, callback) ->
     if config.auto_index
       config.auto_index = if config.auto_index then true else false
 
+    unless _.isArray config.index
+      return callback 'invalid_index'
+
     for file in config.index
       unless utils.rx.filename.test file
         return callback 'invalid_index'

@@ -37,7 +37,7 @@ $ ->
           include: 'uwsgi_params'
 
       when 'static'
-        config['index'] ?= 'index.html'
+        config['index'] ?= ['index.html']
         config['root'] = $('.option-root input').val() or $('.option-root input').prop('placeholder')
 
     $('#nginx-type-json textarea').val JSON.stringify(config, null, '    ')
@@ -144,7 +144,7 @@ $ ->
     .done ->
       location.reload()
 
-  $('#widget-nginx .btn-danger').click ->
+  $('#widget-nginx table .btn-danger').click ->
     if window.confirm 'Are you sure?'
       $.post '/plugin/nginx/update_site', JSON.stringify
         action: 'delete'
@@ -157,10 +157,10 @@ $ ->
       .success ->
         location.reload()
 
-  $('#widget-nginx th .btn-success').click ->
+  $('#widget-nginx table .btn-success').click ->
     $('#nginx-modal .site-id').text ''
 
-  $('#widget-nginx button.btn-info').click ->
+  $('#widget-nginx table button.btn-info').click ->
     $.post '/plugin/nginx/site_config', JSON.stringify
       id: $(@).parents('tr').data 'id'
     .fail (jqXHR) ->
