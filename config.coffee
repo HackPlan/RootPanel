@@ -2,6 +2,7 @@ module.exports =
   web:
     url: 'http://rp3.rpvhost.net'
     listen: 3000
+    listen: '/home/rpadmin/rootpanel.sock'
 
   account:
     cookie_time: 30 * 24 * 3600 * 1000
@@ -30,14 +31,17 @@ module.exports =
     us1:
       domain: 'us1.rpvhost.net'
       location: 'Linode Fremont, CA, USA'
+      readme: ''
 
     jp1:
       domain: 'jp1.rpvhost.net'
       location: 'Linode Tokyo, JP'
+      readme: ''
 
-    rp3:
-      domain: 'rp3.rpvhost.net'
+    ss:
+      domain: 'ss.rpvhost.net'
       location: 'Linode Fremont, CA, USA'
+      readme: 'ShadowSocks Only'
 
   mongodb:
     user: 'rpadmin'

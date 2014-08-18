@@ -10,7 +10,8 @@
     vi /etc/hosts
 
     apt-get install nodejs git mongodb nginx postfix redis-server
-    apt-get install python g++ make screen git wget zip unzip iftop unrar-free axel vim emacs subversion subversion-tools curl tmux mercurial htop iptraf nethogs
+    apt-get install python g++ make screen git wget zip unzip iftop vim curl htop iptraf nethogs
+    apt-get intalll axel unrar-free emacs subversion subversion-tools tmux mercurial
     apt-get install libcurl4-openssl-dev
     apt-get install ntp quota quotatool
 
@@ -106,6 +107,11 @@
     vi /etc/nginx/fastcgi_params
         
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+
+    # ShadowSocks
+
+    add-apt-repository 'deb http://shadowsocks.org/debian wheezy main'
+    apt-get install shadowsocks
 
 ### Runtime
 

@@ -80,7 +80,3 @@ module.exports =
     , (err, html) ->
       throw err if err
       callback html
-
-  preview: (callback) ->
-    jade.renderFile path.join(__dirname, 'view/preview.jade'), {}, (err, html) ->
-      callback html

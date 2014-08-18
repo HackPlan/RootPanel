@@ -37,7 +37,3 @@ module.exports =
         return i.user == account.username and i.command.trim() == 'redis-server *:0'
 
       callback if process then true else false
-
-  preview: (callback) ->
-    jade.renderFile path.join(__dirname, 'view/preview.jade'), {}, (err, html) ->
-      callback html

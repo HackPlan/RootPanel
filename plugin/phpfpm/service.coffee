@@ -37,7 +37,3 @@ module.exports =
     else
       child_process.exec "sudo rm /etc/php5/fpm/pool.d/#{account.username}.conf", ->
         restartPhpfpm()
-
-  preview: (callback) ->
-    jade.renderFile path.join(__dirname, 'view/preview.jade'), {}, (err, html) ->
-      callback html

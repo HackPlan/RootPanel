@@ -39,7 +39,3 @@ module.exports =
         return i.user == account.username and i.command == "memcached #{MEMCACHED_FLAGS} -s /home/#{account.username}/memcached.sock"
 
       callback if process then true else false
-
-  preview: (callback) ->
-    jade.renderFile path.join(__dirname, 'view/preview.jade'), {}, (err, html) ->
-      callback html

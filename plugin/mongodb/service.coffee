@@ -59,7 +59,3 @@ module.exports =
       callback null, _.reduce dbs, (memo, db) ->
         return memo + db.sizeOnDisk / 1024 / 1024
       , 0
-
-  preview: (callback) ->
-    jade.renderFile path.join(__dirname, 'view/preview.jade'), {}, (err, html) ->
-      callback html
