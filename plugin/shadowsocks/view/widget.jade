@@ -6,10 +6,10 @@ header ShadowSocks
     .panel-body
       .input-group(style='margin-bottom: 20px;')
         span.input-group-addon 端口
-        input.form-control(type='text', value='14261', disabled)
+        input.form-control(type='text', value=account.attribute.plugin.shadowsocks.port, disabled)
       .input-group
         span.input-group-addon 密码
-        input.form-control(type='test', value='zppeLxbSfyNR2YwL', disabled)
+        input.form-control(type='text', value=account.attribute.plugin.shadowsocks.password, disabled)
         span.input-group-btn
           button.btn.btn-default(type='button') 重置
 

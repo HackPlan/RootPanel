@@ -110,14 +110,23 @@
 
     # ShadowSocks
 
-    add-apt-repository 'deb http://shadowsocks.org/debian wheezy main'
-    apt-get install shadowsocks
+    apt-get install python-pip python-m2crypto supervisor
+    pip install shadowsocks
+
+    vi /etc/default/supervisor
+
+        ulimit -n 51200
+
+    service supervisor restart
 
 ### Runtime
 
+    # Golang
     apt-get install golang golang-go.tools
 
+    # Python
     apt-get install python python3 python-pip python3-pip python-dev python3-dev
     pip install django tornado markdown python-memcached web.py mongo uwsgi virtualenv virtualenvwrapper flask gevent jinja2 requests
 
+    # Node.js
     npm install forever coffee-script gulp mocha harp bower -g
