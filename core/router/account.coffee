@@ -27,10 +27,7 @@ exports.post '/signup', errorHandling, (req, res) ->
   unless utils.rx.password.test req.body.password
     return res.error 'invalid_password'
 
-  require('../../plugin/linux/monitor').loadPasswd (passwd_cache) ->
-    if req.body.username in _.values(passwd_cache)
-      return res.error 'username_exist'
-
+  callback = ->
     mAccount.byUsername req.body.username, (err, account) ->
       if account
         return res.error 'username_exist'
@@ -49,6 +46,15 @@ exports.post '/signup', errorHandling, (req, res) ->
 
             res.json
               id: account._id
+
+  if 'linux' in config.plugin.availablePlugin
+    require('../../plugin/linux/monitor').loadPasswd (passwd_cache) ->
+      if req.body.username in _.values(passwd_cache)
+        return res.error 'username_exist'
+
+      callback()
+  else
+    callback()
 
 exports.post '/login', errorHandling, (req, res) ->
   mAccount.byUsernameOrEmailOrId req.body.username, (err, account) ->

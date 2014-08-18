@@ -2,14 +2,12 @@ child_process = require 'child_process'
 os = require 'os'
 fs = require 'fs'
 
-plugin = require '../plugin'
+monitor = require './monitor'
 {renderAccount, requireAuthenticate} = require './middleware'
-
-monitor = require '../../plugin/linux/monitor'
 
 module.exports = exports = express.Router()
 
-exports.get '/monitor', renderAccount, requireAuthenticate, (req, res) ->
+app.get '/public/monitor', renderAccount, requireAuthenticate, (req, res) ->
   async.parallel
     resources_usage: (callback) ->
       monitor.monitoringStorage ->
@@ -74,6 +72,8 @@ exports.get '/monitor', renderAccount, requireAuthenticate, (req, res) ->
     memory: monitor.loadMemoryInfo
 
   , (err, result) ->
-    res.render 'public/monitor', _.extend result,
+    jade.renderFile path.join(__dirname, 'view/monitor.jade'), _.extend result,
       last_plist: monitor.last_plist
       _: _
+    , (err, html) ->
+      res.send html

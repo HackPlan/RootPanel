@@ -1,4 +1,6 @@
 child_process = require 'child_process'
+path = require 'path'
+jade = require 'jade'
 
 plugin = require '../../core/plugin'
 
@@ -16,15 +18,15 @@ generatePort = (callback) ->
       callback port
 
 module.exports =
-  enable: (account, callback) =>
+  enable: (account, callback) ->
     generatePort (port) ->
       mAccount.update _id: account._id,
         $set:
           'attribute.plugin.shadowsocks':
             port: port
             password: mAccount.randomSalt()
-      , =>
-        @restart account, ->
+      , ->
+        module.exports.restart account, ->
           callback()
 
   delete: (account, callback) ->
@@ -42,3 +44,10 @@ module.exports =
       # kill process
       child_process.exec "nohup ss-server -c /etc/shadowsocks/#{account.username}.conf &", ->
         callback()
+
+  widget: (account, callback) ->
+    jade.renderFile path.join(__dirname, 'view/widget.jade'),
+      account: account
+    , (err, html) ->
+      throw err if err
+      callback html
