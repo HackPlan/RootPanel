@@ -1,6 +1,10 @@
 service = require './service'
 monitor = require './monitor'
 
+app.view_hook.menu_bar.push
+  href: '/public/monitor/'
+  html: '服务器状态'
+
 module.exports =
   name: 'linux'
   type: 'service'

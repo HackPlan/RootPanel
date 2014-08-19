@@ -9,6 +9,9 @@ config = require './../config'
 
 app.plugins = {}
 
+app.view_hook =
+  menu_bar: []
+
 exports.get = (name) ->
   return require path.join(__dirname, "../plugin/#{name}")
 
