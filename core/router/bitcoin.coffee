@@ -11,6 +11,9 @@ exports.post '/coinbase_callback', (req, res) ->
     unless account
       return res.send 400, 'Invalid Address'
 
+    unless req.query.secret == account.attribute.bitcoin_secret
+      return res.send 400, 'Invalid Secret'
+
     bitcoin.getExchangeRate (rate) ->
       amount = req.body.amount / rate
 

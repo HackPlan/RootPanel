@@ -28,6 +28,7 @@ sample =
 
   attribute:
     bitcoin_deposit_address: '13v2BTCMZMHg5v87susgg86HFZqXERuwUd'
+    bitcoin_secret: '53673f434686b535a6cec7b73a60ce045477f066f30eded55a9b972ccafddb2a'
 
     services: ['shadowsocks']
     plans: ['all']
@@ -80,8 +81,9 @@ exports.hashPassword = (password, password_salt) ->
 
 exports.register = (username, email, password, callback) ->
   password_salt = exports.randomSalt()
+  bitcoin_secret = exports.randomSalt()
 
-  bitcoin.genAddress (address) ->
+  bitcoin.genAddress bitcoin_secret, (address) ->
     exports.insert
       _id: new ObjectID()
       username: username
@@ -94,6 +96,7 @@ exports.register = (username, email, password, callback) ->
         avatar_url: "//ruby-china.org/avatar/#{crypto.createHash('md5').update(email).digest('hex')}?s=58"
       attribute:
         bitcoin_deposit_address: address
+        bitcoin_secret: bitcoin_secret
         services: []
         plans: []
         balance: 0

@@ -2,13 +2,13 @@ request = require 'request'
 
 config = require './../config'
 
-exports.genAddress = (callback) ->
+exports.genAddress = (bitcoin_secret, callback) ->
   request 'https://coinbase.com/api/v1/account/generate_receive_address',
     method: 'POST'
     json:
       api_key: config.bitcoin.coinbase_api_key
       address:
-        callback_url: "#{config.web.url}/bitcoin/coinbase_callback"
+        callback_url: "#{config.web.url}/bitcoin/coinbase_callback?secret=#{bitcoin_secret}"
   , (err, res, body) ->
     callback body.address
 
