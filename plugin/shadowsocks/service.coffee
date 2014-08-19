@@ -49,7 +49,7 @@ queryIptablesInfo = (callback) ->
 module.exports =
   enable: (account, callback) ->
     generatePort (port) ->
-      password = mAccount.randomString 16
+      password = mAccount.randomString 10
 
       mAccount.update _id: account._id,
         $set:
