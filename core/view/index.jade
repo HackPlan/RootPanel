@@ -63,9 +63,9 @@ block content
         a(href= 'https://github.com/jysperm/RootPanel') RootPanel
         | &nbsp; v#{app.package.version}
       p
-        | by &nbsp;
-        a(href= 'http://jysperm.me') jysperm
-        | , yudong
+        for author in app.package.contributors
+          | by &nbsp;
+          a(href= author.url)= author.name
 
   #site-not-exist.modal
     .modal-dialog

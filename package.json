@@ -13,11 +13,6 @@
       "name": "jysperm",
       "email": "jysperm@gmail.com",
       "url": "http://jysperm.me"
-    },
-    {
-      "name": "yudong",
-      "email": "liyudonog1992@gmail.com",
-      "url": "http://feicunyue.com"
     }
   ],
   "scripts": {
@@ -31,23 +26,23 @@
     "rp-clean": "./bin/rp-clean.coffee"
   },
   "dependencies": {
-    "jade": "^1.3",
-    "express": "*",
-    "coffee-script": "*",
-    "mongodb": "*",
-    "underscore": "*",
-    "forever": "*",
-    "markdown": "*",
-    "async": "*",
-    "connect": "~2.17.1",
-    "harp": "*",
-    "middleware-injector": "*",
-    "tmp": "*",
-    "mysql": "*",
-    "moment": "*",
-    "request": "*",
-    "mongo-min": "*",
-    "redis": "*",
-    "nodemailer": "~0.7.0"
+    "jade": "~1.3",
+    "express": "~4.8.4",
+    "coffee-script": "~1.7.1",
+    "mongodb": "~1.4.8",
+    "underscore": "~1.6.0",
+    "forever": "~0.11.1",
+    "markdown": "~0.5.0",
+    "async": "~0.9.0",
+    "connect": "~2.17.3",
+    "harp": "~0.13.0",
+    "middleware-injector": "~0.1.1",
+    "tmp": "~0.0.24",
+    "mysql": "~2.4.2",
+    "moment": "~2.8.1",
+    "request": "~2.40.0",
+    "mongo-min": "~0.2.2",
+    "redis": "~0.12.1",
+    "nodemailer": "~0.7.1"
   }
 }
