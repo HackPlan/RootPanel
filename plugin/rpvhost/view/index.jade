@@ -1,10 +1,10 @@
-extends layout
+extends ../../../core/view/layout
 
 prepend head
   title RP 主机：Linux 虚拟主机 | #{t('app.name')}
 
 append head
-  link(rel='stylesheet', href='/style/index.css')
+  link(rel='stylesheet', href='/plugin/rpvhost/style/index.css')
 
 block content
   #page-title
@@ -60,12 +60,12 @@ block content
   #page-footer
     .container
       p
-        a(href= 'https://github.com/jysperm/RootPanel') RootPanel
+        a(href='https://github.com/jysperm/RootPanel') RootPanel
         | &nbsp; v#{app.package.version}
       p
         for author in app.package.contributors
           | by &nbsp;
-          a(href= author.url)= author.name
+          a(href=author.url)= author.name
 
   #site-not-exist.modal
     .modal-dialog

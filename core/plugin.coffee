@@ -15,17 +15,25 @@ app.view_hook =
 exports.get = (name) ->
   return require path.join(__dirname, "../plugin/#{name}")
 
-exports.loadPlugins = (app) ->
-  for name in config.plugin.availablePlugin
-    i18n.loadPlugin path.join(__dirname, "../plugin/#{name}/locale"), name
+exports.loadPlugin = (name) ->
+  plugin_path = path.join(__dirname, "../plugin/#{name}")
+  plugin = require plugin_path
 
-    plugin = exports.get name
+  if fs.existsSync path.join(plugin_path, 'locale')
+    i18n.loadPlugin path.join(plugin_path, 'locale'), name
 
-    if fs.existsSync path.join(path.join(__dirname, "../plugin/#{name}"), 'static')
-      app.use harp.mount('/plugin/' + name, path.join(path.join(__dirname, "../plugin/#{name}"), 'static'))
+  if fs.existsSync path.join(plugin_path, 'static')
+    app.use harp.mount('/plugin/' + name, path.join(plugin_path, 'static'))
 
-    if plugin.action
-      app.use ('/plugin/' + name), plugin.action
+  if plugin.action
+    app.use ('/plugin/' + name), plugin.action
+
+exports.loadPlugins = ->
+  for name in config.plugin.available_services
+    exports.loadPlugin name
+
+  for name in config.plugin.available_extensions
+    exports.loadPlugin name
 
 exports.writeConfig = (path, content, callback) ->
   tmp.file

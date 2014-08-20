@@ -3,6 +3,7 @@ module.exports =
     url: 'http://rp3.rpvhost.net'
     listen: 3000
     listen: '/home/rpadmin/rootpanel.sock'
+    google_analytics_id: 'UA-49193300-2'
 
   account:
     cookie_time: 30 * 24 * 3600 * 1000
@@ -12,20 +13,17 @@ module.exports =
     availableLanguage: ['zh_CN']
 
   plugin:
-    availablePlugin: ['linux', 'ssh', 'phpfpm', 'mysql', 'nginx', 'memcached', 'mongodb', 'redis']
+    available_extensions: ['rpvhost']
+    available_services: ['shadowsocks']
 
   plans:
     all:
-      price: 10
-      t_name: '所有服务(默认)'
-      t_service: '支持所有服务'
-      t_resources: '磁盘: 520MB, 内存: 27MB, 流量: 37GB'
-      services: ['linux', 'ssh', 'phpfpm', 'mysql', 'nginx', 'memcached', 'mongodb', 'redis']
-      resources:
-        cpu: 144
-        storage: 520
-        transfer: 39
-        memory: 27
+      price: 0
+      t_name: 'ShadowSocks 按量付费'
+      t_service: 'ShadowSocks'
+      t_resources: '0.6 CNY / G'
+      services: ['shadowsocks']
+      resources: {}
 
   nodes:
     us1:
@@ -64,6 +62,9 @@ module.exports =
     coinbase_api_key: null
 
   plugins:
+    rpvhost:
+      index_page: true
+
     linux:
       monitor_cycle: 30 * 1000
 

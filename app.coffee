@@ -10,25 +10,27 @@ global._ = require 'underscore'
 global.ObjectID = require('mongodb').ObjectID
 global.express = require 'express'
 global.async = require 'async'
+global.path = require 'path'
 
 global.app = express()
 global.config = require './config'
 global.i18n = require './core/i18n'
 global.utils = require './core/router/utils'
+global.plugin = require './core/plugin'
 
 if fs.existsSync(config.web.listen)
   fs.unlinkSync config.web.listen
 
-bindRouters = (app) ->
+bindRouters = ->
   app.use require 'middleware-injector'
-
-  app.use '/', require './core/router/index'
 
   for module_name in ['account', 'admin', 'panel', 'plan', 'ticket', 'wiki', 'bitcoin']
     app.use "/#{module_name}", require './core/router/' + module_name
 
-  plugin = require './core/plugin'
-  plugin.loadPlugins app
+  plugin.loadPlugins()
+
+  app.get '/', (req, res) ->
+    res.redirect '/panel/'
 
 exports.connectDatabase = (callback) ->
   {user, password, host, name} = config.mongodb
