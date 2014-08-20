@@ -47,7 +47,7 @@ exports.post '/signup', errorHandling, (req, res) ->
             res.json
               id: account._id
 
-  if 'linux' in config.plugin.availablePlugin
+  if 'linux' in config.plugin.available_services
     require('../../plugin/linux/monitor').loadPasswd (passwd_cache) ->
       if req.body.username in _.values(passwd_cache)
         return res.error 'username_exist'

@@ -81,12 +81,13 @@ module.exports =
     config_content = _.template (fs.readFileSync path.join(__dirname, 'template/config.conf')).toString(), account.attribute.plugin.shadowsocks
 
     plugin.writeConfig "/etc/shadowsocks/#{account.username}.json", config_content, ->
-      config_content = _.template (fs.readFileSync path.join(__dirname, 'template/supervisor.conf')).toString(),
-        account: account
+      child_process.exec "sudo chmod +r /etc/shadowsocks/#{account.username}.json", ->
+        config_content = _.template (fs.readFileSync path.join(__dirname, 'template/supervisor.conf')).toString(),
+          account: account
 
-      plugin.writeConfig "/etc/supervisor/conf.d/#{account.username}.conf", config_content, ->
-        child_process.exec 'sudo supervisorctl reload', ->
-          callback()
+        plugin.writeConfig "/etc/supervisor/conf.d/#{account.username}.conf", config_content, ->
+          child_process.exec 'sudo supervisorctl reload', ->
+            callback()
 
   widget: (account, callback) ->
     jade.renderFile path.join(__dirname, 'view/widget.jade'),

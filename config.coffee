@@ -17,8 +17,7 @@ module.exports =
     available_services: ['shadowsocks']
 
   plans:
-    all:
-      price: 0
+    shadowsocks:
       t_name: 'ShadowSocks 按量付费'
       t_service: 'ShadowSocks'
       t_resources: '0.6 CNY / G'

@@ -49,7 +49,7 @@ exports.calcBilling = (account, isForce, callback) ->
   exports.checkExpired account, ->
     amount = 0
 
-    for planName in account.attribute.plans
+    for planName in _.filter(account.attribute.plans, (i) -> config.plans[i].price)
       plan_info = config.plans[planName]
 
       price = plan_info.price / 30 / 24
@@ -96,7 +96,7 @@ exports.forceUnsubscribe = (account, callback) ->
 exports.calcRemainingTime = (account) ->
   price = 0
 
-  for planName in account.attribute.plans
+  for planName in _.filter(account.attribute.plans, (i) -> config.plans[i].price)
     plan_info = config.plans[planName]
 
     price += plan_info.price / 30 / 24
