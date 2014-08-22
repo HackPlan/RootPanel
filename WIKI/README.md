@@ -13,6 +13,10 @@
 * [文件系统](Linux/Filesystem.md)
 * [SSH](Linux/SSH.md)
 
+### Service
+
+* [ShadowSocks](Service/ShadowSocks.md)
+
 ### Nginx
 
 * [JSON 配置文件](Nginx/JSON-Configure.md)

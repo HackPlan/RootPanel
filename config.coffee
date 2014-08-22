@@ -62,7 +62,7 @@ module.exports =
 
   plugins:
     rpvhost:
-      index_page: true
+      index_page: false
 
     linux:
       monitor_cycle: 30 * 1000

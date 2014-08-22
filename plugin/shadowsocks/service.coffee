@@ -74,7 +74,7 @@ module.exports =
         rule_id = iptables_info[account.attribute.plugin.shadowsocks.port].num
         child_process.exec "sudo iptables -D OUTPUT #{rule_id}", ->
           child_process.exec "sudo rm /etc/supervisor/conf.d/#{account.username}.conf", ->
-            child_process.exec 'sudo supervisorctl reload', ->
+            child_process.exec 'sudo supervisorctl update', ->
               callback()
 
   restart: (account, callback) ->
@@ -86,7 +86,7 @@ module.exports =
           account: account
 
         plugin.writeConfig "/etc/supervisor/conf.d/#{account.username}.conf", config_content, ->
-          child_process.exec 'sudo supervisorctl reload', ->
+          child_process.exec 'sudo supervisorctl update', ->
             callback()
 
   widget: (account, callback) ->
