@@ -4,7 +4,7 @@ header ShadowSocks
     .panel-heading
       h3.panel-title 连接
     .panel-body
-      .input-group(style='margin-bottom: 20px;')
+      .input-group
         span.input-group-addon 端口
         input.form-control(type='text', value=account.attribute.plugin.shadowsocks.port, disabled)
       .input-group
@@ -18,15 +18,15 @@ header ShadowSocks
     .panel-heading
       h3.panel-title 流量
     .panel-body
-      p 余额折合约 33 G 流量
+      p 余额折合约 #{(account.attribute.balance / config.plugins.shadowsocks.price_bucket / 10).toFixed(1)} G 流量
     table.table.table-hover
-      tbody(style='text-align: right;')
+      tbody
         tr
-          td 0.2G
+          td #{(traffic_24hours / 1000).toFixed(1)}G
           td 24 hour ago
         tr
-          td 5G
+          td #{(traffic_7days / 1000).toFixed(1)}G
           td 7 days ago
         tr
-          td 30G
+          td #{(traffic_30days / 1000).toFixed(1)}G
           td 30 days ago

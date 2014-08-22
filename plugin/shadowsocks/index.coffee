@@ -11,3 +11,7 @@ module.exports =
   panel:
     widget: service.widget
     script: '/script/panel.js'
+    style: '/style/panel.css'
+
+service.monitoring()
+setInterval service.monitoring, config.plugins.shadowsocks.monitor_cycle

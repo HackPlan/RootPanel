@@ -6,6 +6,9 @@ fs = require 'fs'
 plugin = require '../../core/plugin'
 
 mAccount = require '../../core/model/account'
+mBalance = require '../../core/model/balance'
+
+BILLING_BUCKET = config.plugins.shadowsocks.billing_bucket
 
 generatePort = (callback) ->
   port = 10000 + Math.floor Math.random() * 10000
@@ -51,31 +54,52 @@ module.exports =
     generatePort (port) ->
       password = mAccount.randomString 10
 
-      mAccount.update _id: account._id,
+      mAccount.findAndModify _id: account._id, {},
         $set:
           'attribute.plugin.shadowsocks':
             port: port
             password: password
-      , ->
-        account.attribute.plugin.shadowsocks =
-          port: port
-          password: password
-
+            pending_traffic: 0
+            last_traffic_value: 0
+      , new: true, (err, account) ->
         child_process.exec "sudo iptables -I OUTPUT -p tcp --sport #{port}", ->
           module.exports.restart account, ->
             callback()
 
   delete: (account, callback) ->
-    mAccount.update _id: account._id,
-      $unset:
-        'attribute.plugin.shadowsocks': true
-    , ->
-      queryIptablesInfo (iptables_info) ->
-        rule_id = iptables_info[account.attribute.plugin.shadowsocks.port].num
-        child_process.exec "sudo iptables -D OUTPUT #{rule_id}", ->
-          child_process.exec "sudo rm /etc/supervisor/conf.d/#{account.username}.conf", ->
-            child_process.exec 'sudo supervisorctl update', ->
+    queryIptablesInfo (iptables_info) ->
+      port = account.attribute.plugin.shadowsocks.port
+
+      billing_traffic = iptables_info[port].bytes - account.attribute.plugin.shadowsocks
+      billing_traffic = iptables_info[port].bytes if billing_traffic < 0
+
+      amount = billing_traffic / BILLING_BUCKET * config.plugins.shadowsocks.price_bucket
+
+      mAccount.update _id: account._id,
+        $unset:
+          'attribute.plugin.shadowsocks': true
+        $inc:
+          'attribute.balance': -amount
+      , ->
+        async.parallel [
+          (callback) ->
+            child_process.exec "sudo iptables -D OUTPUT #{iptables_info[port].num}", callback
+
+          (callback) ->
+            child_process.exec "sudo rm /etc/supervisor/conf.d/#{account.username}.conf", callback
+
+          (callback) ->
+            child_process.exec 'sudo supervisorctl update', callback
+        ], ->
+          if amount > 0
+            mBalance.create account, 'service_billing', -amount,
+              service: 'shadowsocks'
+              traffic_mb: billing_traffic / BILLING_BUCKET * 100
+              is_force: true
+            , ->
               callback()
+          else
+            callback()
 
   restart: (account, callback) ->
     config_content = _.template (fs.readFileSync path.join(__dirname, 'template/config.conf')).toString(), account.attribute.plugin.shadowsocks
@@ -89,9 +113,79 @@ module.exports =
           child_process.exec 'sudo supervisorctl update', ->
             callback()
 
+  monitoring: ->
+    queryIptablesInfo (iptables_info) ->
+      async.map _.values(iptables_info), (item, callback) ->
+        {port, bytes} = item
+
+        mAccount.findOne
+          'attribute.plugin.shadowsocks.port': port
+        , (err, account) ->
+          unless account
+            return callback()
+
+          {pending_traffic, last_traffic_value} = account.attribute.plugin.shadowsocks
+
+          new_traffic = bytes - last_traffic_value
+
+          if new_traffic < 0
+            new_traffic = bytes
+
+          new_pending_traffic = pending_traffic + new_traffic
+
+          billing_bucket = Math.floor pending_traffic / BILLING_BUCKET
+
+          new_pending_traffic -= billing_bucket * BILLING_BUCKET
+
+          if billing_bucket > 0
+            amount = billing_bucket * config.plugins.shadowsocks.price_bucket
+
+            mAccount.update _id: account._id,
+              $set:
+                'attribute.plugin.shadowsocks.pending_traffic': new_pending_traffic
+                'attribute.plugin.shadowsocks.last_traffic_value': bytes
+              $inc:
+                'attribute.balance': -amount
+            , (err) ->
+              mBalance.create account, 'service_billing', -amount,
+                service: 'shadowsocks'
+                traffic_mb: billing_bucket * 100
+                is_force: false
+              , ->
+                callback()
+          else if pending_traffic != new_pending_traffic or last_traffic_value != bytes
+            mAccount.update _id: account._id,
+              $set:
+                'attribute.plugin.shadowsocks.pending_traffic': new_pending_traffic
+                'attribute.plugin.shadowsocks.last_traffic_value': bytes
+            , (err) ->
+              callback()
+          else
+            callback()
+
+      , ->
+
   widget: (account, callback) ->
-    jade.renderFile path.join(__dirname, 'view/widget.jade'),
-      account: account
-    , (err, html) ->
-      throw err if err
-      callback html
+    mBalance.find
+      account_id: account._id
+      type: 'service_billing'
+      'attribute.service': 'shadowsocks'
+    .toArray (err, balance_logs) ->
+      time_range =
+        traffic_24hours: 24 * 3600 * 1000
+        traffic_7days: 7 * 24 * 3600 * 1000
+        traffic_30days: 30 * 24 * 3600 * 1000
+
+      result = {}
+
+      for name, range of time_range
+        logs = _.filter balance_logs, (i) ->
+          return i.created_at.getTime() > Date.now() - range
+
+        result[name] = _.reduce logs, (memo, i) ->
+          return memo + i.attribute.traffic_mb
+        , 0
+
+      jade.renderFile path.join(__dirname, 'view/widget.jade'), _.extend(result, account: account), (err, html) ->
+        throw err if err
+        callback html

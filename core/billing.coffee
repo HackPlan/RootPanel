@@ -72,21 +72,22 @@ exports.calcBilling = (account, options, callback) ->
     else
       new_last_billing_at = new Date account.attribute.last_billing_at.getTime() + billing_time_hour * 3600 * 1000
 
+    # TODO: 付费套餐与非付费套餐并存的情况
+
     modifier =
       $set:
         'attribute.last_billing_at': new_last_billing_at
       $inc:
         'attribute.balance': -amount
 
-    mAccount.update _id: account._id, modifier, ->
+    mAccount.findAndModify _id: account._id, {}, modifier, new: true, (err, account) ->
       mBalance.create account, 'billing', -amount,
         plans: account.attribute.plans
         billing_time: billing_time_hour
         is_force: is_force
         last_billing_at: account.attribute.last_billing_at
       , ->
-        mAccount.findId account._id, (err, account) ->
-          callback account
+        callback account
 
 exports.forceUnsubscribe = (account, callback) ->
   async.mapSeries account.attribute.plans, (plan_name, callback) ->
