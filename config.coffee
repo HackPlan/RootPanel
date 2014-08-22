@@ -16,6 +16,14 @@ module.exports =
     available_extensions: ['rpvhost']
     available_services: ['shadowsocks']
 
+  billing:
+    force_unsubscribe:
+      when_balance_below: 0
+      when_arrears_above: 0
+
+    cyclical_billing: 3600 * 1000
+    daily_billing_cycle: 24 * 3600 * 1000
+
   plans:
     shadowsocks:
       t_name: 'ShadowSocks 按量付费'
