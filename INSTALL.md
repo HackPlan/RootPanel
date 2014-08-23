@@ -9,11 +9,9 @@
     vi /etc/hostname
     vi /etc/hosts
 
-    apt-get install nodejs git mongodb nginx postfix redis-server
+    apt-get install nodejs git mongodb nginx postfix redis-server ntp
     apt-get install python g++ make screen git wget zip unzip iftop vim curl htop iptraf nethogs
-    apt-get intalll axel unrar-free emacs subversion subversion-tools tmux mercurial
-    apt-get install libcurl4-openssl-dev
-    apt-get install ntp quota quotatool
+    apt-get intalll libcurl4-openssl-dev axel unrar-free emacs subversion subversion-tools tmux mercurial
 
     mongo
 
@@ -62,15 +60,7 @@
 
         rpadmin ALL=(ALL) NOPASSWD: ALL
 
-    vi /etc/fstab
-
-        usrquota
-
     reboot
-
-    ln -s /dev/xvda /dev/root
-    quotacheck -am
-    quotaon -au
 
     su rpadmin
     cd ~
@@ -85,6 +75,19 @@
     make start
     
 ### Plugin
+
+    # Linux
+    apt-get install quota quotatool
+
+    vi /etc/fstab
+
+        usrquota
+
+    reboot
+
+        ln -s /dev/xvda /dev/root
+        quotacheck -am
+        quotaon -au
 
     # Memcached
 
@@ -113,11 +116,11 @@
     apt-get install python-pip python-m2crypto supervisor
     pip install shadowsocks
 
+    mkdir /etc/shadowsocks
+
     vi /etc/default/supervisor
 
         ulimit -n 51200
-
-    service supervisor restart
 
 ### Runtime
 
@@ -125,7 +128,7 @@
     apt-get install golang golang-go.tools
 
     # Python
-    apt-get install python python3 python-pip python3-pip python-dev python3-dev
+    apt-get install python python3 python-pip python3-pip python-dev python3-dev python-m2crypto
     pip install django tornado markdown python-memcached web.py mongo uwsgi virtualenv virtualenvwrapper flask gevent jinja2 requests
 
     # Node.js

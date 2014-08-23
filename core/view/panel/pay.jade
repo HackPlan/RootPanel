@@ -25,17 +25,14 @@ block main
         tr
           th 域名
           th 位置
-          th.for-sale 用户量
+          th 说明
       tbody
         for node in nodes
           tr
             td
               a(href='//#{node.domain}')= node.domain
             td= node.location
-            td
-              .progress
-                .progress-bar(role='progressbar', aria-valuenow='0', aria-valuemin='0', aria-valuemax='100', style='width: 0%;')
-                  span 0%
+            td= node.readme
 
   .row
     header 充值记录

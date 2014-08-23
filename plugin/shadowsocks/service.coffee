@@ -39,10 +39,10 @@ queryIptablesInfo = (callback) ->
               port = port.match(/spt:(\d+)/)[1]
 
               iptables_info[port.toString()] =
-                num: num
-                pkts: pkts
-                bytes: bytes
-                port: port
+                num: parseInt num
+                pkts: parseInt pkts
+                bytes: parseInt bytes
+                port: parseInt port
 
         if item[0...CHAIN_OUTPUT.length] == CHAIN_OUTPUT
           is_chain_output = true
@@ -70,8 +70,9 @@ module.exports =
     queryIptablesInfo (iptables_info) ->
       port = account.attribute.plugin.shadowsocks.port
 
-      billing_traffic = iptables_info[port].bytes - account.attribute.plugin.shadowsocks
+      billing_traffic = iptables_info[port].bytes - account.attribute.plugin.shadowsocks.last_traffic_value
       billing_traffic = iptables_info[port].bytes if billing_traffic < 0
+      billing_traffic += account.attribute.plugin.shadowsocks.pending_traffic
 
       amount = billing_traffic / BILLING_BUCKET * config.plugins.shadowsocks.price_bucket
 

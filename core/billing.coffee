@@ -27,7 +27,10 @@ exports.checkExpired = (account, callback) ->
     $set: {}
 
   callback_back = ->
-    mAccount.findAndModify _id: account._id, {}, modifier, new: true, (err, account)->
+    if _.isEmpty modifier.$set
+      return callback account
+
+    mAccount.findAndModify _id: account._id, {}, modifier, new: true, (err, account) ->
       callback account
 
   if account.attribute.balance > 0
@@ -48,7 +51,7 @@ exports.checkExpired = (account, callback) ->
 exports.calcBilling = (account, options, callback) ->
   {is_force} = options
 
-  exports.checkExpired account, ->
+  exports.checkExpired account, (account) ->
     amount = 0
 
     for planName in _.filter(account.attribute.plans, (i) -> config.plans[i].price)
