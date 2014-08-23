@@ -32,16 +32,6 @@ module.exports =
       resources: {}
 
   nodes:
-    us1:
-      domain: 'us1.rpvhost.net'
-      location: 'Linode Fremont, CA, USA'
-      readme: ''
-
-    jp1:
-      domain: 'jp1.rpvhost.net'
-      location: 'Linode Tokyo, JP'
-      readme: ''
-
     ss:
       domain: 'ss.rpvhost.net'
       location: 'Linode Fremont, CA, USA'
@@ -75,12 +65,3 @@ module.exports =
       price_bucket: 0.06
       monitor_cycle: 5 * 60 * 1000
       billing_bucket: 100 * 1024 * 1024
-
-    linux:
-      monitor_cycle: 30 * 1000
-
-    mysql:
-      connection:
-        host: 'localhost'
-        user: 'rpadmin'
-        password: 'password'
