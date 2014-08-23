@@ -6,12 +6,12 @@ RootPanel 是一个高度插件化的，基于 Linux 的虚拟服务销售平台
 
 * Linux 虚拟主机(Nginx, PHP, MySQL, MongoDB, Memcached)
 
-    即最传统的，将一台 Linux 服务器划分给多个用户的方式。
+    即最传统的，将一台 Linux 服务器划分给多个用户的方式。  
     示例站点：<http://us1.rpvhost.net>
 
 * ShadowSocks 代理服务
 
-    按实际使用流量实时结算的 ShadowSocks 代理。
+    按实际使用流量实时结算的 ShadowSocks 代理。  
     示例站点：<http://ss.rpvhost.net>
 
 * Xen VPS(开发中)
@@ -44,10 +44,6 @@ Makefile:
     make start      # 以 forever 启动
     make restart    # 重启 forever 进程
     make stop       # 停止 forever 进程
-
-配置文件：
-
-    config.coffee
 
 配置文件示例(sample 目录):
 
