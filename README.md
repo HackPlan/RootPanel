@@ -1,32 +1,70 @@
-## RootPanel3
-RP3 是一个插件化的 Linux 虚拟主机管理和销售系统。
+# RootPanel
+## 简介
+RootPanel 是一个高度插件化的，基于 Linux 的虚拟服务销售平台，目标是成为虚拟主机界的 WordPress.
 
-所谓虚拟主机就是指在同一个物理服务器(或 VPS)上，划分给多个用户使用，使其互不干扰。  
-相比于 VPS, 虚拟主机实现的是应用级别的虚拟化，而不是操作系统级别的虚拟机。  
-虚拟主机大概介于 PaaS(GAE, SAE) 和 IaaS 之间。
+它的核心功能包括：用户和计费系统，工单系统，管理员面板；其余具体的功能均以插件实现，RootPanel 支持的典型服务有：
 
-## 功能
+* Linux 虚拟主机(Nginx, PHP, MySQL, MongoDB, Memcached)
 
-RP3 的核心功能包括：
+    即最传统的，将一台 Linux 服务器划分给多个用户的方式。
+    示例站点：<http://us1.rpvhost.net>
 
-* 用户和结算系统
-* 工单系统
-* 管理员面板
+* ShadowSocks 代理服务
 
-其他功能均以插件实现，包括 SSH, Nginx, PHP-FPM, MySQL, ShadowSocks 等等。
+    按实际使用流量实时结算的 ShadowSocks 代理。
+    示例站点：<http://ss.rpvhost.net>
 
-## 使用
+* Xen VPS(开发中)
+
+## 安装和使用
+
+开发版本：
+
+    git clone https://github.com/jysperm/RootPanel.git
+
+稳定版本：
+
+    npm install -g rootpanel
+
+详细安装说明：[INSTALL.md](https://github.com/jysperm/RootPanel/blob/master/INSTALL.md)
+
+全局命令：
+
+    rp-start            # 以 forever 启动
+    rp-fix-permissions  # 修复文件系统权限
+    rp-migration        # 版本间数据库迁移脚本
+    rp-system-sync      # 与操作系统同步信息
+    rp-clean            # 清理冗余数据
+
+Makefile:
 
     make install    # 安装依赖
     make run        # 直接运行
-    make test       # 运行测试
+    make test       # 运行测试(开发中)
     make start      # 以 forever 启动
     make restart    # 重启 forever 进程
     make stop       # 停止 forever 进程
+
+配置文件：
+
+    config.coffee
+
+配置文件示例(sample 目录):
+
+    shadowsocks.config.coffee   # ShadowSocks 代理服务
+    linux-vhost.config.coffee   # Linux 虚拟主机
+
+配置文件位于 `config.coffee`
 
 ## 技术构成
 
 * 前端：Bootstrap(3), jQuery, Jade, Less
 * 后端：Express, Coffee
 * 数据库：MongoDB(2.4), Redis
-* 操作系统支持：Ubuntu 14.04
+* 操作系统支持：Ubuntu 14.04 amd64
+
+## 开发情况：
+
+* [ChangeLog](https://github.com/jysperm/RootPanel/blob/master/CHANGELOG.md) | [Releases](https://github.com/jysperm/RootPanel/releases)
+* [TODO List](https://github.com/jysperm/RootPanel/labels/TODO)
+* LICENSE: [GPLv3](https://github.com/jysperm/RootPanel/blob/master/LICENSE)
