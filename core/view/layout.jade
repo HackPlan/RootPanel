@@ -5,6 +5,9 @@ html
     block head
       link(rel='stylesheet', href='http://cdn.staticfile.org/twitter-bootstrap/3.2.0/css/bootstrap.min.css')
       link(rel='stylesheet', href='/style/layout.css')
+      for path in app.view_style
+        link(rel='stylesheet', href=path)
+
   body
     header.navbar-fixed-top
       .container

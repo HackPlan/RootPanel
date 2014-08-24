@@ -8,6 +8,9 @@ module.exports =
   action: action
   service: service
 
+  layout:
+    style: '/style/layout.css'
+
   panel:
     widget: service.widget
     script: '/script/panel.js'

@@ -12,6 +12,8 @@ app.plugins = {}
 app.view_hook =
   menu_bar: []
 
+app.view_style = []
+
 exports.get = (name) ->
   return require path.join(__dirname, "../plugin/#{name}")
 
@@ -24,6 +26,9 @@ exports.loadPlugin = (name) ->
 
   if fs.existsSync path.join(plugin_path, 'static')
     app.use harp.mount('/plugin/' + name, path.join(plugin_path, 'static'))
+
+  if plugin.layout?.style
+    app.view_style.push "/plugin/#{name}#{plugin.layout.style}"
 
   if plugin.action
     app.use ('/plugin/' + name), plugin.action
