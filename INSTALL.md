@@ -1,3 +1,11 @@
+顺序：
+
+* Core 中 reboot 之前的部分
+* Plugin 中用到的插件的 reboot 之前的部分
+* reboot
+* 继续装 Core 中 reboot 后的部分，和 Plugin 中 reboot 后的部分(如果有的话)
+* 安装 Runtime(如果需要的话)
+
 ## Ubuntu 14.04 amd64
 ### Core
 
@@ -9,9 +17,9 @@
     vi /etc/hostname
     vi /etc/hosts
 
-    apt-get install nodejs git mongodb nginx postfix redis-server ntp
+    apt-get install nodejs git mongodb=2.4 nginx postfix redis-server ntp
     apt-get install python g++ make screen git wget zip unzip iftop vim curl htop iptraf nethogs
-    apt-get intalll libcurl4-openssl-dev axel unrar-free emacs subversion subversion-tools tmux mercurial
+    apt-get install libcurl4-openssl-dev axel unrar-free emacs subversion subversion-tools tmux mercurial
 
     mongo
 
