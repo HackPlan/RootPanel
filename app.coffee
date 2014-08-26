@@ -21,6 +21,8 @@ global.plugin = require './core/plugin'
 if fs.existsSync(config.web.listen)
   fs.unlinkSync config.web.listen
 
+fs.chmodSync path.join(__dirname, 'config.coffee'), 0o750
+
 bindRouters = ->
   app.use require 'middleware-injector'
 
@@ -76,7 +78,8 @@ exports.runWebServer = ->
 
     app.use harp.mount(path.join(__dirname, 'core/static'))
 
-    app.listen config.web.listen
+    app.listen config.web.listen, ->
+      fs.chmodSync config.web.listen, 0o770
 
 unless module.parent
   exports.runWebServer()

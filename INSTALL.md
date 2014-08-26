@@ -17,7 +17,7 @@
     vi /etc/hostname
     vi /etc/hosts
 
-    apt-get install nodejs git mongodb=2.4 nginx postfix redis-server ntp
+    apt-get install nodejs git mongodb=2.4 nginx postfix redis-server ntp supervisor
     apt-get install python g++ make screen git wget zip unzip iftop vim curl htop iptraf nethogs
     apt-get install libcurl4-openssl-dev axel unrar-free emacs subversion subversion-tools tmux mercurial
 
@@ -74,14 +74,19 @@
     cd ~
 
     git clone https://github.com/jysperm/RootPanel.git
-    cd RootPanel
+    vi RootPanel/config.coffee
 
-    chmod 750 config.coffee
-    vi config.coffee
+    vi /etc/supervisor/conf.d/rpadmin.conf
 
-    make install
-    make start
-    
+        [program:RootPanel]
+        command=node /home/rpadmin/RootPanel/start.js
+        autorestart=true
+        user=rpadmin
+
+    npm install
+
+    service supervisor restart
+
 ### Plugin
 
     # Linux
@@ -121,7 +126,7 @@
 
     # ShadowSocks
 
-    apt-get install python-pip python-m2crypto supervisor
+    apt-get install python-pip python-m2crypto
     pip install shadowsocks
 
     mkdir /etc/shadowsocks

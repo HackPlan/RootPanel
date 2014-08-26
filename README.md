@@ -4,7 +4,7 @@ RootPanel 是一个高度插件化的，基于 Linux 的虚拟服务销售平台
 
 它的核心功能包括：用户和计费系统，工单系统，管理员面板；其余具体的功能均以插件实现，RootPanel 支持的典型服务有：
 
-* Linux 虚拟主机(Nginx, PHP, MySQL, MongoDB, Memcached)
+* Linux 虚拟主机(Nginx, PHP, MySQL, MongoDB)
 
     即最传统的，将一台 Linux 服务器划分给多个用户的方式。  
     示例站点：<http://us1.rpvhost.net>
@@ -36,14 +36,9 @@ RootPanel 是一个高度插件化的，基于 Linux 的虚拟服务销售平台
     rp-system-sync      # 与操作系统同步信息
     rp-clean            # 清理冗余数据
 
-Makefile:
+运行：
 
-    make install    # 安装依赖
-    make run        # 直接运行
-    make test       # 运行测试(开发中)
-    make start      # 以 forever 启动
-    make restart    # 重启 forever 进程
-    make stop       # 停止 forever 进程
+    node start.js
 
 配置文件示例(sample 目录):
 
