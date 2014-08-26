@@ -21,6 +21,9 @@ exports.post '/subscribe', requireAuthenticate, (req, res) ->
     if plan_info.price and account.attribute.balance <= 0
       return res.error 'insufficient_balance'
 
+    if account.attribute.balance < 0
+      return res.error 'insufficient_balance'
+
     plan.joinPlan account, req.body.plan, ->
       res.json {}
 
