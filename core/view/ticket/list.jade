@@ -21,7 +21,7 @@ mixin showTickets(tickets)
         mixin displayTicketStatus(ticket.status)
 
 prepend head
-  title #{t('ticket.ticket_list')} | #{t('app.name')}
+  title #{t('ticket.ticket_list')} | #{config.web.name}
 
 block main
   header= t('ticket.ticket_list')

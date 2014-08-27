@@ -1,7 +1,7 @@
 extends layout
 
 prepend head
-  title #{t('panel.')} | #{t('app.name')}
+  title #{t('panel.')} | #{config.web.name}
 
 append head
   link(rel='stylesheet', href='/style/panel.css')

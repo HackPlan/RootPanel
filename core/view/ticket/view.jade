@@ -1,7 +1,7 @@
 extends ../layout
 
 prepend head
-  title #{ticket.title} | #{t('app.name')}
+  title #{ticket.title} | #{config.web.name}
   link(rel='stylesheet', href='/style/ticket.css')
 
 block main

@@ -1,7 +1,7 @@
 extends layout
 
 prepend head
-  title #{title} | #{t('app.name')}
+  title #{title} | #{config.web.name}
 
 block main
   header= title

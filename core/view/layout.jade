@@ -54,8 +54,7 @@ html
           #sidebar.col-md-3
             block sidebar
               .row
-                header= t('app.name')
-                p= t('app.description')
+                header= config.web.name
 
     #footer
       if config.web.google_analytics_id
