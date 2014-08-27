@@ -1,8 +1,9 @@
 module.exports =
   web:
-    url: 'http://ss.rpvhost.net'
+    name: 'GreenShadow'
+    url: 'http://greenshadow.net'
     listen: '/home/rpadmin/rootpanel.sock'
-    google_analytics_id: 'UA-49193300-2'
+    google_analytics_id: 'UA-49193300-3'
 
   account:
     cookie_time: 30 * 24 * 3600 * 1000
@@ -16,6 +17,8 @@ module.exports =
     available_services: ['shadowsocks']
 
   billing:
+    taobao_item_id: '38370649858'
+
     force_unsubscribe:
       when_balance_below: 0
       when_arrears_above: 0
@@ -30,12 +33,6 @@ module.exports =
       t_resources: '0.6 CNY / G'
       services: ['shadowsocks']
       resources: {}
-
-  nodes:
-    ss:
-      domain: 'ss.rpvhost.net'
-      location: 'Linode Fremont, CA, USA'
-      readme: 'ShadowSocks Only'
 
   mongodb:
     user: 'rpadmin'

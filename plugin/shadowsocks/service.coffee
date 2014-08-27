@@ -63,8 +63,9 @@ module.exports =
             last_traffic_value: 0
       , new: true, (err, account) ->
         child_process.exec "sudo iptables -I OUTPUT -p tcp --sport #{port}", ->
-          module.exports.restart account, ->
-            callback()
+          child_process.exec 'sudo iptables-save | sudo tee /etc/iptables.rules', ->
+            module.exports.restart account, ->
+              callback()
 
   delete: (account, callback) ->
     queryIptablesInfo (iptables_info) ->
@@ -85,6 +86,9 @@ module.exports =
         async.parallel [
           (callback) ->
             child_process.exec "sudo iptables -D OUTPUT #{iptables_info[port].num}", callback
+
+          (callback) ->
+            child_process.exec 'sudo iptables-save | sudo tee /etc/iptables.rules', callback
 
           (callback) ->
             child_process.exec "sudo rm /etc/supervisor/conf.d/#{account.username}.conf", callback

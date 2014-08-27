@@ -30,7 +30,8 @@ exports.get '/pay', requireAuthenticate, renderAccount, (req, res) ->
     billing_log: (callback) ->
       mBalance.find
         account_id: req.account._id
-        type: 'billing'
+        type:
+          $in: ['billing', 'service_billing']
       ,
         sort:
           created_at: -1

@@ -68,6 +68,10 @@
 
         rpadmin ALL=(ALL) NOPASSWD: ALL
 
+    vi /etc/rc.local
+
+        iptables-restore < /etc/iptables.rules
+
     reboot
 
     su rpadmin

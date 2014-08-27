@@ -2,9 +2,10 @@ markdown = require('markdown').markdown
 path = require 'path'
 fs = require 'fs'
 
-app.view_hook.menu_bar.push
-  href: '/wiki/'
-  html: '用户手册'
+unless _.find(app.view_hook.menu_bar, (i) -> i.href == '/wiki/')
+  app.view_hook.menu_bar.push
+    href: '/wiki/'
+    html: '用户手册'
 
 {renderAccount} = require './middleware'
 

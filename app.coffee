@@ -26,10 +26,12 @@ fs.chmodSync path.join(__dirname, 'config.coffee'), 0o750
 bindRouters = ->
   app.use require 'middleware-injector'
 
-  for module_name in ['account', 'admin', 'panel', 'plan', 'ticket', 'wiki', 'bitcoin']
+  for module_name in ['account', 'admin', 'panel', 'plan', 'ticket', 'bitcoin']
     app.use "/#{module_name}", require './core/router/' + module_name
 
   plugin.loadPlugins()
+
+  app.use '/wiki', require './core/router/wiki'
 
   app.get '/', (req, res) ->
     res.redirect '/panel/'
