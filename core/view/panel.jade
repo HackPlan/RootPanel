@@ -24,7 +24,7 @@ block content
 
       .col-md-9
         .row
-          header= t('panel.overview')
+          header 财务
           p
             | #{t('plan.balance')}: #{account.attribute.balance.toFixed(2)} #{t('plan.currency.cny')}
             if account.attribute.remaining_time && account.attribute.remaining_time != Infinity && account.attribute.remaining_time != -Infinity
@@ -33,7 +33,7 @@ block content
             a(href= '/panel/pay/').btn.btn-success 充值
 
         .row
-          header= t('plan.')
+          header 服务
           table.table.table-hover.plan-list
             tbody
               for plan in plans
@@ -43,9 +43,9 @@ block content
                   td= plan.t_resources
                   td
                     if plan.is_enable
-                      button.btn.btn-danger.btn-sm= t('plan.unsubscribe')
+                      button.btn.btn-danger.btn-sm 关闭
                     else
-                      button.btn.btn-success.btn-sm= t('plan.subscribe')
+                      button.btn.btn-success.btn-sm 开启
 
         if switch_buttons.length
           #service-switch.row

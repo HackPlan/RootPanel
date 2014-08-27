@@ -28,8 +28,8 @@ module.exports =
 
   plans:
     shadowsocks:
-      t_name: 'ShadowSocks 按量付费'
-      t_service: 'ShadowSocks'
+      t_name: 'ShadowSocks'
+      t_service: '按量付费'
       t_resources: '0.6 CNY / G'
       services: ['shadowsocks']
       resources: {}
