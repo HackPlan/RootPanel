@@ -21,6 +21,8 @@
     apt-get install python g++ make screen git wget zip unzip iftop vim curl htop iptraf nethogs
     apt-get install libcurl4-openssl-dev axel unrar-free emacs subversion subversion-tools tmux mercurial
 
+    npm install coffee-script -g
+
     mongo
 
         use admin
@@ -149,4 +151,4 @@
     pip install django tornado markdown python-memcached web.py mongo uwsgi virtualenv virtualenvwrapper flask gevent jinja2 requests
 
     # Node.js
-    npm install forever coffee-script gulp mocha harp bower -g
+    npm install forever gulp mocha harp bower -g

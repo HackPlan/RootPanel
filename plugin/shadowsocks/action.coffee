@@ -25,7 +25,7 @@ exports.post '/reset_password', (req, res) ->
 
 wiki_router = express.Router()
 
-wiki_router.use requireAuthenticate, (req, res) ->
+wiki_router.use renderAccount, requireAuthenticate, (req, res) ->
   url = req.url.substr 1
 
   unless url
