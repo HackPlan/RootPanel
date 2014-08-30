@@ -1,6 +1,6 @@
 {
   "name": "rootpanel",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "A linux virtual host management system with extensibility",
   "homepage": "http://rpvhost.net",
   "license": "GPL-3.0",

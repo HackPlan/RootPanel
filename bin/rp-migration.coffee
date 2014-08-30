@@ -5,12 +5,52 @@ async = require 'async'
 {MongoClient} = require 'mongodb'
 
 config = require '../config'
+{user, password, host, name} = config.mongodb
 
-base_version = _.last process.argv
+version = _.last process.argv
 
 migration_action =
+  '0.7.1': (callback) ->
+    console.log "
+npm install coffee-script -g
+
+vi /etc/rc.local
+
+    iptables-restore < /etc/iptables.rules
+
+vi /etc/supervisor/conf.d/rpadmin.conf
+
+    [program:RootPanel]
+    command=node /home/rpadmin/RootPanel/start.js
+    autorestart=true
+    user=rpadmin
+
+service supervisor restart
+"
+    crypto = require 'crypto'
+    bitcoin = require '../core/bitcoin'
+
+    MongoClient.connect "mongodb://#{user}:#{password}@#{host}/#{name}", (err, db) ->
+      mAccount = db.collection 'accounts'
+
+      mAccount.find().toArray (err, accounts) ->
+        async.each accounts, (account, callback) ->
+          bitcoin_secret = crypto.createHash('sha256').update(crypto.randomBytes(256)).digest('hex')
+
+          bitcoin.genAddress bitcoin_secret, (address) ->
+            mAccount.update _id: account._id,
+              $set:
+                'attribute.bitcoin_deposit_address': address
+                'bitcoin_secret': bitcoin_secret
+            , (err) ->
+              callback err
+
+        , (err) ->
+          throw err if err
+          console.log "[account.attribute.bitcoin_secret] update #{accounts.length} rows"
+          callback()
+
   '0.6.0': (callback) ->
-    {user, password, host, name} = config.mongodb
     MongoClient.connect "mongodb://#{user}:#{password}@#{host}/#{name}", (err, db) ->
       mAccount = db.collection 'accounts'
 
@@ -31,9 +71,9 @@ migration_action =
         throw err if err
         callback()
 
-if migration_action[base_version]
-  migration_action[base_version] ->
-    console.log "Finish migration from #{base_version}"
+if migration_action[version]
+  migration_action[version] ->
+    console.log "Finish migration to #{version}"
     process.exit()
 else
   throw new Error 'Unknown Version'

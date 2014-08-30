@@ -46,7 +46,7 @@ exports.connectDatabase = (callback) ->
 
     callback err
 
-exports.runWebServer = ->
+exports.run = ->
   exports.connectDatabase (err) ->
     throw err if err
 
@@ -84,4 +84,4 @@ exports.runWebServer = ->
       fs.chmodSync config.web.listen, 0o770
 
 unless module.parent
-  exports.runWebServer()
+  exports.run()

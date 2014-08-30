@@ -1,2 +1,2 @@
 require('coffee-script/register');
-require('./app.coffee').runWebServer();
+require('./app.coffee').run();
