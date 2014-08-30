@@ -25,8 +25,6 @@
 
     mongo
 
-        use admin
-        db.addUser({user: 'rpadmin', pwd: 'password', roles: ['readWriteAnyDatabase', 'userAdminAnyDatabase', 'dbAdminAnyDatabase', 'clusterAdmin']})
         use RootPanel
         db.addUser({user: 'rpadmin', pwd: 'password', roles: ['readWrite']})
 
@@ -111,6 +109,13 @@
     # Memcached
 
     apt-get install memcached
+
+    # MongoDB
+
+    mongo
+
+        use admin
+        db.addUser({user: 'rpadmin', pwd: 'password', roles: ['readWriteAnyDatabase', 'userAdminAnyDatabase', 'dbAdminAnyDatabase', 'clusterAdmin']})
     
     # MySQL
     
