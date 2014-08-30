@@ -17,9 +17,9 @@
     vi /etc/hostname
     vi /etc/hosts
 
-    apt-get install nodejs git mongodb=2.4 nginx postfix redis-server ntp supervisor
+    apt-get install mongodb=1:2.4.9-1ubuntu2
+    apt-get install nodejs git nginx postfix redis-server ntp supervisor
     apt-get install python g++ make screen git wget zip unzip iftop vim curl htop iptraf nethogs
-    apt-get install libcurl4-openssl-dev axel unrar-free emacs subversion subversion-tools tmux mercurial
 
     npm install coffee-script -g
 
@@ -78,9 +78,11 @@
     cd ~
 
     git clone https://github.com/jysperm/RootPanel.git
-    vi RootPanel/config.coffee
+    cd RootPanel
 
-    vi /etc/supervisor/conf.d/rpadmin.conf
+    vi config.coffee
+
+    sudo vi /etc/supervisor/conf.d/rpadmin.conf
 
         [program:RootPanel]
         command=node /home/rpadmin/RootPanel/start.js
@@ -89,7 +91,7 @@
 
     npm install
 
-    service supervisor restart
+    sudo service supervisor restart
 
 ### Plugin
 
@@ -147,6 +149,9 @@
         ulimit -n 51200
 
 ### Runtime
+
+    # Shell
+    apt-get install libcurl4-openssl-dev axel unrar-free emacs subversion subversion-tools tmux mercurial
 
     # Golang
     apt-get install golang golang-go.tools
