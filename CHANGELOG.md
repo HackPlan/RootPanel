@@ -1,3 +1,15 @@
+## v0.7.0(2017.8.31)
+用于 2014.8.31，GreenShadow 上线，数据库升级脚本将于 v0.7.1 提供。
+
+* (新增) 数据库升级迁移脚本，兑换代码生成脚本
+* (新增) 工单邮件提醒
+* (新增) 完成了 ShadowSocks 插件
+* (改进) 将 RP 主机的主页独立为了插件
+* (改进) 改进扣费机制，改进插件机制
+* (改进) 改用 supervisor 运行，弃用 Makefile, 更新 README, 新增配置文件示例
+
+39 commits, 82 changed files with 1110 additions and 440 deletions, by 1 contributors: jysperm.
+
 ## v0.6.0(2014.8.11)
 用于 2014.8.11, 新版 jp1.rpvhost.net 上线，没有不兼容的数据库更新。
 
