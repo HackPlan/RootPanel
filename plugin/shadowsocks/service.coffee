@@ -33,16 +33,19 @@ queryIptablesInfo = (callback) ->
       for item in lines
         if is_chain_output
           if item
-            [num, pkts, bytes, prot, opt, in_, out, source, destination, prot, port] = item.split /\s+/
+            try
+              [num, pkts, bytes, prot, opt, in_, out, source, destination, prot, port] = item.split /\s+/
 
-            unless num == 'num'
-              port = port.match(/spt:(\d+)/)[1]
+              unless num == 'num'
+                port = port.match(/spt:(\d+)/)[1]
 
-              iptables_info[port.toString()] =
-                num: parseInt num
-                pkts: parseInt pkts
-                bytes: parseInt bytes
-                port: parseInt port
+                iptables_info[port.toString()] =
+                  num: parseInt num
+                  pkts: parseInt pkts
+                  bytes: parseInt bytes
+                  port: parseInt
+            catch e
+              continue
 
         if item[0...CHAIN_OUTPUT.length] == CHAIN_OUTPUT
           is_chain_output = true

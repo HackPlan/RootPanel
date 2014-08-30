@@ -17,7 +17,7 @@ module.exports =
     available_services: ['shadowsocks']
 
   billing:
-    taobao_item_id: '38370649858'
+    taobao_item_id: '40711140727'
 
     force_unsubscribe:
       when_balance_below: 0
