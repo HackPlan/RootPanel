@@ -60,5 +60,5 @@ module.exports =
 
     shadowsocks:
       price_bucket: 0.06
-      monitor_cycle: 5 * 60 * 1000
+      monitor_cycle: 60 * 1000
       billing_bucket: 100 * 1024 * 1024

@@ -43,7 +43,7 @@ queryIptablesInfo = (callback) ->
                   num: parseInt num
                   pkts: parseInt pkts
                   bytes: parseInt bytes
-                  port: parseInt
+                  port: parseInt port
             catch e
               continue
 
