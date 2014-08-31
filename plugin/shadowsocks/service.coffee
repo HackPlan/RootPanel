@@ -121,6 +121,10 @@ module.exports =
           child_process.exec 'sudo supervisorctl update', ->
             callback()
 
+  restartAccount: (account, callback) ->
+    child_process.exec "sudo supervisorctl restart shadowsocks-#{account.username}", ->
+      callback()
+
   monitoring: ->
     queryIptablesInfo (iptables_info) ->
       async.map _.values(iptables_info), (item, callback) ->

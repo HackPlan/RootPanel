@@ -21,7 +21,8 @@ exports.post '/reset_password', (req, res) ->
     req.account.attribute.plugin.shadowsocks.password = password
 
     service.restart req.account, ->
-      res.json {}
+      service.restartAccount req.account, ->
+        res.json {}
 
 wiki_router = express.Router()
 
