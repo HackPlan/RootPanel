@@ -12,6 +12,7 @@ block main
           th= t('account.username')
           th= t('account.email')
           th 套餐
+          th 流量
           th 余额
           th 操作
       tbody
@@ -20,6 +21,7 @@ block main
             td= account.username
             td= account.email
             td= account.attribute.plans.join(', ')
+            td #{(account.traffic_30days / 1000).toFixed(1)}G
             td= account.attribute.balance.toFixed(2)
             td
               .btn-group
@@ -88,6 +90,23 @@ block main
 prepend sidebar
   .row
     a.btn.btn-lg.btn-success(href='/admin/ticket/')= t('ticket.ticket_list')
+
+append sidebar
+  .row
+    table.table.table-hover
+      tbody
+        tr
+          td #{(traffic_24hours / 1000).toFixed(1)}G
+          td 24 hour ago
+        tr
+          td #{(traffic_3days / 1000).toFixed(1)}G
+          td 3 days ago
+        tr
+          td #{(traffic_7days / 1000).toFixed(1)}G
+          td 7 days ago
+        tr
+          td #{(traffic_30days / 1000).toFixed(1)}G
+          td 30 days ago
 
 append footer
   script(src='/script/admin.js')

@@ -2,25 +2,55 @@
 
 mAccount = require '../model/account'
 mTicket = require '../model/ticket'
+mBalance = require '..//model/balance'
 
 plugin = require '../plugin'
 
 module.exports = exports = express.Router()
 
 exports.get '/', requireAdminAuthenticate, renderAccount, (req, res) ->
-  mAccount.find().toArray (err, accounts) ->
-    sites = []
+  mBalance.find
+    type: 'service_billing'
+    'attribute.service': 'shadowsocks'
+    created_at:
+      $gte: new Date Date.now() - 30 * 24 * 3600 * 1000
+  .toArray (err, balance_logs) ->
+    time_range =
+      traffic_24hours: 24 * 3600 * 1000
+      traffic_3days: 3 * 24 * 3600 * 1000
+      traffic_7days: 7 * 24 * 3600 * 1000
+      traffic_30days: 30 * 24 * 3600 * 1000
 
-    for account in accounts
-      if account.attribute.plugin?.nginx?.sites
-        for site in account.attribute.plugin.nginx.sites
-          sites.push _.extend site,
-            account: account
+    traffic_result = {}
 
-    res.render 'admin/index',
-      accounts: accounts
-      sites: sites
-      siteSummary: plugin.get('nginx').service.siteSummary
+    for name, range of time_range
+      logs = _.filter balance_logs, (i) ->
+        return i.created_at.getTime() > Date.now() - range
+
+      traffic_result[name] = _.reduce logs, (memo, i) ->
+        return memo + i.attribute.traffic_mb
+      , 0
+
+    mAccount.find().toArray (err, accounts) ->
+      sites = []
+
+      for account in accounts
+        if account.attribute.plugin?.nginx?.sites
+          for site in account.attribute.plugin.nginx.sites
+            sites.push _.extend site,
+              account: account
+
+        account.traffic_30days = _.reduce balance_logs, (memo, item) ->
+          if item.account_id.toString() == account._id.toString()
+            return memo + item.attribute.traffic_mb
+          else
+            return memo
+        , 0
+
+      res.render 'admin/index', _.extend traffic_result,
+        accounts: accounts
+        sites: sites
+        siteSummary: plugin.get('nginx').service.siteSummary
 
 exports.get '/ticket', requireAdminAuthenticate, renderAccount, (req, res) ->
   async.parallel
