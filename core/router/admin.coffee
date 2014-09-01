@@ -34,6 +34,8 @@ exports.get '/', requireAdminAuthenticate, renderAccount, (req, res) ->
     mAccount.find().toArray (err, accounts) ->
       sites = []
 
+      pending_traffic = 0
+
       for account in accounts
         if account.attribute.plugin?.nginx?.sites
           for site in account.attribute.plugin.nginx.sites
@@ -47,9 +49,13 @@ exports.get '/', requireAdminAuthenticate, renderAccount, (req, res) ->
             return memo
         , 0
 
+        if account.attribute.plugin.shadowsocks?.pending_traffic
+          pending_traffic += account.attribute.plugin.shadowsocks.pending_traffic
+
       res.render 'admin/index', _.extend traffic_result,
         accounts: accounts
         sites: sites
+        pending_traffic: pending_traffic
         siteSummary: plugin.get('nginx').service.siteSummary
 
 exports.get '/ticket', requireAdminAuthenticate, renderAccount, (req, res) ->

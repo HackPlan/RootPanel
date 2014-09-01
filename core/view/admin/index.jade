@@ -96,6 +96,9 @@ append sidebar
     table.table.table-hover
       tbody
         tr
+          td #{(pending_traffic / 1000 / 1000).toFixed(1)}M
+          td pending
+        tr
           td #{(traffic_24hours / 1000).toFixed(1)}G
           td 24 hour ago
         tr
