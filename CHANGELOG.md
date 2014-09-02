@@ -1,4 +1,9 @@
-## v0.7.0(2017.8.31)
+## v0.7.1(2014.9.2)
+有关 ShadowSocks 的漏洞修复，以及从 v0.6.0 升级的迁移脚本。
+
+9 commits, 15 changed files with 183 additions and 42 deletions, by 1 contributors: jysperm.
+
+## v0.7.0(2014.8.31)
 用于 2014.8.31，GreenShadow 上线，数据库升级脚本将于 v0.7.1 提供。
 
 * (新增) 数据库升级迁移脚本，兑换代码生成脚本
