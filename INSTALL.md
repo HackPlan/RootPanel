@@ -148,6 +148,9 @@
 
         ulimit -n 51200
 
+    iptables -A OUTPUT -p tcp --dport 25 -j DROP
+    iptables -A OUTPUT -d smtp.postmarkapp.com  -j ACCEPT
+
 ### Runtime
 
     # Shell
