@@ -47,6 +47,9 @@ GreenShadow 使用标准的 ShadowSocks 协议，服务器是官方的 Python �
 ## 硬性限制
 为了防止滥发邮件，暂时封掉了 25 端口。
 
+## ShadowSocks
+感谢 [clowwindy](https://github.com/clowwindy) 的 [shadowsocks](https://github.com/clowwindy/shadowsocks).
+
 ## 禁止条款
 若用户违反以下禁止条款，我们将首先暂停您的服务，警告您改正相应行为；若您反复违反条款，或者我们认为您在故意违反条款，我们将停止您的账户，并且不会退款。
 

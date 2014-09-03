@@ -12,7 +12,7 @@ RootPanel 是一个高度插件化的，基于 Linux 的虚拟服务销售平台
 * ShadowSocks 代理服务
 
     按实际使用流量实时结算的 ShadowSocks 代理。  
-    示例站点：<http://ss.rpvhost.net>
+    示例站点：<http://greenshadow.net>
 
 * 朋友合租(开发中)
 * Xen VPS(开发中)
