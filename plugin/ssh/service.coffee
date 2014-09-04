@@ -2,7 +2,7 @@ child_process = require 'child_process'
 jade = require 'jade'
 path = require 'path'
 
-plugin = require '../../core/plugin'
+plugin = require '../../core/pluggable'
 monitor = require '../linux/monitor'
 
 module.exports =

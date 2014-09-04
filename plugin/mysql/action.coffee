@@ -1,6 +1,6 @@
 mysql = require 'mysql'
 
-plugin = require '../../core/plugin'
+plugin = require '../../core/pluggable'
 {requireInService} = require '../../core/router/middleware'
 
 connection = mysql.createConnection config.plugins.mysql.connection

@@ -4,7 +4,7 @@ path = require 'path'
 tmp = require 'tmp'
 fs = require 'fs'
 
-plugin = require '../../core/plugin'
+plugin = require '../../core/pluggable'
 
 mAccount = require '../../core/model/account'
 
@@ -32,7 +32,7 @@ module.exports =
       config_content = _.template (fs.readFileSync path.join(__dirname, 'template/fpm-pool.conf')).toString(),
         account: account
 
-      plugin.writeConfig "/etc/php5/fpm/pool.d/#{account.username}.conf", config_content, ->
+      pluggable.writeConfig "/etc/php5/fpm/pool.d/#{account.username}.conf", config_content, ->
         restartPhpfpm()
     else
       child_process.exec "sudo rm /etc/php5/fpm/pool.d/#{account.username}.conf", ->

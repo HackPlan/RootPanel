@@ -3,7 +3,7 @@ path = require 'path'
 jade = require 'jade'
 fs = require 'fs'
 
-plugin = require '../../core/plugin'
+plugin = require '../../core/pluggable'
 
 mAccount = require '../../core/model/account'
 mBalance = require '../../core/model/balance'
@@ -112,12 +112,12 @@ module.exports =
   restart: (account, callback) ->
     config_content = _.template (fs.readFileSync path.join(__dirname, 'template/config.conf')).toString(), account.attribute.plugin.shadowsocks
 
-    plugin.writeConfig "/etc/shadowsocks/#{account.username}.json", config_content, ->
+    pluggable.writeConfig "/etc/shadowsocks/#{account.username}.json", config_content, ->
       child_process.exec "sudo chmod +r /etc/shadowsocks/#{account.username}.json", ->
         config_content = _.template (fs.readFileSync path.join(__dirname, 'template/supervisor.conf')).toString(),
           account: account
 
-        plugin.writeConfig "/etc/supervisor/conf.d/#{account.username}.conf", config_content, ->
+        pluggable.writeConfig "/etc/supervisor/conf.d/#{account.username}.conf", config_content, ->
           child_process.exec 'sudo supervisorctl update', ->
             callback()
 

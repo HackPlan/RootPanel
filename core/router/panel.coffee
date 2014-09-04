@@ -1,6 +1,6 @@
 config = require '../../config'
 billing = require '../billing'
-plugin = require '../plugin'
+plugin = require '../pluggable'
 bitcoin = require '../bitcoin'
 {requireAuthenticate, renderAccount} = require './middleware'
 
@@ -60,7 +60,7 @@ exports.get '/', requireAuthenticate, (req, res) ->
     account.attribute.remaining_time = Math.ceil(billing.calcRemainingTime(account) / 24)
 
     async.eachSeries account.attribute.services, (service_name, callback) ->
-      service_plugin = plugin.get service_name
+      service_plugin = pluggable.get service_name
 
       if service_plugin.switch
         result.switch_buttons.push service_name

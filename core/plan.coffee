@@ -1,4 +1,4 @@
-plugin = require './plugin'
+plugin = require './pluggable'
 
 mAccount = require './model/account'
 
@@ -14,7 +14,7 @@ exports.joinPlan = (account, plan, callback) ->
       ,
         new: true
       , (err, account)->
-        (plugin.get serviceName).service.enable account, ->
+        (pluggable.get serviceName).service.enable account, ->
           callback()
 
     , ->
@@ -42,7 +42,7 @@ exports.leavePlan = (account, plan, callback) ->
 
         mAccount.update _id: account._id, modifier, (err) ->
           throw err if err
-          (plugin.get serviceName).service.delete account, ->
+          (pluggable.get serviceName).service.delete account, ->
             callback()
 
     , ->

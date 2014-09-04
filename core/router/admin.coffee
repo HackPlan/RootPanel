@@ -4,7 +4,7 @@ mAccount = require '../model/account'
 mTicket = require '../model/ticket'
 mBalance = require '..//model/balance'
 
-plugin = require '../plugin'
+plugin = require '../pluggable'
 
 module.exports = exports = express.Router()
 
@@ -56,7 +56,7 @@ exports.get '/', requireAdminAuthenticate, renderAccount, (req, res) ->
         accounts: accounts
         sites: sites
         pending_traffic: pending_traffic
-        siteSummary: plugin.get('nginx').service.siteSummary
+        siteSummary: pluggable.get('nginx').service.siteSummary
 
 exports.get '/ticket', requireAdminAuthenticate, renderAccount, (req, res) ->
   async.parallel
@@ -142,5 +142,5 @@ exports.post '/update_site', requireAdminAuthenticate, (req, res) ->
       $set:
         'attribute.plugin.nginx.sites.$.is_enable': if req.body.is_enable then true else false
     , ->
-      plugin.get('nginx').service.writeConfig account, ->
+      pluggable.get('nginx').service.writeConfig account, ->
         res.json {}

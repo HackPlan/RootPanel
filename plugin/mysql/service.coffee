@@ -4,7 +4,7 @@ mysql = require 'mysql'
 async = require 'async'
 
 config = require '../../config'
-plugin = require '../../core/plugin'
+plugin = require '../../core/pluggable'
 
 mAccount = require '../../core/model/account'
 

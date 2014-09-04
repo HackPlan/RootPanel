@@ -13,7 +13,7 @@ exports.load = (path) ->
   for lang in options.available_language
     data[lang] = JSON.parse fs.readFileSync((require 'path').join(path, "#{lang}.json"), 'utf8')
 
-exports.loadPlugin = (path, name) ->
+exports.loadForPlugin = (name, path) ->
   for lang in options.available_language
     data[lang]['plugins'][name] = JSON.parse fs.readFileSync((require 'path').join(path, "#{lang}.json"), 'utf8')
 

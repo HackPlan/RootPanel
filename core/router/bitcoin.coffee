@@ -1,5 +1,5 @@
 config = require '../../config'
-plugin = require '../plugin'
+plugin = require '../pluggable'
 bitcoin = require '../bitcoin'
 
 mAccount = require '../model/account'

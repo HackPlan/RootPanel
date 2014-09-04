@@ -1,6 +1,6 @@
 child_process = require 'child_process'
 
-plugin = require '../../core/plugin'
+plugin = require '../../core/pluggable'
 {requireInService} = require '../../core/router/middleware'
 
 module.exports = exports = express.Router()

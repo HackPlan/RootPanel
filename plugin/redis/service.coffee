@@ -4,7 +4,7 @@ path = require 'path'
 tmp = require 'tmp'
 fs = require 'fs'
 
-plugin = require '../../core/plugin'
+plugin = require '../../core/pluggable'
 monitor = require '../linux/monitor'
 
 mAccount = require '../../core/model/account'
@@ -23,12 +23,12 @@ module.exports =
           if is_act_enable
             return callback()
 
-          child_process.exec plugin.sudoSu(account, 'redis-server --unixsocket ~/redis.sock --port 0 --daemonize yes'), (err) ->
+          child_process.exec pluggable.sudoSu(account, 'redis-server --unixsocket ~/redis.sock --port 0 --daemonize yes'), (err) ->
             throw err if err
             app.redis.del 'rp:process_list', ->
               callback()
     else
-      child_process.exec plugin.sudoSu(account, "pkill -ef -u #{account.username} redis-server"), ->
+      child_process.exec pluggable.sudoSu(account, "pkill -ef -u #{account.username} redis-server"), ->
         callback()
 
   switch_status: (account, callback) ->

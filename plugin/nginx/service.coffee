@@ -3,7 +3,7 @@ jade = require 'jade'
 path = require 'path'
 fs = require 'fs'
 
-plugin = require '../../core/plugin'
+plugin = require '../../core/pluggable'
 
 mAccount = require '../../core/model/account'
 
@@ -66,7 +66,7 @@ module.exports =
       user_configure = _.template template.user_configure,
         sites: sites_configure
 
-      plugin.writeConfig "/etc/nginx/sites-enabled/#{account.username}.conf", user_configure, ->
+      pluggable.writeConfig "/etc/nginx/sites-enabled/#{account.username}.conf", user_configure, ->
         child_process.exec 'sudo service nginx reload', (err) ->
           throw err if err
           callback()
