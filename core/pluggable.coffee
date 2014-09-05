@@ -20,7 +20,7 @@ exports.initializePlugins = (callback) ->
     plugin = require plugin_path
 
     if fs.existsSync path.join(plugin_path, 'locale')
-      i18n.loadForPlugin name, path.join(plugin_path, 'locale')
+      i18n.loadForPlugin plugin
 
     if fs.existsSync path.join(plugin_path, 'static')
       app.use harp.mount("/plugin/#{name}", path.join(plugin_path, 'static'))

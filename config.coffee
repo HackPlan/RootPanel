@@ -9,8 +9,9 @@ module.exports =
     cookie_time: 30 * 24 * 3600 * 1000
 
   i18n:
-    defaultLanguage: 'zh_CN'
-    availableLanguage: ['zh_CN']
+    available_language: ['zh_CN']
+    default_language: 'zh_CN'
+    default_timezone: 'Asia/Shanghai'
 
   plugin:
     available_extensions: ['rpvhost']

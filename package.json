@@ -1,6 +1,6 @@
 {
   "name": "rootpanel",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "description": "A linux virtual host management system with extensibility",
   "homepage": "http://rpvhost.net",
   "license": "GPL-3.0",
@@ -38,7 +38,7 @@
     "middleware-injector": "~0.1.1",
     "tmp": "~0.0.24",
     "mysql": "~2.4.2",
-    "moment": "~2.8.1",
+    "moment-timezone": "~0.2.2",
     "request": "~2.40.0",
     "mongo-min": "~0.2.2",
     "redis": "~0.12.1",

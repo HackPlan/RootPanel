@@ -1,36 +1,37 @@
+path = require 'path'
 fs = require 'fs'
 
-options =
-  default_language: null
-  available_language: []
+config = require '../config'
 
-data = {}
+i18n_data = {}
 
-exports.init = (data) ->
-  options = data
+for lang in config.i18n.available_language
+  i18n_data[lang] = require "./locale/#{lang}"
 
-exports.load = (path) ->
+exports.loadForPlugin = (plugin) ->
   for lang in options.available_language
-    data[lang] = JSON.parse fs.readFileSync((require 'path').join(path, "#{lang}.json"), 'utf8')
+    path = "../plugin/#{plugin.name}/locale/#{lang}.json"
 
-exports.loadForPlugin = (name, path) ->
-  for lang in options.available_language
-    data[lang]['plugins'][name] = JSON.parse fs.readFileSync((require 'path').join(path, "#{lang}.json"), 'utf8')
+    if fs.existsSync path
+      i18n_data[lang]['plugins'][plugin.name] = require lang
 
 exports.translate = (name, lang) ->
   unless lang
-    lang = options.default_language
+    lang = config.i18n.default_language
 
-  names = name.split '.'
-  result = data[lang][names.shift()]
+  keys = key.split '.'
+  keys.unshift lang
 
-  for item in names
-    if result and result[item]
+  result = object
+
+  for item in keys
+    unless result[item] == undefined
       result = result[item]
-    else
-      return name
 
-  return result
+  if result == undefined and lang != config.i18n.default_language
+    return exports.translate name, config.i18n.default_language
+  else
+    return result
 
 exports.getTranslator = (lang) ->
   return (name) ->

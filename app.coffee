@@ -6,19 +6,13 @@ moment = require 'moment'
 mongomin = require 'mongo-min'
 redis = require 'redis'
 
-global._ = require 'underscore'
-global.ObjectID = require('mongodb').ObjectID
-global.express = require 'express'
-global.async = require 'async'
-global.path = require 'path'
-
 global.app = express()
 global.config = require './config'
 global.i18n = require './core/i18n'
 global.utils = require './core/router/utils'
 global.pluggable = require './core/pluggable'
 
-if fs.existsSync(config.web.listen)
+if fs.existsSync config.web.listen
   fs.unlinkSync config.web.listen
 
 fs.chmodSync path.join(__dirname, 'config.coffee'), 0o750
@@ -50,12 +44,6 @@ exports.run = ->
   exports.connectDatabase (err) ->
     throw err if err
 
-    i18n.init
-      default_language: 'zh_CN'
-      available_language: ['zh_CN']
-
-    i18n.load path.join(__dirname, 'core/locale')
-
     app.package = require './package.json'
 
     app.use connect.json()
@@ -67,9 +55,8 @@ exports.run = ->
 
     app.use (req, res, next) ->
       res.locals.app = app
-      res.locals.moment = moment
-      res.locals.t = i18n.getTranslator 'zh_CN'
-      res.locals.mAccount = require './core/model/account'
+      res.locals.t = i18n.getTranslator req.cookies.language
+      res.moment = moment().locale(req.cookies.language ? config.i18n.default_language).tz(req.cookies.timezone ? config.i18n.default_timezone)
 
       next()
 
@@ -78,7 +65,7 @@ exports.run = ->
 
     bindRouters app
 
-    app.use harp.mount(path.join(__dirname, 'core/static'))
+    app.use harp.mount './core/static'
 
     app.listen config.web.listen, ->
       fs.chmodSync config.web.listen, 0o770
