@@ -1,4 +1,4 @@
-module.exports = exports = app.db.buildModel 'security_log'
+module.exports = exports = app.db.collection 'security_log'
 
 sample =
   account_id: new ObjectID()

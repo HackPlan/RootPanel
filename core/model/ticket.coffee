@@ -2,7 +2,7 @@ markdown = require('markdown').markdown
 
 mAccount = require './account'
 
-module.exports = exports = app.db.buildModel 'tickets'
+module.exports = exports = app.db.collection 'tickets'
 
 sample =
   account_id: ObjectID()

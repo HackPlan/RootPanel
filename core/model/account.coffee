@@ -6,11 +6,7 @@ bitcoin = require '../bitcoin'
 
 mBalance = require './balance'
 
-module.exports = exports = app.db.buildModel 'accounts'
-
-exports.byUsername = exports.buildByXXOO 'username'
-exports.byEmail = exports.buildByXXOO 'email'
-exports.byDepositAddress = exports.buildByXXOO 'attribute.bitcoin_deposit_address'
+module.exports = exports = app.db.collection 'accounts'
 
 sample =
   username: 'jysperm'

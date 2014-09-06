@@ -3,7 +3,6 @@ path = require 'path'
 harp = require 'harp'
 fs = require 'fs'
 moment = require 'moment'
-mongomin = require 'mongo-min'
 redis = require 'redis'
 
 global.app = express()
@@ -30,19 +29,15 @@ bindRouters = ->
   app.get '/', (req, res) ->
     res.redirect '/panel/'
 
-exports.connectDatabase = (callback) ->
+exports.run = ->
   {user, password, host, name} = config.mongodb
-  mongomin "mongodb://#{user}:#{password}@#{host}/#{name}", (err, db) ->
+
+  MongoClient.connect "mongodb://#{user}:#{password}@#{host}/#{name}", (err, db) ->
+    throw err if err
     app.db = db
 
     app.redis = redis.createClient 6379, '127.0.0.1',
       auth_pass: config.redis_password
-
-    callback err
-
-exports.run = ->
-  exports.connectDatabase (err) ->
-    throw err if err
 
     app.package = require './package.json'
 
@@ -50,8 +45,6 @@ exports.run = ->
     app.use connect.urlencoded()
     app.use connect.cookieParser()
     app.use connect.logger('dev')
-
-    moment.locale 'zh_CN'
 
     app.use (req, res, next) ->
       res.locals.app = app

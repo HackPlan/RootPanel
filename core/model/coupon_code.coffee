@@ -1,6 +1,6 @@
 mAccount = require './account'
 
-module.exports = exports = app.db.buildModel 'coupon_code'
+module.exports = exports = app.db.collection 'coupon_code'
 
 sample =
   code: 'PmlFH2hpziDmyqPX'
