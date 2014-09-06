@@ -3,7 +3,7 @@ child_process = require 'child_process'
 service = require './service'
 configure = require './configure'
 
-{requireInService, getParam} = require '../../core/router/middleware'
+{requireInService, getParam} = require '../../core/middleware'
 
 mAccount = require '../../core/model/account'
 

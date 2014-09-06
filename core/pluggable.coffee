@@ -11,6 +11,7 @@ exports.plugins = {}
 
 exports.hooks =
   account:
+    # function(account, callback(is_allow))
     username_filter: []
     # function(account, callback)
     before_register: []

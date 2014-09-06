@@ -7,7 +7,7 @@ unless _.find(app.view_hook.menu_bar, (i) -> i.href == '/wiki/')
     href: '/wiki/'
     html: '用户手册'
 
-{renderAccount} = require './middleware'
+{renderAccount} = require './../middleware'
 
 module.exports = exports = express.Router()
 

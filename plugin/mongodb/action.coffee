@@ -1,6 +1,6 @@
 crypto = require 'crypto'
 
-{requireInService} = require '../../core/router/middleware'
+{requireInService} = require '../../core/middleware'
 
 mongodb = app.plugins.mongodb
 

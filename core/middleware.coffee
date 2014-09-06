@@ -1,4 +1,4 @@
-mAccount = require '../model/account'
+mAccount = require './model/account'
 
 exports.parseToken = (req, res, next) ->
   if req.headers['x-token']

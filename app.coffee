@@ -40,9 +40,15 @@ exports.run = ->
     app.config = require '../config'
     app.package = require './package.json'
     app.pluggable = require './core/pluggable'
+    app.middleware = require './core/middleware'
+    app.token_manager = require './core/token_manager'
 
     app.models =
       mAccount: require './model/account'
+      mBalanceLog: require './model/balance_log'
+      mCouponCode: require './model/coupon_code'
+      mSecurityLog: require './model/security_log'
+      mTicket: require './model/tickets'
 
     app.use connect.json()
     app.use connect.urlencoded()

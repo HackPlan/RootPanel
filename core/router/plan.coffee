@@ -2,7 +2,7 @@ config = require '../../config'
 plugin = require '../pluggable'
 billing = require '../billing'
 plan = require '../plan'
-{requireAuthenticate} = require './middleware'
+{requireAuthenticate} = require './../middleware'
 
 mAccount = require '../model/account'
 

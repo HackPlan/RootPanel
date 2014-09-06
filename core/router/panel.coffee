@@ -2,7 +2,7 @@ config = require '../../config'
 billing = require '../billing'
 plugin = require '../pluggable'
 bitcoin = require '../bitcoin'
-{requireAuthenticate, renderAccount} = require './middleware'
+{requireAuthenticate, renderAccount} = require './../middleware'
 
 mAccount = require '../model/account'
 mBalance = require '../model/balance_log'

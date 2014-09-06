@@ -1,6 +1,6 @@
 markdown = require('markdown').markdown
 
-{requireAuthenticate, renderAccount, getParam} = require './middleware'
+{requireAuthenticate, renderAccount, getParam} = require './../middleware'
 
 mAccount = require '../model/account'
 mTicket = require '../model/ticket'

@@ -1,11 +1,3 @@
-exports.rx =
-  username: /^[a-z][0-9a-z_]{2,23}$/
-  email: /^\w+([-+.]\w+)*@\w+([-+.]\w+)*$/
-  password: /^.+$/
-  domain: /(\*\.)?[A-Za-z0-9]+(\-[A-Za-z0-9]+)*(\.[A-Za-z0-9]+(\-[A-Za-z0-9]+)*)*/
-  filename: /[A-Za-z0-9_\-\.]+/
-  url: /^https?:\/\/[^\s;]*$/
-
 exports.checkHomeFilePath = (account, path) ->
   home_dir = "/home/#{account.username}/"
 

@@ -1,15 +1,11 @@
-config = require '../../config'
-utils = require './utils'
-{renderAccount, errorHandling, requireAuthenticate} = require './middleware'
-
-mAccount = require '../model/account'
-mSecurityLog = require '../model/security_log'
-mCouponCode = require '../model/coupon_code'
+{renderAccount, errorHandling, requireAuthenticate} = app.middleware
+{mAccount, mSecurityLog, mCouponCode} = app.models
+{pluggable, config, utils, token_manager} = app
 
 module.exports = exports = express.Router()
 
-exports.get '/signup', renderAccount, (req, res) ->
-  res.render 'account/signup'
+exports.get '/register', renderAccount, (req, res) ->
+  res.render 'account/register'
 
 exports.get '/login', renderAccount, (req, res) ->
   res.render 'account/login'
@@ -17,7 +13,7 @@ exports.get '/login', renderAccount, (req, res) ->
 exports.get '/setting', requireAuthenticate, renderAccount, (req, res) ->
   res.render 'account/setting'
 
-exports.post '/signup', errorHandling, (req, res) ->
+exports.post '/register', errorHandling, (req, res) ->
   unless utils.rx.username.test req.body.username
     return res.error 'invalid_username'
 
@@ -27,34 +23,49 @@ exports.post '/signup', errorHandling, (req, res) ->
   unless utils.rx.password.test req.body.password
     return res.error 'invalid_password'
 
-  callback = ->
-    mAccount.byUsername req.body.username, (err, account) ->
-      if account
-        return res.error 'username_exist'
+  async.each pluggable.account.username_filter, (hook_callback, callback) ->
+    hook_callback account, (is_allow) ->
+      if is_allow
+        callback()
+      else
+        callback true
 
-      mAccount.byEmail req.body.email, (err, account) ->
-        if account
-          return res.error 'email_exist'
+  , (not_allow) ->
+    if not_allow
+      return res.error 'username_exist'
 
-        mAccount.register req.body.username, req.body.email, req.body.password, (err, account) ->
-          mAccount.createToken account,
-            ip: req.headers['x-real-ip']
-            ua: req.headers['user-agent']
-          , (err, token)->
-            res.cookie 'token', token,
-              expires: new Date(Date.now() + config.account.cookie_time)
+    async.parallel
+      username: (callback) ->
+        mAccount.fineOne
+          username: req.body.username
+        , (err, account) ->
+          if account
+            res.error 'username_exist'
 
-            res.json
-              id: account._id
+          callback account
 
-  if 'linux' in config.plugin.available_services
-    require('../../plugin/linux/monitor').loadPasswd (passwd_cache) ->
-      if req.body.username in _.values(passwd_cache)
-        return res.error 'username_exist'
+      email: (callback) ->
+        mAccount.findOne
+          email: req.body.email
+        , (err, account) ->
+          if account
+            res.error 'email_exist'
 
-      callback()
-  else
-    callback()
+          callback account
+
+    , (err) ->
+      return if err
+
+      mAccount.register _.pick(req.body, 'username', 'email', 'password'), (err, account) ->
+        token_manager.createToken account,
+          ip: req.headers['x-real-ip']
+          ua: req.headers['user-agent']
+        , (token)->
+          res.cookie 'token', token,
+            expires: new Date(Date.now() + config.account.cookie_time)
+
+          res.json
+            id: account._id
 
 exports.post '/login', errorHandling, (req, res) ->
   mAccount.byUsernameOrEmailOrId req.body.username, (err, account) ->

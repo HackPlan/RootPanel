@@ -1,7 +1,7 @@
 child_process = require 'child_process'
 
 service = require './service'
-{requireInService} = require '../../core/router/middleware'
+{requireInService} = require '../../core/middleware'
 
 mAccount = require '../../core/model/account'
 

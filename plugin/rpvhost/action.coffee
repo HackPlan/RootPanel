@@ -1,4 +1,4 @@
-{renderAccount} = require '../../core/router/middleware'
+{renderAccount} = require '../../core/middleware'
 
 module.exports = exports = express.Router()
 

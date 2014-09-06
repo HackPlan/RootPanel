@@ -1,4 +1,4 @@
-{requireAdminAuthenticate, renderAccount} = require './middleware'
+{requireAdminAuthenticate, renderAccount} = require './../middleware'
 
 mAccount = require '../model/account'
 mTicket = require '../model/ticket'

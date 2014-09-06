@@ -3,7 +3,7 @@ fs = require 'fs'
 path = require 'path'
 
 service = require './service'
-{renderAccount, requireInService, requireAuthenticate} = require '../../core/router/middleware'
+{renderAccount, requireInService, requireAuthenticate} = require '../../core/middleware'
 
 mAccount = require '../../core/model/account'
 
