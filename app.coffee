@@ -6,10 +6,6 @@ moment = require 'moment'
 redis = require 'redis'
 
 global.app = express()
-global.config = require './config'
-global.i18n = require './core/i18n'
-global.utils = require './core/router/utils'
-global.pluggable = require './core/pluggable'
 
 if fs.existsSync config.web.listen
   fs.unlinkSync config.web.listen
@@ -39,7 +35,11 @@ exports.run = ->
     app.redis = redis.createClient 6379, '127.0.0.1',
       auth_pass: config.redis_password
 
+    app.i18n = require './core/i18n'
+    app.utils = require './core/utils'
+    app.config = require '../config'
     app.package = require './package.json'
+    app.pluggable = require './core/pluggable'
 
     app.use connect.json()
     app.use connect.urlencoded()

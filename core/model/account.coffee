@@ -1,8 +1,6 @@
-
 nodemailer = require 'nodemailer'
 
-config = require '../../config'
-bitcoin = require '../bitcoin'
+{config, pluggable} = app
 
 mBalance = require './balance'
 
@@ -59,38 +57,46 @@ sample =
       ua: 'Mozilla/5.0 (Intel Mac OS X) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.102'
   ]
 
-exports.hashPassword = (password, password_salt) ->
-  return exports.sha256(password_salt + exports.sha256(password))
-
-exports.register = (username, email, password, callback) ->
+# @param account: username, email, password
+# @param callback(account)
+exports.register = (account, callback) ->
   password_salt = exports.randomSalt()
-  bitcoin_secret = exports.randomSalt()
 
-  bitcoin.genAddress bitcoin_secret, (address) ->
-    exports.insert
-      _id: new ObjectID()
-      username: username
-      password: exports.hashPassword(password, password_salt)
-      password_salt: password_salt
-      email: email
-      signup_at: new Date()
-      group: []
-      setting:
-        avatar_url: "//ruby-china.org/avatar/#{crypto.createHash('md5').update(email).digest('hex')}?s=58"
-      attribute:
-        bitcoin_deposit_address: address
-        bitcoin_secret: bitcoin_secret
-        services: []
-        plans: []
-        balance: 0
-        last_billing_at: new Date()
-        arrears_at: null
-        resources_limit: {}
+  {username, email, password} = account
 
-        plugin: {}
-      tokens: []
-    , (err, result) ->
-      callback err, result?[0]
+  account =
+    username: username
+    password: exports.hashPassword(password, password_salt)
+    password_salt: password_salt
+    email: email
+    created_at: new Date()
+
+    group: []
+
+    settings:
+      avatar_url: "//ruby-china.org/avatar/#{app.utils.md5(email)}?s=58"
+      language: config.i18n.default_language
+      timezone: config.i18n.default_timezone
+
+    billing:
+      services: []
+      plans: []
+
+      balance: 0
+      last_billing_at: Date()
+      arrears_at: null
+
+    pluggable: {}
+
+    resources_limit: {}
+
+    tokens: []
+
+  async.each pluggable.hooks.account.before_register, (hook_callback, callback) ->
+    hook_callback account, callback
+  , ->
+    exports.insert account, (err, result) ->
+      callback _.first result
 
 exports.updatePassword = (account, password, callback) ->
   password_salt = exports.randomSalt()

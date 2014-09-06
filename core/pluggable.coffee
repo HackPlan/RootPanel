@@ -10,6 +10,11 @@ i18n = require './i18n'
 exports.plugins = {}
 
 exports.hooks =
+  account:
+    username_filter: []
+    # function(account, callback)
+    before_register: []
+
   view:
     layout:
       styles: []
@@ -38,7 +43,7 @@ exports.initializePlugins = (callback) ->
 
   async.parallel [
     (callback) ->
-      async.each config.plugin.available_services, (name, callback) ->
+      async.each config.plugin.available_extensions, (name, callback) ->
         initializePlugin name, (plugin) ->
           initializeExtension plugin, callback
       , callback

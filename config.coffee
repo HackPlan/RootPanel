@@ -14,7 +14,7 @@ module.exports =
     default_timezone: 'Asia/Shanghai'
 
   plugin:
-    available_extensions: ['rpvhost']
+    available_extensions: ['rpvhost', 'wiki', 'bitcoin']
     available_services: ['shadowsocks']
 
   billing:
@@ -40,6 +40,12 @@ module.exports =
     password: 'password'
     host: 'localhost'
     name: 'RootPanel'
+
+  redis:
+    host: '127.0.0.1'
+    port: 6379
+    password: 'password'
+    prefix: 'RP'
 
   redis_password: 'password'
 

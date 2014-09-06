@@ -27,7 +27,7 @@ exports.createToken = (account, type, payload, callback) ->
     , ->
       callback token
 
-# @param payload Must be flat
+# @param payload must be flat
 # @param callback(is_found)
 exports.revokeToken = (token, payload, callback) ->
   modifier =
