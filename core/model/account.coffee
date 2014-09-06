@@ -1,4 +1,4 @@
-crypto = require 'crypto'
+
 nodemailer = require 'nodemailer'
 
 config = require '../../config'
@@ -13,19 +13,17 @@ sample =
   password: '53673f434686ce045477f066f30eded55a9bb535a6cec7b73a60972ccafddb2a'
   password_salt: '53673f434686b535a6cec7b73a60ce045477f066f30eded55a9b972ccafddb2a'
   email: 'jysperm@gmail.com'
-  signup_at: Date()
+  created_at: Date()
 
   group: ['root']
 
-  setting:
+  settings:
     avatar_url: 'http://ruby-china.org/avatar/efcc15b92617a95a09f514a9bff9e6c3?s=58'
     language: 'zh_CN'
+    timezone: 'Asia/Shanghai'
     QQ: '184300584'
 
-  attribute:
-    bitcoin_deposit_address: '13v2BTCMZMHg5v87susgg86HFZqXERuwUd'
-    bitcoin_secret: '53673f434686b535a6cec7b73a60ce045477f066f30eded55a9b972ccafddb2a'
-
+  billing:
     services: ['shadowsocks']
     plans: ['all']
 
@@ -33,42 +31,33 @@ sample =
     last_billing_at: Date()
     arrears_at: Date()
 
-    plugin:
-      phpfpm:
-        is_enbale: false
+  pluggable:
+    bitcoin:
+      bitcoin_deposit_address: '13v2BTCMZMHg5v87susgg86HFZqXERuwUd'
+      bitcoin_secret: '53673f434686b535a6cec7b73a60ce045477f066f30eded55a9b972ccafddb2a'
 
-      nginx:
-        sites: []
+    phpfpm:
+      is_enbale: false
 
-    resources_limit:
-      cpu: 144
-      storage: 520
-      transfer: 39
-      memory: 27
+    nginx:
+      sites: []
+
+  resources_limit:
+    cpu: 144
+    storage: 520
+    transfer: 39
+    memory: 27
 
   tokens: [
+    type: 'access_token'
     token: 'b535a6cec7b73a60c53673f434686e04972ccafddb2a5477f066f30eded55a9b'
+    is_available: true
     created_at: Date()
     updated_at: Date()
-    attribute:
+    payload:
       ip: '123.184.237.163'
       ua: 'Mozilla/5.0 (Intel Mac OS X) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.102'
   ]
-
-exports.sha256 = (data) ->
-  return null unless data
-  return crypto.createHash('sha256').update(data).digest('hex')
-
-exports.randomSalt = ->
-  return exports.sha256 crypto.randomBytes 256
-
-exports.randomString = (length) ->
-  char_map = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-
-  result = _.map _.range(0, length), ->
-    return char_map.charAt Math.floor(Math.random() * char_map.length)
-
-  return result.join ''
 
 exports.hashPassword = (password, password_salt) ->
   return exports.sha256(password_salt + exports.sha256(password))
@@ -110,45 +99,6 @@ exports.updatePassword = (account, password, callback) ->
     $set:
       password: exports.hashPassword(password, password_salt)
       password_salt: password_salt
-  , callback
-
-exports.createToken = (account, attribute, callback) ->
-  generateToken = (callback) ->
-    token = exports.randomSalt()
-
-    exports.findOne
-      'tokens.token': token
-    , (err, result) ->
-      if result
-        generateToken callback
-      else
-        callback token
-
-  generateToken (token) ->
-    exports.update _id: account._id,
-      $push:
-        tokens:
-          token: token
-          created_at: new Date()
-          updated_at: new Date()
-          attribute: attribute
-    , ->
-      callback null, token
-
-exports.removeToken = (token, callback) ->
-  exports.update {'tokens.token': token},
-    $pull:
-      tokens:
-        token: token
-  , callback
-
-exports.authenticate = (token, callback) ->
-  unless token
-    return callback true, null
-
-  exports.findAndModify 'tokens.token': token, {},
-    $set:
-      'tokens.$.updated_at': new Date()
   , callback
 
 exports.byUsernameOrEmailOrId = (username, callback) ->
