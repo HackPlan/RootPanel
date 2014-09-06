@@ -1,8 +1,8 @@
 nodemailer = require 'nodemailer'
 
-{config, pluggable} = app
+{config, pluggable, utils} = app
 
-mBalance = require './balance'
+mBalance = require './balance_log'
 
 module.exports = exports = app.db.collection 'accounts'
 
@@ -60,13 +60,13 @@ sample =
 # @param account: username, email, password
 # @param callback(account)
 exports.register = (account, callback) ->
-  password_salt = exports.randomSalt()
+  password_salt = utils.randomSalt()
 
   {username, email, password} = account
 
   account =
     username: username
-    password: exports.hashPassword(password, password_salt)
+    password: utils.hashPassword(password, password_salt)
     password_salt: password_salt
     email: email
     created_at: new Date()
@@ -74,7 +74,7 @@ exports.register = (account, callback) ->
     group: []
 
     settings:
-      avatar_url: "//ruby-china.org/avatar/#{app.utils.md5(email)}?s=58"
+      avatar_url: "//ruby-china.org/avatar/#{utils.md5(email)}?s=58"
       language: config.i18n.default_language
       timezone: config.i18n.default_timezone
 
@@ -99,11 +99,11 @@ exports.register = (account, callback) ->
       callback _.first result
 
 exports.updatePassword = (account, password, callback) ->
-  password_salt = exports.randomSalt()
+  password_salt = utils.randomSalt()
 
   exports.update _id: account._id,
     $set:
-      password: exports.hashPassword(password, password_salt)
+      password: utils.hashPassword password, password_salt
       password_salt: password_salt
   , callback
 

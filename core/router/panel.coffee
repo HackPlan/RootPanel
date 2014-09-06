@@ -5,7 +5,7 @@ bitcoin = require '../bitcoin'
 {requireAuthenticate, renderAccount} = require './middleware'
 
 mAccount = require '../model/account'
-mBalance = require '../model/balance'
+mBalance = require '../model/balance_log'
 
 module.exports = exports = express.Router()
 

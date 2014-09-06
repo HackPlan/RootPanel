@@ -6,7 +6,7 @@ fs = require 'fs'
 plugin = require '../../core/pluggable'
 
 mAccount = require '../../core/model/account'
-mBalance = require '../../core/model/balance'
+mBalance = require '../../core/model/balance_log'
 
 BILLING_BUCKET = config.plugins.shadowsocks.billing_bucket
 

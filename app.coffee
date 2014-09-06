@@ -15,7 +15,7 @@ fs.chmodSync path.join(__dirname, 'config.coffee'), 0o750
 bindRouters = ->
   app.use require 'middleware-injector'
 
-  for module_name in ['account', 'admin', 'panel', 'plan', 'ticket', 'bitcoin']
+  for module_name in ['account', 'admin', 'panel', 'plan', 'ticket']
     app.use "/#{module_name}", require './core/router/' + module_name
 
   pluggable.initializePlugins()
@@ -40,6 +40,9 @@ exports.run = ->
     app.config = require '../config'
     app.package = require './package.json'
     app.pluggable = require './core/pluggable'
+
+    app.models =
+      mAccount: require './model/account'
 
     app.use connect.json()
     app.use connect.urlencoded()

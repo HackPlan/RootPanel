@@ -2,7 +2,7 @@ config = require './../config'
 plan = require './plan'
 
 mAccount = require './model/account'
-mBalance = require './model/balance'
+mBalance = require './model/balance_log'
 
 exports.cyclicalBilling = ->
   mAccount.find

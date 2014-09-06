@@ -18,6 +18,8 @@ module.exports =
     available_services: ['shadowsocks']
 
   billing:
+    currency: 'CNY'
+
     taobao_item_id: '38370649858'
 
     force_unsubscribe:

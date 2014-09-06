@@ -1,5 +1,6 @@
 request = require 'request'
 
+{mAccount} = app.models
 {pluggable, redis, config} = app
 
 module.exports =
@@ -45,3 +46,22 @@ pluggable.hooks.account.before_register.psuh (account, callback) ->
       bitcoin_secret: bitcoin_secret
 
     callback()
+
+app.post '/bitcoin/coinbase_callback', (req, res) ->
+  mAccount.findOne
+    'pluggable.bitcoin.bitcoin_deposit_address': req.body.address
+  , (err, account) ->
+    unless account
+      return res.send 400, 'Invalid Address'
+
+    unless req.query.secret == account.pluggable.bitcoin.bitcoin_secret
+      return res.send 400, 'Invalid Secret'
+
+    getExchangeRate config.billing.currency, (rate) ->
+      amount = req.body.amount / rate
+
+      mAccount.incBalance account, 'deposit', amount,
+        type: 'bitcoin'
+        order_id: req.body.transaction.hash
+      , ->
+        res.send 'Success'
