@@ -75,7 +75,7 @@ exports.post '/login', errorHandling, (req, res) ->
     unless mAccount.matchPassword account, req.body.password
       return res.error 'wrong_password'
 
-    mAccount.createToken account,
+    token_manager.createToken account,
       ip: req.headers['x-real-ip']
       ua: req.headers['user-agent']
     , (err, token) ->
@@ -87,7 +87,11 @@ exports.post '/login', errorHandling, (req, res) ->
         token: token
 
 exports.post '/logout', requireAuthenticate, (req, res) ->
-  mAccount.removeToken req.token, ->
+  token_manager.remokeToken req.token,
+    revoke_at: new Date()
+    revoke_ip: req.headers['x-real-ip']
+    revoke_ua: req.headers['user-agent']
+  , ->
     res.clearCookie 'token'
     res.json {}
 
@@ -102,7 +106,7 @@ exports.post '/update_password', requireAuthenticate, (req, res) ->
     token = _.first _.where req.account.tokens,
       token: req.token
 
-    mSecurityLog.create req.account, 'update_password',
+    mSecurityLog.create req.account, 'update_password', req.token,
       token: _.omit(token, 'updated_at')
     , ->
       res.json {}
@@ -121,7 +125,7 @@ exports.post '/update_email', requireAuthenticate, (req, res) ->
     token = _.first _.where req.account.tokens,
       token: req.token
 
-    mSecurityLog.create req.account, 'update_email',
+    mSecurityLog.create req.account, 'update_email', req.token,
       old_email: req.account.email
       email: req.body.email
       token: _.omit(token, 'updated_at')
@@ -141,7 +145,7 @@ exports.post '/update_setting', requireAuthenticate, (req, res) ->
     token = _.first _.where req.account.tokens,
       token: req.token
 
-    mSecurityLog.create req.account, 'update_setting',
+    mSecurityLog.create req.account, 'update_setting', req.token,
       name: req.body.name
       old_value: req.account.setting[req.body.name]
       value: req.body.value

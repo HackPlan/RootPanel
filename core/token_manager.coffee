@@ -49,7 +49,7 @@ exports.authenticate = (token, callback) ->
     $set:
       'tokens.$.updated_at': new Date()
   , (err, account) ->
-    matched_token = _.find account?.tokens, (i) ->
-      return i.token == token
+    matched_token = _.first _.where req.account.tokens,
+      token: token
 
     callback matched_token.type, account
