@@ -19,7 +19,7 @@ genAddress = (bitcoin_secret, callback) ->
     throw err if err
     callback body.address
 
-# @param currency: CNY, USD, JPY
+# @param currency: CNY, USD, JPY etc.
 # @param callback(rate)
 getExchangeRate = (currency, callback) ->
   REDIS_KEY = "#{config.redis.prefix}:[bitcoin.getExchangeRate]:#{currency}"
