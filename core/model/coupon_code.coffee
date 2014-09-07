@@ -9,7 +9,7 @@ sample =
   type: 'amount'
   meta:
     amount: 10
-  log: [
+  apply_log: [
     account_id: new ObjectID()
     created_at: new Date()
   ]

@@ -5,16 +5,16 @@ sample =
   type: 'deposit'
   amount: 10
   created_at: new Date()
-  attribute:
+  payload:
     type: 'taobao'
     order_id: '560097131641814'
 
-exports.create = (account, type, amount, attribute, callback) ->
+exports.create = (account, type, amount, payload, callback) ->
   exports.insert
     account_id: account._id
     type: type
     amount: amount
-    attribute: attribute
+    payload: payload
     created_at: new Date()
   , (err, result) ->
-    callback err, result?[0]
+    callback err, _.first result

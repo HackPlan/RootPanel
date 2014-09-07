@@ -13,27 +13,25 @@ sample =
   content_html: 'Ticket Conetnt(HTML)'
   status: 'open/pending/finish/closed'
 
-  attribute:
+  payload:
     public: false
 
   members: [
     ObjectID()
-  ],
+  ]
 
-  replys: [
+  replies: [
     _id: ObjectID()
     account_id: ObjectID()
     created_at: Date()
     content: 'Reply Content(Markdown)'
     content_html: 'Reply Conetnt(HTML)'
-    attribute: {}
+    payload: {}
   ]
 
-exports.createTicket = (account, title, content, members, status, attribute, callback) ->
-  membersID = []
-
-  for member in members
-    membersID.push member._id
+exports.createTicket = (account, title, content, members, status, payload, callback) ->
+  members_id = _.map (members) ->
+    return member._id
 
   exports.insert
     account_id: account._id
@@ -44,10 +42,10 @@ exports.createTicket = (account, title, content, members, status, attribute, cal
     content_html: markdown.toHTML content
     status: status
     members: membersID
-    attribute: attribute
-    replys: []
+    payload: payload
+    replies: []
   , (err, result) ->
-    callback err, result?[0]
+    callback err, _.first result
 
 exports.createReply = (ticket, account, content, status, callback) ->
   data =
@@ -56,11 +54,11 @@ exports.createReply = (ticket, account, content, status, callback) ->
     created_at: new Date()
     content: content
     content_html: markdown.toHTML content
-    attribute: {}
+    payload: {}
 
   exports.update _id: ticket._id,
     $push:
-      replys: data
+      replies: data
     $set:
       status: status
       updated_at: new Date()
