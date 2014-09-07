@@ -1,73 +1,75 @@
 {
-  "app": {
-    "name": "RootPanel",
-    "description": "一个插件化的 Linux 虚拟主机管理系统。"
-  },
-  "plans": {
-    "all": {
-      "name": "所有服务(默认)",
-      "description": "该套餐包含所有的服务"
-    }
-  },
-  "common": {
-    "error": "错误"
-  },
-  "account": {
-    "": "帐号",
-    "signup": "注册",
-    "login": "登录",
-    "username": "用户名",
-    "email": "邮箱",
-    "password": "密码",
-    "logout": "注销"
-  },
-  "panel": {
-    "": "管理面板",
-    "overview": "概况"
-  },
-  "ticket": {
-    "": "工单",
-    "title": "标题",
-    "status": "状态",
-    "create": "创建",
-    "reply": "回复",
-    "replies": "全部回复",
-    "create_ticket": "创建工单",
-    "create_reply": "创建回复",
-    "ticket_list": "工单列表",
-    "close_ticket": "关闭",
-    "finish_ticket": "完成",
-    "reopen_ticket": "重新打开",
-    "creator": "创建者",
-    "members": "成员"
-  },
-  "plan": {
-    "": "套餐",
-    "subscribe": "订购",
-    "unsubscribe": "退订",
-    "balance": "余额",
-    "remaining_time": "剩余时长",
-    "currency": {
-      "cny": "CNY"
-    }
-  },
-  "admin": {
-    "admin_panel": "管理员面板"
-  },
-  "time": {
-    "day": "天"
-  },
-  "view": {
-    "layout": {
-      "navigation": "展开导航"
+    "app": {
+        "name": "RootPanel",
+        "description": "一个插件化的 Linux 虚拟主机管理系统。"
+    },
+    "plans": {
+        "sample": {
+            "name": "示例",
+            "description": "每月 8 元，按小时计费"
+        },
+        "test": {
+            "name": "测试",
+            "description": "按量付费，7 天不使用自动关闭"
+        }
+    },
+    "common": {
+        "error": "错误"
     },
     "account": {
-      "password2": "重复",
-      "already_signup": "已有帐号？",
-      "no_account": "还没有账户？"
-    }
-  },
-  "plugins": {
-
-  }
+        "": "帐号",
+        "signup": "注册",
+        "login": "登录",
+        "username": "用户名",
+        "email": "邮箱",
+        "password": "密码",
+        "logout": "注销"
+    },
+    "panel": {
+        "": "管理面板",
+        "overview": "概况"
+    },
+    "ticket": {
+        "": "工单",
+        "title": "标题",
+        "status": "状态",
+        "create": "创建",
+        "reply": "回复",
+        "replies": "全部回复",
+        "create_ticket": "创建工单",
+        "create_reply": "创建回复",
+        "ticket_list": "工单列表",
+        "close_ticket": "关闭",
+        "finish_ticket": "完成",
+        "reopen_ticket": "重新打开",
+        "creator": "创建者",
+        "members": "成员"
+    },
+    "plan": {
+        "": "套餐",
+        "subscribe": "订购",
+        "unsubscribe": "退订",
+        "balance": "余额",
+        "remaining_time": "剩余时长",
+        "currency": {
+            "cny": "CNY"
+        }
+    },
+    "admin": {
+        "admin_panel": "管理员面板"
+    },
+    "time": {
+        "day": "天"
+    },
+    "view": {
+        "layout": {
+            "navigation": "展开导航"
+        },
+        "account": {
+            "password2": "重复",
+            "already_signup": "已有帐号？",
+            "no_account": "还没有账户？"
+        }
+    },
+    "plugins": {}
 }

@@ -1,8 +1,10 @@
-config = require './../config'
-plan = require './plan'
+{config, plan} = app
+{mAccount, mBalance} = app.models
 
-mAccount = require './model/account'
-mBalance = require './model/balance_log'
+exports.triggerBilling = (account, callback) ->
+
+
+
 
 exports.cyclicalBilling = ->
   mAccount.find

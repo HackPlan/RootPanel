@@ -8,7 +8,7 @@ mAccount = require '../model/account'
 
 module.exports = exports = express.Router()
 
-exports.post '/subscribe', requireAuthenticate, (req, res) ->
+exports.post '/join_plan', requireAuthenticate, (req, res) ->
   unless req.body.plan in _.keys(config.plans)
     return res.error 'invaild_plan'
 
@@ -27,7 +27,7 @@ exports.post '/subscribe', requireAuthenticate, (req, res) ->
     plan.joinPlan account, req.body.plan, ->
       res.json {}
 
-exports.post '/unsubscribe', requireAuthenticate, (req, res) ->
+exports.post '/leave_plan', requireAuthenticate, (req, res) ->
   unless req.body.plan in req.account.attribute.plans
     return res.error 'not_in_plan'
 

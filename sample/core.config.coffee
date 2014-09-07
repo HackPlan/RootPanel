@@ -20,9 +20,7 @@ module.exports =
   billing:
     currency: 'CNY'
 
-    taobao_item_id: '41040606505'
-
-    force_unsubscribe:
+    force_freeze:
       when_balance_below: 0
       when_arrears_above: 0
 
@@ -31,10 +29,24 @@ module.exports =
 
   plans:
     sample:
-      t_name: 'ShadowSocks'
-      t_service: '按量付费'
-      t_resources: '0.6 CNY / G'
-      services: ['shadowsocks']
+      t_name: 'plans.sample.name'
+      t_description: 'plans.sample.name.description'
+
+      billing_by_time:
+        unit: 3600 * 1000
+        price: 10 / (30 * 24)
+
+      services: []
+      resources: {}
+
+    test:
+      t_name: 'plans.test.name'
+      t_description: 'plans.test.name.description'
+
+      billing_by_usage:
+        auto_leave: 7 * 24 * 3600 * 1000
+
+      services: []
       resources: {}
 
   mongodb:
