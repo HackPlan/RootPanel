@@ -64,4 +64,15 @@ RootPanel 是一个高度插件化的，基于 Linux 的虚拟服务销售平台
 
 * [ChangeLog](https://github.com/jysperm/RootPanel/blob/master/CHANGELOG.md) | [Releases](https://github.com/jysperm/RootPanel/releases)
 * [TODO List](https://github.com/jysperm/RootPanel/labels/TODO)
-* LICENSE: [GPLv3](https://github.com/jysperm/RootPanel/blob/master/LICENSE)
+
+授权：
+
+* [AGPLv3](https://github.com/jysperm/RootPanel/blob/master/LICENSE)
+* 商业授权(计划中)
+
+贡献列表(v0.7.1):
+
+* jysperm 7542 lines 98.6%
+* yudong 48 lines 0.6%
+* Akiyori 42 lines 0.5%
+* Tianhao Xiao 17 lines 0.2%

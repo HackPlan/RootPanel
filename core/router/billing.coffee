@@ -1,5 +1,5 @@
 config = require '../../config'
-plugin = require '../pluggable'
+pluggable = require '../pluggable'
 billing = require '../billing'
 plan = require '../plan'
 {requireAuthenticate} = require './../middleware'
