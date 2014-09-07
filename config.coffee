@@ -20,7 +20,7 @@ module.exports =
   billing:
     currency: 'CNY'
 
-    taobao_item_id: '38370649858'
+    taobao_item_id: '41040606505'
 
     force_unsubscribe:
       when_balance_below: 0

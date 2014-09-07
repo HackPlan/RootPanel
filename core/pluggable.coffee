@@ -18,6 +18,9 @@ exports.hooks =
 
   view:
     layout:
+      # object(href, target, body)
+      menu_bar: []
+      # path
       styles: []
 
 exports.initializePlugins = (callback) ->

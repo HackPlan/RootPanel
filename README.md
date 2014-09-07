@@ -43,6 +43,7 @@ RootPanel 是一个高度插件化的，基于 Linux 的虚拟服务销售平台
 
 配置文件示例(sample 目录):
 
+    core.config.coffee          # 仅核心模块
     shadowsocks.config.coffee   # ShadowSocks 代理服务
     full.config.coffee          # 全功能虚拟主机
     php-vhost.config.coffee     # PHP/MySQL 虚拟主机
