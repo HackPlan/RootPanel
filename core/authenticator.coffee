@@ -15,7 +15,7 @@ exports.generateAvailableToken = (callback) ->
 # @param callback(token)
 exports.createToken = (account, type, payload, callback) ->
   exports.generateAvailableToken (token) ->
-    exports.update _id: account._id,
+    exports.update {_id: account._id},
       $push:
         tokens:
           type: type

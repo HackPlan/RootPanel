@@ -1,6 +1,6 @@
 {renderAccount, errorHandling, requireAuthenticate} = app.middleware
 {mAccount, mSecurityLog, mCouponCode} = app.models
-{pluggable, config, utils, token_manager} = app
+{pluggable, config, utils, authenticator} = app
 
 module.exports = exports = express.Router()
 
@@ -57,7 +57,7 @@ exports.post '/register', errorHandling, (req, res) ->
       return if err
 
       mAccount.register _.pick(req.body, 'username', 'email', 'password'), (err, account) ->
-        token_manager.createToken account,
+        authenticator.createToken account,
           ip: req.headers['x-real-ip']
           ua: req.headers['user-agent']
         , (token)->
@@ -75,7 +75,7 @@ exports.post '/login', errorHandling, (req, res) ->
     unless mAccount.matchPassword account, req.body.password
       return res.error 'wrong_password'
 
-    token_manager.createToken account,
+    authenticator.createToken account,
       ip: req.headers['x-real-ip']
       ua: req.headers['user-agent']
     , (err, token) ->
@@ -87,7 +87,7 @@ exports.post '/login', errorHandling, (req, res) ->
         token: token
 
 exports.post '/logout', requireAuthenticate, (req, res) ->
-  token_manager.remokeToken req.token,
+  authenticator.remokeToken req.token,
     revoke_at: new Date()
     revoke_ip: req.headers['x-real-ip']
     revoke_ua: req.headers['user-agent']
@@ -118,7 +118,7 @@ exports.post '/update_email', requireAuthenticate, (req, res) ->
   unless utils.rx.email.test req.body.email
     return res.error 'invalid_email'
 
-  mAccount.update _id: req.account._id,
+  mAccount.update {_id: req.account._id},
     $set:
       email: req.body.email
   , ->

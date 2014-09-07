@@ -24,8 +24,7 @@ module.exports =
       when_balance_below: 0
       when_arrears_above: 0
 
-    cyclical_billing: 3600 * 1000
-    daily_billing_cycle: 24 * 3600 * 1000
+    billing_cycle: 10 * 60 * 1000
 
   plans:
     sample:
@@ -34,6 +33,8 @@ module.exports =
 
       billing_by_time:
         unit: 3600 * 1000
+        min_billing_unit: 24
+
         price: 10 / (30 * 24)
 
       services: []

@@ -56,7 +56,7 @@ exports.createReply = (ticket, account, content, status, callback) ->
     content_html: markdown.toHTML content
     payload: {}
 
-  exports.update _id: ticket._id,
+  exports.update {_id: ticket._id},
     $push:
       replies: data
     $set:
@@ -70,7 +70,7 @@ exports.createReply = (ticket, account, content, status, callback) ->
       callback null, data
 
 exports.addMember = (ticket, account, callback) ->
-  exports.update _id: ticket._id,
+  exports.update {_id: ticket._id},
     $push:
       members: account._id
     $set:

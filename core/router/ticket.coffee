@@ -175,7 +175,7 @@ exports.post '/update', requireAuthenticate, (req, res) ->
       async.parallel [
         (callback) ->
           unless _.isEmpty modifier
-            mTicket.update _id: ticket._id,
+            mTicket.update {_id: ticket._id},
               $set: modifier
             , callback
           else
@@ -183,7 +183,7 @@ exports.post '/update', requireAuthenticate, (req, res) ->
 
         (callback) ->
           unless _.isEmpty addToSetModifier
-            mTicket.update _id: ticket._id,
+            mTicket.update {_id: ticket._id},
               $addToSet:
                 members:
                   $each: addToSetModifier
@@ -193,7 +193,7 @@ exports.post '/update', requireAuthenticate, (req, res) ->
 
         (callback) ->
           unless _.isEmpty pullModifier
-            mTicket.update _id: ticket._id,
+            mTicket.update {_id: ticket._id},
               $pullAll:
                 members: pullModifier
             , callback

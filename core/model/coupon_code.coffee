@@ -30,7 +30,7 @@ exports.codeMessage = (coupon_code) ->
   return exports.type_meta[coupon_code.type].message coupon_code
 
 exports.applyCode = (account, coupon_code, callback) ->
-  exports.update _id: coupon_code._id,
+  exports.update {_id: coupon_code._id},
     $inc:
       available_times: -1
     $push:

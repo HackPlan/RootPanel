@@ -38,7 +38,7 @@ service supervisor restart
           bitcoin_secret = crypto.createHash('sha256').update(crypto.randomBytes(256)).digest('hex')
 
           bitcoin.genAddress bitcoin_secret, (address) ->
-            mAccount.update _id: account._id,
+            mAccount.update {_id: account._id},
               $set:
                 'attribute.bitcoin_deposit_address': address
                 'bitcoin_secret': bitcoin_secret

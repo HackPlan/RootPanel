@@ -41,7 +41,7 @@ exports.run = ->
     app.package = require './package.json'
     app.pluggable = require './core/pluggable'
     app.middleware = require './core/middleware'
-    app.token_manager = require './core/token_manager'
+    app.authenticator = require './core/authenticator'
 
     app.models =
       mAccount: require './model/account'

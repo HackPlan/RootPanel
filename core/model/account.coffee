@@ -25,9 +25,11 @@ sample =
     services: ['shadowsocks']
     plans: ['all']
 
+    last_billing_at:
+      all: new Date()
+
     balance: 100
-    last_billing_at: Date()
-    arrears_at: Date()
+    arrears_at: new Date()
 
   pluggable:
     bitcoin:
@@ -83,7 +85,7 @@ exports.register = (account, callback) ->
       plans: []
 
       balance: 0
-      last_billing_at: Date()
+      last_billing_at: {}
       arrears_at: null
 
     pluggable: {}
@@ -101,7 +103,7 @@ exports.register = (account, callback) ->
 exports.updatePassword = (account, password, callback) ->
   password_salt = utils.randomSalt()
 
-  exports.update _id: account._id,
+  exports.update {_id: account._id},
     $set:
       password: utils.hashPassword password, password_salt
       password_salt: password_salt
@@ -127,7 +129,7 @@ exports.inGroup = (account, group) ->
 
 exports.joinPlan = (account, plan, callback) ->
   account.attribute.plans.push plan
-  exports.update _id: account._id,
+  exports.update {_id: account._id},
     $addToSet:
       'attribute.plans': plan
     $set:
@@ -136,7 +138,7 @@ exports.joinPlan = (account, plan, callback) ->
 
 exports.leavePlan = (account, plan, callback) ->
   account.attribute.plans = _.reject account.attribute.plans, (i) -> i == plan
-  exports.update _id: account._id,
+  exports.update {_id: account._id},
     $pull:
       'attribute.plans': plan
     $set:
@@ -144,7 +146,7 @@ exports.leavePlan = (account, plan, callback) ->
   , callback
 
 exports.incBalance = (account, type, amount, attribute, callback) ->
-  exports.update _id: account._id,
+  exports.update {_id: account._id},
     $inc:
       'attribute.balance': amount
   , ->
