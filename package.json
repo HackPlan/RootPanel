@@ -19,7 +19,6 @@
     "start": "node start.js"
   },
   "bin": {
-    "rp-start": "./bin/rp-start.coffee",
     "rp-fix-permissions": "./bin/rp-fix-permissions.coffee",
     "rp-system-sync": "./bin/rp-system-sync.coffee",
     "rp-migration": "./bin/rp-migration.coffee",

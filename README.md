@@ -31,7 +31,6 @@ RootPanel 是一个高度插件化的，基于 Linux 的虚拟服务销售平台
 
 全局命令：
 
-    rp-start            # 以 forever 启动
     rp-fix-permissions  # 修复文件系统权限
     rp-migration        # 版本间数据库迁移脚本
     rp-system-sync      # 与操作系统同步信息
@@ -49,6 +48,8 @@ RootPanel 是一个高度插件化的，基于 Linux 的虚拟服务销售平台
     php-vhost.config.coffee     # PHP/MySQL 虚拟主机
     node-vhost.config.coffee    # Node.js/Python/Golang 虚拟主机
     share-vps.config.coffee     # 朋友合租
+    static.config.coffee        # 静态文件托管
+    git.config.coffee           # Git 托管
     xen.config.coffee           # Xen VPS
 
 配置文件位于 `config.coffee`
