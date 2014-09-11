@@ -54,6 +54,9 @@ RootPanel 是一个高度插件化的，基于 Linux 的虚拟服务销售平台
 
 配置文件位于 `config.coffee`
 
+## Vagrant
+<https://vagrantcloud.com/jysperm/boxes/rootpanel>
+
 ## 技术构成
 
 * 前端：Bootstrap(3), jQuery, Jade, Less
