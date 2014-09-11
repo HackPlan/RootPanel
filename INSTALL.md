@@ -18,8 +18,8 @@
     vi /etc/hosts
 
     apt-get install mongodb=1:2.4.9-1ubuntu2
-    apt-get install nodejs git nginx postfix redis-server ntp supervisor
-    apt-get install python g++ make screen git wget zip unzip iftop vim curl htop iptraf nethogs
+    apt-get install nodejs git nginx redis-server ntp supervisor
+    apt-get install python g++ make screen wget zip unzip iftop vim curl htop iptraf nethogs
 
     npm install coffee-script -g
 
@@ -154,7 +154,7 @@
 ### Runtime
 
     # Shell
-    apt-get install libcurl4-openssl-dev axel unrar-free emacs subversion subversion-tools tmux mercurial
+    apt-get install libcurl4-openssl-dev axel unrar-free emacs subversion subversion-tools tmux mercurial postfix
 
     # Golang
     apt-get install golang golang-go.tools
