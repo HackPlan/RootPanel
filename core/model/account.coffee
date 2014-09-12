@@ -13,7 +13,7 @@ sample =
   email: 'jysperm@gmail.com'
   created_at: Date()
 
-  group: ['root']
+  groups: ['root']
 
   settings:
     avatar_url: 'http://ruby-china.org/avatar/efcc15b92617a95a09f514a9bff9e6c3?s=58'
@@ -123,9 +123,6 @@ exports.byUsernameOrEmailOrId = (username, callback) ->
 
 exports.matchPassword = (account, password) ->
   return exports.hashPassword(password, account.password_salt) == account.password
-
-exports.inGroup = (account, group) ->
-  return group in account.group
 
 exports.joinPlan = (account, plan, callback) ->
   account.attribute.plans.push plan

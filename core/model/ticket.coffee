@@ -30,9 +30,6 @@ sample =
   ]
 
 exports.createTicket = (account, title, content, members, status, payload, callback) ->
-  members_id = _.map (members) ->
-    return member._id
-
   exports.insert
     account_id: account._id
     created_at: new Date()
@@ -41,14 +38,14 @@ exports.createTicket = (account, title, content, members, status, payload, callb
     content: content
     content_html: markdown.toHTML content
     status: status
-    members: membersID
+    members: _.pluck members, '_id'
     payload: payload
     replies: []
   , (err, result) ->
-    callback err, _.first result
+    callback _.first result
 
 exports.createReply = (ticket, account, content, status, callback) ->
-  data =
+  reply =
     _id: new ObjectID()
     account_id: account._id
     created_at: new Date()
@@ -58,26 +55,14 @@ exports.createReply = (ticket, account, content, status, callback) ->
 
   exports.update {_id: ticket._id},
     $push:
-      replies: data
+      replies: reply
+    $addToSet:
+      members: account._id
     $set:
       status: status
       updated_at: new Date()
   , ->
-    unless exports.getMember ticket, account
-      exports.addMember ticket, account, ->
-        callback null, data
-    else
-      callback null, data
-
-exports.addMember = (ticket, account, callback) ->
-  exports.update {_id: ticket._id},
-    $push:
-      members: account._id
-    $set:
-      updated_at: new Date()
-  , (err) ->
-    throw err if err
-    callback()
+    callback reply
 
 exports.getMember = (ticket, account) ->
   return _.find(ticket.members, (member) -> member.equals(account._id))

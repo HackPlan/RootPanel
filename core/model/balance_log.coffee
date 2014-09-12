@@ -17,4 +17,4 @@ exports.create = (account, type, amount, payload, callback) ->
     payload: payload
     created_at: new Date()
   , (err, result) ->
-    callback err, _.first result
+    callback _.first result

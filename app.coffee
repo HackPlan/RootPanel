@@ -61,7 +61,7 @@ exports.run = ->
 
     app.use (req, res, next) ->
       res.locals.app = app
-      res.locals.t = i18n.getTranslator req.cookies.language
+      res.locals.t = res.t = i18n.getTranslator req.cookies.language
       res.moment = moment().locale(req.cookies.language ? config.i18n.default_language).tz(req.cookies.timezone ? config.i18n.default_timezone)
 
       next()

@@ -1,4 +1,4 @@
-mAccount = require './model/account'
+{mAccount} = app.models
 
 exports.parseToken = (req, res, next) ->
   if req.headers['x-token']
@@ -61,3 +61,11 @@ exports.requireInService = (service_name) ->
         return res.error 'not_in_service'
 
       next()
+
+exports.constructObjectID = (fields = ['id']) ->
+  return (req, res, next) ->
+    for field in fields
+      if req.body[field]
+        req.body[field] = new ObjectID req.body[field]
+
+    next()

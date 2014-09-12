@@ -13,7 +13,7 @@ sample =
       ua: 'Mozilla/5.0 (Intel Mac OS X) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.102'
 
 exports.create = (account, type, token, payload, callback) ->
-  matched_token = _.first _.where account.tokens,
+  matched_token = _.findWhere account.tokens,
     token: token
 
   exports.insert
@@ -22,5 +22,5 @@ exports.create = (account, type, token, payload, callback) ->
     token: token
     payload: payload
     created_at: new Date()
-  , (err, rows) ->
-    callback err, _.first rows
+  , (err, result) ->
+    callback _.first result
