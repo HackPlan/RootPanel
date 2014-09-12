@@ -152,13 +152,3 @@ exports.incBalance = (account, type, amount, attribute, callback) ->
   , ->
     mBalance.create account, type, amount, attribute, (err, balance_log) ->
       callback balance_log
-
-exports.calcResourcesLimit = (plans) ->
-  limit = {}
-
-  for plan in plans
-    for k, v of config.plans[plan].resources
-      limit[k] = 0 unless limit[k]
-      limit[k] += v
-
-  return limit

@@ -36,41 +36,9 @@ exports.triggerBilling = (account, callback) ->
 
     return false
 
-  if is_force
-    return forceLeaveAllPlans callback
-
   async.each account.billing.plans, (plan_name, callback) ->
-    plan_info = config.plans[plan_name]
-
-    unless plan_info.billing_by_time
-      return callback()
-
-    last_billing_at = account.billing.last_billing_at[plan_name]
-
-    if last_billing_at
-      next_billing_at = new Date last_billing_at.getTime() + plan_info.billing_by_time.unit * plan_info.billing_by_time.min_billing_unit
-    else
-      last_billing_at = new Date()
-
-    unless last_billing_at and next_billing_at > new Date()
-      return callback()
-
-    billing_unit_count = (Date.now() - last_billing_at.getTime()) / plan_info.billing_by_time.unit
-
-    if is_force
-      billing_unit_count = Math.ceil billing_unit_count
-      new_last_billing_at = new Date()
-    else
-      billing_unit_count = Math.floor billing_unit_count
-      new_last_billing_at = new Date last_billing_at.getTime() + billing_unit_count * plan_info.billing_by_time.unit
-
-    amount = billing_unit_count * plan_info.billing_by_time.price
-
-    callback null,
-      name: plan_name
-      billing_unit_count: billing_unit_count
-      last_billing_at: new_last_billing_at
-      amount_inc: -amount
+    exports.generateBilling account, plan_name, is_force, (result) ->
+      callback null, result
 
   , (err, result) ->
     result = _.compact result
@@ -98,42 +66,51 @@ exports.triggerBilling = (account, callback) ->
       mBalance.create account, 'billing', modifier.$inc['billing.balance'],
         plans: _.indexBy result, 'name'
       , ->
+        if is_force
+          return forceLeaveAllPlans callback
+        else
+          callback account
 
-
-        callback account
-
-exports.forceBilling = (account, plan_name, callback) ->
+exports.generateBilling = (account, plan_name, is_force, callback) ->
   plan_info = config.plans[plan_name]
 
   unless plan_info.billing_by_time
     return callback()
 
+  last_billing_at = account.billing.last_billing_at[plan_name]
 
+  if last_billing_at
+    next_billing_at = new Date last_billing_at.getTime() + plan_info.billing_by_time.unit * plan_info.billing_by_time.min_billing_unit
+  else
+    last_billing_at = new Date()
 
+  unless last_billing_at and next_billing_at > new Date()
+    return callback()
 
+  billing_unit_count = (Date.now() - last_billing_at.getTime()) / plan_info.billing_by_time.unit
 
-exports.checkExpired = (account, callback) ->
-  modifier =
-    $set: {}
+  if is_force
+    billing_unit_count = Math.ceil billing_unit_count
+    new_last_billing_at = new Date()
+  else
+    billing_unit_count = Math.floor billing_unit_count
+    new_last_billing_at = new Date last_billing_at.getTime() + billing_unit_count * plan_info.billing_by_time.unit
 
-  callback_back = ->
-    if _.isEmpty modifier.$set
-      return callback account
+  amount = billing_unit_count * plan_info.billing_by_time.price
 
-    mAccount.findAndModify _id: account._id, {}, modifier, new: true, (err, account) ->
-      callback account
+  callback
+    name: plan_name
+    billing_unit_count: billing_unit_count
+    last_billing_at: new_last_billing_at
+    amount_inc: -amount
 
-  if account.attribute.balance > 0
-    modifier.$set['attribute.arrears_at'] = null
+exports.calcResourcesLimit = (plans) ->
+  limit = {}
 
-  if account.attribute.balance < 0
-    if account.attribute.balance < config.billing.force_unsubscribe.when_balance_below
-      return exports.forceUnsubscribe account, callback_back
+  for plan_name in plans
+    if config.plans[plan_name].resources
+      for k, v of config.plans[plan_name].resources
+        limit[k] ?= 0
+        limit[k] += v
 
-    unless account.attribute.arrears_at
-      account.attribute.arrears_at = modifier.$set['attribute.arrears_at'] = new Date()
-
-    if Date.now() > account.attribute.arrears_at.getTime() + config.billing.force_unsubscribe.when_arrears_above
-      return exports.forceUnsubscribe account, callback_back
-
-  callback_back()
+  return limit
