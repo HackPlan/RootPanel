@@ -18,7 +18,7 @@ exports.post '/update_password', (req, res) ->
   md5.update "#{req.account.username}:mongo:#{req.body.password}"
   pwd = md5.digest 'hex'
 
-  mongodb.admin_users.update user: req.account.username,
+  mongodb.admin_users.update {user: req.account.username},
     $set:
       pwd: pwd
   , (err, result) ->
@@ -28,7 +28,7 @@ exports.post '/update_password', (req, res) ->
 
       async.each dbs, (db, callback) ->
         db_users = app.db.db(db.name).collection 'system.users'
-        db_users.update user: req.account.username,
+        db_users.update {user: req.account.username},
           $set:
             pwd: pwd
         , ->

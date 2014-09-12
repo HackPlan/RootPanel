@@ -1,6 +1,6 @@
 markdown = require('markdown').markdown
 
-{requireAuthenticate, renderAccount, getParam, constructObjectID} = app.middleware
+{requireAuthenticate, renderAccount, getParam, loadTicket} = app.middleware
 {mAccount, mTicket} = app.models
 {config, notification} = app
 
@@ -23,33 +23,27 @@ exports.get '/list', requireAuthenticate, renderAccount, (req, res) ->
 exports.get '/create', requireAuthenticate, renderAccount, (req, res) ->
   res.render 'ticket/create'
 
-exports.get '/view', requireAuthenticate, renderAccount, getParam, constructObjectID(), (req, res) ->
-  mTicket.findOne _id: req.body.id, (err, ticket) ->
-    unless ticket
-      return res.send 404
+exports.get '/view', renderAccount, getParam, loadTicket, (req, res) ->
+  {ticket} = req
 
-    unless mAccount.inGroup req.account, 'root'
-      unless mTicket.getMember ticket, req.account
-        return res.send 403
+  async.map ticket.members, (member_id, callback) ->
+    mAccount.findOne _id: member_id, callback
+  , (err, result) ->
+    ticket.members = result
 
-    async.map ticket.members, (member_id, callback) ->
-      mAccount.findOne _id: member_id, callback
+    async.map ticket.replies, (reply, callback) ->
+      mAccount.findOne _id: reply.account_id, (err, account) ->
+        reply.account = account
+        callback null, reply
+
     , (err, result) ->
-      ticket.members = result
+      ticket.replies = result
 
-      async.map ticket.replies, (reply, callback) ->
-        mAccount.findOne _id: reply.account_id, (err, account) ->
-          reply.account = account
-          callback null, reply
+      mAccount.findOne _id: ticket.account_id, (err, account) ->
+        ticket.account = account
 
-      , (err, result) ->
-        ticket.replies = result
-
-        mAccount.findOne _id: ticket.account_id, (err, account) ->
-          ticket.account = account
-
-          res.render 'ticket/view',
-            ticket: ticket
+        res.render 'ticket/view',
+          ticket: ticket
 
 exports.post '/create', requireAuthenticate, (req, res) ->
   unless /^.+$/.test req.body.title
@@ -91,38 +85,32 @@ exports.post '/create', requireAuthenticate, (req, res) ->
           config: config
       , ->
 
-exports.post '/reply', requireAuthenticate, constructObjectID(), (req, res) ->
-  mTicket.findOne _id: req.body.id, (err, ticket) ->
-    unless ticket
-      return res.error 'ticket_not_exist'
+exports.post '/reply', loadTicket, (req, res) ->
+  {ticket} = req
 
-    unless mTicket.getMember ticket, req.account
-      unless 'root' in req.account.groups
-        return res.error 'forbidden'
+  status = if 'root' in req.account.groups then 'open' else 'pending'
 
-    status = if 'root' in req.account.groups then 'open' else 'pending'
+  mTicket.createReply ticket, req.account, req.body.content, status, (err, reply) ->
+    async.each ticket.members, (member_id, callback) ->
+      if member_id.toString() == req.account._id.toString()
+        return callback()
 
-    mTicket.createReply ticket, req.account, req.body.content, status, (err, reply) ->
-      async.each ticket.members, (member_id, callback) ->
-        if member_id.toString() == req.account._id.toString()
-          return callback()
+      mAccount.findOne
+        _id: member_id
+      , (err, account) ->
+        notification.createNotice account, 'ticket_reply',
+          title: _.template res.t('notification.ticket_create.title'), ticket
+          body: _.template fs.readSync('./../template/ticket_create_email.html'),
+            ticket: ticket
+            reply: reply
+            account: req.account
+            config: config
+        , ->
+          callback()
 
-        mAccount.findOne
-          _id: member_id
-        , (err, account) ->
-          notification.createNotice account, 'ticket_reply',
-            title: _.template res.t('notification.ticket_create.title'), ticket
-            body: _.template fs.readSync('./../template/ticket_create_email.html'),
-              ticket: ticket
-              reply: reply
-              account: req.account
-              config: config
-          , ->
-            callback()
-
-      , ->
-        return res.json
-          id: reply._id
+    , ->
+      return res.json
+        id: reply._id
 
 exports.post '/list', requireAuthenticate, (req, res) ->
   mTicket.find do ->
@@ -151,94 +139,88 @@ exports.post '/list', requireAuthenticate, (req, res) ->
         updated_at: item.updated_at
       }
 
-exports.post '/update', requireAuthenticate, (req, res) ->
+exports.post '/update', loadTicket, (req, res) ->
+  {ticket} = req
+
   modifier = {}
 
   addToSetModifier = []
   pullModifier = []
 
-  mTicket.findId req.body.id, (err, ticket) ->
-    unless ticket
-      return res.error 'ticket_not_exist'
+  if req.body.status
+    if 'root' in req.account.groups
+      allow_status = ['open', 'pending', 'finish', 'closed']
+    else
+      allow_status = ['closed']
 
-    unless mTicket.getMember ticket, req.account
-      unless mAccount.inGroup req.account, 'root'
-        return res.error 'forbidden'
-
-    if req.body.status
-      if mAccount.inGroup req.account, 'root'
-        allow_status = ['open', 'pending', 'finish', 'closed']
+    if req.body.status in allow_status
+      if ticket.status == req.body.status
+        return res.error 'already_in_status'
       else
-        allow_status = ['closed']
+        modifier['status'] = req.body.status
+    else
+      return res.error 'invalid_status'
 
-      if req.body.status in allow_status
-        if ticket.status == req.body.status
-          return res.error 'already_in_status'
+  callback = ->
+    async.parallel [
+      (callback) ->
+        unless _.isEmpty modifier
+          mTicket.update {_id: ticket._id},
+            $set: modifier
+          , callback
         else
-          modifier['status'] = req.body.status
-      else
-        return res.error 'invalid_status'
-
-    callback = ->
-      async.parallel [
-        (callback) ->
-          unless _.isEmpty modifier
-            mTicket.update {_id: ticket._id},
-              $set: modifier
-            , callback
-          else
-            callback()
-
-        (callback) ->
-          unless _.isEmpty addToSetModifier
-            mTicket.update {_id: ticket._id},
-              $addToSet:
-                members:
-                  $each: addToSetModifier
-            , callback
-          else
-            callback()
-
-        (callback) ->
-          unless _.isEmpty pullModifier
-            mTicket.update {_id: ticket._id},
-              $pullAll:
-                members: pullModifier
-            , callback
-          else
-            callback()
-      ], ->
-        return res.json {}
-
-    if mAccount.inGroup req.account, 'root'
-      if req.body.attribute
-        if req.body.attribute.public
-          modifier['attribute.public'] = true
-        else
-          modifier['attribute.public'] = false
-
-      if req.body.members
-        tasks = {}
-
-        member_name = _.filter _.union(req.body.members.add, req.body.members.remove), (item) -> item
-        for item in member_name
-          tasks[item] = do (item = _.clone(item)) ->
-            return (callback) ->
-              mAccount.byUsernameOrEmailOrId item, (result) ->
-                callback null, result
-
-        async.parallel tasks, (err, result) ->
-          if req.body.members.add
-            for item in req.body.members.add
-              addToSetModifier.push result[item]._id
-
-          if req.body.members.remove
-            for item in req.body.members.remove
-              pullModifier.push result[item]._id
-
           callback()
-      else
-        callback()
 
+      (callback) ->
+        unless _.isEmpty addToSetModifier
+          mTicket.update {_id: ticket._id},
+            $addToSet:
+              members:
+                $each: addToSetModifier
+          , callback
+        else
+          callback()
+
+      (callback) ->
+        unless _.isEmpty pullModifier
+          mTicket.update {_id: ticket._id},
+            $pullAll:
+              members: pullModifier
+          , callback
+        else
+          callback()
+    ], ->
+      return res.json {}
+
+  if 'root' in req.account.groups
+    if req.body.payload
+      if req.body.payload.public
+        modifier['payload.public'] = true
+      else
+        modifier['payload.public'] = false
+
+    if req.body.members
+      tasks = {}
+
+      member_name = _.filter _.union(req.body.members.add, req.body.members.remove), (item) -> item
+      for item in member_name
+        tasks[item] = do (item = _.clone(item)) ->
+          return (callback) ->
+            mAccount.byUsernameOrEmailOrId item, (result) ->
+              callback null, result
+
+      async.parallel tasks, (err, result) ->
+        if req.body.members.add
+          for item in req.body.members.add
+            addToSetModifier.push result[item]._id
+
+        if req.body.members.remove
+          for item in req.body.members.remove
+            pullModifier.push result[item]._id
+
+        callback()
     else
       callback()
+
+  else
+    callback()
