@@ -3,7 +3,7 @@ nodemailer = require 'nodemailer'
 path = require 'path'
 harp = require 'harp'
 fs = require 'fs'
-moment = require 'moment'
+moment = require 'moment-timezone'
 redis = require 'redis'
 
 global.app = express()

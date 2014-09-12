@@ -1,11 +1,3 @@
-顺序：
-
-* Core 中 reboot 之前的部分
-* Plugin 中用到的插件的 reboot 之前的部分
-* reboot
-* 继续装 Core 中 reboot 后的部分，和 Plugin 中 reboot 后的部分(如果有的话)
-* 安装 Runtime(如果需要的话)
-
 ## Ubuntu 14.04 amd64
 ### Core
 
@@ -25,6 +17,8 @@
 
     mongo
 
+        use admin
+        db.addUser({user: 'rpadmin', pwd: 'password', roles: ['readWriteAnyDatabase', 'userAdminAnyDatabase', 'dbAdminAnyDatabase', 'clusterAdmin']})
         use RootPanel
         db.addUser({user: 'rpadmin', pwd: 'password', roles: ['readWrite']})
 
@@ -40,7 +34,7 @@
 
     rm /etc/nginx/sites-enabled/default
     
-    cat > /etc/nginx/sites-available/rpadmin
+    vi /etc/nginx/sites-enabled/rpadmin
     
     server {
         listen 80 default_server;
@@ -59,9 +53,7 @@
         }
     }
 
-    ln -s /etc/nginx/sites-available/rpadmin /etc/nginx/sites-enabled
-
-    adduser rpadmin
+    useradd -m rpadmin
     usermod -G rpadmin -a www-data
 
     vi /etc/sudoers
@@ -72,26 +64,30 @@
 
         iptables-restore < /etc/iptables.rules
 
-    reboot
-
     su rpadmin
     cd ~
 
     git clone https://github.com/jysperm/RootPanel.git
     cd RootPanel
 
-    vi config.coffee
+    cp sample/core.config.coffee config.coffee
 
-    sudo vi /etc/supervisor/conf.d/rpadmin.conf
+    npm install
+
+    exit
+
+    vi /etc/supervisor/conf.d/rpadmin.conf
 
         [program:RootPanel]
         command=node /home/rpadmin/RootPanel/start.js
         autorestart=true
         user=rpadmin
 
-    npm install
 
-    sudo service supervisor restart
+    service nginx restart
+    service mongodb restart
+    service redis-server restart
+    service supervisor restart
 
 ### Plugin
 
@@ -112,13 +108,6 @@
 
     apt-get install memcached
 
-    # MongoDB
-
-    mongo
-
-        use admin
-        db.addUser({user: 'rpadmin', pwd: 'password', roles: ['readWriteAnyDatabase', 'userAdminAnyDatabase', 'dbAdminAnyDatabase', 'clusterAdmin']})
-    
     # MySQL
     
     apt-get install mariadb-server

@@ -52,7 +52,7 @@ RootPanel 是一个高度插件化的，基于 Linux 的虚拟服务销售平台
     git.config.coffee           # Git 托管
     xen.config.coffee           # Xen VPS
 
-配置文件位于 `config.coffee`
+请选择一个配置文件复制到根目录，重命名为 `config.coffee`.
 
 ## Vagrant
 <https://vagrantcloud.com/jysperm/boxes/rootpanel>
