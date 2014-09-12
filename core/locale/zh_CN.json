@@ -61,6 +61,11 @@
     "time": {
         "day": "天"
     },
+    "notification": {
+        "ticket_create": {
+            "title": "工单 | <%= title %>"
+        }
+    },
     "view": {
         "layout": {
             "navigation": "展开导航"

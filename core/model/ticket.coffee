@@ -81,10 +81,3 @@ exports.addMember = (ticket, account, callback) ->
 
 exports.getMember = (ticket, account) ->
   return _.find(ticket.members, (member) -> member.equals(account._id))
-
-exports.sendMailToAdmins = (title, content) ->
-  mAccount.find
-    group: 'root'
-  .toArray (err, accounts) ->
-    for account in accounts
-      mAccount.sendEmail account, title, content

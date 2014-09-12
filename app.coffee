@@ -1,4 +1,5 @@
 connect = require 'connect'
+nodemailer = require 'nodemailer'
 path = require 'path'
 harp = require 'harp'
 fs = require 'fs'
@@ -35,6 +36,8 @@ exports.run = ->
     app.redis = redis.createClient 6379, '127.0.0.1',
       auth_pass: config.redis_password
 
+    app.mailer = nodemailer.createTransport config.email.account
+
     app.i18n = require './core/i18n'
     app.utils = require './core/utils'
     app.config = require '../config'
@@ -47,6 +50,7 @@ exports.run = ->
       mAccount: require './model/account'
       mBalanceLog: require './model/balance_log'
       mCouponCode: require './model/coupon_code'
+      mNotification: require './model/notification'
       mSecurityLog: require './model/security_log'
       mTicket: require './model/tickets'
 
