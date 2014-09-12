@@ -14,3 +14,8 @@ $ ->
     $.post '/account/logout/', {}
     .success ->
       location.reload()
+
+  window.i18n = {}
+
+  $.getJSON "/locale/#{$.cookie('language')}.json", (data) ->
+    window.i18n = data

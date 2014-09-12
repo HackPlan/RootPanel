@@ -72,6 +72,7 @@ exports.run = ->
     bindRouters app
 
     app.use harp.mount './core/static'
+    app.use '/locale', harp.mount './core/locale'
 
     app.listen config.web.listen, ->
       fs.chmodSync config.web.listen, 0o770
