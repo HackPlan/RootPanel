@@ -1,4 +1,7 @@
+_ = require 'underscore'
+
 {mAccount, mTicket} = app.models
+{authenticator} = app
 
 exports.parseToken = (req, res, next) ->
   if req.headers['x-token']
@@ -22,7 +25,7 @@ exports.errorHandling = (req, res, next) ->
 
 exports.accountInfo = (req, res, next) ->
   req.inject [exports.parseToken], ->
-    mAccount.authenticate req.token, (err, account) ->
+    authenticator.authenticate req.token, (err, account) ->
       req.account = account
       next()
 
@@ -46,7 +49,7 @@ exports.requireAuthenticate = (req, res, next) ->
 
 exports.requireAdminAuthenticate = (req, res, next) ->
   req.inject [exports.requireAuthenticate], ->
-    unless mAccount.inGroup req.account, 'root'
+    unless 'root' in req.account.groups
       if req.method == 'GET'
         return res.status(403).end()
       else

@@ -5,7 +5,7 @@ html
     block head
       link(rel='stylesheet', href='http://cdn.staticfile.org/twitter-bootstrap/3.2.0/css/bootstrap.min.css')
       link(rel='stylesheet', href='/style/layout.css')
-      for path in app.view_style
+      for path in hooks.view.layout.styles
         link(rel='stylesheet', href=path)
 
   body
@@ -21,10 +21,10 @@ html
             a.navbar-brand(href='/')= config.web.name
           #navbar-collapse.collapse.navbar-collapse
             ul.nav.navbar-nav
-              for item in app.view_hook.menu_bar
+              for item in hooks.view.layout.menu_bar
                 if item.target
                   li
-                    a(href=item.href, target=item.target)= item.html
+                    a(href=item.href, target=item.target)= item.body
                 else
                   li
                     a(href=item.href)= item.html
@@ -41,7 +41,7 @@ html
                   a#logout(href='/account/logout/')= t('account.logout')
               else
                 li
-                  a(href='/account/signup/')= t('account.signup')
+                  a(href='/account/register/')= t('account.register')
                 li
                   a(href='/account/login/')= t('account.login')
 
@@ -55,6 +55,10 @@ html
             block sidebar
               .row
                 header= config.web.name
+                ul
+                  li #{app.package.version}
+                  li
+                    a(href=app.package.repository.url) Github
 
     #footer
       if config.web.google_analytics_id

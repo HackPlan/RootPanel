@@ -17,5 +17,5 @@ $ ->
 
   window.i18n = {}
 
-  $.getJSON "/locale/#{$.cookie('language')}.json", (data) ->
+  $.getJSON "/locale/#{$.cookie('language')}", (data) ->
     window.i18n = data

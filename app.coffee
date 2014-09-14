@@ -42,30 +42,42 @@ exports.run = ->
       mSecurityLog: require './core/model/security_log'
       mTicket: require './core/model/ticket'
 
+    app.authenticator = require './core/authenticator'
+
     app.i18n = require './core/i18n'
     app.utils = require './core/utils'
     app.config = require './config'
     app.package = require './package.json'
     app.pluggable = require './core/pluggable'
     app.middleware = require './core/middleware'
-    app.authenticator = require './core/authenticator'
 
     app.use connect.json()
     app.use connect.urlencoded()
     app.use connect.cookieParser()
-    app.use connect.logger('dev')
+    app.use connect.logger()
+
+    app.use require 'middleware-injector'
+    app.use app.i18n.initI18nData
 
     app.use (req, res, next) ->
       res.locals.app = app
+      res.locals.config = app.config
+      res.locals.pluggable = app.pluggable
+      res.locals.hooks = app.pluggable.hooks
       res.locals.t = res.t = app.i18n.getTranslator req.cookies.language
-      res.locals.moment = res.moment = moment().locale(req.cookies.language ? config.i18n.default_language).tz(req.cookies.timezone ? config.i18n.default_timezone)
+
+      language = req.cookies.language ? config.i18n.default_language
+      timezone = req.cookies.timezone ? config.i18n.default_timezone
+
+      res.locals.moment = res.moment = moment().locale(language).tz(timezone)
 
       next()
 
     app.set 'views', path.join(__dirname, 'core/view')
     app.set 'view engine', 'jade'
 
-    app.use require 'middleware-injector'
+    app.get '/locale/:language', app.i18n.downloadLocales
+
     app.use '/account', require './core/router/account'
     app.use '/billing', require './core/router/billing'
     app.use '/ticket', require './core/router/ticket'
@@ -78,10 +90,11 @@ exports.run = ->
       res.redirect '/panel/'
 
     app.use harp.mount './core/static'
-    app.use '/locale', harp.mount './core/locale'
 
     app.listen config.web.listen, ->
       fs.chmodSync config.web.listen, 0o770
+
+      console.log "RootPanel start at #{config.web.listen}"
 
 unless module.parent
   exports.run()

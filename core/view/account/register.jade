@@ -1,10 +1,10 @@
 extends ../layout
 
 prepend head
-  title #{t('account.signup')} | #{config.web.name}
+  title #{t('account.register')} | #{config.web.name}
 
 block main
-  header= t('account.signup')
+  header= t('account.register')
   form.form-horizontal.signup-form(method='post', role='form')
     .form-group
       label.col-sm-2.col-md-offset-1.control-label(for='username')= t('account.username')
@@ -24,12 +24,12 @@ block main
         input#password2.form-control(type='password', name='password2')
     .form-group
       .col-sm-offset-3
-        button.action-signup.btn.btn-lg.btn-primary(type='button')= t('account.signup')
+        button.action-signup.btn.btn-lg.btn-primary(type='button')= t('account.register')
 
 prepend sidebar
   .row
-    header= t('view.account.already_signup')
+    header= t('view.account.already_register')
     a.btn.btn-lg.btn-success(href='/account/login/')= t('account.login')
 
 append footer
-  script(src='/script/account/signup.js')
+  script(src='/script/account/register.js')

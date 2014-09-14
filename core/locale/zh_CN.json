@@ -18,7 +18,7 @@
     },
     "account": {
         "": "帐号",
-        "signup": "注册",
+        "register": "注册",
         "login": "登录",
         "username": "用户名",
         "email": "邮箱",
@@ -72,7 +72,7 @@
         },
         "account": {
             "password2": "重复",
-            "already_signup": "已有帐号？",
+            "already_register": "已有帐号？",
             "no_account": "还没有账户？"
         }
     },
