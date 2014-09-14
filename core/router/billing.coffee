@@ -1,7 +1,6 @@
-config = require '../../config'
-pluggable = require '../pluggable'
-billing = require '../billing'
-plan = require '../plan'
+express = require 'express'
+
+{config, pluggable, billing} = app
 {requireAuthenticate} = require './../middleware'
 
 mAccount = require '../model/account'

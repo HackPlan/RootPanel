@@ -41,7 +41,7 @@ siteSummary = (site) ->
 
 module.exports =
   enable: (account, callback) ->
-    mAccount.update _id: account._id,
+    mAccount.update {_id: account._id},
       $set:
         'attribute.plugin.nginx.sites': []
     , ->

@@ -1,3 +1,5 @@
+{ObjectID} = require 'mongodb'
+
 module.exports = exports = app.db.collection 'balance_log'
 
 sample =

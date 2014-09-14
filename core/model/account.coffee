@@ -1,6 +1,4 @@
-nodemailer = require 'nodemailer'
-
-{config, pluggable, utils} = app
+{billing, config, pluggable, utils} = app
 
 mBalance = require './balance_log'
 
@@ -51,7 +49,6 @@ sample =
   tokens: [
     type: 'access_token'
     token: 'b535a6cec7b73a60c53673f434686e04972ccafddb2a5477f066f30eded55a9b'
-    is_available: true
     created_at: Date()
     updated_at: Date()
     payload:
@@ -125,27 +122,27 @@ exports.matchPassword = (account, password) ->
   return exports.hashPassword(password, account.password_salt) == account.password
 
 exports.joinPlan = (account, plan, callback) ->
-  account.attribute.plans.push plan
+  account.billing.plans.push plan
   exports.update {_id: account._id},
     $addToSet:
-      'attribute.plans': plan
+      'billing.plans': plan
     $set:
-      'attribute.resources_limit': exports.calcResourcesLimit account.attribute.plans
+      resources_limit: exports.calcResourcesLimit account.billing.plans
   , callback
 
 exports.leavePlan = (account, plan, callback) ->
-  account.attribute.plans = _.reject account.attribute.plans, (i) -> i == plan
+  account.billing.plans = _.reject account.billing.plans, (i) -> i == plan
   exports.update {_id: account._id},
     $pull:
-      'attribute.plans': plan
+      'billing.plans': plan
     $set:
-      'attribute.resources_limit': exports.calcResourcesLimit account.attribute.plans
+      resources_limit: exports.calcResourcesLimit account.attribute.plans
   , callback
 
-exports.incBalance = (account, type, amount, attribute, callback) ->
+exports.incBalance = (account, type, amount, payload, callback) ->
   exports.update {_id: account._id},
     $inc:
-      'attribute.balance': amount
+      'billing.balance': amount
   , ->
-    mBalance.create account, type, amount, attribute, (err, balance_log) ->
+    mBalance.create account, type, amount, payload, (err, balance_log) ->
       callback balance_log

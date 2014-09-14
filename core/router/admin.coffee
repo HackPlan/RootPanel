@@ -1,10 +1,8 @@
+express = require 'express'
+
 {requireAdminAuthenticate, renderAccount} = require './../middleware'
-
-mAccount = require '../model/account'
-mTicket = require '../model/ticket'
-mBalance = require '..//model/balance'
-
-plugin = require '../pluggable'
+{plaggable} = app
+{mAccount, mTicket, mBalance} = app.models
 
 module.exports = exports = express.Router()
 

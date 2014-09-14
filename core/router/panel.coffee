@@ -1,11 +1,8 @@
-config = require '../../config'
-billing = require '../billing'
-plugin = require '../pluggable'
-bitcoin = require '../bitcoin'
-{requireAuthenticate, renderAccount} = require './../middleware'
+express = require 'express'
 
-mAccount = require '../model/account'
-mBalance = require '../model/balance_log'
+{requireAuthenticate, renderAccount} = require './../middleware'
+{mAccount, mBalance} = app.models
+{plaggable, billing, config} = app
 
 module.exports = exports = express.Router()
 
@@ -43,6 +40,7 @@ exports.get '/pay', requireAuthenticate, renderAccount, (req, res) ->
       nodes: _.values(config.nodes)
 
 exports.get '/', requireAuthenticate, (req, res) ->
+  console.log 'panel'
   billing.checkBilling req.account, (account) ->
     result =
       account: account

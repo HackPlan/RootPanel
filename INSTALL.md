@@ -83,7 +83,6 @@
         autorestart=true
         user=rpadmin
 
-
     service nginx restart
     service mongodb restart
     service redis-server restart

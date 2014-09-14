@@ -5,31 +5,27 @@ harp = require 'harp'
 fs = require 'fs'
 moment = require 'moment-timezone'
 redis = require 'redis'
+express = require 'express'
+{MongoClient} = require 'mongodb'
 
 global.app = express()
+
+config = require './config'
 
 if fs.existsSync config.web.listen
   fs.unlinkSync config.web.listen
 
 fs.chmodSync path.join(__dirname, 'config.coffee'), 0o750
 
-bindRouters = ->
-  app.use require 'middleware-injector'
-
-  for module_name in ['account', 'admin', 'panel', 'plan', 'ticket']
-    app.use "/#{module_name}", require './core/router/' + module_name
-
-  pluggable.initializePlugins()
-
-  app.use '/wiki', require './core/router/wiki'
-
-  app.get '/', (req, res) ->
-    res.redirect '/panel/'
-
 exports.run = ->
   {user, password, host, name} = config.mongodb
 
-  MongoClient.connect "mongodb://#{user}:#{password}@#{host}/#{name}", (err, db) ->
+  if user and password
+    mongodb_uri = "mongodb://#{user}:#{password}@#{host}/#{name}"
+  else
+    mongodb_uri = "mongodb://#{host}/#{name}"
+
+  MongoClient.connect mongodb_uri, (err, db) ->
     throw err if err
     app.db = db
 
@@ -38,21 +34,21 @@ exports.run = ->
 
     app.mailer = nodemailer.createTransport config.email.account
 
+    app.models =
+      mAccount: require './core/model/account'
+      mBalanceLog: require './core/model/balance_log'
+      mCouponCode: require './core/model/coupon_code'
+      mNotification: require './core/model/notification'
+      mSecurityLog: require './core/model/security_log'
+      mTicket: require './core/model/ticket'
+
     app.i18n = require './core/i18n'
     app.utils = require './core/utils'
-    app.config = require '../config'
+    app.config = require './config'
     app.package = require './package.json'
     app.pluggable = require './core/pluggable'
     app.middleware = require './core/middleware'
     app.authenticator = require './core/authenticator'
-
-    app.models =
-      mAccount: require './model/account'
-      mBalanceLog: require './model/balance_log'
-      mCouponCode: require './model/coupon_code'
-      mNotification: require './model/notification'
-      mSecurityLog: require './model/security_log'
-      mTicket: require './model/tickets'
 
     app.use connect.json()
     app.use connect.urlencoded()
@@ -61,15 +57,25 @@ exports.run = ->
 
     app.use (req, res, next) ->
       res.locals.app = app
-      res.locals.t = res.t = i18n.getTranslator req.cookies.language
-      res.moment = moment().locale(req.cookies.language ? config.i18n.default_language).tz(req.cookies.timezone ? config.i18n.default_timezone)
+      res.locals.t = res.t = app.i18n.getTranslator req.cookies.language
+      res.locals.moment = res.moment = moment().locale(req.cookies.language ? config.i18n.default_language).tz(req.cookies.timezone ? config.i18n.default_timezone)
 
       next()
 
     app.set 'views', path.join(__dirname, 'core/view')
     app.set 'view engine', 'jade'
 
-    bindRouters app
+    app.use require 'middleware-injector'
+    app.use '/account', require './core/router/account'
+    app.use '/billing', require './core/router/billing'
+    app.use '/ticket', require './core/router/ticket'
+    app.use '/admin', require './core/router/admin'
+    app.use '/panel', require './core/router/panel'
+
+    app.pluggable.initializePlugins()
+
+    app.get '/', (req, res) ->
+      res.redirect '/panel/'
 
     app.use harp.mount './core/static'
     app.use '/locale', harp.mount './core/locale'

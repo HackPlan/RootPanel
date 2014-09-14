@@ -29,15 +29,12 @@ exports.createToken = (account, type, payload, callback) ->
 
 # @param payload must be flat
 # @param callback(is_found)
-exports.revokeToken = (token, payload, callback) ->
-  modifier =
-    $set:
-      'tokens.$.is_available': false
-
-  for k, v of payload
-    modifier.$set["tokens.$.payload.#{k}"] = v
-
-  exports.update 'tokens.token': token, modifier, (err, rows) ->
+exports.revokeToken = (token, callback) ->
+  exports.update {'tokens.token': token},
+    $pull:
+      tokens:
+        token: token
+  , (err, rows) ->
     callback rows > 0
 
 # @param callback(type, account)

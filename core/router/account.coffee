@@ -1,3 +1,5 @@
+express = require 'express'
+
 {renderAccount, errorHandling, requireAuthenticate} = app.middleware
 {mAccount, mSecurityLog, mCouponCode} = app.models
 {pluggable, config, utils, authenticator} = app
@@ -87,11 +89,11 @@ exports.post '/login', errorHandling, (req, res) ->
         token: token
 
 exports.post '/logout', requireAuthenticate, (req, res) ->
-  authenticator.remokeToken req.token,
-    revoke_at: new Date()
-    revoke_ip: req.headers['x-real-ip']
-    revoke_ua: req.headers['user-agent']
-  , ->
+  authenticator.revokeToken req.token, ->
+    mSecurityLog.create req.account, 'revoke_token', req.token,
+      revoke_ip: req.headers['x-real-ip']
+      revoke_ua: req.headers['user-agent']
+    , ->
     res.clearCookie 'token'
     res.json {}
 

@@ -1,4 +1,5 @@
-markdown = require('markdown').markdown
+markdown = require 'markdown'
+express = require 'express'
 
 {requireAuthenticate, renderAccount, getParam, loadTicket} = app.middleware
 {mAccount, mTicket} = app.models
