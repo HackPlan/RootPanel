@@ -1,4 +1,6 @@
 express = require 'express'
+async = require 'async'
+_ = require 'underscore'
 
 {renderAccount, errorHandling, requireAuthenticate} = app.middleware
 {mAccount, mSecurityLog, mCouponCode} = app.models
@@ -25,7 +27,7 @@ exports.post '/register', errorHandling, (req, res) ->
   unless utils.rx.password.test req.body.password
     return res.error 'invalid_password'
 
-  async.each pluggable.account.username_filter, (hook_callback, callback) ->
+  async.each pluggable.hooks.account.username_filter, (hook_callback, callback) ->
     hook_callback account, (is_allow) ->
       if is_allow
         callback()
@@ -38,28 +40,23 @@ exports.post '/register', errorHandling, (req, res) ->
 
     async.parallel
       username: (callback) ->
-        mAccount.fineOne
+        mAccount.findOne
           username: req.body.username
         , (err, account) ->
-          if account
-            res.error 'username_exist'
-
           callback account
 
       email: (callback) ->
         mAccount.findOne
           email: req.body.email
         , (err, account) ->
-          if account
-            res.error 'email_exist'
-
           callback account
 
     , (err) ->
-      return if err
+      if err
+        return res.error 'username_exist'
 
-      mAccount.register _.pick(req.body, 'username', 'email', 'password'), (err, account) ->
-        authenticator.createToken account,
+      mAccount.register _.pick(req.body, 'username', 'email', 'password'), (account) ->
+        authenticator.createToken account, 'full_access',
           ip: req.headers['x-real-ip']
           ua: req.headers['user-agent']
         , (token)->
@@ -135,16 +132,17 @@ exports.post '/update_email', requireAuthenticate, (req, res) ->
       res.json {}
 
 exports.post '/update_setting', requireAuthenticate, (req, res) ->
-  unless req.body.name in ['qq']
-    return res.error 'invalid_name'
-
   modifiers =
     $set: {}
 
-  modifiers.$set["setting.#{req.body.name}"] = req.body.value
+  for k, v of req.body
+    unless req.body.name in ['qq']
+      return res.error 'invalid_field'
+
+    modifiers.$set["setting.#{k}"] = req.v
 
   mAccount.update _id: req.account._id, modifiers, ->
-    token = _.first _.where req.account.tokens,
+    token = _.findWhere req.account.tokens,
       token: req.token
 
     mSecurityLog.create req.account, 'update_setting', req.token,

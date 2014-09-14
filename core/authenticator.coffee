@@ -1,21 +1,25 @@
+_ = require 'underscore'
+
+utils = require './utils'
+
 mAccount = require './model/account'
 
 # @param callback(token)
-exports.generateAvailableToken = (callback) ->
-  token = exports.randomSalt()
+exports.generateToken = (callback) ->
+  token = utils.randomSalt()
 
-  exports.findOne
+  mAccount.findOne
     'tokens.token': token
   , (err, result) ->
     if result
-      exports.generateAvailableToken callback
+      exports.generateToken callback
     else
       callback token
 
 # @param callback(token)
 exports.createToken = (account, type, payload, callback) ->
-  exports.generateAvailableToken (token) ->
-    exports.update {_id: account._id},
+  exports.generateToken (token) ->
+    mAccount.update {_id: account._id},
       $push:
         tokens:
           type: type
@@ -30,7 +34,7 @@ exports.createToken = (account, type, payload, callback) ->
 # @param payload must be flat
 # @param callback(is_found)
 exports.revokeToken = (token, callback) ->
-  exports.update {'tokens.token': token},
+  mAccount.update {'tokens.token': token},
     $pull:
       tokens:
         token: token
@@ -42,11 +46,11 @@ exports.authenticate = (token, callback) ->
   unless token
     return callback null
 
-  exports.findAndModify 'tokens.token': token, {},
+  mAccount.findAndModify 'tokens.token': token, {},
     $set:
       'tokens.$.updated_at': new Date()
   , (err, account) ->
-    matched_token = _.first _.where req.account.tokens,
+    matched_token = _.findWhere req.account.tokens,
       token: token
 
-    callback matched_token.type, account
+    callback matched_token, account

@@ -1,5 +1,7 @@
-{config, plan} = app
-{mAccount, mBalance} = app.models
+mAccount = null
+mBalance = null
+
+config = require '../config'
 
 exports.cyclicalBilling = (callback) ->
   mAccount.find
@@ -12,7 +14,9 @@ exports.cyclicalBilling = (callback) ->
     , ->
       callback()
 
-exports.cyclicalBilling ->
+exports.run = ->
+  {mAccount, mBalance} = app.models
+
   setInterval ->
     exports.cyclicalBilling ->
   , config.billing.billing_cycle

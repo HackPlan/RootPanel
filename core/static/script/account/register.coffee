@@ -1,16 +1,11 @@
 $ ->
-  $('.action-signup').click ->
+  $('.action-register').click ->
     unless $('#password').val() == $('#password2').val()
-      return alert '两次密码不一致'
+      return alert t 'view.account.password_Inconsistent'
 
-    $.post '/account/signup/', JSON.stringify
+    request '/account/register/',
       username: $('#username').val()
       password: $('#password').val()
       email: $('#email').val()
-    .fail (jqXHR) ->
-      if jqXHR.responseJSON?.error
-        alert jqXHR.responseJSON.error
-      else
-        alert jqXHR.statusText
-    .success ->
+    , ->
       location.href = '/panel/'

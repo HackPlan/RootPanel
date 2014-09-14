@@ -16,6 +16,9 @@
     "common": {
         "error": "错误"
     },
+    "error_code": {
+        "username_exist": "用户名已存在"
+    },
     "account": {
         "": "帐号",
         "register": "注册",
@@ -73,7 +76,8 @@
         "account": {
             "password2": "重复",
             "already_register": "已有帐号？",
-            "no_account": "还没有账户？"
+            "no_account": "还没有账户？",
+            "password_Inconsistent": "两次输入的密码不一致"
         }
     },
     "plugins": {}

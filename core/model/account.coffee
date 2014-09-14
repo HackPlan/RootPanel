@@ -1,4 +1,10 @@
-{billing, config, pluggable, utils} = app
+async = require 'async'
+_ = require 'underscore'
+
+billing = require '../billing'
+config = require '../../config'
+pluggable = require '../pluggable'
+utils = require '../utils'
 
 mBalance = require './balance_log'
 

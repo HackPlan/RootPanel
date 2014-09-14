@@ -48,6 +48,7 @@ exports.run = ->
     app.utils = require './core/utils'
     app.config = require './config'
     app.package = require './package.json'
+    app.billing = require './core/billing'
     app.pluggable = require './core/pluggable'
     app.middleware = require './core/middleware'
 
@@ -90,6 +91,8 @@ exports.run = ->
       res.redirect '/panel/'
 
     app.use harp.mount './core/static'
+
+    app.billing.run()
 
     app.listen config.web.listen, ->
       fs.chmodSync config.web.listen, 0o770
