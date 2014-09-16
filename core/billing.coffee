@@ -1,5 +1,5 @@
-mAccount = null
-mBalance = null
+mAccount = require './model/account'
+mBalance = require './model/balance_log'
 
 config = require '../config'
 
@@ -15,8 +15,6 @@ exports.cyclicalBilling = (callback) ->
       callback()
 
 exports.run = ->
-  {mAccount, mBalance} = app.models
-
   setInterval ->
     exports.cyclicalBilling ->
   , config.billing.billing_cycle

@@ -1,5 +1,8 @@
-{mAccount, mNotification} = app.models
-{i18n, config} = app
+mAccount = require './model/account'
+mNotification = require './model/notification'
+
+i18n = require './i18n'
+config = require './config'
 
 {NOTICE, EVENT, LOG} = exports =
   NOTICE: 'notice'

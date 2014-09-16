@@ -1,7 +1,9 @@
 _ = require 'underscore'
 
-{mAccount, mTicket} = app.models
-{authenticator} = app
+mAccount = require './model/account'
+mTicket = require './model/ticket'
+
+authenticator = require './authenticator'
 
 exports.parseToken = (req, res, next) ->
   if req.headers['x-token']

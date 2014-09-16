@@ -42,8 +42,6 @@ exports.run = ->
       mSecurityLog: require './core/model/security_log'
       mTicket: require './core/model/ticket'
 
-    app.authenticator = require './core/authenticator'
-
     app.i18n = require './core/i18n'
     app.utils = require './core/utils'
     app.config = require './config'
@@ -51,6 +49,7 @@ exports.run = ->
     app.billing = require './core/billing'
     app.pluggable = require './core/pluggable'
     app.middleware = require './core/middleware'
+    app.authenticator = require './core/authenticator'
 
     app.use connect.json()
     app.use connect.urlencoded()

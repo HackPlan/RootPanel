@@ -1,6 +1,5 @@
 {ObjectID} = require 'mongodb'
-
-markdown = require('markdown').markdown
+{markdown} = require 'markdown'
 
 mAccount = require './account'
 

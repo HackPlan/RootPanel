@@ -4,8 +4,8 @@ harp = require 'harp'
 fs = require 'fs'
 _ = require 'underscore'
 
-config = require './../config'
 i18n = require './i18n'
+config = require './../config'
 
 exports.plugins = {}
 
