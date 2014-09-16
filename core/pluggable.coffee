@@ -11,17 +11,65 @@ exports.plugins = {}
 
 exports.hooks =
   account:
-    # function(account, callback(is_allow))
+    # filter: function(account, callback(is_allow))
     username_filter: []
-    # function(account, callback)
+    # filter: function(account, callback)
     before_register: []
 
   view:
     layout:
-      # object(href, target, body)
+      # href, target, body
       menu_bar: []
       # path
+      scripts: []
+      # path
       styles: []
+
+    panel:
+      # path
+      scripts: []
+      # generator: function(account, callback)
+      widgets: []
+      # path
+      styles: []
+      # name
+      switch_buttons: []
+
+exports.registerHook = (hook_name, plugin, payload) ->
+  keys = hook_name.split '.'
+  last_key = keys.pop()
+
+  pointer = exports.hooks
+
+  for item in keys
+    if pointer[item] == undefined
+      throw new Error 'Invalid hook name'
+    else
+      pointer = pointer[item]
+
+  pointer[last_key].push _.extend payload
+    plugin_info: plugin
+
+exports.selectHook = (account, hook_name) ->
+  keys = hook_name.split '.'
+
+  pointer = exports.hooks
+
+  for item in keys
+    if pointer[item] == undefined
+      throw new Error 'Invalid hook name'
+    else
+      pointer = pointer[item]
+
+  selected_hooks = []
+
+  for hook in pointer
+    if hook.plugin_info.type == 'service'
+      selected_hooks.push hook
+    else if hook.plugin_info.name in account.billing.services
+      selected_hooks.push hook
+
+  return selected_hooks
 
 exports.initializePlugins = (callback) ->
   initializePlugin = (name, callback) ->

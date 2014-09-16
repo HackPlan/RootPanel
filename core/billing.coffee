@@ -15,9 +15,10 @@ exports.cyclicalBilling = (callback) ->
       callback()
 
 exports.run = ->
-  setInterval ->
-    exports.cyclicalBilling ->
-  , config.billing.billing_cycle
+  exports.cyclicalBilling ->
+    setInterval ->
+      exports.cyclicalBilling ->
+    , config.billing.billing_cycle
 
 # @param callback(account)
 exports.triggerBilling = (account, callback) ->
@@ -151,7 +152,6 @@ exports.leavePlan = (account, plan, callback) ->
 
     , ->
       callback()
-
 
 exports.calcResourcesLimit = (plans) ->
   limit = {}

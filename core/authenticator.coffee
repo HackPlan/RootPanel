@@ -50,7 +50,7 @@ exports.authenticate = (token, callback) ->
     $set:
       'tokens.$.updated_at': new Date()
   , (err, account) ->
-    matched_token = _.findWhere req.account.tokens,
+    matched_token = _.findWhere account.tokens,
       token: token
 
     callback matched_token, account

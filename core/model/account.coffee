@@ -1,14 +1,14 @@
 async = require 'async'
 _ = require 'underscore'
 
+module.exports = exports = app.db.collection 'accounts'
+
 billing = require '../billing'
 config = require '../../config'
 pluggable = require '../pluggable'
 utils = require '../utils'
 
 mBalance = require './balance_log'
-
-module.exports = exports = app.db.collection 'accounts'
 
 sample =
   username: 'jysperm'

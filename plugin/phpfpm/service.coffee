@@ -10,7 +10,7 @@ mAccount = require '../../core/model/account'
 
 module.exports =
   enable: (account, callback) ->
-    mAccount.update _id: account._id,
+    mAccount.update {_id: account._id},
       $set:
         'attribute.plugin.phpfpm.is_enable': false
     , ->

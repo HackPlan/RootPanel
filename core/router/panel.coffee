@@ -2,7 +2,7 @@ express = require 'express'
 
 {requireAuthenticate, renderAccount} = require './../middleware'
 {mAccount, mBalance} = app.models
-{plaggable, billing, config} = app
+{pluggable, billing, config} = app
 
 module.exports = exports = express.Router()
 
@@ -39,56 +39,26 @@ exports.get '/pay', requireAuthenticate, renderAccount, (req, res) ->
     res.render 'panel/pay', _.extend result,
       nodes: _.values(config.nodes)
 
-exports.get '/', requireAuthenticate, (req, res) ->
-  console.log 'panel'
-  billing.checkBilling req.account, (account) ->
-    result =
+exports.get '/', requireAuthenticate, renderAccount, (req, res) ->
+  billing.triggerBilling req.account, (account) ->
+    view_data =
       account: account
       plans: []
-      switch_buttons: []
-      widgets: []
-      script: []
-      style: []
+      widgets_html: []
 
     for name, info of config.plans
       result.plans.push _.extend info,
         name: name
         is_enable: name in req.account.attribute.plans
 
-    account.attribute.remaining_time = Math.ceil(billing.calcRemainingTime(account) / 24)
+    async.each pluggable.hooks.view.panel.widgets, (hook, callback) ->
+      if hook.plugin_info.type == 'service'
+        unless hook.plugin_info.name in account.billing.services
+          return callback()
 
-    async.eachSeries account.attribute.services, (service_name, callback) ->
-      service_plugin = pluggable.get service_name
+      hook.generator account, (html) ->
+        callback null, html
+    , (err, widgets_html) ->
+      view_data.widgets_html = widgets_html
 
-      if service_plugin.switch
-        result.switch_buttons.push service_name
-
-      if service_plugin.panel?.script
-        result.script.push "/plugin/#{service_name}#{service_plugin.panel.script}"
-
-      if service_plugin.panel?.style
-        result.style.push "/plugin/#{service_name}#{service_plugin.panel.style}"
-
-      async.parallel [
-        (callback) ->
-          unless service_plugin.panel?.widget
-            return callback()
-
-          service_plugin.panel.widget account, (html) ->
-            result.widgets.push
-              plugin: service_plugin
-              html: html
-            callback()
-
-        (callback) ->
-          if service_plugin.switch_status
-            service_plugin.switch_status account, (is_enable) ->
-              account.attribute.plugin[service_name] ?= {}
-              account.attribute.plugin[service_name].is_enable = is_enable
-              callback()
-          else
-            callback()
-      ], callback
-
-    , ->
-      res.render 'panel', result
+      res.render 'panel', view_data

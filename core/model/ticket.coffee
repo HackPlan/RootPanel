@@ -1,9 +1,9 @@
 {ObjectID} = require 'mongodb'
 {markdown} = require 'markdown'
 
-mAccount = require './account'
-
 module.exports = exports = app.db.collection 'tickets'
+
+mAccount = require './account'
 
 sample =
   account_id: ObjectID()

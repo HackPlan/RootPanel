@@ -5,62 +5,49 @@ prepend head
 
 append head
   link(rel='stylesheet', href='/style/panel.css')
-  for path in style
-    link(rel='stylesheet', href=path)
+  for hook in selectHook('view.panel.styles')
+    link(rel='stylesheet', href=hook.path)
 
-block content
-  #content.container
-    .row
-      #sidenav.col-md-3
-        ul.nav.nav-pills.nav-stacked
-          li.active
-            a(href='/panel/')
-              span.glyphicon.pull-right.glyphicon-home
-              | #{t('panel.')}
-          li
-            a(href='/ticket/list/')
-              span.glyphicon.pull-right.glyphicon-edit
-              | #{t('ticket.')}
+block main
+  .row
+    header 财务
+    p #{t('plan.balance')}: #{account.billing.balance.toFixed(2)} #{t('plan.currency.cny')}
+    p
+      a(href= '/panel/pay/').btn.btn-success 充值
 
-      .col-md-9
-        .row
-          header 财务
-          p
-            | #{t('plan.balance')}: #{account.attribute.balance.toFixed(2)} #{t('plan.currency.cny')}
-            if account.attribute.remaining_time && account.attribute.remaining_time != Infinity && account.attribute.remaining_time != -Infinity
-              |  |  #{t('plan.remaining_time')}: #{account.attribute.remaining_time} #{t('time.day')}
-          p
-            a(href= '/panel/pay/').btn.btn-success 充值
-
-        .row
-          header 服务
-          table.table.table-hover.plan-list
-            tbody
-              for plan in plans
-                tr(data-name='#{plan.name}')
-                  td= plan.t_name
-                  td= plan.t_service
-                  td= plan.t_resources
-                  td
-                    if plan.is_enable
-                      button.btn.btn-danger.btn-sm 关闭
-                    else
-                      button.btn.btn-success.btn-sm 开启
-
-        if switch_buttons.length
-          #service-switch.row
-            header 服务开关
-            for name in switch_buttons
-              if account.attribute.plugin[name].is_enable
-                button(data-name= name).btn.btn-danger 关闭 #{t('plugins.' + name + '.name')}
+  .row
+    header 付费方案
+    table.table.table-hover.plan-list
+      tbody
+        for plan in plans
+          tr(data-name='#{plan.name}')
+            td= plan.t_name
+            td= plan.t_service
+            td= plan.t_resources
+            td
+              if plan.is_enable
+                button.btn.btn-danger.btn-sm 退订方案
               else
-                button(data-name= name).btn.btn-success 开启 #{t('plugins.' + name + '.name')}
+                button.btn.btn-success.btn-sm 订购方案
 
-        for widget in widgets
-          .row(id='widget-#{widget.plugin.name}')
-            != widget.html
+  if switch_buttons.length
+    #service-switch.row
+      header 服务开关
+      for name in switch_buttons
+        if account.attribute.plugin[name].is_enable
+          button(data-name= name).btn.btn-danger 关闭 #{t('plugins.' + name + '.name')}
+        else
+          button(data-name= name).btn.btn-success 开启 #{t('plugins.' + name + '.name')}
+
+  for widget in widgets
+    .row(id='widget-#{widget.plugin.name}')
+      != widget.html
+
+prepend sidebar
+  .row
+    a.btn.btn-lg.btn-success(href='/ticket/list/') 工单
 
 append footer
   script(src='/script/panel.js')
-  for path in script
-    script(src= path)
+  for hook in selectHook('view.panel.scripts')
+      script(src=hook.path)

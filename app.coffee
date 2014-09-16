@@ -62,9 +62,10 @@ exports.run = ->
     app.use (req, res, next) ->
       res.locals.app = app
       res.locals.config = app.config
-      res.locals.pluggable = app.pluggable
-      res.locals.hooks = app.pluggable.hooks
       res.locals.t = res.t = app.i18n.getTranslator req.cookies.language
+
+      res.locals.selectHook = (name) ->
+        return app.pluggable.selectHook req.account, name
 
       language = req.cookies.language ? config.i18n.default_language
       timezone = req.cookies.timezone ? config.i18n.default_timezone

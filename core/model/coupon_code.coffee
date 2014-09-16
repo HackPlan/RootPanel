@@ -1,8 +1,8 @@
 {ObjectID} = require 'mongodb'
 
-mAccount = require './account'
-
 module.exports = exports = app.db.collection 'coupon_code'
+
+mAccount = require './account'
 
 sample =
   code: 'PmlFH2hpziDmyqPX'
