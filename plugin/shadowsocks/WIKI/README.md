@@ -47,6 +47,12 @@ GreenShadow 使用标准的 ShadowSocks 协议，服务器是官方的 Python �
 ## 硬性限制
 为了防止滥发邮件，暂时封掉了 25 端口。
 
+## 国外优秀资源
+
+* [Google] [Google Plus] [Google Drive] [Google Play] [Chrome Store]
+* [Facebook] [Twitter] [Youtube] [Flickr] [Dropbox] [V2EX] [Github]
+* [Blogger] [WordPress] [Feedly] [Wikipedia] [XArt]
+
 ## ShadowSocks
 感谢 [clowwindy](https://github.com/clowwindy) 的 [shadowsocks](https://github.com/clowwindy/shadowsocks).
 
