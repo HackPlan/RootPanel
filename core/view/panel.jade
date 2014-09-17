@@ -30,18 +30,17 @@ block main
               else
                 button.btn.btn-success.btn-sm 订购方案
 
-  if switch_buttons.length
+  if selectHook('view.panel.switch_buttons').length
     #service-switch.row
       header 服务开关
-      for name in switch_buttons
-        if account.attribute.plugin[name].is_enable
-          button(data-name= name).btn.btn-danger 关闭 #{t('plugins.' + name + '.name')}
+      for hook in selectHook('view.panel.switch_buttons')
+        if account.attribute.plugin[hook.name].is_enable
+          button(data-name=hook.name).btn.btn-danger 关闭 #{t('plugins.' + hook.name + '.name')}
         else
-          button(data-name= name).btn.btn-success 开启 #{t('plugins.' + name + '.name')}
+          button(data-name=hook.name).btn.btn-success 开启 #{t('plugins.' + hook.name + '.name')}
 
-  for widget in widgets
-    .row(id='widget-#{widget.plugin.name}')
-      != widget.html
+  for widget_html in widgets_html
+    != widget_html
 
 prepend sidebar
   .row

@@ -1,4 +1,6 @@
 express = require 'express'
+async = require 'async'
+_ = require 'underscore'
 
 {requireAuthenticate, renderAccount} = require './../middleware'
 {mAccount, mBalance} = app.models
@@ -47,18 +49,15 @@ exports.get '/', requireAuthenticate, renderAccount, (req, res) ->
       widgets_html: []
 
     for name, info of config.plans
-      result.plans.push _.extend info,
+      view_data.plans.push _.extend info,
         name: name
-        is_enable: name in req.account.attribute.plans
+        is_enable: name in req.account.billing.plans
 
-    async.each pluggable.hooks.view.panel.widgets, (hook, callback) ->
-      if hook.plugin_info.type == 'service'
-        unless hook.plugin_info.name in account.billing.services
-          return callback()
-
+    async.map pluggable.selectHook(account, 'view.panel.widgets'), (hook, callback) ->
       hook.generator account, (html) ->
         callback null, html
     , (err, widgets_html) ->
+      console.log err, widgets_html
       view_data.widgets_html = widgets_html
 
       res.render 'panel', view_data

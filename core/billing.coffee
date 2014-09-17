@@ -1,3 +1,6 @@
+async = require 'async'
+_ = require 'underscore'
+
 mAccount = require './model/account'
 mBalance = require './model/balance_log'
 
@@ -31,10 +34,10 @@ exports.triggerBilling = (account, callback) ->
         callback account
 
   is_force = do ->
-    if account.attribute.balance < config.billing.force_freeze.when_balance_below
+    if account.billing.balance < config.billing.force_freeze.when_balance_below
       return true
 
-    if Date.now() > account.attribute.arrears_at.getTime() + config.billing.force_freeze.when_arrears_above
+    if account.billing.arrears_at and Date.now() > account.billing.arrears_at.getTime() + config.billing.force_freeze.when_arrears_above
       return true
 
     return false

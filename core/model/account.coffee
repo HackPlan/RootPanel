@@ -76,7 +76,7 @@ exports.register = (account, callback) ->
     email: email
     created_at: new Date()
 
-    group: []
+    groups: []
 
     settings:
       avatar_url: "//ruby-china.org/avatar/#{utils.md5(email)}?s=58"
@@ -152,3 +152,6 @@ exports.incBalance = (account, type, amount, payload, callback) ->
   , ->
     mBalance.create account, type, amount, payload, (err, balance_log) ->
       callback balance_log
+
+exports.inGroup = (account, group) ->
+  return group in account.groups

@@ -5,8 +5,8 @@ html
     block head
       link(rel='stylesheet', href='http://cdn.staticfile.org/twitter-bootstrap/3.2.0/css/bootstrap.min.css')
       link(rel='stylesheet', href='/style/layout.css')
-      for path in hooks.view.layout.styles
-        link(rel='stylesheet', href=path)
+      for hook in selectHook('view.layout.styles')
+        link(rel='stylesheet', href=hook.path)
 
   body
     header.navbar-fixed-top
@@ -21,20 +21,20 @@ html
             a.navbar-brand(href='/')= config.web.name
           #navbar-collapse.collapse.navbar-collapse
             ul.nav.navbar-nav
-              for item in hooks.view.layout.menu_bar
-                if item.target
+              for hook in selectHook('view.layout.menu_bar')
+                if hook.target
                   li
-                    a(href=item.href, target=item.target)= item.body
+                    a(href=hook.href, target=hook.target)= hook.body
                 else
                   li
-                    a(href=item.href)= item.html
+                    a(href=hook.href)= hook.body
             ul.nav.navbar-nav.navbar-right
               if account
                 li
                   a(href='/account/setting/')= account.username
                 li
                   a(href='/panel/')= t('panel.')
-                if mAccount.inGroup(account, 'root')
+                if app.models.mAccount.inGroup(account, 'root')
                   li
                     a(href='/admin/') 管理员面板
                 li
@@ -73,6 +73,6 @@ html
       script(src='http://cdn.staticfile.org/jquery-cookie/1.4.1/jquery.cookie.min.js')
       script(src='http://cdn.staticfile.org/twitter-bootstrap/3.2.0/js/bootstrap.min.js')
       script(src='/script/layout.js')
-      for path in hooks.view.layout.scripts
-        script(src=path)
+      for hook in selectHook('view.layout.scripts')
+        script(src=hook.path)
       block footer
