@@ -1,9 +1,7 @@
 extends layout
 
-prepend head
+append header
   title #{t('panel.')} | #{config.web.name}
-
-append head
   link(rel='stylesheet', href='/style/panel.css')
   for hook in selectHook('view.panel.styles')
     link(rel='stylesheet', href=hook.path)
@@ -21,9 +19,9 @@ block main
       tbody
         for plan in plans
           tr(data-name='#{plan.name}')
-            td= plan.t_name
-            td= plan.t_service
-            td= plan.t_resources
+            td
+              strong= t(plan.t_name)
+            td= t(plan.t_description)
             td
               if plan.is_enable
                 button.btn.btn-danger.btn-sm 退订方案
@@ -44,7 +42,10 @@ block main
 
 prepend sidebar
   .row
-    a.btn.btn-lg.btn-success(href='/ticket/list/') 工单
+    p
+      a.btn.btn-lg.btn-success(href='/ticket/list/') 工单
+    p
+      a.btn.btn-lg.btn-success(href='/account/setting/') 首选项
 
 append footer
   script(src='/script/panel.js')

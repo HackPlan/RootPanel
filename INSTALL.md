@@ -149,7 +149,7 @@
 
     # Python
     apt-get install python python3 python-pip python3-pip python-dev python3-dev python-m2crypto
-    pip install django tornado markdown python-memcached web.py mongo uwsgi virtualenv virtualenvwrapper flask gevent jinja2 requests
+    pip install django tornado markdown python-memcached web.py mongo uwsgi virtualenv virtualenvwrapper flask gevent jinja2 requests MySQL-python
 
     # Node.js
     npm install forever gulp mocha harp bower -g

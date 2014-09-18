@@ -64,10 +64,8 @@
     "time": {
         "day": "天"
     },
-    "notification": {
-        "ticket_create": {
-            "title": "工单 | <%= title %>"
-        }
+    "notification_title": {
+        "ticket_create": "工单 | <%= title %>"
     },
     "view": {
         "layout": {

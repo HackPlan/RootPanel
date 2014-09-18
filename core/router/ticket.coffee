@@ -79,7 +79,7 @@ exports.post '/create', requireAuthenticate, (req, res) ->
   else
     createTicket [req.account], 'pending', (ticket) ->
       notification.createGroupNotice 'root', 'ticket_create',
-        title: _.template res.t('notification.ticket_create.title'), ticket
+        title: _.template res.t('notification_title.ticket_create'), ticket
         body: _.template fs.readSync('./../template/ticket_create_email.html'),
           ticket: ticket
           account: req.account
@@ -100,7 +100,7 @@ exports.post '/reply', loadTicket, (req, res) ->
         _id: member_id
       , (err, account) ->
         notification.createNotice account, 'ticket_reply',
-          title: _.template res.t('notification.ticket_create.title'), ticket
+          title: _.template res.t('notification_title.ticket_create'), ticket
           body: _.template fs.readSync('./../template/ticket_create_email.html'),
             ticket: ticket
             reply: reply

@@ -2,7 +2,7 @@ doctype html
 html
   head
     meta(charset='utf-8')
-    block head
+    block header
       link(rel='stylesheet', href='http://cdn.staticfile.org/twitter-bootstrap/3.2.0/css/bootstrap.min.css')
       link(rel='stylesheet', href='/style/layout.css')
       for hook in selectHook('view.layout.styles')
@@ -56,7 +56,7 @@ html
               .row
                 header= config.web.name
                 ul
-                  li #{app.package.version}
+                  li v#{app.package.version}
                   li
                     a(href=app.package.repository.url) Github
 
