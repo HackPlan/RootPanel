@@ -24,7 +24,6 @@ exports.createToken = (account, type, payload, callback) ->
         tokens:
           type: type
           token: token
-          is_available: true
           created_at: new Date()
           updated_at: new Date()
           payload: payload
@@ -50,7 +49,7 @@ exports.authenticate = (token, callback) ->
     $set:
       'tokens.$.updated_at': new Date()
   , (err, account) ->
-    matched_token = _.findWhere account.tokens,
+    matched_token = _.findWhere account?.tokens,
       token: token
 
     callback matched_token, account

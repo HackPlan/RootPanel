@@ -1,6 +1,6 @@
 extends ../layout
 
-prepend head
+append header
   title 个人信息 | #{config.web.name}
 
 block main
@@ -10,7 +10,7 @@ block main
       .form-group
         label.col-sm-2.col-md-offset-1.control-label QQ
         .col-sm-5
-          input.form-control(type='text', name='qq', value=account.setting.qq)
+          input.form-control(type='text', name='qq', value=account.settings.qq)
       .form-group
         .col-sm-offset-3
           button.action-save.btn.btn-lg.btn-success(type='button') 保存
@@ -59,7 +59,7 @@ block main
       .form-group
         label.col-sm-2.col-md-offset-1.control-label 新邮箱
         .col-sm-5
-          input.form-control(type='text', name='email', required)
+          input.form-control(type='text', name='email')
       .form-group
         .col-sm-offset-3
           button.action-update-email.btn.btn-lg.btn-info(type='button') 修改

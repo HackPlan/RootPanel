@@ -112,20 +112,26 @@ exports.updatePassword = (account, password, callback) ->
       password_salt: password_salt
   , callback
 
-exports.byUsernameOrEmailOrId = (username, callback) ->
-  exports.byUsername username, (err, account) ->
+exports.search = (username, callback) ->
+  exports.findOne
+    username: username
+  , (err, account) ->
     if account
       return callback null, account
 
-    exports.byEmail username, (err, account) ->
+    exports.findOne
+      email: username
+    , (err, account) ->
       if account
         return callback null, account
 
-      exports.findId username, (err, account) ->
+      exports.findOne
+        _id: new ObjectID username
+      , (err, account) ->
         callback null, account
 
 exports.matchPassword = (account, password) ->
-  return exports.hashPassword(password, account.password_salt) == account.password
+  return utils.hashPassword(password, account.password_salt) == account.password
 
 exports.joinPlan = (account, plan, callback) ->
   account.billing.plans.push plan

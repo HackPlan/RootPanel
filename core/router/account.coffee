@@ -27,7 +27,7 @@ exports.post '/register', errorHandling, (req, res) ->
   unless utils.rx.password.test req.body.password
     return res.error 'invalid_password'
 
-  async.each pluggable.selectHook(account, 'account.username_filter'), (hook, callback) ->
+  async.each pluggable.selectHook(req.account, 'account.username_filter'), (hook, callback) ->
     hook.filter account, (is_allow) ->
       if is_allow
         callback()
@@ -43,17 +43,22 @@ exports.post '/register', errorHandling, (req, res) ->
         mAccount.findOne
           username: req.body.username
         , (err, account) ->
+          if account
+            return res.error 'username_exist'
+
           callback account
 
       email: (callback) ->
         mAccount.findOne
           email: req.body.email
         , (err, account) ->
+          if account
+            return res.error 'email_exist'
+
           callback account
 
     , (err) ->
-      if err
-        return res.error 'username_exist'
+      return if err
 
       mAccount.register _.pick(req.body, 'username', 'email', 'password'), (account) ->
         authenticator.createToken account, 'full_access',
@@ -67,17 +72,17 @@ exports.post '/register', errorHandling, (req, res) ->
             id: account._id
 
 exports.post '/login', errorHandling, (req, res) ->
-  mAccount.byUsernameOrEmailOrId req.body.username, (err, account) ->
+  mAccount.search req.body.username, (err, account) ->
     unless account
       return res.error 'wrong_password'
 
     unless mAccount.matchPassword account, req.body.password
       return res.error 'wrong_password'
 
-    authenticator.createToken account,
+    authenticator.createToken account, 'full_access',
       ip: req.headers['x-real-ip']
       ua: req.headers['user-agent']
-    , (err, token) ->
+    , (token) ->
       res.cookie 'token', token,
         expires: new Date(Date.now() + config.account.cookie_time)
 
