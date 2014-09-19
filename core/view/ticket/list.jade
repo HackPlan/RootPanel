@@ -20,7 +20,7 @@ mixin showTickets(tickets)
       td
         mixin displayTicketStatus(ticket.status)
 
-prepend head
+prepend header
   title #{t('ticket.ticket_list')} | #{config.web.name}
 
 block main

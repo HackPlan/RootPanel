@@ -11,6 +11,7 @@ sample =
   type: 'amount'
   meta:
     amount: 10
+    category: '2014.9.20'
   apply_log: [
     account_id: new ObjectID()
     created_at: new Date()
@@ -18,8 +19,19 @@ sample =
 
 exports.type_meta =
   amount:
-    message: (coupon_code) ->
-      return "账户余额：#{coupon_code.meta.amount} CNY"
+    restrict: (account, coupon_code, callback) ->
+      exports.findOne
+        type: 'amount'
+        'meta.category': coupon_code.meta.category
+        'apply_log.account_id': account._id
+      , (err, result) ->
+        if result
+          callback true
+        else
+          callback null
+
+    message: (coupon_code, callback) ->
+      callback "账户余额：#{coupon_code.meta.amount} CNY"
 
     apply: (account, coupon_code, callback) ->
       mAccount.incBalance account, 'deposit', coupon_code.meta.amount,
@@ -28,8 +40,25 @@ exports.type_meta =
       , ->
         callback()
 
-exports.codeMessage = (coupon_code) ->
-  return exports.type_meta[coupon_code.type].message coupon_code
+exports.codeMessage = (coupon_code, callback) ->
+  exports.type_meta[coupon_code.type].message coupon_code, callback
+
+exports.restrictCode = (account, coupon_code, callback) ->
+  exports.type_meta[coupon_code.type].restrict account, coupon_code, callback
+
+exports.createCodes = (coupon_code, count, callback) ->
+  coupon_codes = _.map _.range(0, count), ->
+    return {
+      code: utils.randomString 16
+      expired: coupon_code.expired
+      available_times: coupon_code.expired
+      type: coupon_code.type
+      meta: coupon_code.meta
+      log: []
+    }
+
+  exports.insert coupon_codes, (err, coupon_codes) ->
+    callback coupon_codes
 
 exports.applyCode = (account, coupon_code, callback) ->
   exports.update {_id: coupon_code._id},

@@ -132,7 +132,6 @@ exports.post '/update_email', requireAuthenticate, (req, res) ->
     mSecurityLog.create req.account, 'update_email', req.token,
       old_email: req.account.email
       email: req.body.email
-      token: _.omit(token, 'updated_at')
     , ->
       res.json {}
 
@@ -144,7 +143,7 @@ exports.post '/update_setting', requireAuthenticate, (req, res) ->
     unless req.body.name in ['qq']
       return res.error 'invalid_field'
 
-    modifiers.$set["setting.#{k}"] = req.v
+    modifiers.$set["settings.#{k}"] = req.v
 
   mAccount.update _id: req.account._id, modifiers, ->
     token = _.findWhere req.account.tokens,
@@ -154,7 +153,6 @@ exports.post '/update_setting', requireAuthenticate, (req, res) ->
       name: req.body.name
       old_value: req.account.setting[req.body.name]
       value: req.body.value
-      token: _.omit(token, 'updated_at')
     , ->
       res.json {}
 
@@ -173,6 +171,9 @@ exports.post '/use_coupon', requireAuthenticate, (req, res) ->
 
     unless coupon_code.available_times > 0
       return res.error 'code_not_available'
+
+    if _.find coupon_code.apply_log, (i) -> i.account_id.toString() == req.account._id.toString()
+      return res.error 'already_used'
 
     mCouponCode.applyCode req.account, coupon_code, ->
       res.json {}

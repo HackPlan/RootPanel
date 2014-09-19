@@ -1,7 +1,9 @@
 extends layout
 
-append header
+prepend header
   title #{t('panel.')} | #{config.web.name}
+
+append header
   link(rel='stylesheet', href='/style/panel.css')
   for hook in selectHook('view.panel.styles')
     link(rel='stylesheet', href=hook.path)

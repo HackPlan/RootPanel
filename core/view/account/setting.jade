@@ -1,6 +1,6 @@
 extends ../layout
 
-append header
+prepend header
   title 个人信息 | #{config.web.name}
 
 block main
@@ -28,7 +28,7 @@ block main
 
   .row
     header 修改密码
-    form.form-password.form-horizontal(method='post', role='form')
+    form.form-password.form-horizontal
       .form-group
         label.col-sm-2.col-md-offset-1.control-label 原密码
         .col-sm-5

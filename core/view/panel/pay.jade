@@ -1,7 +1,9 @@
 extends ../layout
 
-prepend head
+prepend header
   title 充值 | #{config.web.name}
+
+append header
   link(rel='stylesheet', href='/style/panel/pay.css')
 
 block main
