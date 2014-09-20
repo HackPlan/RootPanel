@@ -1,11 +1,16 @@
 $ ->
   $('.action-register').click ->
-    unless $('#password').val() == $('#password2').val()
-      return alert t 'view.account.password_Inconsistent'
+    username = $('.input-username').val()
+    password = $('.input-password').val()
+    password2 = $('.input-password2').val()
+    email = $('.input-email').val()
+
+    unless password == password2
+      return alert t 'view.account.password_inconsistent'
 
     request '/account/register/',
-      username: $('#username').val()
-      password: $('#password').val()
-      email: $('#email').val()
+      username: username
+      password: password
+      email: email
     , ->
       location.href = '/panel/'

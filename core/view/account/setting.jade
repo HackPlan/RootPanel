@@ -10,7 +10,7 @@ block main
       .form-group
         label.col-sm-2.col-md-offset-1.control-label QQ
         .col-sm-5
-          input.form-control(type='text', name='qq', value=account.settings.qq)
+          input.input-qq.form-control(type='text', value=account.settings.qq)
       .form-group
         .col-sm-offset-3
           button.action-save.btn.btn-lg.btn-success(type='button') 保存
@@ -21,7 +21,7 @@ block main
       .form-group
         label.col-sm-2.col-md-offset-1.control-label 代码
         .col-sm-5
-          input.form-control(type='text', name='coupon_code', required)
+          input.input-coupon_code.form-control(type='text')
       .form-group
         .col-sm-offset-3
           button.action-use.btn.btn-lg.btn-success(type='button') 使用
@@ -32,15 +32,15 @@ block main
       .form-group
         label.col-sm-2.col-md-offset-1.control-label 原密码
         .col-sm-5
-          input.form-control(type='password', name='old_password')
+          input.input-old_password.form-control(type='password')
       .form-group
         label.col-sm-2.col-md-offset-1.control-label 新密码
         .col-sm-5
-          input.form-control(type='password', name='password')
+          input.input-password.form-control(type='password')
       .form-group
         label.col-sm-2.col-md-offset-1.control-label 重复密码
         .col-sm-5
-          input.form-control(type='password', name='password2')
+          input.input-password2.form-control(type='password')
       .form-group
         .col-sm-offset-3
           button.action-update-password.btn.btn-lg.btn-info(type='button') 修改
@@ -55,11 +55,11 @@ block main
       .form-group
         label.col-sm-2.col-md-offset-1.control-label 密码
         .col-sm-5
-          input.form-control(type='password', name='password')
+          input.input-password.form-control(type='password')
       .form-group
         label.col-sm-2.col-md-offset-1.control-label 新邮箱
         .col-sm-5
-          input.form-control(type='text', name='email')
+          input.input-email.form-control(type='text')
       .form-group
         .col-sm-offset-3
           button.action-update-email.btn.btn-lg.btn-info(type='button') 修改

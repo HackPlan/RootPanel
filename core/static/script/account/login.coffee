@@ -1,14 +1,9 @@
 $ ->
   $('.action-login').click ->
-    $.post '/account/login/', JSON.stringify
-      username : $('#username').val()
-      password : $('#password').val()
-    .fail (jqXHR) ->
-      if jqXHR.responseJSON?.error
-        alert jqXHR.responseJSON.error
-      else
-        alert jqXHR.statusText
-    .success ->
+    request '/account/login/',
+      username: $('.input-username').val()
+      password: $('.input-password').val()
+    , ->
       location.href = '/panel/'
 
   $('#password').keypress (e) ->

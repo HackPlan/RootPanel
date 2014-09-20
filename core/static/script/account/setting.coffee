@@ -1,44 +1,38 @@
 $ ->
-  $('.action-update-password').click ->
-    if $('.form-password :input[name=password]').val() != $('.form-password :input[name=password2]').val()
-      return alert 'Two password is not equal'
-
-    $.post '/account/update_password/', JSON.stringify
-      old_password : $('.form-password :input[name=old_password]').val()
-      password: $('.form-password :input[name=password]').val()
-    .fail (jqXHR) ->
-      alert jqXHR.responseJSON?.error ? jqXHR.statusText
-    .success ->
-      alert 'Success!'
-
   $('.action-save').click ->
-    $.post '/account/update_setting/', JSON.stringify
-      name: 'qq'
-      value: $(':input[name=qq]').val()
-    .fail (jqXHR) ->
-      alert jqXHR.responseJSON?.error ? jqXHR.statusText
-    .success ->
-      alert 'Success!'
-
-  $('.action-update-email').click ->
-    $.post '/account/update_email/', JSON.stringify
-      password: $('.form-email :input[name=password]').val()
-      email: $(':input[name=email]').val()
-    .fail (jqXHR) ->
-      alert jqXHR.responseJSON?.error ? jqXHR.statusText
-    .success ->
-      alert 'Success!'
+    request '/account/update_setting/',
+      qq: $('.form-setting .input-qq').val()
+    , ->
+      alert t 'common.success'
 
   $('.action-use').click ->
-    $.post '/account/coupon_info/', JSON.stringify
-      code: $(':input[name=coupon_code]').val()
-    .fail (jqXHR) ->
-      alert jqXHR.responseJSON?.error ? jqXHR.statusText
-    .success (data) ->
+    code = $('.form-coupon .input-coupon_code').val()
+
+    request '/account/coupon_info/',
+      code: code
+    , ->
       if window.confirm data.message
-        $.post '/account/use_coupon/', JSON.stringify
-          code: $(':input[name=coupon_code]').val()
-        .fail (jqXHR) ->
-          alert jqXHR.responseJSON?.error ? jqXHR.statusText
-        .success ->
-          alert 'Success!'
+        request '/account/use_coupon/',
+          code: code
+        , ->
+          alert t 'common.success'
+
+  $('.action-update-password').click ->
+    password = $('.form-password .input-password').val()
+    password2 = $('.form-password .input-password2').val()
+
+    if password != password2
+      return alert t 'view.account.password_inconsistent'
+
+    request '/account/update_password/',
+      old_password: $('.form-password .input-old_password').val()
+      password: password
+    , ->
+      alert t 'common.success'
+
+  $('.action-update-email').click ->
+    request '/account/update_email/',
+      password: $('.form-email .input-password').val()
+      email: $('.form-email .input-email').val()
+    , ->
+      alert t 'common.success'

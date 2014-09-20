@@ -6,31 +6,33 @@ async = require 'async'
 
 config = require '../config'
 {user, password, host, name} = config.mongodb
+mongodb_uri = "mongodb://#{user}:#{password}@#{host}/#{name}"
 
 version = _.last process.argv
 
 migration_action =
   '0.7.1': (callback) ->
-    console.log "
-npm install coffee-script -g
+    ###
+      npm install coffee-script -g
 
-vi /etc/rc.local
+      vi /etc/rc.local
 
-    iptables-restore < /etc/iptables.rules
+          iptables-restore < /etc/iptables.rules
 
-vi /etc/supervisor/conf.d/rpadmin.conf
+      vi /etc/supervisor/conf.d/rpadmin.conf
 
-    [program:RootPanel]
-    command=node /home/rpadmin/RootPanel/start.js
-    autorestart=true
-    user=rpadmin
+          [program:RootPanel]
+          command=node /home/rpadmin/RootPanel/start.js
+          autorestart=true
+          user=rpadmin
 
-service supervisor restart
-"
+      service supervisor restart
+    ###
+
     crypto = require 'crypto'
     bitcoin = require '../core/bitcoin'
 
-    MongoClient.connect "mongodb://#{user}:#{password}@#{host}/#{name}", (err, db) ->
+    MongoClient.connect mongodb_uri, (err, db) ->
       mAccount = db.collection 'accounts'
 
       mAccount.find().toArray (err, accounts) ->
@@ -51,7 +53,7 @@ service supervisor restart
           callback()
 
   '0.6.0': (callback) ->
-    MongoClient.connect "mongodb://#{user}:#{password}@#{host}/#{name}", (err, db) ->
+    MongoClient.connect mongodb_uri, (err, db) ->
       mAccount = db.collection 'accounts'
 
       async.parallel [

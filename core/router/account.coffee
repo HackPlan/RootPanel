@@ -172,7 +172,10 @@ exports.post '/use_coupon', requireAuthenticate, (req, res) ->
     unless coupon_code.available_times > 0
       return res.error 'code_not_available'
 
-    if _.find coupon_code.apply_log, (i) -> i.account_id.toString() == req.account._id.toString()
+    apply_log = _.find coupon_code.apply_log, (i) ->
+      return i.account_id.toString() == req.account._id.toString()
+
+    if apply_log
       return res.error 'already_used'
 
     mCouponCode.applyCode req.account, coupon_code, ->
