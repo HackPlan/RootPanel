@@ -1,3 +1,4 @@
+{ObjectID} = require 'mongodb'
 _ = require 'underscore'
 
 mAccount = require './model/account'
@@ -36,6 +37,10 @@ exports.renderAccount = (req, res, next) ->
     old_render = res.render
     res.render = (name, options = {} , fn) ->
       options = _.extend {account: req.account}, options
+
+      options.inGroup = (group_name) ->
+        return group_name in options.account?.groups
+
       old_render.call res, name, options, fn
     next()
 
@@ -74,17 +79,3 @@ exports.constructObjectID = (fields = ['id']) ->
         req.body[field] = new ObjectID req.body[field]
 
     next()
-
-exports.loadTicket = (req, res, next) ->
-  req.inject [exports.requireAuthenticate, exports.constructObjectID()], ->
-    mTicket.findOne _id: req.body.id, (err, ticket) ->
-      unless ticket
-        return res.error 'ticket_not_exist'
-
-      unless mTicket.getMember ticket, req.account
-        unless 'root' in req.account.groups
-          return res.error 'forbidden'
-
-      req.ticket = ticket
-
-      next()

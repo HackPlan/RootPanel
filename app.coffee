@@ -49,7 +49,12 @@ exports.run = ->
     app.billing = require './core/billing'
     app.pluggable = require './core/pluggable'
     app.middleware = require './core/middleware'
+    app.notification = require './core/notification'
     app.authenticator = require './core/authenticator'
+
+    app.template_data =
+      ticket_create_email: fs.readFileSync('./core/template/ticket_create_email.html').toString()
+      ticket_reply_email: fs.readFileSync('./core/template/ticket_reply_email.html').toString()
 
     app.use connect.json()
     app.use connect.urlencoded()
@@ -70,7 +75,8 @@ exports.run = ->
       language = req.cookies.language ? config.i18n.default_language
       timezone = req.cookies.timezone ? config.i18n.default_timezone
 
-      res.locals.moment = res.moment = moment().locale(language).tz(timezone)
+      res.locals.moment = res.moment = ->
+        return moment.apply(@, arguments).locale(language).tz(timezone)
 
       next()
 

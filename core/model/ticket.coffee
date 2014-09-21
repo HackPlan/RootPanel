@@ -1,5 +1,6 @@
 {ObjectID} = require 'mongodb'
 {markdown} = require 'markdown'
+_ = require 'underscore'
 
 module.exports = exports = app.db.collection 'tickets'
 
@@ -14,8 +15,7 @@ sample =
   content_html: 'Ticket Conetnt(HTML)'
   status: 'open/pending/finish/closed'
 
-  payload:
-    public: false
+  options: {}
 
   members: [
     ObjectID()
@@ -27,10 +27,10 @@ sample =
     created_at: Date()
     content: 'Reply Content(Markdown)'
     content_html: 'Reply Conetnt(HTML)'
-    payload: {}
+    options: {}
   ]
 
-exports.createTicket = (account, title, content, members, status, payload, callback) ->
+exports.createTicket = (account, title, content, members, status, options, callback) ->
   exports.insert
     account_id: account._id
     created_at: new Date()
@@ -40,7 +40,7 @@ exports.createTicket = (account, title, content, members, status, payload, callb
     content_html: markdown.toHTML content
     status: status
     members: _.pluck members, '_id'
-    payload: payload
+    options: options
     replies: []
   , (err, result) ->
     callback _.first result
@@ -52,7 +52,7 @@ exports.createReply = (ticket, account, content, status, callback) ->
     created_at: new Date()
     content: content
     content_html: markdown.toHTML content
-    payload: {}
+    options: {}
 
   exports.update {_id: ticket._id},
     $push:

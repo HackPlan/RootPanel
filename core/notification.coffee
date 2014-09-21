@@ -1,10 +1,12 @@
+async = require 'async'
+
 mAccount = require './model/account'
 mNotification = require './model/notification'
 
 i18n = require './i18n'
-config = require './config'
+config = require '../config'
 
-{NOTICE, EVENT, LOG} = exports =
+{NOTICE, EVENT, LOG} = module.exports = exports =
   NOTICE: 'notice'
   EVENT: 'event'
   LOG: 'log'

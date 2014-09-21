@@ -1,4 +1,6 @@
 {ObjectID} = require 'mongodb'
+async = require 'async'
+_ = require 'underscore'
 
 module.exports = exports = app.db.collection 'notifications'
 

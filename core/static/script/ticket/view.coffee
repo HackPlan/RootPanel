@@ -2,25 +2,15 @@ $ ->
   id = $('.row.content').data 'id'
 
   $('.action-reply').click ->
-    $.post '/ticket/reply/', JSON.stringify
+    request '/ticket/reply/',
       id: id
-      content: $('#reply-content').val()
-    .fail (jqXHR) ->
-      if jqXHR.responseJSON?.error
-        alert jqXHR.responseJSON.error
-      else
-        alert jqXHR.statusText
-    .success ->
+      content: $('.input-content').val()
+    , (result) ->
       location.reload()
 
-  $('.change-status').click ->
-    $.post '/ticket/update/', JSON.stringify
+  $('.action-update-status').click ->
+    request '/ticket/update_status/',
       id: id
       status: $(@).data 'status'
-    .fail (jqXHR) ->
-      if jqXHR.responseJSON?.error
-        alert jqXHR.responseJSON.error
-      else
-        alert jqXHR.statusText
-    .done ->
+    , (result) ->
       location.reload()
