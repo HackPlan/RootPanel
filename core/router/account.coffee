@@ -140,19 +140,15 @@ exports.post '/update_setting', requireAuthenticate, (req, res) ->
     $set: {}
 
   for k, v of req.body
-    unless req.body.name in ['qq']
+    unless k in ['qq']
       return res.error 'invalid_field'
 
-    modifiers.$set["settings.#{k}"] = req.v
+    modifiers.$set["settings.#{k}"] = v
 
   mAccount.update _id: req.account._id, modifiers, ->
-    token = _.findWhere req.account.tokens,
-      token: req.token
-
-    mSecurityLog.create req.account, 'update_setting', req.token,
-      name: req.body.name
-      old_value: req.account.setting[req.body.name]
-      value: req.body.value
+    mSecurityLog.create req.account, 'update_settings', req.token,
+      old_settings: _.pick.apply @, [req.account.settings].concat _.keys(req.body)
+      settings: req.body
     , ->
       res.json {}
 

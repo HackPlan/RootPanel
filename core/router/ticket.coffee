@@ -1,5 +1,6 @@
-markdown = require 'markdown'
 express = require 'express'
+async = require 'async'
+_ = require 'underscore'
 
 {requireAuthenticate, renderAccount, getParam, loadTicket} = app.middleware
 {mAccount, mTicket} = app.models

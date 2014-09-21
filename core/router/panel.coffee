@@ -57,7 +57,6 @@ exports.get '/', requireAuthenticate, renderAccount, (req, res) ->
       hook.generator account, (html) ->
         callback null, html
     , (err, widgets_html) ->
-      console.log err, widgets_html
       view_data.widgets_html = widgets_html
 
       res.render 'panel', view_data

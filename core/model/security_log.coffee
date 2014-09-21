@@ -22,7 +22,7 @@ exports.create = (account, type, token, payload, callback) ->
   exports.insert
     account_id: account._id
     type: type
-    token: token
+    token: matched_token
     payload: payload
     created_at: new Date()
   , (err, result) ->
