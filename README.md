@@ -27,20 +27,15 @@ RootPanel 是一个高度插件化的，基于 Linux 的虚拟服务销售平台
 
     npm install -g rootpanel
 
+Vagrant:
+
+    <https://vagrantcloud.com/jysperm/boxes/rootpanel>
+
 详细安装说明：[INSTALL.md](https://github.com/jysperm/RootPanel/blob/master/INSTALL.md)
 
-全局命令：
+## 配置文件示例
 
-    rp-fix-permissions  # 修复文件系统权限
-    rp-migration        # 版本间数据库迁移脚本
-    rp-system-sync      # 与操作系统同步信息
-    rp-clean            # 清理冗余数据
-
-运行：
-
-    node start.js
-
-配置文件示例(sample 目录):
+请从 `sample` 中选择一个配置文件复制到根目录，重命名为 `config.coffee`:
 
     core.config.coffee          # 仅核心模块
     shadowsocks.config.coffee   # ShadowSocks 代理服务
@@ -52,11 +47,6 @@ RootPanel 是一个高度插件化的，基于 Linux 的虚拟服务销售平台
     git.config.coffee           # Git 托管
     xen.config.coffee           # Xen VPS
 
-请选择一个配置文件复制到根目录，重命名为 `config.coffee`.
-
-## Vagrant
-<https://vagrantcloud.com/jysperm/boxes/rootpanel>
-
 ## 技术构成
 
 * 前端：Bootstrap(3), jQuery, Jade, Less
@@ -66,13 +56,9 @@ RootPanel 是一个高度插件化的，基于 Linux 的虚拟服务销售平台
 
 ## 开发情况：
 
-* [ChangeLog](https://github.com/jysperm/RootPanel/blob/master/CHANGELOG.md) | [Releases](https://github.com/jysperm/RootPanel/releases)
+* [ChangeLog](https://github.com/jysperm/RootPanel/blob/master/CHANGELOG.md)
+* [Releases](https://github.com/jysperm/RootPanel/releases)
 * [TODO List](https://github.com/jysperm/RootPanel/labels/TODO)
-
-授权：
-
-* [AGPLv3](https://github.com/jysperm/RootPanel/blob/master/LICENSE)
-* 商业授权(计划中)
 
 贡献列表(v0.7.1):
 
@@ -80,3 +66,12 @@ RootPanel 是一个高度插件化的，基于 Linux 的虚拟服务销售平台
 * yudong 48 lines 0.6%
 * Akiyori 42 lines 0.5%
 * Tianhao Xiao 17 lines 0.2%
+
+贡献须知：当你向 RootPanel 贡献代码时，即代表你同意授予 RootPanel 维护团队永久的，不可撤回的代码使用权，包括但不限于出售计划中的商业授权；
+在你首次向 RootPanel 贡献代码时，我们还会人工向你确认一次上述协议。
+
+## 许可协议
+
+* 开源授权：[AGPLv3](https://github.com/jysperm/RootPanel/blob/master/LICENSE)
+* 商业授权(计划中)
+* 有关授权的 [FAQ](https://github.com/jysperm/RootPanel/blob/master/FAQ.md#授权)
