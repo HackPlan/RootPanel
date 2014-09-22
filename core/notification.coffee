@@ -36,7 +36,7 @@ exports.createGroupNotice = (group, type, notice, callback) ->
       callback notification
 
     mAccount.find
-      group: 'root'
+      groups: 'root'
     .toArray (err, accounts) ->
       async.each accounts, (account, callback) ->
         app.mailer.sendMail
@@ -44,7 +44,7 @@ exports.createGroupNotice = (group, type, notice, callback) ->
           to: account.email
           subject: notice.title
           html: notice.body
-        , ->
-          callback()
-      , ->
+        , callback
+      , (err) ->
+        throw err if err
         callback notification

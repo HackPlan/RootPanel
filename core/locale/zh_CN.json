@@ -66,7 +66,7 @@
         "day": "天"
     },
     "notification_title": {
-        "ticket_create": "工单 | <%= title %>"
+        "ticket": "<%= title %> | 工单"
     },
     "view": {
         "layout": {
