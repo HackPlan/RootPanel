@@ -1,8 +1,11 @@
 {ObjectID} = require 'mongodb'
+_ = require 'underscore'
 
-module.exports = exports = app.db.collection 'coupon_code'
+module.exports = exports = app.db.collection 'coupon_codes'
 
 mAccount = require './account'
+
+utils = require '../utils'
 
 sample =
   code: 'PmlFH2hpziDmyqPX'
@@ -22,8 +25,11 @@ exports.type_meta =
     restrict: (account, coupon_code, callback) ->
       exports.findOne
         type: 'amount'
-        'meta.category': coupon_code.meta.category
-        'apply_log.account_id': account._id
+        $or: [
+          'meta.category': coupon_code.meta.category
+        ,
+          'apply_log.account_id': account._id
+        ]
       , (err, result) ->
         if result
           callback true
@@ -50,8 +56,8 @@ exports.createCodes = (coupon_code, count, callback) ->
   coupon_codes = _.map _.range(0, count), ->
     return {
       code: utils.randomString 16
-      expired: coupon_code.expired
-      available_times: coupon_code.expired
+      expired: coupon_code.expired or null
+      available_times: coupon_code.available_times
       type: coupon_code.type
       meta: coupon_code.meta
       log: []

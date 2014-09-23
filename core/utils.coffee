@@ -1,4 +1,5 @@
 crypto = require 'crypto'
+_ = require 'underscore'
 
 exports.rx =
   username: /^[a-z][0-9a-z_]{2,23}$/
@@ -32,4 +33,4 @@ exports.randomString = (length) ->
   return result.join ''
 
 exports.hashPassword = (password, password_salt) ->
-  return exports.sha256(password_salt + exports.sha256(password))
+  return exports.sha256 password_salt + exports.sha256(password)

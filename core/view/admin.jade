@@ -1,0 +1,109 @@
+extends layout
+
+prepend header
+  title #{t('admin.admin_panel')} | #{config.web.name}
+
+append header
+  link(rel='stylesheet', href='/style/admin.css')
+
+block main
+  .row
+    ul.nav.nav-tabs(role='tablist')
+      li.active
+        a(href='#tab-account-list', data-toggle='tab') 用户列表
+      li
+        a(href='#tab-coupon-code', data-toggle='tab') 兑换代码
+
+    .tab-content
+      #tab-account-list.tab-pane.active
+        table.table.table-hover
+          thead
+            tr
+              th= t('account.username')
+              th= t('account.email')
+              th 套餐
+              th 余额
+              th 操作
+          tbody
+            for account in accounts
+              tr(data-id='#{account._id}')
+                td= account.username
+                td= account.email
+                td= account.billing.plans.join(', ')
+                td= account.billing.balance.toFixed(2)
+                td
+                  button.btn.btn-info.btn-sm(type='button') 详情
+                  .btn-group
+                    button(type='button', data-toggle='dropdown').btn.btn-primary.btn-sm.dropdown-toggle
+                      | 操作 &nbsp;
+                      span.caret
+                    ul.dropdown-menu
+                      li
+                        a.action-create-payment(href='#') 创建充值记录
+                      if account.billing.balance <= 0 && account.billing.plans.length == 0
+                        li
+                          a.action-delete-account(href='#') 删除账户
+
+      #tab-coupon-code.tab-pane
+        form.form-horizontal
+          .form-group
+            label.col-sm-2.control-label 过期时间
+            .col-sm-5
+              input.input-expired.form-control(type='text', placeholder='Empty for no limit')
+          .form-group
+            label.col-sm-2.control-label 可用次数
+            .col-sm-5
+              input.input-available_times.form-control(type='text', value='1')
+          .form-group
+            label.col-sm-2.control-label 类型
+            .col-sm-5
+              select.input-type.form-control
+                for type in coupon_code_types
+                  option= type
+          .form-group
+            label.col-sm-2.control-label 数量
+            .col-sm-5
+              input.input-count.form-control(type='text', value='1')
+          .form-group
+            label.col-sm-2.control-label meta
+            .col-sm-5
+              input.input-meta.form-control(type='text', value='{"amount": 5, "category": "2014"}')
+          .form-group
+            label.col-sm-2.control-label
+            .col-sm-5
+              button.action-generate-code.btn.btn-lg.btn-primary(type='button') 生成
+
+        .output-coupon-code
+
+
+  #create-payment-modal.modal.fade
+    .modal-dialog
+      .modal-content
+        .modal-header
+          button.close(type='button', data-dismiss='modal', aria-hidden='true') &times;
+          h4.modal-title 创建充值记录
+        .modal-body
+          form.form-horizontal(method='post', role='form')
+            .form-group
+              label.col-sm-2.col-md-offset-1.control-label(for='account_id') ID
+              .col-sm-5
+                p#account_id.form-control-static
+            .form-group
+              label.col-sm-2.col-md-offset-1.control-label(for='amont') 金额
+              .col-sm-5
+                input#amont.form-control(type='text', name='amont', required)
+            .form-group
+              label.col-sm-2.col-md-offset-1.control-label(for='order_id') 订单号
+              .col-sm-5
+                input#order_id.form-control(type='order_id', name='order_id', required)
+
+        .modal-footer
+          button.btn.btn-danger(type='button', data-dismiss='modal') 关闭
+          button.btn.btn-success.action-create-payment(type='button') 创建
+
+prepend sidebar
+  .row
+    a.btn.btn-lg.btn-success(href='/admin/ticket/')= t('ticket.ticket_list')
+
+append footer
+  script(src='/script/admin.js')

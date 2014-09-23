@@ -157,12 +157,17 @@ exports.all '/coupon_info', requireAuthenticate, (req, res) ->
     unless coupon_code
       return res.error 'code_not_exist'
 
-    res.json
-      message: mCouponCode.codeMessage coupon_code
+    mCouponCode.restrictCode req.account, coupon_code, (err) ->
+      if err
+        return res.error 'code_not_available'
+
+      mCouponCode.codeMessage coupon_code, (message) ->
+        res.json
+          message: message
 
 exports.post '/use_coupon', requireAuthenticate, (req, res) ->
   mCouponCode.getCode req.body.code, (coupon_code) ->
-    unless !coupon_code.expired or Date.now() < coupon_code.expired.getTime()
+    if coupon_code.expired and Date.now() > coupon_code.expired.getTime()
       return res.error 'code_expired'
 
     unless coupon_code.available_times > 0

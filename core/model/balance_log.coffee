@@ -1,4 +1,5 @@
 {ObjectID} = require 'mongodb'
+_ = require 'underscore'
 
 module.exports = exports = app.db.collection 'balance_log'
 

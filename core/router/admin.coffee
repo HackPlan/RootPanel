@@ -4,59 +4,15 @@ _ = require 'underscore'
 
 {requireAdminAuthenticate, renderAccount} = require './../middleware'
 {plaggable} = app
-{mAccount, mTicket, mBalance} = app.models
+{mAccount, mTicket, mBalanceLog, mCouponCode} = app.models
 
 module.exports = exports = express.Router()
 
 exports.get '/', requireAdminAuthenticate, renderAccount, (req, res) ->
-  mBalance.find
-    type: 'service_billing'
-    'attribute.service': 'shadowsocks'
-    created_at:
-      $gte: new Date Date.now() - 30 * 24 * 3600 * 1000
-  .toArray (err, balance_logs) ->
-    time_range =
-      traffic_24hours: 24 * 3600 * 1000
-      traffic_3days: 3 * 24 * 3600 * 1000
-      traffic_7days: 7 * 24 * 3600 * 1000
-      traffic_30days: 30 * 24 * 3600 * 1000
-
-    traffic_result = {}
-
-    for name, range of time_range
-      logs = _.filter balance_logs, (i) ->
-        return i.created_at.getTime() > Date.now() - range
-
-      traffic_result[name] = _.reduce logs, (memo, i) ->
-        return memo + i.attribute.traffic_mb
-      , 0
-
-    mAccount.find().toArray (err, accounts) ->
-      sites = []
-
-      pending_traffic = 0
-
-      for account in accounts
-        if account.attribute.plugin?.nginx?.sites
-          for site in account.attribute.plugin.nginx.sites
-            sites.push _.extend site,
-              account: account
-
-        account.traffic_30days = _.reduce balance_logs, (memo, item) ->
-          if item.account_id.toString() == account._id.toString()
-            return memo + item.attribute.traffic_mb
-          else
-            return memo
-        , 0
-
-        if account.attribute.plugin.shadowsocks?.pending_traffic
-          pending_traffic += account.attribute.plugin.shadowsocks.pending_traffic
-
-      res.render 'admin/index', _.extend traffic_result,
-        accounts: accounts
-        sites: sites
-        pending_traffic: pending_traffic
-        siteSummary: pluggable.get('nginx').service.siteSummary
+  mAccount.find().toArray (err, accounts) ->
+    return res.render 'admin',
+      accounts: accounts
+      coupon_code_types: _.keys mCouponCode.type_meta
 
 exports.get '/ticket', requireAdminAuthenticate, renderAccount, (req, res) ->
   async.parallel
@@ -144,3 +100,9 @@ exports.post '/update_site', requireAdminAuthenticate, (req, res) ->
     , ->
       pluggable.get('nginx').service.writeConfig account, ->
         res.json {}
+
+exports.post '/generate_coupon_code', requireAdminAuthenticate, (req, res) ->
+  coupon_code = _.pick req.body, 'expired', 'available_times', 'type', 'meta'
+
+  mCouponCode.createCodes coupon_code, req.body.count, (coupon_codes) ->
+    res.json coupon_codes

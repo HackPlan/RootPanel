@@ -10,8 +10,8 @@ $ ->
 
     request '/account/coupon_info/',
       code: code
-    , ->
-      if window.confirm data.message
+    , (result) ->
+      if window.confirm result.message
         request '/account/use_coupon/',
           code: code
         , ->
