@@ -43,7 +43,7 @@ exports.triggerBilling = (account, callback) ->
     return false
 
   async.each account.billing.plans, (plan_name, callback) ->
-    exports.generateBilling account, plan_name, is_force, (result) ->
+    exports.generateBilling account, plan_name, {is_force: is_force}, (result) ->
       callback null, result
 
   , (err, result) ->
@@ -77,7 +77,8 @@ exports.triggerBilling = (account, callback) ->
         else
           callback account
 
-exports.generateBilling = (account, plan_name, is_force, callback) ->
+exports.generateBilling = (account, plan_name, options, callback) ->
+  {is_force} = options
   plan_info = config.plans[plan_name]
 
   unless plan_info.billing_by_time

@@ -11,25 +11,15 @@ $ ->
     .success ->
       location.reload()
 
-  $('.plan-list .btn-danger').click ->
+  $('.action-leave-plan').click ->
     if window.confirm 'Are you sure?'
-      $.post "/plan/unsubscribe/", JSON.stringify
+      request '/billing/leave_plan/',
         plan: $(@).parents('tr').data 'name'
-      .fail (jqXHR) ->
-        if jqXHR.responseJSON?.error
-          alert jqXHR.responseJSON.error
-        else
-          alert jqXHR.statusText
-      .success ->
+      , (result) ->
         location.reload()
 
-  $('.plan-list .btn-success').click ->
-    $.post "/plan/subscribe/", JSON.stringify
+  $('.action-join-plan').click ->
+    request '/billing/join_plan/',
       plan: $(@).parents('tr').data 'name'
-    .fail (jqXHR) ->
-      if jqXHR.responseJSON?.error
-        alert jqXHR.responseJSON.error
-      else
-        alert jqXHR.statusText
-    .success ->
+    , (result) ->
       location.reload()

@@ -26,9 +26,9 @@ block main
             td= t(plan.t_description)
             td
               if plan.is_enable
-                button.btn.btn-danger.btn-sm 退订方案
+                button.action-join-plan.btn.btn-danger.btn-sm 退订方案
               else
-                button.btn.btn-success.btn-sm 订购方案
+                button.action-leave-plan.btn.btn-success.btn-sm 订购方案
 
   if selectHook('view.panel.switch_buttons').length
     #service-switch.row

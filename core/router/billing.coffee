@@ -12,25 +12,22 @@ exports.post '/join_plan', requireAuthenticate, (req, res) ->
   unless req.body.plan in _.keys(config.plans)
     return res.error 'invaild_plan'
 
-  if req.body.plan in req.account.attribute.plans
+  if req.body.plan in req.account.billing.plans
     return res.error 'already_in_plan'
 
   plan_info = config.plans[req.body.plan]
 
-  billing.calcBilling req.account, true, (account) ->
-    if plan_info.price and account.attribute.balance <= 0
+  billing.triggerBilling req.account, (account) ->
+    if account.billing.balance < config.billing.force_freeze.when_balance_below
       return res.error 'insufficient_balance'
 
-    if account.attribute.balance < 0
-      return res.error 'insufficient_balance'
-
-    plan.joinPlan account, req.body.plan, ->
+    billing.joinPlan account, req.body.plan, ->
       res.json {}
 
 exports.post '/leave_plan', requireAuthenticate, (req, res) ->
-  unless req.body.plan in req.account.attribute.plans
+  unless req.body.plan in req.account.billing.plans
     return res.error 'not_in_plan'
 
-  billing.calcBilling req.account, true, (account) ->
-    plan.leavePlan account, req.body.plan, ->
+  billing.generateBilling req.account, req.body.plan, {is_force: true}, (account) ->
+    billing.leavePlan account, req.body.plan, ->
       res.json {}
