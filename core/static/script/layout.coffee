@@ -48,13 +48,13 @@ $ ->
   window.tErr = (name) ->
     return "error_code.#{name}"
 
-  clientVersion = localStorage.getItem 'localeVersion'
-  currentVersion = "#{($ 'body').data 'locale'}"
+  client_version = localStorage.getItem 'locale_version'
+  current_version = "#{($ 'body').data 'locale'}"
 
-  if clientVersion  == currentVersion
-    window.i18n_data = JSON.parse(localStorage.getItem 'localeContent')
+  if client_version  == current_version
+    window.i18n_data = JSON.parse(localStorage.getItem 'locale_content')
   else
     $.getJSON "/locale/#{$.cookie('language')}", (data) ->
       window.i18n_data = data
-      localStorage.setItem 'localeVersion', currentVersion
-      localStorage.setItem 'localeContent', JSON.stringify data
+      localStorage.setItem 'locale_version', current_version
+      localStorage.setItem 'locale_content', JSON.stringify data
