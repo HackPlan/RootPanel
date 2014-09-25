@@ -8,7 +8,7 @@ html
       for hook in selectHook('view.layout.styles')
         link(rel='stylesheet', href=hook.path)
 
-  body
+  body(data-locale=app.localeVersion)
     header.navbar-fixed-top
       .container
         nav.navbar.navbar-default.navbar-inverse(role='navigation')

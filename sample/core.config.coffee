@@ -9,6 +9,7 @@ module.exports =
     cookie_time: 30 * 24 * 3600 * 1000
 
   i18n:
+		version: '0,1'
     available_language: ['zh_CN']
     default_language: 'zh_CN'
     default_timezone: 'Asia/Shanghai'

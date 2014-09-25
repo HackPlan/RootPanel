@@ -56,6 +56,7 @@ exports.run = ->
       ticket_create_email: fs.readFileSync('./core/template/ticket_create_email.html').toString()
       ticket_reply_email: fs.readFileSync('./core/template/ticket_reply_email.html').toString()
 
+    app.localeVersion = config.i18n.version
     app.use connect.json()
     app.use connect.urlencoded()
     app.use connect.cookieParser()
@@ -102,7 +103,6 @@ exports.run = ->
 
     app.listen config.web.listen, ->
       fs.chmodSync config.web.listen, 0o770
-
       console.log "RootPanel start at #{config.web.listen}"
 
 unless module.parent
