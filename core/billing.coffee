@@ -23,34 +23,34 @@ exports.run = ->
       exports.cyclicalBilling ->
     , config.billing.billing_cycle
 
+exports.forceLeaveAllPlans = (account, callback) ->
+  async.eachSeries account.billing.plans, (plan_name, callback) ->
+    exports.leavePlan account, plan_name, callback
+  , ->
+    mAccount.findOne {_id: account._id}, (err, account) ->
+      callback account
+
+exports.isForceFreeze = (account) ->
+  if account.billing.balance < config.billing.force_freeze.when_balance_below
+    return true
+
+  force_freeze_when = account.billing.arrears_at.getTime() + config.billing.force_freeze.when_arrears_above
+
+  if account.billing.arrears_at and Date.now() > force_freeze_when
+    return true
+
+  return false
+
 # @param callback(account)
 exports.triggerBilling = (account, callback) ->
-  forceLeaveAllPlans = (callback) ->
-    async.eachSeries account.billing.plans, (plan_name, callback) ->
-      exports.leavePlan account, plan_name, callback
-    , ->
-      mAccount.findOne {_id: account._id}, (err, account) ->
-        callback account
-
-  is_force = do ->
-    if account.billing.balance < config.billing.force_freeze.when_balance_below
-      return true
-
-    force_freeze_when = account.billing.arrears_at.getTime() + config.billing.force_freeze.when_arrears_above
-
-    if account.billing.arrears_at and Date.now() > force_freeze_when
-      return true
-
-    return false
-
   async.each account.billing.plans, (plan_name, callback) ->
     exports.generateBilling account, plan_name, (result) ->
       callback null, result
 
   , (err, result) ->
-    result = _.compact result
+    billing_reports = _.compact result
 
-    if _.isEmpty result
+    if _.isEmpty billing_reports
       return callback account
 
     modifier =
@@ -58,9 +58,9 @@ exports.triggerBilling = (account, callback) ->
       $inc:
         'billing.balance': 0
 
-    for item in result
-      modifier.$set["billing.last_billing_at.#{item.name}"] = item.last_billing_at
-      modifier.$inc['billing.balance'] += item.amount_inc
+    for report in billing_reports
+      modifier.$set["billing.last_billing_at.#{report.plan_name}"] = report.last_billing_at
+      modifier.$inc['billing.balance'] += report.amount_inc
 
     if account.billing.balance > 0
       if account.billing.arrears_at
@@ -71,10 +71,11 @@ exports.triggerBilling = (account, callback) ->
 
     mAccount.findAndModify {_id: account._id}, null, modifier, {new: true}, (err, account) ->
       mBalance.create account, 'billing', modifier.$inc['billing.balance'],
-        plans: _.indexBy result, 'name'
+        plans: _.indexBy billing_reports, 'plan_name'
       , ->
-        if is_force
-          return forceLeaveAllPlans callback
+        if exports.isForceFreeze account
+          exports.forceLeaveAllPlans account, ->
+            callback()
         else
           callback account
 
@@ -96,7 +97,7 @@ exports.generateBilling = (account, plan_name, callback) ->
   amount = billing_unit_count * plan_info.billing_by_time.price
 
   callback
-    name: plan_name
+    plan_name: plan_name
     billing_unit_count: billing_unit_count
     last_billing_at: new_last_billing_at
     amount_inc: -amount
@@ -129,7 +130,7 @@ exports.joinPlan = (account, plan_name, callback) ->
 exports.leavePlan = (account, plan_name, callback) ->
   leaved_services = _.reject account.billing.services, (service_name) ->
     for item in _.without(account.billing.plans, plan_name)
-      if service_name in config.plans[plan_name].services
+      if service_name in config.plans[item].services
         return true
 
     return false
