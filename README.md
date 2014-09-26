@@ -19,17 +19,9 @@ RootPanel 是一个高度插件化的，基于 Linux 的虚拟服务销售平台
 
 ## 安装和使用
 
-开发版本：
-
-    git clone https://github.com/jysperm/RootPanel.git
-
-稳定版本：
-
-    npm install -g rootpanel
-
-Vagrant:
-
-    <https://vagrantcloud.com/jysperm/boxes/rootpanel>
+* 开发版本：`git clone https://github.com/jysperm/RootPanel.git`
+* 稳定版本：`npm install -g rootpanel`
+* Vagrant: `https://vagrantcloud.com/jysperm/boxes/rootpanel`
 
 详细安装说明：[INSTALL.md](https://github.com/jysperm/RootPanel/blob/master/INSTALL.md)
 
@@ -74,4 +66,4 @@ Vagrant:
 
 * 开源授权：[AGPLv3](https://github.com/jysperm/RootPanel/blob/master/LICENSE)
 * 商业授权(计划中)
-* 有关授权的 [FAQ](https://github.com/jysperm/RootPanel/blob/master/FAQ.md#授权)
+* 有关授权的 [FAQ](https://github.com/jysperm/RootPanel/blob/develop/FAQ.md#%E6%8E%88%E6%9D%83)

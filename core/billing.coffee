@@ -8,7 +8,7 @@ config = require '../config'
 
 exports.cyclicalBilling = (callback) ->
   mAccount.find
-    'attribute.plans.0':
+    'billing.plans.0':
       $exists: true
   .toArray (err, accounts) ->
     async.each accounts, (account, callback) ->
@@ -27,8 +27,7 @@ exports.run = ->
 exports.triggerBilling = (account, callback) ->
   forceLeaveAllPlans = (callback) ->
     async.eachSeries account.billing.plans, (plan_name, callback) ->
-      mAccount.findOne {_id: account._id}, (err, account) ->
-        plan.leavePlan account, plan_name, callback
+      exports.leavePlan account, plan_name, callback
     , ->
       mAccount.findOne {_id: account._id}, (err, account) ->
         callback account
@@ -37,13 +36,15 @@ exports.triggerBilling = (account, callback) ->
     if account.billing.balance < config.billing.force_freeze.when_balance_below
       return true
 
-    if account.billing.arrears_at and Date.now() > account.billing.arrears_at.getTime() + config.billing.force_freeze.when_arrears_above
+    force_freeze_when = account.billing.arrears_at.getTime() + config.billing.force_freeze.when_arrears_above
+
+    if account.billing.arrears_at and Date.now() > force_freeze_when
       return true
 
     return false
 
   async.each account.billing.plans, (plan_name, callback) ->
-    exports.generateBilling account, plan_name, {is_force: is_force}, (result) ->
+    exports.generateBilling account, plan_name, (result) ->
       callback null, result
 
   , (err, result) ->
@@ -77,8 +78,7 @@ exports.triggerBilling = (account, callback) ->
         else
           callback account
 
-exports.generateBilling = (account, plan_name, options, callback) ->
-  {is_force} = options
+exports.generateBilling = (account, plan_name, callback) ->
   plan_info = config.plans[plan_name]
 
   unless plan_info.billing_by_time
@@ -86,23 +86,13 @@ exports.generateBilling = (account, plan_name, options, callback) ->
 
   last_billing_at = account.billing.last_billing_at[plan_name]
 
-  if last_billing_at
-    next_billing_at = new Date last_billing_at.getTime() + plan_info.billing_by_time.unit * plan_info.billing_by_time.min_billing_unit
-  else
-    last_billing_at = new Date()
-
-  unless last_billing_at and next_billing_at > new Date()
+  unless last_billing_at < new Date()
     return callback()
 
-  billing_unit_count = (Date.now() - last_billing_at.getTime()) / plan_info.billing_by_time.unit
+  billing_time_range = (last_billing_at.getTime() + plan_info.billing_by_time.min_billing_unit) - Date.now()
+  billing_unit_count = Math.floor billing_time_range / plan_info.billing_by_time.unit
 
-  if is_force
-    billing_unit_count = Math.ceil billing_unit_count
-    new_last_billing_at = new Date()
-  else
-    billing_unit_count = Math.floor billing_unit_count
-    new_last_billing_at = new Date last_billing_at.getTime() + billing_unit_count * plan_info.billing_by_time.unit
-
+  new_last_billing_at = new Date last_billing_at.getTime() + billing_unit_count * plan_info.billing_by_time.unit
   amount = billing_unit_count * plan_info.billing_by_time.price
 
   callback
@@ -111,49 +101,58 @@ exports.generateBilling = (account, plan_name, options, callback) ->
     last_billing_at: new_last_billing_at
     amount_inc: -amount
 
-exports.joinPlan = (account, plan, callback) ->
-  mAccount.joinPlan account, plan, ->
-    async.each config.plans[plan].services, (serviceName, callback) ->
-      if serviceName in account.attribute.services
-        return callback()
+exports.joinPlan = (account, plan_name, callback) ->
+  original_account = account
+  plan_info = config.plans[plan_name]
 
-      mAccount.findAndModify _id: account._id, {},
-        $addToSet:
-          'attribute.services': serviceName
-      ,
-        new: true
-      , (err, account)->
-        (pluggable.get serviceName).service.enable account, ->
-          callback()
+  modifier =
+    $addToSet:
+      'billing.plans': plan_name
+      'billing.services':
+        $each: plan_info.services
+    $set:
+      'resources_limit': exports.calcResourcesLimit _.union account.billing.plans, [plan_name]
 
+  for service_name in plan_info.services
+    modifier.$set["billing.last_billing_at.#{service_name}"] = new Date()
+
+  mAccount.findAndModify {_id: account._id}, modifier, {},
+    new: true
+  , (err, account) ->
+    async.series _.difference(account.billing.services, original_account.billing.services), (service_name, callback) ->
+      async.series pluggable.selectHook(account, "service.#{service_name}.enable"), (hook, callback) ->
+        hook.action account, callback
+      , callback
     , ->
       callback()
 
-exports.leavePlan = (account, plan, callback) ->
-  mAccount.leavePlan account, plan, ->
-    async.each config.plans[plan].services, (serviceName, callback) ->
-      stillInService = do ->
-        for item in _.without(account.attribute.plans, plan)
-          if serviceName in config.plans[item].services
-            return true
+exports.leavePlan = (account, plan_name, callback) ->
+  leaved_services = _.reject account.billing.services, (service_name) ->
+    for item in _.without(account.billing.plans, plan_name)
+      if service_name in config.plans[plan_name].services
+        return true
 
-        return false
+    return false
 
-      if stillInService
-        callback()
-      else
-        modifier =
-          $pull:
-            'attribute.services': serviceName
-          $unset: {}
+  modifier =
+    $pull:
+      'billing.plans': plan_name
+    $pullAll:
+      'billing.services': leaved_services
+    $set:
+      'resources_limit': exports.calcResourcesLimit _.without account.billing.plans, plan_name
+    $unset: {}
 
-        modifier['$unset']["attribute.plugin.#{serviceName}"] = ''
+  for service_name in leaved_services
+    modifier.$unset["billing.last_billing_at.#{service_name}"] = true
 
-        mAccount.update _id: account._id, modifier, (err) ->
-          throw err if err
-          (pluggable.get serviceName).service.delete account, ->
-            callback()
-
+  mAccount.findAndModify {_id: account._id}, modifier, {},
+    new: true
+  , (err, account) ->
+    async.series leaved_services, (service_name, callback) ->
+      async.series pluggable.selectHook(account, "service.#{service_name}.disable"), (hook, callback) ->
+        hook.action account, callback
+      , callback
     , ->
       callback()
 

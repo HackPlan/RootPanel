@@ -35,6 +35,13 @@ exports.hooks =
       # name
       switch_buttons: []
 
+  service:
+    'service_name':
+      # action: function(account, callback)
+      enable: []
+      # action: function(account, callback)
+      disable: []
+
 exports.registerHook = (hook_name, plugin, payload) ->
   keys = hook_name.split '.'
   last_key = keys.pop()
@@ -61,15 +68,13 @@ exports.selectHook = (account, hook_name) ->
     else
       pointer = pointer[item]
 
-  selected_hooks = []
-
-  for hook in pointer
-    if hook.plugin_info.type == 'service'
-      selected_hooks.push hook
+  return _.filter pointer, (hook) ->
+    if hook.plugin_info.type == 'extension'
+      return true
     else if hook.plugin_info.name in account.billing.services
-      selected_hooks.push hook
-
-  return selected_hooks
+      return true
+    else
+      return false
 
 exports.initializePlugins = (callback) ->
   initializePlugin = (name, callback) ->

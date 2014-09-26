@@ -133,24 +133,6 @@ exports.search = (username, callback) ->
 exports.matchPassword = (account, password) ->
   return utils.hashPassword(password, account.password_salt) == account.password
 
-exports.joinPlan = (account, plan, callback) ->
-  account.billing.plans.push plan
-  exports.update {_id: account._id},
-    $addToSet:
-      'billing.plans': plan
-    $set:
-      resources_limit: exports.calcResourcesLimit account.billing.plans
-  , callback
-
-exports.leavePlan = (account, plan, callback) ->
-  account.billing.plans = _.reject account.billing.plans, (i) -> i == plan
-  exports.update {_id: account._id},
-    $pull:
-      'billing.plans': plan
-    $set:
-      resources_limit: exports.calcResourcesLimit account.attribute.plans
-  , callback
-
 exports.incBalance = (account, type, amount, payload, callback) ->
   exports.update {_id: account._id},
     $inc:
