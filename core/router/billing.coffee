@@ -15,10 +15,8 @@ exports.post '/join_plan', requireAuthenticate, (req, res) ->
   if req.body.plan in req.account.billing.plans
     return res.error 'already_in_plan'
 
-  plan_info = config.plans[req.body.plan]
-
   billing.triggerBilling req.account, (account) ->
-    if account.billing.balance < config.billing.force_freeze.when_balance_below
+    if account.billing.balance <= config.billing.force_freeze.when_balance_below
       return res.error 'insufficient_balance'
 
     billing.joinPlan account, req.body.plan, ->
@@ -28,6 +26,6 @@ exports.post '/leave_plan', requireAuthenticate, (req, res) ->
   unless req.body.plan in req.account.billing.plans
     return res.error 'not_in_plan'
 
-  billing.generateBilling req.account, req.body.plan, {is_force: true}, (account) ->
+  billing.triggerBilling req.account, (account) ->
     billing.leavePlan account, req.body.plan, ->
       res.json {}

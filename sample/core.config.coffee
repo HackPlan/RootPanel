@@ -33,10 +33,8 @@ module.exports =
       t_description: 'plans.sample.name.description'
 
       billing_by_time:
-        unit: 3600 * 1000
-        min_billing_unit: 24
-
-        price: 10 / (30 * 24)
+        unit: 24 * 3600 * 1000
+        price: 10 / 30
 
       services: []
       resources: {}

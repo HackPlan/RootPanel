@@ -5,6 +5,7 @@ mAccount = require './model/account'
 mBalance = require './model/balance_log'
 
 config = require '../config'
+pluggable = require './pluggable'
 
 exports.cyclicalBilling = (callback) ->
   mAccount.find
@@ -34,16 +35,15 @@ exports.isForceFreeze = (account) ->
   if account.billing.balance < config.billing.force_freeze.when_balance_below
     return true
 
-  force_freeze_when = account.billing.arrears_at.getTime() + config.billing.force_freeze.when_arrears_above
-
-  if account.billing.arrears_at and Date.now() > force_freeze_when
-    return true
+  if account.billing.arrears_at
+    if Date.now() > account.billing.arrears_at.getTime() + config.billing.force_freeze.when_arrears_above
+      return true
 
   return false
 
 # @param callback(account)
 exports.triggerBilling = (account, callback) ->
-  async.each account.billing.plans, (plan_name, callback) ->
+  async.map account.billing.plans, (plan_name, callback) ->
     exports.generateBilling account, plan_name, (result) ->
       callback null, result
 
@@ -70,9 +70,7 @@ exports.triggerBilling = (account, callback) ->
         modifier.$set['billing.arrears_at'] = new Date()
 
     mAccount.findAndModify {_id: account._id}, null, modifier, {new: true}, (err, account) ->
-      mBalance.create account, 'billing', modifier.$inc['billing.balance'],
-        plans: _.indexBy billing_reports, 'plan_name'
-      , ->
+      mBalance.create account, 'billing', modifier.$inc['billing.balance'], _.indexBy(billing_reports, 'plan_name'), ->
         if exports.isForceFreeze account
           exports.forceLeaveAllPlans account, ->
             callback()
@@ -90,7 +88,7 @@ exports.generateBilling = (account, plan_name, callback) ->
   unless last_billing_at < new Date()
     return callback()
 
-  billing_time_range = (last_billing_at.getTime() + plan_info.billing_by_time.min_billing_unit) - Date.now()
+  billing_time_range = (Date.now() + plan_info.billing_by_time.unit) - last_billing_at.getTime()
   billing_unit_count = Math.floor billing_time_range / plan_info.billing_by_time.unit
 
   new_last_billing_at = new Date last_billing_at.getTime() + billing_unit_count * plan_info.billing_by_time.unit
@@ -114,14 +112,13 @@ exports.joinPlan = (account, plan_name, callback) ->
     $set:
       'resources_limit': exports.calcResourcesLimit _.union account.billing.plans, [plan_name]
 
-  for service_name in plan_info.services
-    modifier.$set["billing.last_billing_at.#{service_name}"] = new Date()
+  modifier.$set["billing.last_billing_at.#{plan_name}"] = new Date()
 
-  mAccount.findAndModify {_id: account._id}, modifier, {},
+  mAccount.findAndModify {_id: account._id}, null, modifier,
     new: true
   , (err, account) ->
-    async.series _.difference(account.billing.services, original_account.billing.services), (service_name, callback) ->
-      async.series pluggable.selectHook(account, "service.#{service_name}.enable"), (hook, callback) ->
+    async.each _.difference(account.billing.services, original_account.billing.services), (service_name, callback) ->
+      async.each pluggable.selectHook(account, "service.#{service_name}.enable"), (hook, callback) ->
         hook.action account, callback
       , callback
     , ->
@@ -144,14 +141,13 @@ exports.leavePlan = (account, plan_name, callback) ->
       'resources_limit': exports.calcResourcesLimit _.without account.billing.plans, plan_name
     $unset: {}
 
-  for service_name in leaved_services
-    modifier.$unset["billing.last_billing_at.#{service_name}"] = true
+  modifier.$unset["billing.last_billing_at.#{plan_name}"] = true
 
-  mAccount.findAndModify {_id: account._id}, modifier, {},
+  mAccount.findAndModify {_id: account._id}, null, modifier,
     new: true
   , (err, account) ->
-    async.series leaved_services, (service_name, callback) ->
-      async.series pluggable.selectHook(account, "service.#{service_name}.disable"), (hook, callback) ->
+    async.each leaved_services, (service_name, callback) ->
+      async.each pluggable.selectHook(account, "service.#{service_name}.disable"), (hook, callback) ->
         hook.action account, callback
       , callback
     , ->
