@@ -111,19 +111,3 @@ exports.initializePlugins = (callback) ->
           initializeService plugin, callback
       , callback
   ], callback
-
-exports.writeConfig = (path, content, callback) ->
-  tmp.file
-    mode: 0o750
-  , (err, filepath, fd) ->
-    fs.writeSync fd, content, 0, 'utf8'
-    fs.closeSync fd
-
-    child_process.exec "sudo cp #{filepath} #{path}", (err) ->
-      throw err if err
-
-      fs.unlink path, ->
-        callback()
-
-exports.sudoSu = (account, command) ->
-  return "sudo su #{account.username} -c '#{command}'"
