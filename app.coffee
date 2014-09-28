@@ -44,6 +44,7 @@ exports.run = ->
 
     app.i18n = require './core/i18n'
     app.utils = require './core/utils'
+    app.cache = require './cache'
     app.config = require './config'
     app.package = require './package.json'
     app.billing = require './core/billing'
