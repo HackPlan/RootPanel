@@ -64,6 +64,6 @@ RootPanel 是一个高度插件化的，基于 Linux 的虚拟服务销售平台
 
 ## 许可协议
 
-* 开源授权：[AGPLv3](https://github.com/jysperm/RootPanel/blob/master/LICENSE)
+* 开源授权：[AGPLv3](https://github.com/jysperm/RootPanel/blob/master/LICENSE) | [CC-SA](http://creativecommons.org/licenses/sa/1.0/)(文档) | Public Domain(配置文件和示例)
 * 商业授权(计划中)
 * 有关授权的 [FAQ](https://github.com/jysperm/RootPanel/blob/develop/FAQ.md#%E6%8E%88%E6%9D%83)
