@@ -52,7 +52,7 @@ $ ->
   current_version = "#{($ 'body').data 'locale'}"
 
   if client_version  == current_version
-    window.i18n_data = JSON.parse(localStorage.getItem 'locale_content')
+    window.i18n_data = JSON.parse localStorage.getItem 'locale_content'
   else
     $.getJSON "/locale/#{$.cookie('language')}", (data) ->
       window.i18n_data = data
