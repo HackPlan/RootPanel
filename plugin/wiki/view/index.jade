@@ -1,0 +1,7 @@
+extends ../../../core/view/layout
+
+prepend head
+  title #{title} | #{config.web.name}
+
+block main
+  != content

@@ -46,6 +46,11 @@ exports.hooks =
       # action: function(account, callback)
       disable: []
 
+  plugin:
+    wiki:
+      # t_category, t_title, language, content_markdown
+      pages: []
+
 exports.registerHook = (hook_name, plugin, payload) ->
   keys = hook_name.split '.'
   last_key = keys.pop()
@@ -119,8 +124,7 @@ exports.initializePlugins = (callback) ->
   ], callback
 
 exports.createHelpers = (plugin) ->
-  plugin = _.extend plugin,
-    registerHook: (hook_name, payload) ->
-      return exports.registerHook hook_name, plugin, payload
+  plugin.registerHook = (hook_name, payload) ->
+    return exports.registerHook hook_name, plugin, payload
 
   return plugin

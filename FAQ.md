@@ -16,4 +16,4 @@
 
 * 如何定义「代码」？
 
-    代码是指代码库中除说明文件(INSTALL.md, README.md etc.), 配置文件(.gitignore, package.json etc.), 配置文件和示例(sample/*.config.coffee etc.), 文档(DOC/*.md, WIKI/*.md etc.) 之外的所有文件。
+    代码是指代码库中除说明文件(`INSTALL.md`, `README.md` etc.), 配置文件(`.gitignore`, `package.json` etc.), 配置文件和示例(`sample/*.config.coffee` etc.), 文档(`DOC/*.md`, `WIKI/*.md` etc.) 之外的所有文件。
