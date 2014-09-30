@@ -6,7 +6,7 @@ bitcoin = require './bitcoin'
 {mAccount} = app.models
 {pluggable, config} = app
 
-module.exports = exports = pluggable.createHelpers module.exports,
+module.exports = pluggable.createHelpers exports =
   name: 'bitcoin'
   type: 'extension'
 

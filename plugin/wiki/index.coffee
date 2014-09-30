@@ -3,7 +3,7 @@
 
 wiki = require './wiki'
 
-module.exports = exports = pluggable.createHelpers module.exports,
+module.exports = pluggable.createHelpers exports =
   name: 'wiki'
   type: 'extension'
 

@@ -13,7 +13,7 @@ for lang in config.i18n.available_language
   i18n_data[lang] = require "./locale/#{lang}"
 
 exports.loadForPlugin = (plugin) ->
-  for lang in options.available_language
+  for lang in config.i18n.available_language
     path = "../plugin/#{plugin.name}/locale/#{lang}.json"
 
     if fs.existsSync path

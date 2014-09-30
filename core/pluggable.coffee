@@ -54,11 +54,13 @@ exports.registerHook = (hook_name, plugin, payload) ->
 
   for item in keys
     if pointer[item] == undefined
-      throw new Error 'Invalid hook name'
+      pointer[item] = {}
+      pointer = pointer[item]
     else
       pointer = pointer[item]
 
-  pointer[last_key].push _.extend payload
+  pointer[last_key] ?= []
+  pointer[last_key].push _.extend payload,
     plugin_info: plugin
 
 exports.selectHook = (account, hook_name) ->
@@ -116,8 +118,9 @@ exports.initializePlugins = (callback) ->
       , callback
   ], callback
 
-exports.createHelpers = (plugin, payload) ->
-  return _.extend payload, {
+exports.createHelpers = (plugin) ->
+  plugin = _.extend plugin,
     registerHook: (hook_name, payload) ->
       return exports.registerHook hook_name, plugin, payload
-  }
+
+  return plugin
