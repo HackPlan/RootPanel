@@ -1,6 +1,7 @@
 path = require 'path'
+jade = require 'jade'
 
-{pluggable} = app
+{pluggable, config} = app
 {renderAccount} = app.middleware
 
 module.exports = pluggable.createHelpers exports =
@@ -12,10 +13,11 @@ exports.registerHook 'view.layout.menu_bar',
   target: '_blank'
   body: '官方博客'
 
-exports.registerHook 'billing.payment_method',
+exports.registerHook 'billing.payment_methods',
   widget_generator: (account, callback) ->
     jade.renderFile path.join(__dirname, 'view/payment_method.jade'),
       account: account
+      config: config
     , (err, html) ->
       callback html
 

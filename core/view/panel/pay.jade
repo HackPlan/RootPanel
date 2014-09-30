@@ -9,16 +9,9 @@ append header
 block main
   .row
     header 充值
-    div
-      h2 比特币
-      p 你可以直接向该地址发送比特币。在经过一次确认后，系统会实时地，自动为你折算充值金额，最小支付金额 0.0005。
-      p 实时汇率：10 CNY = #{(exchange_rate * 10).toFixed(4)} BTC
-      pre= account.attribute.bitcoin_deposit_address
 
-    div
-      h2 淘宝
-      p 拍下对应宝贝后付款即可，购买时注意选择服务器节点选项，备注填写你的用户名。
-      a.btn.btn-success(href='http://item.taobao.com/item.htm?id=#{config.billing.taobao_item_id}') 淘宝购买
+    for payment_method in payment_methods
+      != payment_method
 
   .row
     header 充值记录
@@ -55,7 +48,3 @@ block main
           tr
             td= moment(item.created_at).format('YYYY-MM-DD HH:mm:ss')
             td #{item.amount.toFixed(2)} CNY
-            if item.type == 'billing'
-              td #{item.attribute.plans.join(', ')} | #{item.attribute.billing_time} hours #{item.attribute.is_force ? '| force' : ''}
-            else if item.type == 'service_billing' && item.attribute.service == 'shadowsocks'
-              td ShadowSocks #{item.attribute.traffic_mb} MB #{item.attribute.is_force ? '| force' : ''}

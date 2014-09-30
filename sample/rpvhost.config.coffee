@@ -65,3 +65,6 @@ module.exports =
   plugins:
     bitcoin:
       coinbase_api_key: 'coinbase-simple-api-key'
+
+    rpvhost:
+      taobao_item_id: '38370649858'

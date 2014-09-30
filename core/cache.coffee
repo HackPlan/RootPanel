@@ -1,6 +1,8 @@
 stringify = require 'json-stable-stringify'
 
-{redis, config} = app
+config = require '../config'
+
+{redis} = app
 
 exports.hashKey = (key, param) ->
   return "#{config.redis.prefix}:#{key}" + stringify(param)

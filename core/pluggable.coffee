@@ -17,8 +17,8 @@ exports.hooks =
     before_register: []
 
   billing:
-    # widget_generator: function(account, callback)
-    payment_method: []
+    # widget_generator: function(account, callback(html))
+    payment_methods: []
 
   view:
     layout:

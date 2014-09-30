@@ -3,7 +3,7 @@ async = require 'async'
 _ = require 'underscore'
 
 {requireAuthenticate, renderAccount} = require './../middleware'
-{mAccount, mBalance} = app.models
+{mAccount, mBalanceLog} = app.models
 {pluggable, billing, config} = app
 
 module.exports = exports = express.Router()
@@ -12,12 +12,15 @@ exports.get '/pay', requireAuthenticate, renderAccount, (req, res) ->
   LIMIT = 10
 
   async.parallel
-    exchange_rate: (callback) ->
-      bitcoin.getExchangeRate (rate) ->
-        callback null, rate
+    payment_methods: (callback) ->
+      async.map pluggable.selectHook(req.account, 'billing.payment_methods'), (hook, callback) ->
+        hook.widget_generator req.account, (html) ->
+          console.log html
+          callback null, html
+      , callback
 
     deposit_log: (callback) ->
-      mBalance.find
+      mBalanceLog.find
         account_id: req.account._id
         type: 'deposit'
       ,
@@ -27,7 +30,7 @@ exports.get '/pay', requireAuthenticate, renderAccount, (req, res) ->
       .toArray callback
 
     billing_log: (callback) ->
-      mBalance.find
+      mBalanceLog.find
         account_id: req.account._id
         type:
           $in: ['billing', 'service_billing']

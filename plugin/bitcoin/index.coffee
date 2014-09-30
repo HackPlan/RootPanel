@@ -4,7 +4,7 @@ path = require 'path'
 bitcoin = require './bitcoin'
 
 {mAccount} = app.models
-{pluggable, config} = app
+{pluggable, config, utils} = app
 
 module.exports = pluggable.createHelpers exports =
   name: 'bitcoin'
@@ -12,7 +12,7 @@ module.exports = pluggable.createHelpers exports =
 
 exports.registerHook 'account.before_register',
   filter: (account, callback) ->
-    bitcoin_secret = exports.randomSalt()
+    bitcoin_secret = utils.randomSalt()
 
     bitcoin.genAddress bitcoin_secret, (address) ->
       account.pluggable.bitcoin =
@@ -21,12 +21,14 @@ exports.registerHook 'account.before_register',
 
       callback()
 
-exports.registerHook 'billing.payment_method',
+exports.registerHook 'billing.payment_methods',
   widget_generator: (account, callback) ->
-    jade.renderFile path.join(__dirname, 'view/payment_method.jade'),
-      account: account
-    , (err, html) ->
-      callback html
+    bitcoin.getExchangeRate config.billing.currency, (rate) ->
+      jade.renderFile path.join(__dirname, 'view/payment_method.jade'),
+        account: account
+        exchange_rate: rate
+      , (err, html) ->
+        callback html
 
 app.post '/bitcoin/coinbase_callback', (req, res) ->
   mAccount.findOne
