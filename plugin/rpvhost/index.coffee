@@ -3,11 +3,11 @@ path = require 'path'
 {pluggable} = app
 {renderAccount} = app.middleware
 
-module.exports =
+module.exports = exports = pluggable.createHelpers module.exports,
   name: 'rpvhost'
   type: 'extension'
 
-pluggable.registerHook 'view.layout.menu_bar', module.exports,
+exports.registerHook 'view.layout.menu_bar',
   href: '//blog.rpvhost.net'
   target: '_blank'
   body: '官方博客'

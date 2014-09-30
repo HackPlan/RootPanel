@@ -80,7 +80,7 @@ module.exports =
 
       amount = billing_traffic / BILLING_BUCKET * config.plugins.shadowsocks.price_bucket
 
-      mAccount.update _id: account._id,
+      mAccount.update {_id: account._id},
         $unset:
           'attribute.plugin.shadowsocks': true
         $inc:
@@ -152,7 +152,7 @@ module.exports =
           if billing_bucket > 0
             amount = billing_bucket * config.plugins.shadowsocks.price_bucket
 
-            mAccount.update _id: account._id,
+            mAccount.update {_id: account._id},
               $set:
                 'attribute.plugin.shadowsocks.pending_traffic': new_pending_traffic
                 'attribute.plugin.shadowsocks.last_traffic_value': bytes
@@ -166,7 +166,7 @@ module.exports =
               , ->
                 callback()
           else if pending_traffic != new_pending_traffic or last_traffic_value != bytes
-            mAccount.update _id: account._id,
+            mAccount.update {_id: account._id},
               $set:
                 'attribute.plugin.shadowsocks.pending_traffic': new_pending_traffic
                 'attribute.plugin.shadowsocks.last_traffic_value': bytes

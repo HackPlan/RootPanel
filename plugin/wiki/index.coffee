@@ -3,11 +3,11 @@
 
 wiki = require './wiki'
 
-module.exports =
+module.exports = exports = pluggable.createHelpers module.exports,
   name: 'wiki'
   type: 'extension'
 
-pluggable.registerHook 'view.layout.menu_bar', module.exports,
+exports.registerHook 'view.layout.menu_bar',
   href: '/wiki/'
   body: '用户手册'
 

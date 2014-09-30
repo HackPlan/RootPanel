@@ -16,6 +16,10 @@ exports.hooks =
     # filter: function(account, callback)
     before_register: []
 
+  billing:
+    # widget_generator: function(account, callback)
+    payment_method: []
+
   view:
     layout:
       # href, target, body
@@ -111,3 +115,9 @@ exports.initializePlugins = (callback) ->
           initializeService plugin, callback
       , callback
   ], callback
+
+exports.createHelpers = (plugin, payload) ->
+  return _.extend payload, {
+    registerHook: (hook_name, payload) ->
+      return exports.registerHook hook_name, plugin, payload
+  }
