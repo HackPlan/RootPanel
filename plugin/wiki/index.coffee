@@ -20,7 +20,8 @@ for category_name in fs.readdirSync("#{__dirname}/../../WIKI")
       t_category: category_name
       t_title: file_name
       language: 'zh_CN'
-      content_markdown: fs.readFileSync("#{__dirname}/../../WIKI/#{category_name}/#{file_name}")
+      content_markdown: fs.readFileSync("#{__dirname}/../../WIKI/#{category_name}/#{file_name}").toString()
 
 app.get '/wiki', renderAccount, wiki.index
-app.use '/wiki', renderAccount, wiki.page
+
+app.get '/wiki/:category/:title', renderAccount, wiki.page

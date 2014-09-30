@@ -1,7 +1,8 @@
-markdown = require('markdown').markdown
+{markdown} = require 'markdown'
 path = require 'path'
 jade = require 'jade'
 fs = require 'fs'
+_ = require 'underscore'
 
 {pluggable} = app
 
@@ -20,27 +21,27 @@ exports.index = (req, res) ->
 
   for category_name, pages of pages_by_category
     result.push
+      t_category: category_name
       category: res.t category_name
       pages: pages
 
-  jade.renderFile "#{__dirname}/view/index.jade",
+  view_data = _.extend res.locals,
     category_list: result
 
+  jade.renderFile "#{__dirname}/view/index.jade", view_data, (err, html) ->
+    res.send html
+
 exports.page = (req, res) ->
-  url = req.url.substr '/wiki'.length
+  matched_page = _.findWhere pluggable.selectHook(req.account, 'plugin.wiki.pages'),
+    t_category: req.params.category
+    t_title: req.params.title
 
-  unless url
-    url = 'README.md'
+  unless matched_page
+    return res.status(404).end()
 
-  filename = path.resolve path.join __dirname, '../../WIKI', url
-  baseDir = path.resolve path.join __dirname, '../../WIKI'
+  view_data = _.extend res.locals,
+    title: res.t matched_page.t_title
+    content: markdown.toHTML matched_page.content_markdown
 
-  unless filename[0 .. baseDir.length - 1] == baseDir
-    return res.status(403).end()
-
-  fs.readFile filename, (err, data) ->
-    if err
-      return res.status(404).send err.toString()
-    res.render 'wiki',
-      title: url
-      content: markdown.toHTML data.toString()
+  jade.renderFile "#{__dirname}/view/page.jade", view_data, (err, html) ->
+    res.send html

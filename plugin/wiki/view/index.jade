@@ -1,7 +1,13 @@
 extends ../../../core/view/layout
 
-prepend head
-  title #{title} | #{config.web.name}
+prepend header
+  title 用户手册 | #{config.web.name}
 
 block main
-  != content
+  for category in category_list
+    h2= category.category
+    ul
+      for page in category.pages
+        li
+          a(href="/wiki/#{category.t_category}/#{page.t_title}")= page.title
+          | &nbsp; (#{page.language})
