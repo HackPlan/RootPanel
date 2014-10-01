@@ -1,8 +1,12 @@
 path = require 'path'
 fs = require 'fs'
 _ = require 'underscore'
-acceptLanguage = require 'accept-language'
 
+acceptLanguage = require 'accept-language'
+stringify = require 'json-stable-stringify'
+
+utils = require './utils'
+cache = require './cache'
 config = require '../config'
 
 acceptLanguage.default config.i18n.default_language.replace('_', '-')
@@ -71,12 +75,23 @@ exports.initI18nData = (req, res, next) ->
 
   next()
 
-exports.downloadLocales = (req, res) ->
-  language = req.params.language
+exports.pickClientLocale = (language) ->
+  cached_result = cache.counter.get "client.locale:#{language}"
+
+  if cached_result
+    return cached_result
 
   result = i18n_data[config.i18n.default_language]
 
   if language in config.i18n.available_language and language != config.i18n.default_language
     result = _.extend result, i18n_data[language]
 
-  res.json result
+  cache.counter.set "client.locale:#{language}", result, NaN
+
+  return result
+
+exports.clientLocaleHash = (language) ->
+  return utils.sha256 stringify exports.pickClientLocale language
+
+exports.downloadLocales = (req, res) ->
+  res.json exports.pickClientLocale req.params.language

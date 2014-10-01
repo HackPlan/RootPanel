@@ -57,7 +57,7 @@ exports.run = ->
       ticket_create_email: fs.readFileSync('./core/template/ticket_create_email.html').toString()
       ticket_reply_email: fs.readFileSync('./core/template/ticket_reply_email.html').toString()
 
-    app.localeVersion = config.i18n.version
+
     app.use connect.json()
     app.use connect.urlencoded()
     app.use connect.cookieParser()
@@ -68,14 +68,15 @@ exports.run = ->
 
     app.use (req, res, next) ->
       res.locals.app = app
+      res.locals.res = res
       res.locals.config = app.config
       res.locals.t = res.t = app.i18n.getTranslator req.cookies.language
 
       res.locals.selectHook = (name) ->
         return app.pluggable.selectHook req.account, name
 
-      language = req.cookies.language ? config.i18n.default_language
-      timezone = req.cookies.timezone ? config.i18n.default_timezone
+      res.language = req.cookies.language ? config.i18n.default_language
+      res.timezone = req.cookies.timezone ? config.i18n.default_timezone
 
       res.locals.moment = res.moment = ->
         return moment.apply(@, arguments).locale(language).tz(timezone)

@@ -8,7 +8,7 @@ html
       for hook in selectHook('view.layout.styles')
         link(rel='stylesheet', href=hook.path)
 
-  body(data-locale=app.localeVersion)
+  body(data-locale-version=app.i18n.clientLocaleHash(res.language))
     header.navbar-fixed-top
       .container
         nav.navbar.navbar-default.navbar-inverse(role='navigation')
@@ -44,6 +44,13 @@ html
                   a(href='/account/register/')= t('account.register')
                 li
                   a(href='/account/login/')= t('account.login')
+              li.dropdown
+                a(href='#', data-toggle='dropdown').dropdown-toggle
+                  span.glyphicon.glyphicon-globe
+                ul.dropdown-menu
+                  li
+                    a(href='#') 简体中文 (zh_CN)
+                    a(href='#') English (en)
 
     block content
       #content.container

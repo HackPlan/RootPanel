@@ -15,7 +15,6 @@ exports.get '/pay', requireAuthenticate, renderAccount, (req, res) ->
     payment_methods: (callback) ->
       async.map pluggable.selectHook(req.account, 'billing.payment_methods'), (hook, callback) ->
         hook.widget_generator req.account, (html) ->
-          console.log html
           callback null, html
       , callback
 

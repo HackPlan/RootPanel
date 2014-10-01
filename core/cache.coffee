@@ -1,8 +1,11 @@
 stringify = require 'json-stable-stringify'
+CounterCache = require('counter-cache')
 
 config = require '../config'
 
 {redis} = app
+
+exports.counter = new CounterCache()
 
 exports.hashKey = (key, param) ->
   return "#{config.redis.prefix}:#{key}" + stringify(param)

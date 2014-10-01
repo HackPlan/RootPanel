@@ -49,12 +49,13 @@ $ ->
     return "error_code.#{name}"
 
   client_version = localStorage.getItem 'locale_version'
-  current_version = "#{($ 'body').data 'locale'}"
+  latest_version = $('body').data 'locale-version'
 
-  if client_version  == current_version
-    window.i18n_data = JSON.parse localStorage.getItem 'locale_content'
+  if client_version  == latest_version
+    window.i18n_data = JSON.parse localStorage.getItem 'locale_cache'
   else
     $.getJSON "/locale/#{$.cookie('language')}", (data) ->
       window.i18n_data = data
-      localStorage.setItem 'locale_version', current_version
+
+      localStorage.setItem 'locale_version', latest_version
       localStorage.setItem 'locale_content', JSON.stringify data

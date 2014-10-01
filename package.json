@@ -42,6 +42,7 @@
         "request": "^2.40.0",
         "tmp": "^0.0.24",
         "underscore": "^1.6.0",
-        "json-stable-stringify": "^1.0.0"
+        "json-stable-stringify": "^1.0.0",
+        "counter-cache": "^0.1.0"
     }
 }
