@@ -57,20 +57,18 @@ exports.run = ->
       ticket_create_email: fs.readFileSync('./core/template/ticket_create_email.html').toString()
       ticket_reply_email: fs.readFileSync('./core/template/ticket_reply_email.html').toString()
 
-
     app.use connect.json()
     app.use connect.urlencoded()
     app.use connect.cookieParser()
     app.use connect.logger()
 
     app.use require 'middleware-injector'
-    app.use app.i18n.initI18nData
 
     app.use (req, res, next) ->
       res.locals.app = app
       res.locals.res = res
       res.locals.config = app.config
-      res.locals.t = res.t = app.i18n.getTranslator req.cookies.language
+      res.locals.t = res.t = app.i18n.getTranslator req
 
       res.locals.selectHook = (name) ->
         return app.pluggable.selectHook req.account, name

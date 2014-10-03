@@ -31,13 +31,17 @@ exports.parseLanguageCode = parseLanguageCode = (language) ->
 
 exports.calcLanguagePriority = (req) ->
   negotiator = new Negotiator req
-  language_info = parseLanguageCode req.cookies.language
 
-  result = _.filter config.i18n.available_language, (i) ->
-    return i.language == language_info.language
+  result = []
 
-  result = _.union result, _.filter config.i18n.available_language, (i) ->
-    return parseLanguageCode(i).lang == language_info.lang
+  if req.cookies.language
+    language_info = parseLanguageCode req.cookies.language
+
+    result = _.union result, _.filter config.i18n.available_language, (i) ->
+      return i.language == language_info.language
+
+    result = _.union result, _.filter config.i18n.available_language, (i) ->
+      return parseLanguageCode(i).lang == language_info.lang
 
   result = _.union result, _.filter config.i18n.available_language, (i) ->
     return parseLanguageCode(i).lang in negotiator.languages()
@@ -83,51 +87,29 @@ exports.getTranslator = (req) ->
 
     return result
 
-exports.initI18nData = (req, res, next) ->
-  timezone_mapping =
-    CN: 'Asia/Shanghai'
-    TW: 'Asia/Taipei'
-    HK: 'Asia/Hong_Kong'
-    US: 'US/Aleutian'
-    GB: 'Europe/London'
-
-  if !req.cookies['language'] or req.cookies['timezone']
-    result = acceptLanguage.parse req.headers['accept-language']
-
-    language = result[0].language.toLowerCase()
-    region = result[0].region.toUpperCase()
-
-  unless req.cookies['language']
-    locale_code = "#{language}_#{region}"
-
-    req.cookies['language'] = locale_code
-    res.cookie 'language', locale_code
-
-  unless req.cookies['timezone']
-    timezone = timezone_mapping[region]
-
-    req.cookies['timezone'] = timezone
-    res.cookie 'timezone', timezone
-
-  next()
-
-exports.pickClientLocale = (language) ->
-  cached_result = cache.counter.get "client.locale:#{language}"
+exports.pickClientLocale = (req) ->
+  cache_key = "client.locale:#{req.cookies['language']}/#{req.headers['accept-language']}"
+  cached_result = cache.counter.get cache_key
 
   if cached_result
     return cached_result
 
-  result = i18n_data[config.i18n.default_language]
+  priority_order = exports.calcLanguagePriority req
 
-  if language in config.i18n.available_language and language != config.i18n.default_language
+  result = {}
+
+  for language in priority_order
     result = _.extend result, i18n_data[language]
 
-  cache.counter.set "client.locale:#{language}", result, NaN
+  cache.counter.set cache_key, result, NaN
 
   return result
 
-exports.clientLocaleHash = (language) ->
-  return utils.sha256 stringify exports.pickClientLocale language
+exports.clientLocaleHash = (req) ->
+  return utils.sha256 stringify exports.pickClientLocale req
 
 exports.downloadLocales = (req, res) ->
-  res.json exports.pickClientLocale req.params.language
+  if req.params['language']
+    req.cookies['language'] = req.params['language']
+
+  res.json exports.pickClientLocale req

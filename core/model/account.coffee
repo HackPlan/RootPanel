@@ -80,7 +80,7 @@ exports.register = (account, callback) ->
 
     settings:
       avatar_url: "//ruby-china.org/avatar/#{utils.md5(email)}?s=58"
-      language: config.i18n.default_language
+      language: 'auto'
       timezone: config.i18n.default_timezone
 
     billing:

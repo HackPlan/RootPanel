@@ -20,6 +20,8 @@ $ ->
     if $(@).attr('href') == location.pathname
       $(@).parent().addClass('active')
 
+  $('body > header nav ul.navbar-right > li.dropdown').append $.cookie('language')
+
   if window.location.hash == '#redirect'
     $('#site-not-exist').modal 'show'
 
@@ -40,7 +42,7 @@ $ ->
       unless result[item] == undefined
         result = result[item]
 
-    if result == undefined or typeof result == 'object'
+    if result == undefined
       return name
     else
       return result
@@ -54,8 +56,8 @@ $ ->
   if client_version  == latest_version
     window.i18n_data = JSON.parse localStorage.getItem 'locale_cache'
   else
-    $.getJSON "/locale/#{$.cookie('language')}", (data) ->
-      window.i18n_data = data
+    $.getJSON "/locale/", (result) ->
+      window.i18n_data = result
 
       localStorage.setItem 'locale_version', latest_version
-      localStorage.setItem 'locale_content', JSON.stringify data
+      localStorage.setItem 'locale_content', JSON.stringify result

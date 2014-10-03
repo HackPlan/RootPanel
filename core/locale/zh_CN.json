@@ -17,6 +17,11 @@
         "error": "错误",
         "success": "成功"
     },
+    "languages": {
+      "zh_CN": "简体中文",
+      "en": "English",
+      "auto": "自动"
+    },
     "error_code": {
         "username_exist": "用户名已存在"
     },
