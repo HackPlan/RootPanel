@@ -45,9 +45,9 @@ block main
 prepend sidebar
   .row
     p
-      a.btn.btn-lg.btn-success(href='/ticket/list/') 工单
+      a.btn.btn-lg.btn-success(href='/ticket/list/')= t('ticket.')
     p
-      a.btn.btn-lg.btn-success(href='/account/setting/') 首选项
+      a.btn.btn-lg.btn-success(href='/account/preferences/')= t('account.preferences')
 
 append footer
   script(src='/script/panel.js')

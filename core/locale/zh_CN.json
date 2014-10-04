@@ -1,88 +1,105 @@
 {
-    "app": {
-        "name": "RootPanel",
-        "description": "一个插件化的 Linux 虚拟主机管理系统。"
+  "app": {
+    "name": "RootPanel",
+    "description": "一个插件化的 Linux 虚拟主机管理系统。"
+  },
+  "plans": {
+    "sample": {
+      "name": "示例",
+      "description": "每月 8 元，按小时计费"
     },
-    "plans": {
-        "sample": {
-            "name": "示例",
-            "description": "每月 8 元，按小时计费"
-        },
-        "test": {
-            "name": "测试",
-            "description": "按量付费，7 天不使用自动关闭"
-        }
-    },
-    "common": {
-        "error": "错误",
-        "success": "成功"
-    },
-    "languages": {
-      "zh_CN": "简体中文",
-      "en": "English",
-      "auto": "自动"
-    },
-    "error_code": {
-        "username_exist": "用户名已存在"
+    "test": {
+      "name": "测试",
+      "description": "按量付费，7 天不使用自动关闭"
+    }
+  },
+  "common": {
+    "error": "错误",
+    "success": "成功",
+    "save": "保存",
+    "apply": "使用",
+    "change": "修改"
+  },
+  "languages": {
+    "zh_CN": "简体中文",
+    "en": "English",
+    "auto": "自动"
+  },
+  "error_code": {
+    "username_exist": "用户名已存在"
+  },
+  "account": {
+    "": "帐号",
+    "register": "注册",
+    "login": "登录",
+    "username": "用户名",
+    "email": "邮箱",
+    "password": "密码",
+    "logout": "注销",
+    "preferences": "首选项"
+  },
+  "panel": {
+    "": "管理面板",
+    "overview": "概况"
+  },
+  "ticket": {
+    "": "工单",
+    "title": "标题",
+    "status": "状态",
+    "create": "创建",
+    "reply": "回复",
+    "replies": "全部回复",
+    "create_ticket": "创建工单",
+    "create_reply": "创建回复",
+    "ticket_list": "工单列表",
+    "close_ticket": "关闭",
+    "finish_ticket": "完成",
+    "reopen_ticket": "重新打开",
+    "creator": "创建者",
+    "members": "成员"
+  },
+  "plan": {
+    "": "套餐",
+    "subscribe": "订购",
+    "unsubscribe": "退订",
+    "balance": "余额",
+    "remaining_time": "剩余时长",
+    "currency": {
+      "cny": "CNY"
+    }
+  },
+  "admin": {
+    "admin_panel": "管理员面板"
+  },
+  "time": {
+    "day": "天"
+  },
+  "notification_title": {
+    "ticket": "<%= title %> | 工单"
+  },
+  "view": {
+    "layout": {
+      "navigation": "展开导航"
     },
     "account": {
-        "": "帐号",
-        "register": "注册",
-        "login": "登录",
-        "username": "用户名",
-        "email": "邮箱",
-        "password": "密码",
-        "logout": "注销"
+      "password2": "重复",
+      "already_register": "已有帐号？",
+      "no_account": "还没有账户？",
+      "password_inconsistent": "两次输入的密码不一致"
     },
-    "panel": {
-        "": "管理面板",
-        "overview": "概况"
-    },
-    "ticket": {
-        "": "工单",
-        "title": "标题",
-        "status": "状态",
-        "create": "创建",
-        "reply": "回复",
-        "replies": "全部回复",
-        "create_ticket": "创建工单",
-        "create_reply": "创建回复",
-        "ticket_list": "工单列表",
-        "close_ticket": "关闭",
-        "finish_ticket": "完成",
-        "reopen_ticket": "重新打开",
-        "creator": "创建者",
-        "members": "成员"
-    },
-    "plan": {
-        "": "套餐",
-        "subscribe": "订购",
-        "unsubscribe": "退订",
-        "balance": "余额",
-        "remaining_time": "剩余时长",
-        "currency": {
-            "cny": "CNY"
-        }
-    },
-    "admin": {
-        "admin_panel": "管理员面板"
-    },
-    "time": {
-        "day": "天"
-    },
-    "notification_title": {
-        "ticket": "<%= title %> | 工单"
-    },
-    "view": {
-        "layout": {
-            "navigation": "展开导航"
-        },
-        "account": {
-            "password2": "重复",
-            "already_register": "已有帐号？",
-            "no_account": "还没有账户？",
-            "password_inconsistent": "两次输入的密码不一致"
-        }
-    },
-    "plugins": {}
+    "preferences": {
+      "options": "信息和偏好",
+      "qq": "QQ",
+      "coupon_code": "兑换代码",
+      "code": "代码",
+      "update_password": "修改密码",
+      "old_password": "原密码",
+      "new_password": "新密码",
+      "repeat_password": "重复密码",
+      "update_email": "修改邮箱",
+      "current_email": "当前邮箱",
+      "new_email": "新邮箱"
+    }
+  },
+  "plugins": {}
 }

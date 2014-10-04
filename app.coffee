@@ -70,6 +70,8 @@ exports.run = ->
       res.locals.config = app.config
       res.locals.t = res.t = app.i18n.getTranslator req
 
+      res.locals.config.web.name = res.t app.config.web.t_name
+
       res.locals.selectHook = (name) ->
         return app.pluggable.selectHook req.account, name
 

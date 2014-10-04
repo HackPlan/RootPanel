@@ -1,6 +1,6 @@
 module.exports =
   web:
-    name: 'RP 主机'
+    t_name: 'plugins.rpvhost.site_name'
     url: 'http://rpvhost.net'
     listen: '/home/rpadmin/rootpanel.sock'
     google_analytics_id: 'UA-49193300-2'

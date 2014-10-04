@@ -28,7 +28,7 @@ block main
       for reply in ticket.replies
         li.list-group-item.clearfix
           a.pull-left
-            img(src= reply.account.settings.avatar_url)
+            img(src= reply.account.preferences.avatar_url)
           .list-content
             p!= reply.content_html
             p
@@ -63,7 +63,7 @@ prepend sidebar
     header= t('ticket.creator')
     li.list-group-item.clearfix
       a.pull-left
-        img(src= ticket.account.settings.avatar_url)
+        img(src= ticket.account.preferences.avatar_url)
       p
         span.label.label-info= ticket.account.username
         br
@@ -73,7 +73,7 @@ prepend sidebar
     header= t('ticket.members')
     for member in ticket.members
       a.pull-left
-        img(src= member.settings.avatar_url, alt= member.username)
+        img(src= member.preferences.avatar_url, alt= member.username)
 
 append footer
   script(src='/script/ticket/view.js')

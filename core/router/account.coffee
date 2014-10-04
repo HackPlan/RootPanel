@@ -138,7 +138,7 @@ exports.post '/update_email', requireAuthenticate, (req, res) ->
     , ->
       res.json {}
 
-exports.post '/update_settings', requireAuthenticate, (req, res) ->
+exports.post '/update_preferences', requireAuthenticate, (req, res) ->
   modifiers =
     $set: {}
 

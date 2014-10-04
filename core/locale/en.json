@@ -12,7 +12,7 @@
   "common": {
     "error": "Error"
   },
-   "account": {
+  "account": {
     "": "Account",
     "signup": "Register",
     "login": "Login",
@@ -24,7 +24,7 @@
   "panel": {
     "": "Control Panel"
   },
-    "ticket": {
+  "ticket": {
     "": "Support Tickets",
     "type": "Type",
     "title": "Title",
@@ -39,7 +39,7 @@
     "finish_ticket": "Finish",
     "reopen_ticket": "Reopen"
   },
-    "plan": {
+  "plan": {
     "": "Plan"
   },
   "admin": {
@@ -56,6 +56,5 @@
     }
   },
   "plugins": {
-
   }
 }

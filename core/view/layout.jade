@@ -36,7 +36,7 @@ html
                   a(href='/panel/')= t('panel.')
                 if app.models.mAccount.inGroup(account, 'root')
                   li
-                    a(href='/admin/') 管理员面板
+                    a(href='/admin/')= t('admin.admin_panel')
                 li
                   a#logout(href='/account/logout/')= t('account.logout')
               else
