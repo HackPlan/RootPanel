@@ -59,14 +59,14 @@ exports.run = ->
 
     app.use connect.json()
     app.use connect.urlencoded()
-    app.use connect.cookieParser()
     app.use connect.logger()
+    app.use require('cookie-parser')()
 
     app.use require 'middleware-injector'
 
     app.use (req, res, next) ->
       res.locals.app = app
-      res.locals.res = res
+      res.locals.req = req
       res.locals.config = app.config
       res.locals.t = res.t = app.i18n.getTranslator req
 
@@ -84,7 +84,7 @@ exports.run = ->
     app.set 'views', path.join(__dirname, 'core/view')
     app.set 'view engine', 'jade'
 
-    app.get '/locale/:language', app.i18n.downloadLocales
+    app.get '/locale/:language?', app.i18n.downloadLocales
 
     app.use '/account', require './core/router/account'
     app.use '/billing', require './core/router/billing'

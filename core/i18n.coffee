@@ -3,6 +3,7 @@ fs = require 'fs'
 _ = require 'underscore'
 
 stringify = require 'json-stable-stringify'
+Negotiator = require 'negotiator'
 
 utils = require './utils'
 cache = require './cache'
@@ -25,8 +26,8 @@ exports.parseLanguageCode = parseLanguageCode = (language) ->
 
   return {
     language: language
-    lang: lang.toLowerCase()
-    country: country.toUpperCase()
+    lang: lang?.toLowerCase()
+    country: country?.toUpperCase()
   }
 
 exports.calcLanguagePriority = (req) ->
@@ -88,6 +89,7 @@ exports.getTranslator = (req) ->
     return result
 
 exports.pickClientLocale = (req) ->
+  console.log req.cookies
   cache_key = "client.locale:#{req.cookies['language']}/#{req.headers['accept-language']}"
   cached_result = cache.counter.get cache_key
 

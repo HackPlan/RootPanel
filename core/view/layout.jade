@@ -8,7 +8,7 @@ html
       for hook in selectHook('view.layout.styles')
         link(rel='stylesheet', href=hook.path)
 
-  body(data-locale-version=app.i18n.clientLocaleHash(res))
+  body(data-locale-version=app.i18n.clientLocaleHash(req))
     header.navbar-fixed-top
       .container
         nav.navbar.navbar-default.navbar-inverse(role='navigation')
@@ -75,8 +75,7 @@ html
           (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
           m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
           })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-          ga('create', '#{config.web.google_analytic
-          s_id}', 'auto');
+          ga('create', '#{config.web.google_analytics_id}', 'auto');
           ga('send', 'pageview');
       script(src='http://cdn.staticfile.org/jquery/2.0.3/jquery.min.js')
       script(src='http://cdn.staticfile.org/jquery-cookie/1.4.1/jquery.cookie.min.js')
