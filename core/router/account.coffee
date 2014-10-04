@@ -86,6 +86,9 @@ exports.post '/login', errorHandling, (req, res) ->
       res.cookie 'token', token,
         expires: new Date(Date.now() + config.account.cookie_time)
 
+      res.cookie 'language', account.settings.language,
+        expires: new Date(Date.now() + config.account.cookie_time)
+
       res.json
         id: account._id
         token: token
@@ -135,12 +138,12 @@ exports.post '/update_email', requireAuthenticate, (req, res) ->
     , ->
       res.json {}
 
-exports.post '/update_setting', requireAuthenticate, (req, res) ->
+exports.post '/update_settings', requireAuthenticate, (req, res) ->
   modifiers =
     $set: {}
 
   for k, v of req.body
-    unless k in ['qq']
+    unless k in ['qq', 'language']
       return res.error 'invalid_field'
 
     modifiers.$set["settings.#{k}"] = v

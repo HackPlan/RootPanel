@@ -1,6 +1,6 @@
 $ ->
   $('.action-save').click ->
-    request '/account/update_setting/',
+    request '/account/update_settings/',
       qq: $('.form-setting .input-qq').val()
     , ->
       alert t 'common.success'

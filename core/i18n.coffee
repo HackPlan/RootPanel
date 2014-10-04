@@ -89,7 +89,6 @@ exports.getTranslator = (req) ->
     return result
 
 exports.pickClientLocale = (req) ->
-  console.log req.cookies
   cache_key = "client.locale:#{req.cookies['language']}/#{req.headers['accept-language']}"
   cached_result = cache.counter.get cache_key
 

@@ -8,7 +8,7 @@ html
       for hook in selectHook('view.layout.styles')
         link(rel='stylesheet', href=hook.path)
 
-  body(data-locale-version=app.i18n.clientLocaleHash(req))
+  body(data-username="#{account ? account.username : ''}", data-locale-version=app.i18n.clientLocaleHash(req))
     header.navbar-fixed-top
       .container
         nav.navbar.navbar-default.navbar-inverse(role='navigation')
@@ -47,6 +47,8 @@ html
               li.dropdown
                 a(href='#', data-toggle='dropdown').dropdown-toggle
                   span.glyphicon.glyphicon-globe
+                  | &nbsp;
+                  span.label-language
                 ul.dropdown-menu
                   li
                     a.action-switch-language(href='#', data-language='auto') #{t('languages.auto')} (auto)
@@ -79,7 +81,9 @@ html
           ga('send', 'pageview');
       script(src='http://cdn.staticfile.org/jquery/2.0.3/jquery.min.js')
       script(src='http://cdn.staticfile.org/jquery-cookie/1.4.1/jquery.cookie.min.js')
+      script(src='http://cdn.staticfile.org/underscore.js/1.7.0/underscore-min.js')
       script(src='http://cdn.staticfile.org/twitter-bootstrap/3.2.0/js/bootstrap.min.js')
+      script(src='/script/global.js')
       script(src='/script/layout.js')
       for hook in selectHook('view.layout.scripts')
         script(src=hook.path)
