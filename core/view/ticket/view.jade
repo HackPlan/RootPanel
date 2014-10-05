@@ -10,14 +10,17 @@ block main
   .row.content(data-id='#{ticket._id}')
     header
       | #{ticket.title} &nbsp;
+
+      - status = t('ticket_status.' + t_status)
+
       if ticket.status == 'closed'
-        span.small.text-muted 已关闭
+        span.small.text-muted= status
       else if ticket.status == 'open'
-        span.small.text-primary 开放的
+        span.small.text-primary= status
       else if ticket.status == 'pending'
-        span.small.text-warning 等待处理
+        span.small.text-warning= status
       else if ticket.status == 'finish'
-        span.small.text-success 已完成
+        span.small.text-success= status
 
     p!= ticket.content_html
 
@@ -45,7 +48,7 @@ block main
           textarea.form-control.input-content(rows='5')
       .form-group.padding
         if ticket.status == 'closed'
-          button(disabled).btn.btn-lg.btn-primary 已关闭
+          button(disabled).btn.btn-lg.btn-primary= t('ticket_status.closed')
         else
           button.btn.btn-lg.btn-primary.action-reply(type='button')= t('ticket.create_reply')
           button(type='button', data-status='closed').btn.btn-lg.btn-danger.action-update-status= t('ticket.close_ticket')

@@ -18,7 +18,19 @@
     "success": "成功",
     "save": "保存",
     "apply": "使用",
-    "change": "修改"
+    "change": "修改",
+    "charge": "充值",
+    "enable": "启用",
+    "disable": "禁用",
+    "time": "时间",
+    "amount": "金额",
+    "actions": "操作",
+    "details": "详情",
+    "type": "类型",
+    "generate": "生成",
+    "id": "ID",
+    "close": "关闭",
+    "create": "创建"
   },
   "languages": {
     "zh_CN": "简体中文",
@@ -58,14 +70,21 @@
     "creator": "创建者",
     "members": "成员"
   },
+  "ticket_status": {
+    "closed": "已关闭",
+    "open": "开放的",
+    "pending": "等待处理",
+    "finish": "已完成",
+    "related": "与我相关"
+  },
   "plan": {
-    "": "套餐",
-    "subscribe": "订购",
-    "unsubscribe": "退订",
+    "": "付费方案",
+    "join": "订购方案",
+    "leave": "退订方案",
     "balance": "余额",
     "remaining_time": "剩余时长",
     "currency": {
-      "cny": "CNY"
+      "CNY": "CNY"
     }
   },
   "admin": {
@@ -99,6 +118,27 @@
       "update_email": "修改邮箱",
       "current_email": "当前邮箱",
       "new_email": "新邮箱"
+    },
+    "panel": {
+      "billing": "财务",
+      "service_switch": "服务开关"
+    },
+    "pay": {
+      "pay_log": "充值记录",
+      "pay_method": "方式",
+      "billing_log": "扣费记录"
+    },
+    "admin": {
+      "account_list": "用户列表",
+      "coupon_code": "兑换代码",
+      "confirm_payment": "确认充值",
+      "delete_account": "删除账户",
+      "expired": "过期时间",
+      "empty_expired_tips": "留空表示无限制",
+      "available_times": "可用次数",
+      "count": "数量",
+      "meta": "参数",
+      "order_id": "订单号"
     }
   },
   "plugins": {}

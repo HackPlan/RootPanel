@@ -10,9 +10,9 @@ block main
   .row
     ul.nav.nav-tabs(role='tablist')
       li.active
-        a(href='#tab-account-list', data-toggle='tab') 用户列表
+        a(href='#tab-account-list', data-toggle='tab')= t('view.admin.account_list')
       li
-        a(href='#tab-coupon-code', data-toggle='tab') 兑换代码
+        a(href='#tab-coupon-code', data-toggle='tab')= t('view.admin.coupon_code')
 
     .tab-content
       #tab-account-list.tab-pane.active
@@ -21,9 +21,9 @@ block main
             tr
               th= t('account.username')
               th= t('account.email')
-              th 套餐
-              th 余额
-              th 操作
+              th= t('plan.')
+              th= t('common.amount')
+              th= t('common.actions')
           tbody
             for account in accounts
               tr(data-id='#{account._id}')
@@ -32,74 +32,74 @@ block main
                 td= account.billing.plans.join(', ')
                 td= account.billing.balance.toFixed(2)
                 td
-                  button.btn.btn-info.btn-sm(type='button') 详情
+                  button.btn.btn-info.btn-sm(type='button')= t('common.details')
                   .btn-group
                     button(type='button', data-toggle='dropdown').btn.btn-primary.btn-sm.dropdown-toggle
-                      | 操作 &nbsp;
+                      | #{t('common.actions')} &nbsp;
                       span.caret
                     ul.dropdown-menu
                       li
-                        a.action-create-payment(href='#') 创建充值记录
+                        a.action-create-payment(href='#')= t('view.admin.confirm_payment')
                       if account.billing.balance <= 0 && account.billing.plans.length == 0
                         li
-                          a.action-delete-account(href='#') 删除账户
+                          a.action-delete-account(href='#')= t('view.admin.delete_account')
 
       #tab-coupon-code.tab-pane
         form.form-horizontal
           .form-group
-            label.col-sm-2.control-label 过期时间
+            label.col-sm-2.control-label= t('view.admin.expired')
             .col-sm-5
-              input.input-expired.form-control(type='text', placeholder='Empty for no limit')
+              input.input-expired.form-control(type='text', placeholder=t('view.admin.empty_expired_tips'))
           .form-group
-            label.col-sm-2.control-label 可用次数
+            label.col-sm-2.control-label= t('view.admin.available_times')
             .col-sm-5
               input.input-available_times.form-control(type='text', value='1')
           .form-group
-            label.col-sm-2.control-label 类型
+            label.col-sm-2.control-label= t('common.type')
             .col-sm-5
               select.input-type.form-control
                 for type in coupon_code_types
                   option= type
           .form-group
-            label.col-sm-2.control-label 数量
+            label.col-sm-2.control-label= t('view.admin.count')
             .col-sm-5
               input.input-count.form-control(type='text', value='1')
           .form-group
-            label.col-sm-2.control-label meta
+            label.col-sm-2.control-label= t('view.admin.meta')
             .col-sm-5
               input.input-meta.form-control(type='text', value='{"amount": 5, "category": "2014"}')
           .form-group
             label.col-sm-2.control-label
             .col-sm-5
-              button.action-generate-code.btn.btn-lg.btn-primary(type='button') 生成
+              button.action-generate-code.btn.btn-lg.btn-primary(type='button')= t('common.generate')
 
         .output-coupon-code
 
 
-  #create-payment-modal.modal.fade
+  .confirm-payment-modal.modal.fade
     .modal-dialog
       .modal-content
         .modal-header
           button.close(type='button', data-dismiss='modal', aria-hidden='true') &times;
-          h4.modal-title 创建充值记录
+          h4.modal-title= t('view.admin.confirm_payment')
         .modal-body
           form.form-horizontal(method='post', role='form')
             .form-group
-              label.col-sm-2.col-md-offset-1.control-label(for='account_id') ID
+              label.col-sm-2.col-md-offset-1.control-label= t('common.id')
               .col-sm-5
-                p#account_id.form-control-static
+                p.input-account-id.form-control-static
             .form-group
-              label.col-sm-2.col-md-offset-1.control-label(for='amont') 金额
+              label.col-sm-2.col-md-offset-1.control-label= t('common.amount')
               .col-sm-5
-                input#amont.form-control(type='text', name='amont', required)
+                input.input-amont.form-control(type='text')
             .form-group
-              label.col-sm-2.col-md-offset-1.control-label(for='order_id') 订单号
+              label.col-sm-2.col-md-offset-1.control-label= t('view.admin.order_id')
               .col-sm-5
-                input#order_id.form-control(type='order_id', name='order_id', required)
+                input.input-order-id.form-control(type='order_id')
 
         .modal-footer
-          button.btn.btn-danger(type='button', data-dismiss='modal') 关闭
-          button.btn.btn-success.action-create-payment(type='button') 创建
+          button.btn.btn-danger(type='button', data-dismiss='modal')= t('common.close')
+          button.btn.btn-success.action-confirm-payment(type='button')= t('common.create')
 
 prepend sidebar
   .row

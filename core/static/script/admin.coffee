@@ -1,7 +1,7 @@
 $ ->
-  $('.action-create-payment').click ->
-    $('#account_id').html $(@).parents('tr').data 'id'
-    $('#create-payment-modal').modal 'show'
+  $('#tab-account-list .action-confirm-payment').click ->
+    $('.confirm-payment-modal .input-account-id').html $(@).parents('tr').data 'id'
+    $('.confirm-payment-modal').modal 'show'
 
   $('.action-delete-account').click (e) ->
     e.preventDefault()
@@ -26,18 +26,13 @@ $ ->
     .success ->
       location.reload()
 
-  $('#create-payment-modal .action-create-payment').click ->
-    $.post '/admin/create_payment/', JSON.stringify
-      account_id: $('#account_id').html()
+  $('.confirm-payment-modal .action-confirm-payment').click ->
+    request '/admin/confirm_payment/',
+      account_id: $('.input-account-id').test()
       type: 'taobao'
-      amount: $('#amont').val()
-      order_id: $('#order_id').val()
-    .fail (jqXHR) ->
-      if jqXHR.responseJSON?.error
-        alert jqXHR.responseJSON.error
-      else
-        alert jqXHR.statusText
-    .success ->
+      amount: $('input-amount').val()
+      order_id: $('input-order-id').val()
+    , ->
       location.reload()
 
   $('.action-generate-code').click ->

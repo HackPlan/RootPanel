@@ -31,11 +31,14 @@ $ ->
 
     language = $(@).data 'language'
 
-    $.cookie 'language', language, expires: 365
+    $.cookie 'language', language,
+      expires: 365
+      path: '/'
+
     $('.label-language').text language
 
     if $('body').data 'username'
-      request '/account/update_settings/',
+      request '/account/update_preferences/',
         language: language
       , ->
         location.reload()
