@@ -11,15 +11,16 @@ config = require '../config'
 
 i18n_data = {}
 
-for lang in config.i18n.available_language
-  i18n_data[lang] = require "./locale/#{lang}"
+for filename in fs.readdirSync "#{__dirname}/locale"
+  language = path.basename filename, '.json'
+  i18n_data[language] = require "#{__dirname}/locale/#{filename}"
+  config.i18n.available_language = _.union config.i18n.available_language, [language]
 
 exports.loadForPlugin = (plugin) ->
-  for lang in config.i18n.available_language
-    path = "../plugin/#{plugin.name}/locale/#{lang}.json"
-
-    if fs.existsSync path
-      i18n_data[lang]['plugins'][plugin.name] = require lang
+  for filename in fs.readdirSync "#{__dirname}/../plugin/#{plugin.name}/locale"
+    language = path.basename filename, '.json'
+    i18n_data[language]['plugins'][plugin.name] = require "#{__dirname}/../plugin/#{plugin.name}/locale/#{filename}"
+    config.i18n.available_language = _.union config.i18n.available_language, [language]
 
 exports.parseLanguageCode = parseLanguageCode = (language) ->
   [lang, country] = language.replace('-', '_').split '_'
