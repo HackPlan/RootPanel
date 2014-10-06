@@ -79,7 +79,7 @@ exports.run = ->
       res.timezone = req.cookies.timezone ? config.i18n.default_timezone
 
       res.locals.moment = res.moment = ->
-        return moment.apply(@, arguments).locale(language).tz(timezone)
+        return moment.apply(@, arguments).locale(res.language).tz(res.timezone)
 
       next()
 

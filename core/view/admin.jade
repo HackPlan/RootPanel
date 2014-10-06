@@ -39,7 +39,7 @@ block main
                       span.caret
                     ul.dropdown-menu
                       li
-                        a.action-create-payment(href='#')= t('view.admin.confirm_payment')
+                        a.action-confirm-payment(href='#')= t('view.admin.confirm_payment')
                       if account.billing.balance <= 0 && account.billing.plans.length == 0
                         li
                           a.action-delete-account(href='#')= t('view.admin.delete_account')
@@ -91,7 +91,7 @@ block main
             .form-group
               label.col-sm-2.col-md-offset-1.control-label= t('common.amount')
               .col-sm-5
-                input.input-amont.form-control(type='text')
+                input.input-amount.form-control(type='text')
             .form-group
               label.col-sm-2.col-md-offset-1.control-label= t('view.admin.order_id')
               .col-sm-5

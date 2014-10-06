@@ -28,10 +28,10 @@ $ ->
 
   $('.confirm-payment-modal .action-confirm-payment').click ->
     request '/admin/confirm_payment/',
-      account_id: $('.input-account-id').test()
+      account_id: $('.input-account-id').text()
       type: 'taobao'
-      amount: $('input-amount').val()
-      order_id: $('input-order-id').val()
+      amount: $('.input-amount').val()
+      order_id: $('.input-order-id').val()
     , ->
       location.reload()
 

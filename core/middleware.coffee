@@ -29,7 +29,10 @@ exports.errorHandling = (req, res, next) ->
 exports.accountInfo = (req, res, next) ->
   req.inject [exports.parseToken], ->
     authenticator.authenticate req.token, (err, account) ->
-      req.account = account
+      if account
+        account.t = res.t
+        req.account = account
+
       next()
 
 exports.renderAccount = (req, res, next) ->

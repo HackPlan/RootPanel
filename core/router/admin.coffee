@@ -1,3 +1,4 @@
+{ObjectID} = require 'mongodb'
 express = require 'express'
 async = require 'async'
 _ = require 'underscore'
@@ -59,7 +60,7 @@ exports.get '/ticket', requireAdminAuthenticate, renderAccount, (req, res) ->
       closed: result.closed
 
 exports.post '/confirm_payment', requireAdminAuthenticate, (req, res) ->
-  mAccount.findOne {_id: req.body.account_id}, (err, account) ->
+  mAccount.findOne {_id: ObjectID(req.body.account_id)}, (err, account) ->
     unless account
       return res.error 'account_not_exist'
 
@@ -75,7 +76,7 @@ exports.post '/confirm_payment', requireAdminAuthenticate, (req, res) ->
       res.json {}
 
 exports.post '/delete_account', requireAdminAuthenticate, (req, res) ->
-  mAccount.findId req.body.account_id, (err, account) ->
+  mAccount.findOne {_id: ObjectID(req.body.account_id)}, (err, account) ->
     unless account
       return res.error 'account_not_exist'
 
