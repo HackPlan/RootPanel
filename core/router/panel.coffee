@@ -40,7 +40,6 @@ exports.get '/pay', requireAuthenticate, renderAccount, (req, res) ->
             callback()
 
         , ->
-          console.log deposit_logs
           callback null, deposit_logs
 
     billing_log: (callback) ->

@@ -1,5 +1,5 @@
 div
-  h2= t('plugins.bitcoin.')
-  p= t('plugins.bitcoin.view.payment_tips')
-  p= t('plugins.bitcoin.view.exchange_rate_tips', {rate10: (exchange_rate * 10).toFixed(4)})
+  h2= account.t('plugins.bitcoin.')
+  p= account.t('plugins.bitcoin.view.payment_tips')
+  p= account.t('plugins.bitcoin.view.exchange_rate_tips', {rate10: (exchange_rate * 10).toFixed(4)})
   pre= account.pluggable.bitcoin.bitcoin_deposit_address

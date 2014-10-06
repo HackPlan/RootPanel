@@ -21,5 +21,11 @@ exports.registerHook 'billing.payment_methods',
     , (err, html) ->
       callback html
 
+exports.registerHook 'view.pay.display_payment_details',
+  type: 'taobao'
+  filter: (account, deposit_log, callback) ->
+    callback account.t 'plugins.rpvhost.view.payment_details',
+      order_id: deposit_log.payload.order_id
+
 app.get '/', renderAccount, (req, res) ->
   res.render path.join(__dirname, './view/index')

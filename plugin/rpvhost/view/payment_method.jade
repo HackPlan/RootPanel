@@ -1,4 +1,4 @@
 div
-  h2 淘宝
-  p 拍下对应宝贝后付款即可，购买时注意选择服务器节点选项，备注填写你的用户名。
-  a.btn.btn-success(href='http://item.taobao.com/item.htm?id=#{config.plugins.rpvhost.taobao_item_id}') 淘宝购买
+  h2= account.t('plugins.rpvhost.taobao')
+  p= account.t('plugins.rpvhost.view.payment_tips')
+  a.btn.btn-success(href='http://item.taobao.com/item.htm?id=#{config.plugins.rpvhost.taobao_item_id}')= account.t('plugins.rpvhost.view.go_pay')
