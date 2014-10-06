@@ -5,6 +5,8 @@ module.exports =
   name: 'ssh'
   type: 'service'
 
+  dependencies: ['linux']
+
   action: action
   service: service
 

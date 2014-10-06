@@ -92,6 +92,17 @@ exports.selectHook = (account, hook_name) ->
       return false
 
 exports.initializePlugins = (callback) ->
+  checkDependencies = ->
+    all_plugins = _.union config.plugin.available_extensions, config.plugin.available_services
+
+    for plugin_name in all_plugins
+      plugin = require path.join __dirname, "../plugin/#{plugin_name}"
+
+      if plugin.dependencies
+        for dependence in plugin.dependencies
+          unless dependence in all_plugins
+            throw new Error "#{plugin_name} is Dependent on #{dependence} but not load"
+
   initializePlugin = (name, callback) ->
     plugin_path = path.join __dirname, "../plugin/#{name}"
     plugin = require plugin_path
@@ -112,6 +123,8 @@ exports.initializePlugins = (callback) ->
 
   initializeService = (plugin, callback) ->
     callback()
+
+  checkDependencies()
 
   async.parallel [
     (callback) ->
