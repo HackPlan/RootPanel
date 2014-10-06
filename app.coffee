@@ -10,14 +10,26 @@ express = require 'express'
 
 global.app = express()
 
-config = require './config'
+config = null
 
-if fs.existsSync config.web.listen
-  fs.unlinkSync config.web.listen
+exports.checkEnvironment = ->
+  config_file_path = path.join __dirname, 'config.coffee'
 
-fs.chmodSync path.join(__dirname, 'config.coffee'), 0o750
+  unless fs.existsSync config_file_path
+    default_config_file_path = path.join __dirname, './sample/rpvhost.config.coffee'
+    fs.writeFileSync config_file_path, fs.readFileSync default_config_file_path
+    console.log '[Warning] Copy sample config file to ./config.coffee'
+
+  fs.chmodSync config_file_path, 0o750
+
+  config = require './config'
+
+  if fs.existsSync config.web.listen
+    fs.unlinkSync config.web.listen
 
 exports.run = ->
+  exports.checkEnvironment()
+
   {user, password, host, name} = config.mongodb
 
   if user and password
