@@ -1,5 +1,5 @@
 div
-  h2 比特币
-  p 你可以直接向该地址发送比特币。在经过一次确认后，系统会实时地，自动为你折算充值金额，最小支付金额为 0.0005.
-  p 实时汇率：10 CNY = #{(exchange_rate * 10).toFixed(4)} BTC
+  h2= t('plugins.bitcoin.')
+  p= t('plugins.bitcoin.view.payment_tips')
+  p= t('plugins.bitcoin.view.exchange_rate_tips', {rate10: (exchange_rate * 10).toFixed(4)})
   pre= account.pluggable.bitcoin.bitcoin_deposit_address
