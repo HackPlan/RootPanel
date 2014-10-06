@@ -1,21 +1,22 @@
-header SSH
+header= t('plugins.ssh.')
 .col-md-6
   .panel.panel-warning
     .panel-heading
-       h3.panel-title 设置 SSH 密码
+       h3.panel-title= t('plugins.ssh.view.update_password')
     .panel-body
       .input-group.update-password
         input.form-control(type='password')
         span.input-group-btn
-          button.btn.btn-default(type='button') 提交
+          button.btn.btn-default(type='button')= t('common.submit')
+
 .col-md-6
   table(style= 'table-layout: fixed;').table.table-hover
     thead
       tr
-        td(style= 'width: 250px;') 进程
-        td 内存
-        td CPU
-        td 操作
+        td(style= 'width: 250px;')= t('plugins.ssh.process')
+        td= t('plugins.ssh.memory')
+        td= t('plugins.ssh.cpu')
+        td= t('common.action')
     tbody
       for process in plist
         tr(data-id= '#{process.pid}')
@@ -23,4 +24,4 @@ header SSH
           td #{(process.rss / 1024).toFixed(1)}M
           td #{process.cpu_per}%
           td
-            button.btn-kill.btn.btn-danger.btn-xs Kill
+            button.btn-kill.btn.btn-danger.btn-xs= t('plugins.ssh.kill')

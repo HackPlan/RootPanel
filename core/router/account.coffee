@@ -64,7 +64,7 @@ exports.post '/register', errorHandling, (req, res) ->
         authenticator.createToken account, 'full_access',
           ip: req.headers['x-real-ip']
           ua: req.headers['user-agent']
-        , (token)->
+        , (token) ->
           res.cookie 'token', token,
             expires: new Date(Date.now() + config.account.cookie_time)
 

@@ -30,7 +30,8 @@
     "generate": "生成",
     "id": "ID",
     "close": "关闭",
-    "create": "创建"
+    "create": "创建",
+    "submit": "提交"
   },
   "languages": {
     "zh_CN": "简体中文",
