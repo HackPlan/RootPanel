@@ -26,7 +26,22 @@ exports.get '/pay', requireAuthenticate, renderAccount, (req, res) ->
         sort:
           created_at: -1
         limit: LIMIT
-      .toArray callback
+      .toArray (err, deposit_logs) ->
+        async.each deposit_logs, (deposit_log, callback) ->
+          matched_hook = _.find pluggable.selectHook(req.account, 'view.pay.display_payment_details'), (hook) ->
+            return hook?.type == deposit_log.payload.type
+
+          unless matched_hook
+            return callback()
+
+          matched_hook.filter req.account, deposit_log, (l_payment_details) ->
+            deposit_log.l_payment_details = l_payment_details
+
+            callback()
+
+        , ->
+          console.log deposit_logs
+          callback null, deposit_logs
 
     billing_log: (callback) ->
       mBalanceLog.find

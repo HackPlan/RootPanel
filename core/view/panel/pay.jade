@@ -3,9 +3,6 @@ extends ../layout
 prepend header
   title #{t('common.charge')} | #{config.web.name}
 
-append header
-  link(rel='stylesheet', href='/style/panel/pay.css')
-
 block main
   .row
     header= t('common.charge')
@@ -26,14 +23,10 @@ block main
           tr
             td= moment(item.created_at).format('YYYY-MM-DD HH:mm:ss')
             td #{item.amount.toFixed(2)} #{t('plan.currency.' + config.billing.currency)}
-            if item.attribute.type == 'taobao'
-              td 淘宝支付 订单号：#{item.attribute.order_id}
-            else if item.attribute.type == 'bitcoin'
-              td
-                | 比特币支付 &nbsp;
-                a(href= 'https://blockchain.info/tx/#{item.attribute.order_id}')= item.attribute.order_id.slice(0, 40)
+            if item.l_payment_details
+              td!= item.l_payment_details
             else
-              td #{item.attribute.type} #{item.attribute.order_id}
+              td #{item.payload.type} #{item.payload.order_id}
 
   .row
     header= t('view.pay.billing_log')

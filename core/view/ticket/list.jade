@@ -1,21 +1,21 @@
 extends ../layout
 
-mixin displayTicketStatus(t_status)
-  - status = t('ticket_status.' + t_status)
+mixin displayTicketStatus(status)
+  - l_status = t('ticket_status.' + status)
 
-  if t_status == 'closed'
-    span.text-muted= status
-  else if t_status == 'open'
-    span.text-primary= status
-  else if t_status == 'pending'
-    span.text-warning= status
-  else if t_status == 'finish'
-    span.text-success= status
+  if status == 'closed'
+    span.text-muted= l_status
+  else if status == 'open'
+    span.text-primary= l_status
+  else if status == 'pending'
+    span.text-warning= l_status
+  else if status == 'finish'
+    span.text-success= l_status
   else
-    | #{status}
+    | #{l_status}
 
-mixin displayTicketsTable(t_status, tickets)
-  h4= t('ticket_status.' + t_status)
+mixin displayTicketsTable(status, tickets)
+  h4= t('ticket_status.' + status)
 
   table.table.table-hover
     thead

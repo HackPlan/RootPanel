@@ -30,6 +30,13 @@ exports.registerHook 'billing.payment_methods',
       , (err, html) ->
         callback html
 
+exports.registerHook 'view.pay.display_payment_details',
+  type: 'bitcoin'
+  filter: (account, deposit_log, callback) ->
+    callback account.t 'plugins.bitcoin.view.payment_details',
+      order_id: deposit_log.payload.order_id
+      short_order_id: deposit_log.payload.order_id[0 .. 40]
+
 app.post '/bitcoin/coinbase_callback', (req, res) ->
   mAccount.findOne
     'pluggable.bitcoin.bitcoin_deposit_address': req.body.address

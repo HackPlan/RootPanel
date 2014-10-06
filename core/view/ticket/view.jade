@@ -11,16 +11,16 @@ block main
     header
       | #{ticket.title} &nbsp;
 
-      - status = t('ticket_status.' + t_status)
+      - l_status = t('ticket_status.' + status)
 
       if ticket.status == 'closed'
-        span.small.text-muted= status
+        span.small.text-muted= l_status
       else if ticket.status == 'open'
-        span.small.text-primary= status
+        span.small.text-primary= l_status
       else if ticket.status == 'pending'
-        span.small.text-warning= status
+        span.small.text-warning= l_status
       else if ticket.status == 'finish'
-        span.small.text-success= status
+        span.small.text-success= l_status
 
     p!= ticket.content_html
 

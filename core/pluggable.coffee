@@ -39,6 +39,10 @@ exports.hooks =
       # name
       switch_buttons: []
 
+    pay:
+      # type, filter: function(account, deposit_log, callback(l_details))
+      display_payment_details: []
+
   service:
     'service_name':
       # action: function(account, callback)
