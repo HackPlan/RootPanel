@@ -28,7 +28,7 @@ exports.post '/register', errorHandling, (req, res) ->
     return res.error 'invalid_password'
 
   async.each pluggable.selectHook(req.account, 'account.username_filter'), (hook, callback) ->
-    hook.filter account, (is_allow) ->
+    hook.filter req, (is_allow) ->
       if is_allow
         callback()
       else

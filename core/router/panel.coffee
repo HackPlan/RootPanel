@@ -14,7 +14,7 @@ exports.get '/pay', requireAuthenticate, renderAccount, (req, res) ->
   async.parallel
     payment_methods: (callback) ->
       async.map pluggable.selectHook(req.account, 'billing.payment_methods'), (hook, callback) ->
-        hook.widget_generator req.account, (html) ->
+        hook.widget_generator req, (html) ->
           callback null, html
       , callback
 
@@ -34,8 +34,8 @@ exports.get '/pay', requireAuthenticate, renderAccount, (req, res) ->
           unless matched_hook
             return callback()
 
-          matched_hook.filter req.account, deposit_log, (l_payment_details) ->
-            deposit_log.l_payment_details = l_payment_details
+          matched_hook.filter req, deposit_log, (payment_details) ->
+            deposit_log.payment_details = payment_details
 
             callback()
 
@@ -70,7 +70,7 @@ exports.get '/', requireAuthenticate, renderAccount, (req, res) ->
         is_enable: name in req.account.billing.plans
 
     async.map pluggable.selectHook(account, 'view.panel.widgets'), (hook, callback) ->
-      hook.generator account, (html) ->
+      hook.generator req, (html) ->
         callback null, html
     , (err, widgets_html) ->
       view_data.widgets_html = widgets_html

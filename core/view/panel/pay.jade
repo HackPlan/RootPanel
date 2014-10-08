@@ -23,8 +23,8 @@ block main
           tr
             td= moment(item.created_at).format('YYYY-MM-DD HH:mm:ss')
             td #{item.amount.toFixed(2)} #{t('plan.currency.' + config.billing.currency)}
-            if item.l_payment_details
-              td!= item.l_payment_details
+            if item.payment_details
+              td!= item.payment_details
             else
               td #{item.payload.type} #{item.payload.order_id}
 

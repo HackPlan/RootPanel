@@ -1,7 +1,7 @@
 extends ../../../core/view/layout
 
 prepend header
-  title account.t('plugins.wiki.') | #{config.web.name}
+  title #{t('')} | #{config.web.name}
 
 block main
   for category in category_list

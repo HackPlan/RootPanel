@@ -11,29 +11,27 @@ module.exports = pluggable.createHelpers exports =
   type: 'extension'
 
 exports.registerHook 'account.before_register',
-  filter: (account, callback) ->
+  filter: (req, callback) ->
     bitcoin_secret = utils.randomSalt()
 
     bitcoin.genAddress bitcoin_secret, (address) ->
-      account.pluggable.bitcoin =
+      req.account.pluggable.bitcoin =
         bitcoin_deposit_address: address
         bitcoin_secret: bitcoin_secret
 
       callback()
 
 exports.registerHook 'billing.payment_methods',
-  widget_generator: (account, callback) ->
+  widget_generator: (req, callback) ->
     bitcoin.getExchangeRate config.billing.currency, (rate) ->
-      jade.renderFile path.join(__dirname, 'view/payment_method.jade'),
-        account: account
+      exports.render 'payment_method', req,
         exchange_rate: rate
-      , (err, html) ->
-        callback html
+      , callback
 
 exports.registerHook 'view.pay.display_payment_details',
   type: 'bitcoin'
-  filter: (account, deposit_log, callback) ->
-    callback account.t 'plugins.bitcoin.view.payment_details',
+  filter: (req, deposit_log, callback) ->
+    callback exports.t(req) 'view.payment_details',
       order_id: deposit_log.payload.order_id
       short_order_id: deposit_log.payload.order_id[0 .. 40]
 

@@ -1,6 +1,7 @@
 async = require 'async'
 path = require 'path'
 harp = require 'harp'
+jade = require 'jade'
 fs = require 'fs'
 _ = require 'underscore'
 
@@ -11,13 +12,13 @@ exports.plugins = {}
 
 exports.hooks =
   account:
-    # filter: function(account, callback(is_allow))
+    # filter: function(req, callback(is_allow))
     username_filter: []
-    # filter: function(account, callback)
+    # filter: function(req, callback)
     before_register: []
 
   billing:
-    # widget_generator: function(account, callback(html))
+    # widget_generator: function(req, callback(html))
     payment_methods: []
 
   view:
@@ -32,7 +33,7 @@ exports.hooks =
     panel:
       # path
       scripts: []
-      # generator: function(account, callback)
+      # generator: function(req, callback)
       widgets: []
       # path
       styles: []
@@ -40,14 +41,14 @@ exports.hooks =
       switch_buttons: []
 
     pay:
-      # type, filter: function(account, deposit_log, callback(l_details))
+      # type, filter: function(req, deposit_log, callback(l_details))
       display_payment_details: []
 
   service:
     'service_name':
-      # action: function(account, callback)
+      # action: function(req, callback)
       enable: []
-      # action: function(account, callback)
+      # action: function(req, callback)
       disable: []
 
   plugin:
@@ -143,5 +144,32 @@ exports.initializePlugins = (callback) ->
 exports.createHelpers = (plugin) ->
   plugin.registerHook = (hook_name, payload) ->
     return exports.registerHook hook_name, plugin, payload
+
+  plugin.t = (req) ->
+    return (name) ->
+      full_name = "plugins.#{plugin.name}.#{name}"
+      console.log full_name
+
+      args = _.toArray arguments
+      args[0] = full_name
+
+      full_result = req.res.locals.t.apply @, args
+
+      unless full_result == full_name
+        return full_result
+
+      return req.res.locals.t.apply @, _.toArray(arguments)
+
+  plugin.render = (template_name, req, view_data, callback) ->
+    template_path = path.join __dirname, "../plugin/#{plugin.name}/view/#{template_name}.jade"
+
+    locals = _.extend _.clone(req.res.locals), view_data,
+      account: req.account
+
+      t: plugin.t req
+
+    jade.renderFile template_path, locals, (err, html) ->
+      throw err if err
+      callback html
 
   return plugin

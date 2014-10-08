@@ -1,4 +1,4 @@
 div
-  h2= account.t('plugins.rpvhost.taobao')
-  p= account.t('plugins.rpvhost.view.payment_tips')
-  a.btn.btn-success(href='http://item.taobao.com/item.htm?id=#{config.plugins.rpvhost.taobao_item_id}')= account.t('plugins.rpvhost.view.go_pay')
+  h2= t('taobao')
+  p= t('view.payment_tips')
+  a.btn.btn-success(href='http://item.taobao.com/item.htm?id=#{app.config.plugins.rpvhost.taobao_item_id}')= t('view.go_pay')

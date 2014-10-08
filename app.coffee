@@ -77,21 +77,29 @@ exports.run = ->
     app.use require 'middleware-injector'
 
     app.use (req, res, next) ->
-      res.locals.app = app
-      res.locals.req = req
-      res.locals.config = app.config
-      res.locals.t = res.t = app.i18n.getTranslator req
-
-      res.locals.config.web.name = res.t app.config.web.t_name
-
-      res.locals.selectHook = (name) ->
-        return app.pluggable.selectHook req.account, name
+      req.res = res
 
       res.language = req.cookies.language ? config.i18n.default_language
       res.timezone = req.cookies.timezone ? config.i18n.default_timezone
 
-      res.locals.moment = res.moment = ->
-        return moment.apply(@, arguments).locale(res.language).tz(res.timezone)
+      res.locals =
+        config: config
+        app: app
+        req: req
+        res: res
+
+        t: app.i18n.getTranslator req
+
+        selectHook: (name) ->
+          return app.pluggable.selectHook req.account, name
+
+        moment: ->
+          return moment.apply(@, arguments).locale(res.language).tz(res.timezone)
+
+      res.t = res.locals.t
+      res.moment = res.locals.moment
+
+      res.locals.config.web.name = res.t app.config.web.t_name
 
       next()
 
