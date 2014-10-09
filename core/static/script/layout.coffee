@@ -2,7 +2,7 @@ $ ->
   client_version = localStorage.getItem 'locale_version'
   latest_version = $('body').data 'locale-version'
 
-  if client_version  == latest_version
+  if client_version == latest_version
     window.i18n_data = JSON.parse localStorage.getItem 'locale_cache'
   else
     $.getJSON "/locale/", (result) ->

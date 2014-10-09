@@ -7,6 +7,10 @@ moment = require 'moment-timezone'
 redis = require 'redis'
 express = require 'express'
 {MongoClient} = require 'mongodb'
+session = require 'express-session'
+crypto = require 'crypto'
+csrf = require('csrf')()
+RedisStore = require('connect-redis')(session)
 
 global.app = express()
 
@@ -14,6 +18,7 @@ config = null
 
 exports.checkEnvironment = ->
   config_file_path = path.join __dirname, 'config.coffee'
+  session_key_path = path.join __dirname, 'session.key'
 
   unless fs.existsSync config_file_path
     default_config_file_path = path.join __dirname, './sample/rpvhost.config.coffee'
@@ -26,6 +31,9 @@ exports.checkEnvironment = ->
 
   if fs.existsSync config.web.listen
     fs.unlinkSync config.web.listen
+
+  unless fs.existsSync session_key_path
+    fs.writeFileSync session_key_path, crypto.randomBytes(48).toString('hex')
 
 exports.run = ->
   exports.checkEnvironment()
@@ -75,6 +83,31 @@ exports.run = ->
     app.use require('cookie-parser')()
 
     app.use require 'middleware-injector'
+
+    app.use session
+      store: new RedisStore
+        client: app.redis
+
+      resave: true
+      saveUninitialized: true
+      secret: fs.readFileSync path.join __dirname, 'session.key'
+
+    app.use (req, res, next) ->
+      unless req.session.csrf_secret
+        csrf.secret (err, secret) ->
+          req.session.csrf_secret = secret
+          req.session.csrf_token = csrf.token secret
+          next()
+
+      next()
+
+    app.use (req, res, next) ->
+      unless req.method == 'GET'
+        unless csrf.verify req.session.csrf_secret, req.params.csrf_token
+          res.status(403).send
+            error: 'invalid_csrf_token'
+
+      next()
 
     app.use (req, res, next) ->
       req.res = res

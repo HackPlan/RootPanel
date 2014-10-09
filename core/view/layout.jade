@@ -8,7 +8,7 @@ html
       for hook in selectHook('view.layout.styles')
         link(rel='stylesheet', href=hook.path)
 
-  body(data-username="#{account ? account.username : ''}", data-locale-version=app.i18n.clientLocaleHash(req))
+  body(data-username="#{account ? account.username : ''}", data-locale-version=app.i18n.clientLocaleHash(req), data-csrf-token=req.session.csrf_token)
     header.navbar-fixed-top
       .container
         nav.navbar.navbar-default.navbar-inverse(role='navigation')

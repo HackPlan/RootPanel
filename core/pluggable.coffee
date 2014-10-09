@@ -148,7 +148,6 @@ exports.createHelpers = (plugin) ->
   plugin.t = (req) ->
     return (name) ->
       full_name = "plugins.#{plugin.name}.#{name}"
-      console.log full_name
 
       args = _.toArray arguments
       args[0] = full_name
