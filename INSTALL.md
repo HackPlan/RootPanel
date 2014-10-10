@@ -67,7 +67,7 @@
     su rpadmin
     cd ~
 
-    git clone https://github.com/jysperm/RootPanel.git
+    git clone -b stable https://github.com/jysperm/RootPanel.git
     cd RootPanel
 
     cp sample/core.config.coffee config.coffee

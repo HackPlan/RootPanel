@@ -14,14 +14,11 @@ RootPanel 是一个高度插件化的，基于 Linux 的虚拟服务销售平台
     按实际使用流量实时结算的 ShadowSocks 代理。  
     示例站点：<http://greenshadow.net>
 
-* 朋友合租(开发中)
-* Xen VPS(开发中)
-
 ## 安装和使用
 
+* 稳定版本：`git clone -b stable https://github.com/jysperm/RootPanel.git`
 * 开发版本：`git clone https://github.com/jysperm/RootPanel.git`
-* 稳定版本：`npm install -g rootpanel`
-* Vagrant: `https://vagrantcloud.com/jysperm/boxes/rootpanel`
+* Vagrant: <https://vagrantcloud.com/jysperm/boxes/rootpanel>
 
 详细安装说明：[INSTALL.md](https://github.com/jysperm/RootPanel/blob/master/INSTALL.md)
 
@@ -30,14 +27,14 @@ RootPanel 是一个高度插件化的，基于 Linux 的虚拟服务销售平台
 请从 `sample` 中选择一个配置文件复制到根目录，重命名为 `config.coffee`:
 
     core.config.coffee          # 仅核心模块
-    shadowsocks.config.coffee   # ShadowSocks 代理服务
-    full.config.coffee          # 全功能虚拟主机
-    php-vhost.config.coffee     # PHP/MySQL 虚拟主机
-    node-vhost.config.coffee    # Node.js/Python/Golang 虚拟主机
-    share-vps.config.coffee     # 朋友合租
-    static.config.coffee        # 静态文件托管
-    git.config.coffee           # Git 托管
-    xen.config.coffee           # Xen VPS
+    shadowsocks.config.coffee   # ShadowSocks 代理服务 (重构中)
+    full.config.coffee          # 全功能虚拟主机 (重构中)
+    php-vhost.config.coffee     # PHP/MySQL 虚拟主机 (计划中)
+    node-vhost.config.coffee    # Node.js/Python/Golang 虚拟主机 (计划中)
+    share-vps.config.coffee     # 朋友合租 (计划中)
+    static.config.coffee        # 静态文件托管 (计划中)
+    git.config.coffee           # Git 托管 (计划中)
+    xen.config.coffee           # Xen VPS (计划中)
 
 ## 技术构成
 
