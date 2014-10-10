@@ -1,27 +1,28 @@
-service = require './service'
-monitor = require './monitor'
+{pluggable, config} = app
 
-{pluggable} = app
+linux = require './linux'
 
-app.view_hook.menu_bar.push
-  href: '/public/monitor/'
-  html: '服务器状态'
-
-module.exports =
+module.exports = pluggable.createHelpers exports =
   name: 'linux'
   type: 'service'
 
-  service: service
+exports.registerHook 'view.layout.menu_bar',
+  href: '/public/monitor/'
+  body: '服务器状态'
 
-  panel:
-    widget: service.widget
-    style:'/style/panel.css'
+exports.registerHook 'account.username_filter',
+  filter: (username, callback) ->
+    linux.getPasswdMap (passwd_map) ->
+      callback username in _.values passwd_map
 
-pluggable.account.username_filter.push (account, callback) ->
-  monitor.loadPasswd (passwd_cache) ->
-    if req.body.username in _.values(passwd_cache)
-      return callback false
+exports.registerHook 'view.panel.styles',
+  path: '/plugin/linux/style/panel.css'
 
-    callback true
+exports.registerHook 'view.panel.widgets',
+  generator: (req, callback) ->
 
-monitor.run()
+exports.registerServiceHook 'enable',
+  action: (req, callback) ->
+
+exports.registerServiceHook 'disable',
+  action: (req, callback) ->

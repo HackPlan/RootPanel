@@ -56,26 +56,6 @@ exports.loadMemoryInfo = (callback) ->
       swap_used_per: swap_used_per
       swap_free_per: swap_free_per
 
-exports.loadPasswd = (callback) ->
-  app.redis.get 'rp:passwd_cache', (err, result) ->
-    if result
-      passwd_cache = JSON.parse result
-      callback passwd_cache
-    else
-      fs.readFile '/etc/passwd', (err, content) ->
-        throw err if err
-        content = content.toString().split '\n'
-
-        passwd_cache = {}
-
-        for line in content
-          if line
-            [username, password, uid] = line.split ':'
-            passwd_cache[uid] = username
-
-        app.redis.setex 'rp:passwd_cache', 120, JSON.stringify(passwd_cache), ->
-          callback passwd_cache
-
 exports.getProcessList = (callback) ->
   app.redis.get 'rp:process_list', (err, plist) ->
     if plist
