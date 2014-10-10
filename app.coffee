@@ -35,8 +35,16 @@ exports.checkEnvironment = ->
   unless fs.existsSync session_key_path
     fs.writeFileSync session_key_path, crypto.randomBytes(48).toString('hex')
 
+exports.loadCoreTemplates = ->
+  app.template_data = {}
+
+  for filename in fs.readdirSync "#{__dirname}/core/template"
+    template_name = path.basename filename, path.extname(filename)
+    app.template_data[template_name] = fs.readFileSync "#{__dirname}/core/template/#{filename}"
+
 exports.run = ->
   exports.checkEnvironment()
+  exports.loadCoreTemplates()
 
   {user, password, host, name} = config.mongodb
 
@@ -72,10 +80,6 @@ exports.run = ->
     app.middleware = require './core/middleware'
     app.notification = require './core/notification'
     app.authenticator = require './core/authenticator'
-
-    app.template_data =
-      ticket_create_email: fs.readFileSync('./core/template/ticket_create_email.html').toString()
-      ticket_reply_email: fs.readFileSync('./core/template/ticket_reply_email.html').toString()
 
     app.use connect.json()
     app.use connect.urlencoded()
