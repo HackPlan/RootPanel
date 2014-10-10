@@ -24,10 +24,10 @@ html
               for hook in selectHook('view.layout.menu_bar')
                 if hook.target
                   li
-                    a(href=hook.href, target=hook.target)= hook.body
+                    a(href=hook.href, target=hook.target)= t(hook.t_body)
                 else
                   li
-                    a(href=hook.href)= hook.body
+                    a(href=hook.href)= t(hook.t_body)
             ul.nav.navbar-nav.navbar-right
               if account
                 li

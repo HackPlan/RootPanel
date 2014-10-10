@@ -12,7 +12,7 @@ module.exports = pluggable.createHelpers exports =
 
 exports.registerHook 'view.layout.menu_bar',
   href: '/wiki/'
-  body: '用户手册'
+  t_body: 'plugins.wiki.'
 
 for category_name in fs.readdirSync("#{__dirname}/../../WIKI")
   for file_name in fs.readdirSync("#{__dirname}/../../WIKI/#{category_name}")

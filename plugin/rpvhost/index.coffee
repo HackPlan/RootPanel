@@ -11,7 +11,7 @@ module.exports = pluggable.createHelpers exports =
 exports.registerHook 'view.layout.menu_bar',
   href: '//blog.rpvhost.net'
   target: '_blank'
-  body: '官方博客'
+  t_body: 'plugins.rpvhost.official_blog'
 
 exports.registerHook 'billing.payment_methods',
   widget_generator: (req, callback) ->

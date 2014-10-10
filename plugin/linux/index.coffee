@@ -8,7 +8,7 @@ module.exports = pluggable.createHelpers exports =
 
 exports.registerHook 'view.layout.menu_bar',
   href: '/public/monitor/'
-  body: '服务器状态'
+  t_body: 'plugins.linux.server_monitor'
 
 exports.registerHook 'account.username_filter',
   filter: (username, callback) ->

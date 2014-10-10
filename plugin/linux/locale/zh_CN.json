@@ -1,4 +1,5 @@
 {
   "name": "Linux",
+  "server_monitor": "服务器状态",
   "description": "Linux 是 RP 主机的基础服务，负责进行资源限制"
 }
