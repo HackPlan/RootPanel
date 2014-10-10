@@ -12,9 +12,9 @@ exports.plugins = {}
 
 exports.hooks =
   account:
-    # filter: function(req, callback(is_allow))
+    # filter: function(username, callback(is_allow))
     username_filter: []
-    # filter: function(req, callback)
+    # filter: function(account, callback)
     before_register: []
 
   billing:
@@ -87,6 +87,8 @@ exports.selectHook = (account, hook_name) ->
   return _.filter pointer, (hook) ->
     if hook.plugin_info.type == 'extension'
       return true
+    else if account.meta == 'any'
+      return true
     else if hook.plugin_info.name in account.billing.services
       return true
     else
@@ -144,6 +146,9 @@ exports.initializePlugins = (callback) ->
 exports.createHelpers = (plugin) ->
   plugin.registerHook = (hook_name, payload) ->
     return exports.registerHook hook_name, plugin, payload
+
+  plugin.registerServiceHook = (hook_name, payload) ->
+    return plugin.registerHook "service.#{plugin.name}.#{hook_name}", payload
 
   plugin.t = (req) ->
     return (name) ->

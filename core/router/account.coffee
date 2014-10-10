@@ -27,8 +27,8 @@ exports.post '/register', errorHandling, (req, res) ->
   unless utils.rx.password.test req.body.password
     return res.error 'invalid_password'
 
-  async.each pluggable.selectHook(req.account, 'account.username_filter'), (hook, callback) ->
-    hook.filter req, (is_allow) ->
+  async.each pluggable.selectHook({meta: 'any'}, 'account.username_filter'), (hook, callback) ->
+    hook.filter req.body.username, (is_allow) ->
       if is_allow
         callback()
       else
