@@ -1,24 +1,21 @@
 $ ->
-  $.ajaxSetup
-    contentType: 'application/json; charset=UTF-8'
+  client_version = localStorage.getItem 'locale_version'
+  latest_version = $('body').data 'locale-version'
 
-  window.request = (url, param, options, callback) ->
-    unless callback
-      callback = options
+  if client_version == latest_version
+    window.i18n_data = JSON.parse localStorage.getItem 'locale_cache'
+  else
+    $.getJSON "/locale/", (result) ->
+      window.i18n_data = result
 
-    jQueryMethod = $[options.method ? 'post']
-
-    jQueryMethod url, JSON.stringify param
-    .fail (jqXHR) ->
-      if jqXHR.responseJSON?.error
-        alert window.t "error_code.#{jqXHR.responseJSON.error}"
-      else
-        alert jqXHR.statusText
-    .success callback
+      localStorage.setItem 'locale_version', latest_version
+      localStorage.setItem 'locale_content', JSON.stringify result
 
   $('nav a').each ->
     if $(@).attr('href') == location.pathname
       $(@).parent().addClass('active')
+
+  $('.label-language').text $.cookie('language')
 
   if window.location.hash == '#redirect'
     $('#site-not-exist').modal 'show'
@@ -29,32 +26,21 @@ $ ->
     .success ->
       location.reload()
 
-  window.i18n_data = {}
+  $('.action-switch-language').click (e) ->
+    e.preventDefault()
 
-  window.t = (name) ->
-    keys = name.split '.'
+    language = $(@).data 'language'
 
-    result = window.i18n_data
+    $.cookie 'language', language,
+      expires: 365
+      path: '/'
 
-    for item in keys
-      unless result[item] == undefined
-        result = result[item]
+    $('.label-language').text language
 
-    if result == undefined or typeof result == 'object'
-      return name
+    if $('body').data 'username'
+      request '/account/update_preferences/',
+        language: language
+      , ->
+        location.reload()
     else
-      return result
-
-  window.tErr = (name) ->
-    return "error_code.#{name}"
-
-  client_version = localStorage.getItem 'locale_version'
-  current_version = "#{($ 'body').data 'locale'}"
-
-  if client_version  == current_version
-    window.i18n_data = JSON.parse(localStorage.getItem 'locale_content')
-  else
-    $.getJSON "/locale/#{$.cookie('language')}", (data) ->
-      window.i18n_data = data
-      localStorage.setItem 'locale_version', current_version
-      localStorage.setItem 'locale_content', JSON.stringify data
+      location.reload()

@@ -7,17 +7,37 @@ moment = require 'moment-timezone'
 redis = require 'redis'
 express = require 'express'
 {MongoClient} = require 'mongodb'
+session = require 'express-session'
+crypto = require 'crypto'
+csrf = require('csrf')()
+RedisStore = require('connect-redis')(session)
 
 global.app = express()
 
-config = require './config'
+config = null
 
-if fs.existsSync config.web.listen
-  fs.unlinkSync config.web.listen
+exports.checkEnvironment = ->
+  config_file_path = path.join __dirname, 'config.coffee'
+  session_key_path = path.join __dirname, 'session.key'
 
-fs.chmodSync path.join(__dirname, 'config.coffee'), 0o750
+  unless fs.existsSync config_file_path
+    default_config_file_path = path.join __dirname, './sample/rpvhost.config.coffee'
+    fs.writeFileSync config_file_path, fs.readFileSync default_config_file_path
+    console.log '[Warning] Copy sample config file to ./config.coffee'
+
+  fs.chmodSync config_file_path, 0o750
+
+  config = require './config'
+
+  if fs.existsSync config.web.listen
+    fs.unlinkSync config.web.listen
+
+  unless fs.existsSync session_key_path
+    fs.writeFileSync session_key_path, crypto.randomBytes(48).toString('hex')
 
 exports.run = ->
+  exports.checkEnvironment()
+
   {user, password, host, name} = config.mongodb
 
   if user and password
@@ -57,35 +77,69 @@ exports.run = ->
       ticket_create_email: fs.readFileSync('./core/template/ticket_create_email.html').toString()
       ticket_reply_email: fs.readFileSync('./core/template/ticket_reply_email.html').toString()
 
-    app.localeVersion = config.i18n.version
     app.use connect.json()
     app.use connect.urlencoded()
-    app.use connect.cookieParser()
     app.use connect.logger()
+    app.use require('cookie-parser')()
 
     app.use require 'middleware-injector'
-    app.use app.i18n.initI18nData
+
+    app.use session
+      store: new RedisStore
+        client: app.redis
+
+      resave: true
+      saveUninitialized: true
+      secret: fs.readFileSync path.join __dirname, 'session.key'
 
     app.use (req, res, next) ->
-      res.locals.app = app
-      res.locals.config = app.config
-      res.locals.t = res.t = app.i18n.getTranslator req.cookies.language
+      unless req.session.csrf_secret
+        csrf.secret (err, secret) ->
+          req.session.csrf_secret = secret
+          req.session.csrf_token = csrf.token secret
+          next()
 
-      res.locals.selectHook = (name) ->
-        return app.pluggable.selectHook req.account, name
+      next()
 
-      language = req.cookies.language ? config.i18n.default_language
-      timezone = req.cookies.timezone ? config.i18n.default_timezone
+    app.use (req, res, next) ->
+      unless req.method == 'GET'
+        unless csrf.verify req.session.csrf_secret, req.params.csrf_token
+          res.status(403).send
+            error: 'invalid_csrf_token'
 
-      res.locals.moment = res.moment = ->
-        return moment.apply(@, arguments).locale(language).tz(timezone)
+      next()
+
+    app.use (req, res, next) ->
+      req.res = res
+
+      res.language = req.cookies.language ? config.i18n.default_language
+      res.timezone = req.cookies.timezone ? config.i18n.default_timezone
+
+      res.locals =
+        config: config
+        app: app
+        req: req
+        res: res
+
+        t: app.i18n.getTranslator req
+
+        selectHook: (name) ->
+          return app.pluggable.selectHook req.account, name
+
+        moment: ->
+          return moment.apply(@, arguments).locale(res.language).tz(res.timezone)
+
+      res.t = res.locals.t
+      res.moment = res.locals.moment
+
+      res.locals.config.web.name = res.t app.config.web.t_name
 
       next()
 
     app.set 'views', path.join(__dirname, 'core/view')
     app.set 'view engine', 'jade'
 
-    app.get '/locale/:language', app.i18n.downloadLocales
+    app.get '/locale/:language?', app.i18n.downloadLocales
 
     app.use '/account', require './core/router/account'
     app.use '/billing', require './core/router/billing'

@@ -19,7 +19,7 @@ sample =
 
   groups: ['root']
 
-  settings:
+  preferences:
     avatar_url: 'http://ruby-china.org/avatar/efcc15b92617a95a09f514a9bff9e6c3?s=58'
     language: 'zh_CN'
     timezone: 'Asia/Shanghai'
@@ -78,9 +78,9 @@ exports.register = (account, callback) ->
 
     groups: []
 
-    settings:
+    preferences:
       avatar_url: "//ruby-china.org/avatar/#{utils.md5(email)}?s=58"
-      language: config.i18n.default_language
+      language: 'auto'
       timezone: config.i18n.default_timezone
 
     billing:
@@ -98,7 +98,7 @@ exports.register = (account, callback) ->
     tokens: []
 
   async.each pluggable.selectHook(account, 'account.before_register'), (hook, callback) ->
-    hook.filter account, callback
+    hook.filter req, callback
   , ->
     exports.insert account, (err, result) ->
       callback _.first result

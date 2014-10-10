@@ -1,30 +1,21 @@
 extends ../layout
 
 mixin displayTicketStatus(status)
+  - l_status = t('ticket_status.' + status)
+
   if status == 'closed'
-    span.text-muted 已关闭
+    span.text-muted= l_status
   else if status == 'open'
-    span.text-primary 开放的
+    span.text-primary= l_status
   else if status == 'pending'
-    span.text-warning 等待处理
+    span.text-warning= l_status
   else if status == 'finish'
-    span.text-success 已完成
+    span.text-success= l_status
   else
-    | #{status}
+    | #{l_status}
 
-mixin showTickets(tickets)
-  for ticket in tickets
-    tr(data-id= '#{ticket._id}')
-      td
-        a(href='/ticket/view/?id=#{ticket._id}')= ticket.title
-      td
-        mixin displayTicketStatus(ticket.status)
-
-prepend header
-  title #{t('ticket.ticket_list')} | #{config.web.name}
-
-block main
-  header= t('ticket.ticket_list')
+mixin displayTicketsTable(status, tickets)
+  h4= t('ticket_status.' + status)
 
   table.table.table-hover
     thead
@@ -32,24 +23,37 @@ block main
         th= t('ticket.title')
         th= t('ticket.status')
     tbody
-      if tickets
-        mixin showTickets(tickets)
+      for ticket in tickets
+        tr(data-id='#{ticket._id}')
+          td
+            a(href='/ticket/view/?id=#{ticket._id}')= ticket.title
+          td
+            mixin displayTicketStatus(ticket.status)
 
-      if pending
-        mixin showTickets(pending)
+prepend header
+  title #{t('ticket.ticket_list')} | #{config.web.name}
 
-      if open
-        mixin showTickets(open)
+block main
+  header= t('ticket.ticket_list')
 
-      if finish
-        mixin showTickets(finish)
+  if tickets
+    mixin displayTicketsTable('related', tickets)
 
-      if closed
-        mixin showTickets(closed)
+  if pending && pending.length
+    mixin displayTicketsTable('pending', pending)
+
+  if open && open.length
+    mixin displayTicketsTable('open', open)
+
+  if finish && finish.length
+    mixin displayTicketsTable('finish', finish)
+
+  if closed && closed.length
+    mixin displayTicketsTable('closed', closed)
 
 prepend sidebar
   .row
     if tickets
       a.btn.btn-lg.btn-success(href='/ticket/create/')= t('ticket.create_ticket')
     else
-      a.btn.btn-lg.btn-success(href='/admin/ticket/') 工单列表
+      a.btn.btn-lg.btn-success(href='/admin/ticket/')= t('ticket.ticket_list')

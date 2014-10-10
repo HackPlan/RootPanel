@@ -100,7 +100,7 @@ exports.generateBilling = (account, plan_name, callback) ->
     last_billing_at: new_last_billing_at
     amount_inc: -amount
 
-exports.joinPlan = (account, plan_name, callback) ->
+exports.joinPlan = (req, account, plan_name, callback) ->
   original_account = account
   plan_info = config.plans[plan_name]
 
@@ -119,12 +119,12 @@ exports.joinPlan = (account, plan_name, callback) ->
   , (err, account) ->
     async.each _.difference(account.billing.services, original_account.billing.services), (service_name, callback) ->
       async.each pluggable.selectHook(account, "service.#{service_name}.enable"), (hook, callback) ->
-        hook.action account, callback
+        hook.action req, callback
       , callback
     , ->
       callback()
 
-exports.leavePlan = (account, plan_name, callback) ->
+exports.leavePlan = (req, account, plan_name, callback) ->
   leaved_services = _.reject account.billing.services, (service_name) ->
     for item in _.without(account.billing.plans, plan_name)
       if service_name in config.plans[item].services
@@ -148,7 +148,7 @@ exports.leavePlan = (account, plan_name, callback) ->
   , (err, account) ->
     async.each leaved_services, (service_name, callback) ->
       async.each pluggable.selectHook(account, "service.#{service_name}.disable"), (hook, callback) ->
-        hook.action account, callback
+        hook.action req, callback
       , callback
     , ->
       callback()

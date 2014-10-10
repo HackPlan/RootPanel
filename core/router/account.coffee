@@ -14,8 +14,8 @@ exports.get '/register', renderAccount, (req, res) ->
 exports.get '/login', renderAccount, (req, res) ->
   res.render 'account/login'
 
-exports.get '/setting', requireAuthenticate, renderAccount, (req, res) ->
-  res.render 'account/setting'
+exports.get '/preferences', requireAuthenticate, renderAccount, (req, res) ->
+  res.render 'account/preferences'
 
 exports.post '/register', errorHandling, (req, res) ->
   unless utils.rx.username.test req.body.username
@@ -28,7 +28,7 @@ exports.post '/register', errorHandling, (req, res) ->
     return res.error 'invalid_password'
 
   async.each pluggable.selectHook(req.account, 'account.username_filter'), (hook, callback) ->
-    hook.filter account, (is_allow) ->
+    hook.filter req, (is_allow) ->
       if is_allow
         callback()
       else
@@ -64,7 +64,7 @@ exports.post '/register', errorHandling, (req, res) ->
         authenticator.createToken account, 'full_access',
           ip: req.headers['x-real-ip']
           ua: req.headers['user-agent']
-        , (token)->
+        , (token) ->
           res.cookie 'token', token,
             expires: new Date(Date.now() + config.account.cookie_time)
 
@@ -84,6 +84,9 @@ exports.post '/login', errorHandling, (req, res) ->
       ua: req.headers['user-agent']
     , (token) ->
       res.cookie 'token', token,
+        expires: new Date(Date.now() + config.account.cookie_time)
+
+      res.cookie 'language', account.settings.language,
         expires: new Date(Date.now() + config.account.cookie_time)
 
       res.json
@@ -135,12 +138,12 @@ exports.post '/update_email', requireAuthenticate, (req, res) ->
     , ->
       res.json {}
 
-exports.post '/update_setting', requireAuthenticate, (req, res) ->
+exports.post '/update_preferences', requireAuthenticate, (req, res) ->
   modifiers =
     $set: {}
 
   for k, v of req.body
-    unless k in ['qq']
+    unless k in ['qq', 'language']
       return res.error 'invalid_field'
 
     modifiers.$set["settings.#{k}"] = v

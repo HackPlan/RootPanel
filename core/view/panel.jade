@@ -10,13 +10,13 @@ append header
 
 block main
   .row
-    header 财务
-    p #{t('plan.balance')}: #{account.billing.balance.toFixed(2)} #{t('plan.currency.cny')}
+    header= t('view.panel.billing')
+    p #{t('plan.balance')}: #{account.billing.balance.toFixed(2)} #{t('plan.currency.' + config.billing.currency)}
     p
-      a(href= '/panel/pay/').btn.btn-success 充值
+      a(href= '/panel/pay/').btn.btn-success= t('common.charge')
 
   .row
-    header 付费方案
+    header= t('plan.')
     table.table.table-hover.plan-list
       tbody
         for plan in plans
@@ -26,18 +26,18 @@ block main
             td= t(plan.t_description)
             td
               if plan.is_enable
-                button.action-leave-plan.btn.btn-danger.btn-sm 退订方案
+                button.action-leave-plan.btn.btn-danger.btn-sm= t('plan.join')
               else
-                button.action-join-plan.btn.btn-success.btn-sm 订购方案
+                button.action-join-plan.btn.btn-success.btn-sm= t('plan.leave')
 
   if selectHook('view.panel.switch_buttons').length
     #service-switch.row
-      header 服务开关
+      header= t('view.panel.service_switch')
       for hook in selectHook('view.panel.switch_buttons')
         if account.attribute.plugin[hook.name].is_enable
-          button(data-name=hook.name).btn.btn-danger 关闭 #{t('plugins.' + hook.name + '.name')}
+          button(data-name=hook.name).btn.btn-danger #{t('common.disable')} #{t('plugins.' + hook.name + '.name')}
         else
-          button(data-name=hook.name).btn.btn-success 开启 #{t('plugins.' + hook.name + '.name')}
+          button(data-name=hook.name).btn.btn-success #{t('common.enable')} #{t('plugins.' + hook.name + '.name')}
 
   for widget_html in widgets_html
     != widget_html
@@ -45,9 +45,9 @@ block main
 prepend sidebar
   .row
     p
-      a.btn.btn-lg.btn-success(href='/ticket/list/') 工单
+      a.btn.btn-lg.btn-success(href='/ticket/list/')= t('ticket.')
     p
-      a.btn.btn-lg.btn-success(href='/account/setting/') 首选项
+      a.btn.btn-lg.btn-success(href='/account/preferences/')= t('account.preferences')
 
 append footer
   script(src='/script/panel.js')

@@ -10,7 +10,7 @@ module.exports =
 
   i18n:
     defaultLanguage: 'zh_CN'
-    availableLanguage: ['zh_CN']
+    availableLanguage: ['zh_CN', 'en']
 
   plugin:
     available_extensions: ['rpvhost']

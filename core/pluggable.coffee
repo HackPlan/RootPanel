@@ -1,6 +1,7 @@
 async = require 'async'
 path = require 'path'
 harp = require 'harp'
+jade = require 'jade'
 fs = require 'fs'
 _ = require 'underscore'
 
@@ -11,14 +12,14 @@ exports.plugins = {}
 
 exports.hooks =
   account:
-    # filter: function(account, callback(is_allow))
+    # filter: function(req, callback(is_allow))
     username_filter: []
-    # filter: function(account, callback)
+    # filter: function(req, callback)
     before_register: []
 
   billing:
-    # widget_generator: function(account, callback)
-    payment_method: []
+    # widget_generator: function(req, callback(html))
+    payment_methods: []
 
   view:
     layout:
@@ -32,19 +33,28 @@ exports.hooks =
     panel:
       # path
       scripts: []
-      # generator: function(account, callback)
+      # generator: function(req, callback)
       widgets: []
       # path
       styles: []
       # name
       switch_buttons: []
 
+    pay:
+      # type, filter: function(req, deposit_log, callback(l_details))
+      display_payment_details: []
+
   service:
     'service_name':
-      # action: function(account, callback)
+      # action: function(req, callback)
       enable: []
-      # action: function(account, callback)
+      # action: function(req, callback)
       disable: []
+
+  plugin:
+    wiki:
+      # t_category, t_title, language, content_markdown
+      pages: []
 
 exports.registerHook = (hook_name, plugin, payload) ->
   keys = hook_name.split '.'
@@ -83,6 +93,17 @@ exports.selectHook = (account, hook_name) ->
       return false
 
 exports.initializePlugins = (callback) ->
+  checkDependencies = ->
+    all_plugins = _.union config.plugin.available_extensions, config.plugin.available_services
+
+    for plugin_name in all_plugins
+      plugin = require path.join __dirname, "../plugin/#{plugin_name}"
+
+      if plugin.dependencies
+        for dependence in plugin.dependencies
+          unless dependence in all_plugins
+            throw new Error "#{plugin_name} is Dependent on #{dependence} but not load"
+
   initializePlugin = (name, callback) ->
     plugin_path = path.join __dirname, "../plugin/#{name}"
     plugin = require plugin_path
@@ -104,6 +125,8 @@ exports.initializePlugins = (callback) ->
   initializeService = (plugin, callback) ->
     callback()
 
+  checkDependencies()
+
   async.parallel [
     (callback) ->
       async.each config.plugin.available_extensions, (name, callback) ->
@@ -119,8 +142,33 @@ exports.initializePlugins = (callback) ->
   ], callback
 
 exports.createHelpers = (plugin) ->
-  plugin = _.extend plugin,
-    registerHook: (hook_name, payload) ->
-      return exports.registerHook hook_name, plugin, payload
+  plugin.registerHook = (hook_name, payload) ->
+    return exports.registerHook hook_name, plugin, payload
+
+  plugin.t = (req) ->
+    return (name) ->
+      full_name = "plugins.#{plugin.name}.#{name}"
+
+      args = _.toArray arguments
+      args[0] = full_name
+
+      full_result = req.res.locals.t.apply @, args
+
+      unless full_result == full_name
+        return full_result
+
+      return req.res.locals.t.apply @, _.toArray(arguments)
+
+  plugin.render = (template_name, req, view_data, callback) ->
+    template_path = path.join __dirname, "../plugin/#{plugin.name}/view/#{template_name}.jade"
+
+    locals = _.extend _.clone(req.res.locals), view_data,
+      account: req.account
+
+      t: plugin.t req
+
+    jade.renderFile template_path, locals, (err, html) ->
+      throw err if err
+      callback html
 
   return plugin

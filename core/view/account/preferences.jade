@@ -1,0 +1,69 @@
+extends ../layout
+
+prepend header
+  title #{t('account.preferences')} | #{config.web.name}
+
+block main
+  .row
+    header= t('view.preferences.options')
+    form.form-setting.form-horizontal
+      .form-group
+        label.col-sm-2.col-md-offset-1.control-label= t('view.preferences.qq')
+        .col-sm-5
+          input.input-qq.form-control(type='text', value=account.settings.qq)
+      .form-group
+        .col-sm-offset-3
+          button.action-save.btn.btn-lg.btn-success(type='button')= t('common.save')
+
+  .row
+    header= t('view.preferences.coupon_code')
+    form.form-coupon.form-horizontal
+      .form-group
+        label.col-sm-2.col-md-offset-1.control-label= t('view.preferences.code')
+        .col-sm-5
+          input.input-coupon_code.form-control(type='text')
+      .form-group
+        .col-sm-offset-3
+          button.action-use.btn.btn-lg.btn-success(type='button')= t('common.apply')
+
+  .row
+    header= t('view.preferences.update_password')
+    form.form-password.form-horizontal
+      .form-group
+        label.col-sm-2.col-md-offset-1.control-label= t('view.preferences.old_password')
+        .col-sm-5
+          input.input-old_password.form-control(type='password')
+      .form-group
+        label.col-sm-2.col-md-offset-1.control-label= t('view.preferences.new_password')
+        .col-sm-5
+          input.input-password.form-control(type='password')
+      .form-group
+        label.col-sm-2.col-md-offset-1.control-label= t('view.preferences.repeat_password')
+        .col-sm-5
+          input.input-password2.form-control(type='password')
+      .form-group
+        .col-sm-offset-3
+          button.action-update-password.btn.btn-lg.btn-info(type='button')= t('common.change')
+
+  .row
+    header= t('view.preferences.update_email')
+    form.form-email.form-horizontal
+      .form-group
+        label.col-sm-2.col-md-offset-1.control-label= t('view.preferences.current_email')
+        .col-sm-5
+          input.form-control(value=account.email, disabled)
+      .form-group
+        label.col-sm-2.col-md-offset-1.control-label= t('account.password')
+        .col-sm-5
+          input.input-password.form-control(type='password')
+      .form-group
+        label.col-sm-2.col-md-offset-1.control-label= t('view.preferences.new_email')
+        .col-sm-5
+          input.input-email.form-control(type='text')
+      .form-group
+        .col-sm-offset-3
+          button.action-update-email.btn.btn-lg.btn-info(type='button')= t('common.change')
+
+
+append footer
+  script(src='/script/account/setting.js')
