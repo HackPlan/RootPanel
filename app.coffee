@@ -90,13 +90,13 @@ exports.run = ->
 
       resave: true
       saveUninitialized: true
-      secret: fs.readFileSync path.join __dirname, 'session.key'
+      secret: fs.readFileSync(path.join __dirname, 'session.key').toString()
 
     app.use (req, res, next) ->
       unless req.session.csrf_secret
         csrf.secret (err, secret) ->
           req.session.csrf_secret = secret
-          req.session.csrf_token = csrf.token secret
+          req.session.csrf_token = csrf.create secret
           next()
 
       next()
