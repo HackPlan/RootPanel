@@ -16,6 +16,8 @@ exports.hooks =
     username_filter: []
     # filter: function(account, callback)
     before_register: []
+    # action: function(account, callback)
+    resources_limit_changed: []
 
   billing:
     # widget_generator: function(req, callback(html))
