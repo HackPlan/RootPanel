@@ -1,9 +1,9 @@
 module.exports =
   web:
-    name: 'RootPanel'
-    url: 'http://rpvhost.net'
+    t_name: 'plugins.rpvhost.site_name'
+    url: 'http://rp.rpvhost.net'
     listen: '/home/rpadmin/rootpanel.sock'
-    google_analytics_id: 'UA-49193300-2'
+    google_analytics_id: ''
 
   account:
     cookie_time: 30 * 24 * 3600 * 1000
