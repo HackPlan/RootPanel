@@ -34,3 +34,8 @@ exports.randomString = (length) ->
 
 exports.hashPassword = (password, password_salt) ->
   return exports.sha256 password_salt + exports.sha256(password)
+
+exports.wrapAsync = (func) ->
+  return (callback) ->
+    func (result) ->
+      callback null, result

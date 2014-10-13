@@ -1,5 +1,9 @@
+_ = require 'underscore'
+async = require 'async'
+
 {pluggable, config} = app
 {requireAuthenticate} = app.middleware
+{wrapAsync} = app.utils
 
 linux = require './linux'
 monitor = require './monitor'
@@ -46,21 +50,10 @@ exports.registerServiceHook 'disable',
 
 app.get '/public/monitor', requireAuthenticate, (req, res) ->
   async.parallel
-    resources_usage: (callback) ->
-      linux.getResourceUsageByAccounts (resources_usage) ->
-        callback null, resources_usage
-
-    system: (callback) ->
-      linux.getSystemInfo (system_info) ->
-        callback null, system_info
-
-    storage: (callback) ->
-      linux.getStorageInfo (storage_info) ->
-        callback null, storage_info
-
-    process_list: (callback) ->
-      linux.getProcessList (process_list) ->
-        callback null, process_list
+    resources_usage: wrapAsync linux.getResourceUsageByAccounts
+    system: wrapAsync linux.getSystemInfo
+    storage: wrapAsync linux.getStorageInfo
+    process_list: wrapAsync linux.getProcessList
 
   , (err, result) ->
     exports.render 'monitor', req, result, (html) ->

@@ -5,6 +5,7 @@ async = require 'async'
 _ = require 'underscore'
 
 {cache} = app
+{wrapAsync} = app.utils
 
 monitor = require './monitor'
 
@@ -239,13 +240,8 @@ exports.getResourceUsageByAccounts = (callback) ->
     is_json: true
   , (callback) ->
     async.parallel
-      storage_quota: (callback) ->
-        exports.getStorageQuota (storage_quota) ->
-          callback null, storage_quota
-
-      process_list: (callback) ->
-        exports.getProcessList (process_list) ->
-          callback null, process_list
+      storage_quota: wrapAsync exports.getStorageQuota
+      process_list: wrapAsync exports.getProcessList
 
     , (err, result) ->
       resources_usage_by_accounts = []
