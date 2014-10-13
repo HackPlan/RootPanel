@@ -39,6 +39,16 @@ exports.try = (key, options, setter, callback) ->
         options.command key, value, ->
           callback value
 
+exports.delete (key, param, callback) ->
+  unless callback
+    callback = param
+    param = {}
+
+  key = exports.hashKey key, param
+
+  redis.del key, ->
+    callback()
+
 exports.SET = ->
   return (key, value, callback) ->
     redis.set key, value, callback

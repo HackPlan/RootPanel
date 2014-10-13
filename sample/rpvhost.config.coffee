@@ -50,8 +50,6 @@ module.exports =
     password: 'password'
     prefix: 'RP'
 
-  redis_password: 'password'
-
   email:
     send_from: 'robot@rpvhost.net'
 
@@ -67,3 +65,6 @@ module.exports =
 
     rpvhost:
       taobao_item_id: '38370649858'
+
+    linux:
+      monitor_cycle: 30 * 1000

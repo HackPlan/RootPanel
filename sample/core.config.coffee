@@ -60,8 +60,6 @@ module.exports =
     password: 'password'
     prefix: 'RP'
 
-  redis_password: 'password'
-
   email:
     send_from: 'robot@rpvhost.net'
 

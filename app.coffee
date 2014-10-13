@@ -58,7 +58,7 @@ exports.run = ->
     app.db = db
 
     app.redis = redis.createClient 6379, '127.0.0.1',
-      auth_pass: config.redis_password
+      auth_pass: config.redis.password
 
     app.mailer = nodemailer.createTransport config.email.account
 

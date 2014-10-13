@@ -1,6 +1,8 @@
 {pluggable, config} = app
+{requireAuthenticate} = app.middleware
 
 linux = require './linux'
+monitor = require './monitor'
 
 module.exports = pluggable.createHelpers exports =
   name: 'linux'
@@ -23,10 +25,11 @@ exports.registerHook 'view.panel.styles',
 
 exports.registerHook 'view.panel.widgets',
   generator: (req, callback) ->
-    exports.render 'widget', req,
-      resources_usage: null
-      storage_usage: null
-    , callback
+    linux.getResourceUsageByAccounts (resources_usage) ->
+      exports.render 'widget', req,
+        resources_usage: resources_usage[req.account.username]
+      , (html) ->
+        callback html
 
 exports.registerHook 'account.resources_limit_changed',
   action: (account, callback) ->
@@ -40,3 +43,27 @@ exports.registerServiceHook 'enable',
 exports.registerServiceHook 'disable',
   action: (req, callback) ->
     linux.deleteUser req.account, callback
+
+app.get '/public/monitor', requireAuthenticate, (req, res) ->
+  async.parallel
+    resources_usage: (callback) ->
+      linux.getResourceUsageByAccounts (resources_usage) ->
+        callback null, resources_usage
+
+    system: (callback) ->
+      linux.getSystemInfo (system_info) ->
+        callback null, system_info
+
+    storage: (callback) ->
+      linux.getStorageInfo (storage_info) ->
+        callback null, storage_info
+
+    process_list: (callback) ->
+      linux.getProcessList (process_list) ->
+        callback null, process_list
+
+  , (err, result) ->
+    exports.render 'monitor', req, result, (html) ->
+      res.send html
+
+monitor.run()
