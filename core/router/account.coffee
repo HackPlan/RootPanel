@@ -8,13 +8,13 @@ _ = require 'underscore'
 
 module.exports = exports = express.Router()
 
-exports.get '/register', renderAccount, (req, res) ->
+exports.get '/register', (req, res) ->
   res.render 'account/register'
 
-exports.get '/login', renderAccount, (req, res) ->
+exports.get '/login', (req, res) ->
   res.render 'account/login'
 
-exports.get '/preferences', requireAuthenticate, renderAccount, (req, res) ->
+exports.get '/preferences', requireAuthenticate, (req, res) ->
   res.render 'account/preferences'
 
 exports.post '/register', errorHandling, (req, res) ->

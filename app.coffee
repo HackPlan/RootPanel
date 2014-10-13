@@ -140,6 +140,8 @@ exports.run = ->
 
       next()
 
+    app.use app.middleware.accountInfo
+
     app.set 'views', path.join(__dirname, 'core/view')
     app.set 'view engine', 'jade'
 

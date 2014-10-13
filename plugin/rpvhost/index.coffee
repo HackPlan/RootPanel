@@ -2,7 +2,6 @@ path = require 'path'
 jade = require 'jade'
 
 {pluggable, config} = app
-{renderAccount} = app.middleware
 
 module.exports = pluggable.createHelpers exports =
   name: 'rpvhost'
@@ -23,6 +22,6 @@ exports.registerHook 'view.pay.display_payment_details',
     callback exports.t(req) 'view.payment_details',
       order_id: deposit_log.payload.order_id
 
-app.get '/', renderAccount, (req, res) ->
+app.get '/', (req, res) ->
   exports.render 'index', req, {}, (html) ->
     res.send html
