@@ -118,9 +118,6 @@ exports.initializePlugins = (callback) ->
     if fs.existsSync path.join(plugin_path, 'static')
       app.use harp.mount("/plugin/#{name}", path.join(plugin_path, 'static'))
 
-    if plugin.router
-      app.use ("/plugin/#{name}"), plugin.router
-
     callback plugin
 
   initializeExtension = (plugin, callback) ->
