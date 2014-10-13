@@ -3,12 +3,6 @@ path = require 'path'
 monitor = require './monitor'
 
 module.exports =
-  enable: (account, callback) ->
-    callback()
-
-  delete: (account, callback) ->
-    callback()
-
   widget: (account, callback) ->
     mysql = require '../mysql/service'
     mongodb = require '../mongodb/service'
@@ -19,7 +13,6 @@ module.exports =
         mongodb: _.partial(mongodb.storage, account)
       , (err, plugin_storage) ->
         jade.renderFile path.join(__dirname, 'view/widget.jade'),
-          account: account
           resources_usage: do ->
             usage = monitor.resources_usage[account.username] ? {cpu: 0, memory: 0}
             return {
