@@ -89,6 +89,10 @@ exports.selectHook = (account, hook_name) ->
   return _.filter pointer, (hook) ->
     if hook.plugin_info.type == 'extension'
       return true
+    else if !hook.require_account
+      return true
+    else if !account
+      return false
     else if account.meta == 'any'
       return true
     else if hook.plugin_info.name in account.billing.services

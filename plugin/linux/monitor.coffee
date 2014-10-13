@@ -1,6 +1,8 @@
 child_process = require 'child_process'
 os = require 'os'
 fs = require 'fs'
+async = require 'async'
+_ = require 'underscore'
 
 {config} = app
 {mAccount} = app.models
