@@ -107,8 +107,8 @@ exports.run = ->
 
     app.use (req, res, next) ->
       unless req.method == 'GET'
-        unless csrf.verify req.session.csrf_secret, req.params.csrf_token
-          res.status(403).send
+        unless csrf.verify req.session.csrf_secret, req.body.csrf_token
+          return res.status(403).send
             error: 'invalid_csrf_token'
 
       next()
@@ -156,7 +156,8 @@ exports.run = ->
     app.pluggable.initializePlugins()
 
     app.get '/', (req, res) ->
-      res.redirect '/panel/'
+      unless res.headerSent
+        res.redirect '/panel/'
 
     app.use harp.mount './core/static'
 

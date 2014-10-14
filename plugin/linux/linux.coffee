@@ -257,3 +257,7 @@ exports.getResourceUsageByAccounts = (callback) ->
       callback resources_usage_by_accounts
 
   , callback
+
+exports.getResourceUsageByAccount = (callback) ->
+  exports.getResourceUsageByAccounts (resources_usage_by_accounts) ->
+    callback _.indexBy resources_usage_by_accounts, 'username'

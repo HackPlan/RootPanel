@@ -44,21 +44,22 @@ exports.post '/register', errorHandling, (req, res) ->
           username: req.body.username
         , (err, account) ->
           if account
-            return res.error 'username_exist'
-
-          callback account
+            callback 'username_exist'
+          else
+            callback()
 
       email: (callback) ->
         mAccount.findOne
           email: req.body.email
         , (err, account) ->
           if account
-            return res.error 'email_exist'
-
-          callback account
+            callback 'email_exist'
+          else
+            callback()
 
     , (err) ->
-      return if err
+      if err
+        return res.error err
 
       mAccount.register _.pick(req.body, 'username', 'email', 'password'), (account) ->
         authenticator.createToken account, 'full_access',

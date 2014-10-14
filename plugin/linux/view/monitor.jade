@@ -5,7 +5,7 @@ prepend head
 
 append head
   link(rel='stylesheet', href='/style/panel.css')
-  link(rel='stylesheet', href='/style/public/monitor.css')
+  link(rel='stylesheet', href='/plugin/linux/style/monitor.css')
 
 block content
   #content.container
@@ -119,6 +119,3 @@ block content
                 td= process.start
                 td= process.time
                 td!= _.escape(process.command).replace(/ /g, '&nbsp;')
-
-append footer
-  script(src='/script/panel.js')

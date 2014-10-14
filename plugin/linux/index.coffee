@@ -29,7 +29,8 @@ exports.registerHook 'view.panel.styles',
 
 exports.registerHook 'view.panel.widgets',
   generator: (req, callback) ->
-    linux.getResourceUsageByAccounts (resources_usage) ->
+    linux.getResourceUsageByAccount (resources_usage) ->
+      console.log resources_usage
       exports.render 'widget', req,
         resources_usage: resources_usage[req.account.username]
       , (html) ->

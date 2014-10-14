@@ -39,7 +39,11 @@
     "auto": "自动"
   },
   "error_code": {
-    "username_exist": "用户名已存在"
+    "username_exist": "用户名已存在",
+    "email_exist": "邮箱已存在",
+    "invalid_username": "用户名不符合要求",
+    "invalid_password": "密码不符合要求",
+    "invalid_email": "邮箱不符合要求"
   },
   "account": {
     "": "帐号",
