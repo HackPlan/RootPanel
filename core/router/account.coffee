@@ -8,13 +8,13 @@ _ = require 'underscore'
 
 module.exports = exports = express.Router()
 
-exports.get '/register', renderAccount, (req, res) ->
+exports.get '/register', (req, res) ->
   res.render 'account/register'
 
-exports.get '/login', renderAccount, (req, res) ->
+exports.get '/login', (req, res) ->
   res.render 'account/login'
 
-exports.get '/preferences', requireAuthenticate, renderAccount, (req, res) ->
+exports.get '/preferences', requireAuthenticate, (req, res) ->
   res.render 'account/preferences'
 
 exports.post '/register', errorHandling, (req, res) ->
@@ -27,8 +27,8 @@ exports.post '/register', errorHandling, (req, res) ->
   unless utils.rx.password.test req.body.password
     return res.error 'invalid_password'
 
-  async.each pluggable.selectHook(req.account, 'account.username_filter'), (hook, callback) ->
-    hook.filter req, (is_allow) ->
+  async.each pluggable.selectHook(null, 'account.username_filter'), (hook, callback) ->
+    hook.filter req.body.username, (is_allow) ->
       if is_allow
         callback()
       else
@@ -44,21 +44,22 @@ exports.post '/register', errorHandling, (req, res) ->
           username: req.body.username
         , (err, account) ->
           if account
-            return res.error 'username_exist'
-
-          callback account
+            callback 'username_exist'
+          else
+            callback()
 
       email: (callback) ->
         mAccount.findOne
           email: req.body.email
         , (err, account) ->
           if account
-            return res.error 'email_exist'
-
-          callback account
+            callback 'email_exist'
+          else
+            callback()
 
     , (err) ->
-      return if err
+      if err
+        return res.error err
 
       mAccount.register _.pick(req.body, 'username', 'email', 'password'), (account) ->
         authenticator.createToken account, 'full_access',

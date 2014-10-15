@@ -11,11 +11,11 @@ module.exports = pluggable.createHelpers exports =
   type: 'extension'
 
 exports.registerHook 'account.before_register',
-  filter: (req, callback) ->
+  filter: (account, callback) ->
     bitcoin_secret = utils.randomSalt()
 
     bitcoin.genAddress bitcoin_secret, (address) ->
-      req.account.pluggable.bitcoin =
+      account.pluggable.bitcoin =
         bitcoin_deposit_address: address
         bitcoin_secret: bitcoin_secret
 

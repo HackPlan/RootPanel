@@ -10,8 +10,7 @@
     vi /etc/hosts
 
     apt-get install mongodb=1:2.4.9-1ubuntu2
-    apt-get install nodejs git nginx redis-server ntp supervisor
-    apt-get install python g++ make screen wget zip unzip iftop vim curl htop iptraf nethogs
+    apt-get install python g++ make nodejs git nginx redis-server ntp supervisor
 
     npm install coffee-script -g
 
@@ -36,22 +35,22 @@
     
     vi /etc/nginx/sites-enabled/rpadmin
     
-    server {
-        listen 80 default_server;
-        listen [::]:80 default_server ipv6only=on;
-        rewrite ^/(.*)$ http://DOMAIN/#redirect permanent;
-    }
-
-    server {
-        listen 80;
-
-        server_name DOMAIN;
-
-        location / {
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_pass http://unix:/home/rpadmin/rootpanel.sock:/;
+        server {
+            listen 80 default_server;
+            listen [::]:80 default_server ipv6only=on;
+            rewrite ^/(.*)$ http://rp.rpvhost.net/#redirect permanent;
         }
-    }
+
+        server {
+            listen 80;
+
+            server_name rp.rpvhost.net;
+
+            location / {
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_pass http://unix:/home/rpadmin/rootpanel.sock:/;
+            }
+        }
 
     useradd -m rpadmin
     usermod -G rpadmin -a www-data
@@ -142,6 +141,7 @@
 ### Runtime
 
     # Shell
+    aot-get install screen wget zip unzip iftop vim curl htop iptraf nethogs
     apt-get install libcurl4-openssl-dev axel unrar-free emacs subversion subversion-tools tmux mercurial postfix
 
     # Golang

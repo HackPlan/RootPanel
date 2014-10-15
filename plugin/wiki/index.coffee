@@ -2,7 +2,6 @@ path = require 'path'
 fs = require 'fs'
 
 {pluggable} = app
-{renderAccount} = app.middleware
 
 wiki = require './wiki'
 
@@ -12,7 +11,7 @@ module.exports = pluggable.createHelpers exports =
 
 exports.registerHook 'view.layout.menu_bar',
   href: '/wiki/'
-  body: '用户手册'
+  t_body: 'plugins.wiki.'
 
 for category_name in fs.readdirSync("#{__dirname}/../../WIKI")
   for file_name in fs.readdirSync("#{__dirname}/../../WIKI/#{category_name}")
@@ -22,6 +21,6 @@ for category_name in fs.readdirSync("#{__dirname}/../../WIKI")
       language: 'zh_CN'
       content_markdown: fs.readFileSync("#{__dirname}/../../WIKI/#{category_name}/#{file_name}").toString()
 
-app.get '/wiki', renderAccount, wiki.index
+app.get '/wiki', wiki.index
 
-app.get '/wiki/:category/:title', renderAccount, wiki.page
+app.get '/wiki/:category/:title', wiki.page

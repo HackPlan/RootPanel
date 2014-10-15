@@ -29,16 +29,13 @@ exports.errorHandling = (req, res, next) ->
 exports.accountInfo = (req, res, next) ->
   req.inject [exports.parseToken], ->
     authenticator.authenticate req.token, (err, account) ->
-      req.account = account
+      if account
+        req.account = account
+        res.locals.account = _.extend account,
+          inGroup: (group_name) ->
+            return group_name in account.groups
+
       next()
-
-exports.renderAccount = (req, res, next) ->
-  req.inject [exports.accountInfo], ->
-    res.locals.account = _.extend req.account,
-      inGroup: (group_name) ->
-        return group_name in req.account?.groups
-
-    next()
 
 exports.requireAuthenticate = (req, res, next) ->
   req.inject [exports.accountInfo, exports.errorHandling], ->

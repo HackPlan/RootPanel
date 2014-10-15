@@ -1,4 +1,11 @@
 {
-  "name": "Linux",
-  "description": "Linux 是 RP 主机的基础服务，负责进行资源限制"
+  "": "Linux",
+  "server_monitor": "服务器状态",
+  "description": "Linux 是 RP 主机的基础服务，负责进行资源限制",
+  "widget": {
+    "hour_cpu": "一小时 CPU 时间",
+    "hour_memory": "一小时内存占用",
+    "storage": "储存空间",
+    "month_transfer": "月流量"
+  }
 }

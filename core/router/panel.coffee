@@ -2,13 +2,13 @@ express = require 'express'
 async = require 'async'
 _ = require 'underscore'
 
-{requireAuthenticate, renderAccount} = require './../middleware'
+{requireAuthenticate} = app.middleware
 {mAccount, mBalanceLog} = app.models
 {pluggable, billing, config} = app
 
 module.exports = exports = express.Router()
 
-exports.get '/pay', requireAuthenticate, renderAccount, (req, res) ->
+exports.get '/pay', requireAuthenticate, (req, res) ->
   LIMIT = 10
 
   async.parallel
@@ -57,7 +57,7 @@ exports.get '/pay', requireAuthenticate, renderAccount, (req, res) ->
     res.render 'panel/pay', _.extend result,
       nodes: _.values(config.nodes)
 
-exports.get '/', requireAuthenticate, renderAccount, (req, res) ->
+exports.get '/', requireAuthenticate, (req, res) ->
   billing.triggerBilling req.account, (account) ->
     view_data =
       account: account

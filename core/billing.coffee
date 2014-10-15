@@ -1,3 +1,4 @@
+stringify = require 'json-stable-stringify'
 async = require 'async'
 _ = require 'underscore'
 
@@ -122,7 +123,12 @@ exports.joinPlan = (req, account, plan_name, callback) ->
         hook.action req, callback
       , callback
     , ->
-      callback()
+      unless stringify(original_account.resources_limit) == stringify(account.resources_limit)
+        async.each pluggable.selectHook(account, 'account.resources_limit_changed'), (hook, callback) ->
+          hook.action account, callback
+        , callback
+      else
+        callback()
 
 exports.leavePlan = (req, account, plan_name, callback) ->
   leaved_services = _.reject account.billing.services, (service_name) ->
@@ -131,6 +137,8 @@ exports.leavePlan = (req, account, plan_name, callback) ->
         return true
 
     return false
+
+  original_account = account
 
   modifier =
     $pull:
@@ -147,11 +155,16 @@ exports.leavePlan = (req, account, plan_name, callback) ->
     new: true
   , (err, account) ->
     async.each leaved_services, (service_name, callback) ->
-      async.each pluggable.selectHook(account, "service.#{service_name}.disable"), (hook, callback) ->
+      async.each pluggable.selectHook(original_account, "service.#{service_name}.disable"), (hook, callback) ->
         hook.action req, callback
       , callback
     , ->
-      callback()
+      unless stringify(original_account.resources_limit) == stringify(account.resources_limit)
+        async.each pluggable.selectHook(account, 'account.resources_limit_changed'), (hook, callback) ->
+          hook.action account, callback
+        , callback
+      else
+        callback()
 
 exports.calcResourcesLimit = (plans) ->
   limit = {}

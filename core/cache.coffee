@@ -27,7 +27,7 @@ exports.try = (key, options, setter, callback) ->
   redis.get key, (err, value) ->
     if value != undefined
       if options.is_json
-        value = JSON.prase value
+        value = JSON.parse value
 
       callback value
 
@@ -38,6 +38,16 @@ exports.try = (key, options, setter, callback) ->
 
         options.command key, value, ->
           callback value
+
+exports.delete = (key, param, callback) ->
+  unless callback
+    callback = param
+    param = {}
+
+  key = exports.hashKey key, param
+
+  redis.del key, ->
+    callback()
 
 exports.SET = ->
   return (key, value, callback) ->

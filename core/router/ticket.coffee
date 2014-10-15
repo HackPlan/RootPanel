@@ -2,7 +2,7 @@ express = require 'express'
 async = require 'async'
 _ = require 'underscore'
 
-{requireAuthenticate, renderAccount, getParam, constructObjectID} = app.middleware
+{requireAuthenticate, getParam, constructObjectID} = app.middleware
 {mAccount, mTicket} = app.models
 {config, notification} = app
 
@@ -22,7 +22,7 @@ loadTicket = (req, res, next) ->
 
       next()
 
-exports.get '/list', requireAuthenticate, renderAccount, (req, res) ->
+exports.get '/list', requireAuthenticate, (req, res) ->
   mTicket.find
     $or: [
       account_id: req.account._id
@@ -36,10 +36,10 @@ exports.get '/list', requireAuthenticate, renderAccount, (req, res) ->
     res.render 'ticket/list',
       tickets: tickets
 
-exports.get '/create', requireAuthenticate, renderAccount, (req, res) ->
+exports.get '/create', requireAuthenticate, (req, res) ->
   res.render 'ticket/create'
 
-exports.get '/view', renderAccount, getParam, loadTicket, (req, res) ->
+exports.get '/view', getParam, loadTicket, (req, res) ->
   {ticket} = req
 
   async.map ticket.members, (member_id, callback) ->

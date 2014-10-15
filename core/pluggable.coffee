@@ -10,12 +10,19 @@ config = require './../config'
 
 exports.plugins = {}
 
+hookHelper = (options) ->
+  return _.extend [], options
+
 exports.hooks =
   account:
-    # filter: function(req, callback(is_allow))
-    username_filter: []
-    # filter: function(req, callback)
-    before_register: []
+    # filter: function(username, callback(is_allow))
+    username_filter: hookHelper
+      always_notice: true
+    # filter: function(account, callback)
+    before_register: hookHelper
+      always_notice: true
+    # action: function(account, callback)
+    resources_limit_changed: []
 
   billing:
     # widget_generator: function(req, callback(html))
@@ -56,6 +63,17 @@ exports.hooks =
       # t_category, t_title, language, content_markdown
       pages: []
 
+exports.createHookPoint = (hook_name) ->
+  keys = hook_name.split '.'
+
+  pointer = exports.hooks
+
+  for item in keys
+    if pointer[item] == undefined
+      pointer[item] = {}
+
+    pointer = pointer[item]
+
 exports.registerHook = (hook_name, plugin, payload) ->
   keys = hook_name.split '.'
   last_key = keys.pop()
@@ -87,6 +105,10 @@ exports.selectHook = (account, hook_name) ->
   return _.filter pointer, (hook) ->
     if hook.plugin_info.type == 'extension'
       return true
+    else if pointer.always_notice or hook.always_notice
+      return true
+    else if !account
+      return false
     else if hook.plugin_info.name in account.billing.services
       return true
     else
@@ -113,9 +135,6 @@ exports.initializePlugins = (callback) ->
 
     if fs.existsSync path.join(plugin_path, 'static')
       app.use harp.mount("/plugin/#{name}", path.join(plugin_path, 'static'))
-
-    if plugin.router
-      app.use ("/plugin/#{name}"), plugin.router
 
     callback plugin
 
@@ -144,6 +163,9 @@ exports.initializePlugins = (callback) ->
 exports.createHelpers = (plugin) ->
   plugin.registerHook = (hook_name, payload) ->
     return exports.registerHook hook_name, plugin, payload
+
+  plugin.registerServiceHook = (hook_name, payload) ->
+    return plugin.registerHook "service.#{plugin.name}.#{hook_name}", payload
 
   plugin.t = (req) ->
     return (name) ->

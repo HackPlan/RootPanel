@@ -3,6 +3,7 @@ nodemailer = require 'nodemailer'
 path = require 'path'
 harp = require 'harp'
 fs = require 'fs'
+morgan = require 'morgan'
 moment = require 'moment-timezone'
 redis = require 'redis'
 express = require 'express'
@@ -58,7 +59,7 @@ exports.run = ->
     app.db = db
 
     app.redis = redis.createClient 6379, '127.0.0.1',
-      auth_pass: config.redis_password
+      auth_pass: config.redis.password
 
     app.mailer = nodemailer.createTransport config.email.account
 
@@ -83,7 +84,7 @@ exports.run = ->
 
     app.use connect.json()
     app.use connect.urlencoded()
-    app.use connect.logger()
+    app.use morgan('dev')
     app.use require('cookie-parser')()
 
     app.use require 'middleware-injector'
@@ -107,8 +108,8 @@ exports.run = ->
 
     app.use (req, res, next) ->
       unless req.method == 'GET'
-        unless csrf.verify req.session.csrf_secret, req.params.csrf_token
-          res.status(403).send
+        unless csrf.verify req.session.csrf_secret, req.body.csrf_token
+          return res.status(403).send
             error: 'invalid_csrf_token'
 
       next()
@@ -140,6 +141,8 @@ exports.run = ->
 
       next()
 
+    app.use app.middleware.accountInfo
+
     app.set 'views', path.join(__dirname, 'core/view')
     app.set 'view engine', 'jade'
 
@@ -154,7 +157,8 @@ exports.run = ->
     app.pluggable.initializePlugins()
 
     app.get '/', (req, res) ->
-      res.redirect '/panel/'
+      unless res.headerSent
+        res.redirect '/panel/'
 
     app.use harp.mount './core/static'
 

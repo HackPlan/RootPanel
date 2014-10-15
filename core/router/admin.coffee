@@ -3,19 +3,19 @@ express = require 'express'
 async = require 'async'
 _ = require 'underscore'
 
-{requireAdminAuthenticate, renderAccount} = require './../middleware'
+{requireAdminAuthenticate} = app.middleware
 {plaggable} = app
 {mAccount, mTicket, mBalanceLog, mCouponCode} = app.models
 
 module.exports = exports = express.Router()
 
-exports.get '/', requireAdminAuthenticate, renderAccount, (req, res) ->
+exports.get '/', requireAdminAuthenticate, (req, res) ->
   mAccount.find().toArray (err, accounts) ->
     return res.render 'admin',
       accounts: accounts
       coupon_code_types: _.keys mCouponCode.type_meta
 
-exports.get '/ticket', requireAdminAuthenticate, renderAccount, (req, res) ->
+exports.get '/ticket', requireAdminAuthenticate, (req, res) ->
   async.parallel
     pending: (callback) ->
       mTicket.find
