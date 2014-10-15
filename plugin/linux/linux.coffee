@@ -25,7 +25,8 @@ exports.createUser = (account, callback) ->
 exports.deleteUser = (account, callback) ->
   async.series [
     (callback) ->
-      child_process.exec "sudo pkill -u #{account.username}", callback
+      child_process.exec "sudo pkill -u #{account.username}", ->
+        callback()
 
     (callback) ->
       child_process.exec "sudo userdel -rf #{account.username}", callback
@@ -39,6 +40,9 @@ exports.deleteUser = (account, callback) ->
       callback()
 
 exports.setResourceLimit = (account, callback) ->
+  unless 'linux' in account.billing.services
+    return callback()
+
   storage_limit = account.resources_limit.storage
   soft_limit = (storage_limit * 1024 * 0.8).toFixed()
   hard_limit = (storage_limit * 1024 * 1.2).toFixed()

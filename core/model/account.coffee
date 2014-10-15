@@ -97,7 +97,7 @@ exports.register = (account, callback) ->
 
     tokens: []
 
-  async.each pluggable.selectHook({meta: 'any'}, 'account.before_register'), (hook, callback) ->
+  async.each pluggable.selectHook(account, 'account.before_register'), (hook, callback) ->
     hook.filter account, callback
   , ->
     exports.insert account, (err, result) ->

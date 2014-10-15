@@ -123,7 +123,12 @@ exports.joinPlan = (req, account, plan_name, callback) ->
         hook.action req, callback
       , callback
     , ->
-      callback()
+      unless stringify(original_account.resources_limit) == stringify(account.resources_limit)
+        async.each pluggable.selectHook(account, 'account.resources_limit_changed'), (hook, callback) ->
+          hook.action account, callback
+        , callback
+      else
+        callback()
 
 exports.leavePlan = (req, account, plan_name, callback) ->
   leaved_services = _.reject account.billing.services, (service_name) ->
@@ -133,8 +138,7 @@ exports.leavePlan = (req, account, plan_name, callback) ->
 
     return false
 
-  original_resources_limit = account.resources_limit
-  new_resources_limit = exports.calcResourcesLimit _.without account.billing.plans, plan_name
+  original_account = account
 
   modifier =
     $pull:
@@ -142,7 +146,7 @@ exports.leavePlan = (req, account, plan_name, callback) ->
     $pullAll:
       'billing.services': leaved_services
     $set:
-      'resources_limit': new_resources_limit
+      'resources_limit': exports.calcResourcesLimit _.without account.billing.plans, plan_name
     $unset: {}
 
   modifier.$unset["billing.last_billing_at.#{plan_name}"] = true
@@ -151,11 +155,11 @@ exports.leavePlan = (req, account, plan_name, callback) ->
     new: true
   , (err, account) ->
     async.each leaved_services, (service_name, callback) ->
-      async.each pluggable.selectHook(account, "service.#{service_name}.disable"), (hook, callback) ->
+      async.each pluggable.selectHook(original_account, "service.#{service_name}.disable"), (hook, callback) ->
         hook.action req, callback
       , callback
     , ->
-      unless stringify(original_resources_limit) == stringify(new_resources_limit)
+      unless stringify(original_account.resources_limit) == stringify(account.resources_limit)
         async.each pluggable.selectHook(account, 'account.resources_limit_changed'), (hook, callback) ->
           hook.action account, callback
         , callback

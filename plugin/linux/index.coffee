@@ -43,6 +43,7 @@ exports.registerHook 'view.panel.widgets',
         callback html
 
 exports.registerHook 'account.resources_limit_changed',
+  always_notice: true
   action: (account, callback) ->
     linux.setResourceLimit account, callback
 

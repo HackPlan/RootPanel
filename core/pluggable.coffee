@@ -10,12 +10,17 @@ config = require './../config'
 
 exports.plugins = {}
 
+hookHelper = (options) ->
+  return _.extend [], options
+
 exports.hooks =
   account:
     # filter: function(username, callback(is_allow))
-    username_filter: []
+    username_filter: hookHelper
+      always_notice: true
     # filter: function(account, callback)
-    before_register: []
+    before_register: hookHelper
+      always_notice: true
     # action: function(account, callback)
     resources_limit_changed: []
 
@@ -100,10 +105,10 @@ exports.selectHook = (account, hook_name) ->
   return _.filter pointer, (hook) ->
     if hook.plugin_info.type == 'extension'
       return true
+    else if pointer.always_notice or hook.always_notice
+      return true
     else if !account
       return false
-    else if account.meta == 'any'
-      return true
     else if hook.plugin_info.name in account.billing.services
       return true
     else

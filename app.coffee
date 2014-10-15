@@ -3,6 +3,7 @@ nodemailer = require 'nodemailer'
 path = require 'path'
 harp = require 'harp'
 fs = require 'fs'
+morgan = require 'morgan'
 moment = require 'moment-timezone'
 redis = require 'redis'
 express = require 'express'
@@ -83,7 +84,7 @@ exports.run = ->
 
     app.use connect.json()
     app.use connect.urlencoded()
-    app.use connect.logger()
+    app.use morgan('dev')
     app.use require('cookie-parser')()
 
     app.use require 'middleware-injector'
