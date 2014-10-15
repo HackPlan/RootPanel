@@ -58,6 +58,17 @@ exports.hooks =
       # t_category, t_title, language, content_markdown
       pages: []
 
+exports.createHookPoint = (hook_name) ->
+  keys = hook_name.split '.'
+
+  pointer = exports.hooks
+
+  for item in keys
+    if pointer[item] == undefined
+      pointer[item] = {}
+
+    pointer = pointer[item]
+
 exports.registerHook = (hook_name, plugin, payload) ->
   keys = hook_name.split '.'
   last_key = keys.pop()
@@ -88,8 +99,6 @@ exports.selectHook = (account, hook_name) ->
 
   return _.filter pointer, (hook) ->
     if hook.plugin_info.type == 'extension'
-      return true
-    else if !hook.require_account
       return true
     else if !account
       return false
