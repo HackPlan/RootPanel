@@ -26,9 +26,9 @@ block main
             td= t(plan.t_description)
             td
               if plan.is_enable
-                button.action-leave-plan.btn.btn-danger.btn-sm= t('plan.join')
+                button.action-leave-plan.btn.btn-danger.btn-sm= t('plan.leave')
               else
-                button.action-join-plan.btn.btn-success.btn-sm= t('plan.leave')
+                button.action-join-plan.btn.btn-success.btn-sm= t('plan.join')
 
   if selectHook('view.panel.switch_buttons').length
     #service-switch.row
@@ -40,7 +40,7 @@ block main
           button(data-name=hook.name).btn.btn-success #{t('common.enable')} #{t('plugins.' + hook.name + '.name')}
 
   for widget_html in widgets_html
-    != widget_html
+    .row!= widget_html
 
 prepend sidebar
   .row

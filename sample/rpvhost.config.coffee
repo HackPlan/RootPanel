@@ -35,8 +35,13 @@ module.exports =
         unit: 24 * 3600 * 1000
         price: 10 / 30
 
-      services: []
-      resources: {}
+      services: ['ssh', 'linux']
+
+      resources:
+        cpu: 144
+        storage: 520
+        transfer: 39
+        memory: 27
 
   mongodb:
     user: 'rpadmin'

@@ -55,6 +55,7 @@ exports.getPasswdMap = (callback) ->
     is_json: true
   , (callback) ->
     fs.readFile '/etc/passwd', (err, content) ->
+      console.error err if err
       result = {}
 
       for line in _.compact(content.toString().split '\n')
@@ -70,6 +71,7 @@ exports.getMemoryInfo = (callback) ->
     is_json: true
   , (callback) ->
     fs.readFile '/proc/meminfo', (err, content) ->
+      console.error err if err
       mapping = {}
 
       for line in content.toString().split('\n')
@@ -113,6 +115,8 @@ exports.getProcessList = (callback) ->
   , (callback) ->
     exports.getPasswdMap (passwd_map) ->
       child_process.exec "sudo ps awufxn", (err, stdout) ->
+        console.error err if err
+
         callback _.map stdout.split('\n')[1 ... -1], (item) ->
           result = /^\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(.+)$/.exec item
 
@@ -146,6 +150,7 @@ exports.getStorageQuota = (callback) ->
     is_json: true
   , (callback) ->
     child_process.exec "sudo repquota -a", (err, stdout) ->
+      console.error err if err
       lines = _.filter stdout.split('\n')[5...-1], (i) -> i
 
       lines = _.map lines, (line) ->
@@ -157,7 +162,7 @@ exports.getStorageQuota = (callback) ->
 
         return {
           username: username
-          size_used: parseInt size_used
+          size_used: parseFloat (parseInt(size_used) / 1024 / 1024).toFixed(1)
           inode_used: parseInt inode_used
         }
 
@@ -192,7 +197,7 @@ exports.getSystemInfo = (callback) ->
         hostname: os.hostname()
         cpu: os.cpus()[0]['model']
         uptime: os.uptime()
-        loadavg: _.map os.loadavg(), (i) -> i.toFixed(2)
+        loadavg: _.map os.loadavg(), (i) -> parseFloat(i.toFixed(2))
         time: new Date()
 
   , callback
@@ -203,6 +208,7 @@ exports.getStorageInfo = (callback) ->
     is_json: true
   , (callback) ->
     child_process.exec "df -h", (err, stdout) ->
+      console.error err if err
       disks = {}
 
       for line in stdout.split('\n')
@@ -244,6 +250,7 @@ exports.getResourceUsageByAccounts = (callback) ->
       process_list: wrapAsync exports.getProcessList
 
     , (err, result) ->
+        console.error err if err
       resources_usage_by_accounts = []
 
       for username, usage of monitor.resources_usage
@@ -258,6 +265,7 @@ exports.getResourceUsageByAccounts = (callback) ->
 
   , callback
 
-exports.getResourceUsageByAccount = (callback) ->
+exports.getResourceUsageByAccount = (account, callback) ->
   exports.getResourceUsageByAccounts (resources_usage_by_accounts) ->
-    callback _.indexBy resources_usage_by_accounts, 'username'
+    callback _.findWhere resources_usage_by_accounts,
+      username: account.username

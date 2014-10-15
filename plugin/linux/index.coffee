@@ -29,10 +29,16 @@ exports.registerHook 'view.panel.styles',
 
 exports.registerHook 'view.panel.widgets',
   generator: (req, callback) ->
-    linux.getResourceUsageByAccount (resources_usage) ->
-      console.log resources_usage
+    linux.getResourceUsageByAccount req.account, (resources_usage) ->
+      resources_usage ?=
+        username: req.account.username
+        cpu: 0
+        memory: 0
+        storage: 0
+        process: 0
+
       exports.render 'widget', req,
-        resources_usage: resources_usage[req.account.username]
+        usage: resources_usage
       , (html) ->
         callback html
 
@@ -43,7 +49,7 @@ exports.registerHook 'account.resources_limit_changed',
 exports.registerServiceHook 'enable',
   action: (req, callback) ->
     linux.createUser req.account, ->
-      linux.setResourceLimit account, callback
+      linux.setResourceLimit req.account, callback
 
 exports.registerServiceHook 'disable',
   action: (req, callback) ->

@@ -59,7 +59,8 @@ exports.monitoring = (callback) ->
               IncreaseAccountUsage account_name, 'memory', memory_usage
 
           for username, usage of resources_usage
-            usage.memory = usage.memory / recent_resources_usage.length / config.plugins.linux.monitor_cycle * 1000
+            base = recent_resources_usage.length / config.plugins.linux.monitor_cycle * 1000
+            usage.memory = parseFloat (usage.memory / base).toFixed(1)
 
           async.each _.keys(resources_usage), (username, callback) ->
             mAccount.search username, (err, account) ->
