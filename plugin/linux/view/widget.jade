@@ -10,10 +10,10 @@ mixin displayProgressBar(now, limit, unit)
       span #{now} / #{limit} #{unit}
 
 header= t('')
-table.table.table-hover
+table.table.table-hover.linux-widget-table
   tbody
     tr
-      td(style='width: 200px;')= t('widget.hour_cpu')
+      td= t('widget.hour_cpu')
       td
         mixin displayProgressBar(usage.cpu, limit.cpu, 's')
     tr
