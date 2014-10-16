@@ -1,10 +1,9 @@
 extends ../../../core/view/layout
 
-prepend head
-  title 服务器状态 | #{t('app.name')}
+prepend header
+  title #{t('server_monitor')} | #{t('app.name')}
 
-append head
-  link(rel='stylesheet', href='/style/panel.css')
+append header
   link(rel='stylesheet', href='/plugin/linux/style/monitor.css')
 
 block content
@@ -33,10 +32,10 @@ block content
                 td #{(system.uptime / 3600).toFixed(1)} hours
               tr
                 td Loadavg
-                td= system.loadavg
+                td= system.loadavg.join(', ')
               tr
                 td Address
-                td= system.address
+                td= system.address.join(', ')
 
       .col-md-8
         .panel.panel-default
@@ -106,7 +105,7 @@ block content
               th TIME
               th COMMAND
           tbody
-            for process in last_plist
+            for process in process_list
               tr
                 td= process.user
                 td= process.pid

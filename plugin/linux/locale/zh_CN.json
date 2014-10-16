@@ -7,5 +7,10 @@
     "hour_memory": "一小时内存占用",
     "storage": "储存空间",
     "month_transfer": "月流量"
+  },
+  "monitor": {
+    "system": "操作系统",
+    "system_info": "系统信息",
+    "cpu": "CPU"
   }
 }

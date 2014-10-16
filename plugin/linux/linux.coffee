@@ -249,6 +249,7 @@ exports.getResourceUsageByAccounts = (callback) ->
     command: cache.SETEX 20
     is_json: true
   , (callback) ->
+    console.log 'getResourceUsageByAccounts'
     async.parallel
       storage_quota: wrapAsync exports.getStorageQuota
       process_list: wrapAsync exports.getProcessList
