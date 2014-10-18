@@ -1,4 +1,5 @@
 /node_modules
+/coverage-reporter.html
 
 /.vagrant
 /package.box

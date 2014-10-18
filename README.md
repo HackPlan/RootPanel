@@ -16,8 +16,8 @@ RootPanel 是一个高度插件化的，基于 Linux 的虚拟服务销售平台
 
 ## 安装和使用
 
-* 稳定版本：`git clone -b stable https://github.com/jysperm/RootPanel.git`
-* 开发版本：`git clone https://github.com/jysperm/RootPanel.git`
+* 稳定版本：`git clone -b stable https://github.com/jysperm/RootPanel.git` [![Build Status](https://travis-ci.org/jysperm/RootPanel.svg?branch=stable)](https://travis-ci.org/jysperm/RootPanel)
+* 开发版本：`git clone https://github.com/jysperm/RootPanel.git` [![Build Status](https://travis-ci.org/jysperm/RootPanel.svg?branch=master)](https://travis-ci.org/jysperm/RootPanel)
 * Vagrant: <https://vagrantcloud.com/jysperm/boxes/rootpanel>
 
 详细安装说明：[INSTALL.md](https://github.com/jysperm/RootPanel/blob/master/INSTALL.md)

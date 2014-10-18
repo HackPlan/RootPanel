@@ -7,17 +7,30 @@ app.libs =
   async: require 'async'
   bodyParser: require 'body-parser'
   cookieParser: require 'cookie-parser'
+  crypto: require 'crypto'
   depd: require 'depd'
   express: require 'express'
   fs: require 'fs'
+  harp: require 'harp'
   middlewareInjector: require 'middleware-injector'
   mongoose: require 'mongoose'
   morgan: require 'morgan'
   nodemailer: require 'nodemailer'
   path: require 'path'
   redis: require 'redis'
+  redisStore: require 'connect-redis'
+  expressSession: require 'express-session'
 
-{cookieParser, bodyParser, depd, express, fs, nodemailer, path} = exports.libs
+{cookieParser, crypto, bodyParser, depd, express, fs, harp, middlewareInjector, mongoose} = exports.libs
+{morgan, nodemailer, path, redis, redisStore, expressSession} = exports.libs
+
+RedisStore = redisStore expressSession
+
+app.logger = do ->
+  unless process.env.NODE_ENV == 'test'
+    return console.log
+
+  return ->
 
 app.package = require './package'
 app.deprecate = depd 'rootpanel'
@@ -26,9 +39,14 @@ do ->
   config_path = path.join __dirname, 'config.coffee'
 
   unless fs.existsSync config_path
-    default_config_path = path.join __dirname, './sample/core.config.coffee'
-    fs.writeFileSync config_file_path, fs.readFileSync default_config_path
-    app.deprecate 'config.coffee not found, copy sample config to ./config.coffee'
+    unless process.env.TRAVIS == 'true'
+      app.deprecate 'config.coffee not found, copy sample config to ./config.coffee'
+
+      default_config = 'core'
+    else
+      default_config = 'travis-ci'
+
+    fs.writeFileSync config_path, fs.readFileSync path.join __dirname, "./sample/#{default_config}.config.coffee"
 
   fs.chmodSync config_path, 0o750
 
@@ -42,6 +60,7 @@ do  ->
 
   unless fs.existsSync session_key_path
     fs.writeFileSync session_key_path, crypto.randomBytes(48).toString('hex')
+    fs.chmodSync session_key_path, 0o750
 
 app.config = config
 app.db = require './core/db'
@@ -73,20 +92,20 @@ app.models =
   SecurityLog: require './core/model/security_log'
   Ticket: require './core/model/ticket'
 
-app.use bodyParser.json()
-app.use morgan 'dev'
-app.use cookieParser()
-app.use middlewareInjector
+app.express.use bodyParser.json()
+app.express.use morgan 'dev'
+app.express.use cookieParser()
+app.express.use middlewareInjector
 
-app.use session
+app.express.use expressSession
   store: new RedisStore
     client: app.redis
 
-  resave: true
-  saveUninitialized: true
+  resave: false
+  saveUninitialized: false
   secret: fs.readFileSync(path.join __dirname, 'session.key').toString()
 
-app.use (req, res, next) ->
+app.express.use (req, res, next) ->
   unless req.session.csrf_secret
     csrf.secret (err, secret) ->
       req.session.csrf_secret = secret
@@ -95,7 +114,7 @@ app.use (req, res, next) ->
 
   next()
 
-app.use (req, res, next) ->
+app.express.use (req, res, next) ->
   unless req.method == 'GET'
     unless csrf.verify req.session.csrf_secret, req.body.csrf_token
       return res.status(403).send
@@ -103,7 +122,7 @@ app.use (req, res, next) ->
 
   next()
 
-app.use (req, res, next) ->
+app.express.use (req, res, next) ->
   req.res = res
 
   res.language = req.cookies.language ? config.i18n.default_language
@@ -130,29 +149,29 @@ app.use (req, res, next) ->
 
   next()
 
-app.use app.middleware.accountInfo
+app.express.use app.middleware.accountInfo
 
-app.set 'views', path.join(__dirname, 'core/view')
-app.set 'view engine', 'jade'
+app.express.set 'views', path.join(__dirname, 'core/view')
+app.express.set 'view engine', 'jade'
 
-app.get '/locale/:language?', app.i18n.downloadLocales
+app.express.get '/locale/:language?', app.i18n.downloadLocales
 
-app.use '/account', require './core/router/account'
-app.use '/billing', require './core/router/billing'
-app.use '/ticket', require './core/router/ticket'
-app.use '/admin', require './core/router/admin'
-app.use '/panel', require './core/router/panel'
+app.express.use '/account', require './core/router/account'
+app.express.use '/billing', require './core/router/billing'
+app.express.use '/ticket', require './core/router/ticket'
+app.express.use '/admin', require './core/router/admin'
+app.express.use '/panel', require './core/router/panel'
 
 app.pluggable.initializePlugins()
 
-app.get '/', (req, res) ->
+app.express.get '/', (req, res) ->
   unless res.headerSent
     res.redirect '/panel/'
 
-app.use harp.mount './core/static'
+app.express.use harp.mount './core/static'
 
-app.billing.run()
+app.express.listen config.web.listen, ->
+  if fs.existsSync config.web.listen
+    fs.chmodSync config.web.listen, 0o770
 
-app.listen config.web.listen, ->
-  fs.chmodSync config.web.listen, 0o770
-  console.log "RootPanel start at #{config.web.listen}"
+  app.logger "RootPanel start at #{config.web.listen}"
