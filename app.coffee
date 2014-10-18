@@ -3,6 +3,8 @@
 global.app = exports
 
 app.libs =
+  _: require 'underscore'
+  async: require 'async'
   bodyParser: require 'body-parser'
   cookieParser: require 'cookie-parser'
   depd: require 'depd'
@@ -13,6 +15,7 @@ app.libs =
   morgan: require 'morgan'
   nodemailer: require 'nodemailer'
   path: require 'path'
+  redis: require 'redis'
 
 {cookieParser, bodyParser, depd, express, fs, nodemailer, path} = exports.libs
 
@@ -27,7 +30,7 @@ do ->
     fs.writeFileSync config_file_path, fs.readFileSync default_config_path
     app.deprecate 'config.coffee not found, copy sample config to ./config.coffee'
 
-  fs.chmodSync config_file_path, 0o750
+  fs.chmodSync config_path, 0o750
 
 config = require './config'
 
@@ -41,8 +44,8 @@ do  ->
     fs.writeFileSync session_key_path, crypto.randomBytes(48).toString('hex')
 
 app.config = config
-app.db = require './db'
-app.templates = require './templates'
+app.db = require './core/db'
+app.templates = require './core/templates'
 app.i18n = require './core/i18n'
 app.utils = require './core/utils'
 app.cache = require './core/cache'
@@ -59,6 +62,8 @@ app.express = express()
 
 app.redis = redis.createClient 6379, '127.0.0.1',
   auth_pass: config.redis.password
+
+app.schemas = {}
 
 app.models =
   Account: require './core/model/account'

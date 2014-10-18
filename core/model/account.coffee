@@ -1,66 +1,81 @@
 async = require 'async'
 _ = require 'underscore'
 
-module.exports = exports = app.db.collection 'accounts'
+{_, async, mongoose} = app.libs
 
-billing = require '../billing'
-config = require '../../config'
-pluggable = require '../pluggable'
-utils = require '../utils'
+Token = mongoose.Schema
+  type:
+    type: String
 
-mBalance = require './balance_log'
+  token:
+    type: String
 
-sample =
-  username: 'jysperm'
-  password: '53673f434686ce045477f066f30eded55a9bb535a6cec7b73a60972ccafddb2a'
-  password_salt: '53673f434686b535a6cec7b73a60ce045477f066f30eded55a9b972ccafddb2a'
-  email: 'jysperm@gmail.com'
-  created_at: Date()
+  created_at:
+    type: Date
 
-  groups: ['root']
+  update_at:
+    type: Date
 
-  preferences:
-    avatar_url: 'http://ruby-china.org/avatar/efcc15b92617a95a09f514a9bff9e6c3?s=58'
-    language: 'zh_CN'
-    timezone: 'Asia/Shanghai'
-    QQ: '184300584'
+  payload:
+    type: Object
 
-  billing:
-    services: ['shadowsocks']
-    plans: ['all']
+Account = mongoose.Schema
+  username:
+    type: String
+    required: true
 
-    last_billing_at:
-      all: new Date()
+  email:
+    type: String
+    required: true
 
-    balance: 100
-    arrears_at: new Date()
+  password:
+    type: String
 
-  pluggable:
-    bitcoin:
-      bitcoin_deposit_address: '13v2BTCMZMHg5v87susgg86HFZqXERuwUd'
-      bitcoin_secret: '53673f434686b535a6cec7b73a60ce045477f066f30eded55a9b972ccafddb2a'
+  password_salt:
+    type: String
 
-    phpfpm:
-      is_enbale: false
-
-    nginx:
-      sites: []
-
-  resources_limit:
-    cpu: 144
-    storage: 520
-    transfer: 39
-    memory: 27
+  groups:
+    type: Array
+    default: []
 
   tokens: [
-    type: 'access_token'
-    token: 'b535a6cec7b73a60c53673f434686e04972ccafddb2a5477f066f30eded55a9b'
-    created_at: Date()
-    updated_at: Date()
-    payload:
-      ip: '123.184.237.163'
-      ua: 'Mozilla/5.0 (Intel Mac OS X) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.102'
+    Token
   ]
+
+  preferences:
+    type: Object
+    default: {}
+
+  billing:
+    services:
+      type: Array
+      default: []
+
+    plans:
+      type: Array
+      default: []
+
+    last_billing_at:
+      type: Object
+      default: {}
+
+    balance:
+      type: Number
+      default: 0
+
+    arrears_at:
+      type: Date
+      default: null
+
+  pluggable:
+    type: Object
+    default: {}
+
+  resources_limit:
+    type: Object
+    default: {}
+
+module.exports = mongoose.model 'Account', Account
 
 # @param account: username, email, password
 # @param callback(account)
