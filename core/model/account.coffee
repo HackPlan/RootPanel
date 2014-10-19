@@ -5,28 +5,34 @@ _ = require 'underscore'
 
 Token = mongoose.Schema
   type:
+    required: true
     type: String
+    enum: ['full_access']
 
   token:
+    required: true
     type: String
 
   created_at:
     type: Date
+    default: Date.now
 
   update_at:
     type: Date
+    default: Date.now
 
   payload:
     type: Object
+    default: {}
 
 Account = mongoose.Schema
   username:
-    type: String
     required: true
+    type: String
 
   email:
-    type: String
     required: true
+    type: String
 
   password:
     type: String

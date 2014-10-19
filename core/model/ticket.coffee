@@ -1,34 +1,70 @@
-{ObjectID} = require 'mongodb'
-{markdown} = require 'markdown'
-_ = require 'underscore'
+{_, ObjectId, mongoose} = app.libs
 
 module.exports = exports = app.db.collection 'tickets'
 
-mAccount = require './account'
+Reply = mongoose.Schema
+  _id:
+    type: ObjectId
 
-sample =
-  account_id: ObjectID()
-  created_at: Date()
-  updated_at: Date()
-  title: 'Ticket Title'
-  content: 'Ticket Content(Markdown)'
-  content_html: 'Ticket Conetnt(HTML)'
-  status: 'open/pending/finish/closed'
+  account_id:
+    required: true
+    type: ObjectId
+    ref: 'Account'
 
-  options: {}
+  created_at:
+    type: Date
+    default: Date.now
+
+  content:
+    type: String
+
+  content_html:
+    type: String
+
+  option:
+    type: Object
+    default: {}
+
+Ticket = mongoose.Schema
+  account_id:
+    required: true
+    type: ObjectId
+    ref: 'Account'
+
+  created_at:
+    type: Date
+    default: Date.now
+
+  updated_at:
+    type: Date
+    default: Date.now
+
+  title:
+    type: String
+
+  content:
+    type: String
+
+  content_html:
+    type: String
+
+  status:
+    type: String
+    enum: ['open', 'pending', 'finish', 'closed']
+
+  option:
+    type: Object
+    default: {}
 
   members: [
-    ObjectID()
+    ObjectId
   ]
 
   replies: [
-    _id: ObjectID()
-    account_id: ObjectID()
-    created_at: Date()
-    content: 'Reply Content(Markdown)'
-    content_html: 'Reply Conetnt(HTML)'
-    options: {}
+    Reply
   ]
+
+module.exports = mongoose.model 'Ticket', Ticket
 
 exports.createTicket = (account, title, content, members, status, options, callback) ->
   exports.insert

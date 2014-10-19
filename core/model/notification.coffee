@@ -1,17 +1,36 @@
-{ObjectID} = require 'mongodb'
-async = require 'async'
-_ = require 'underscore'
+{_, ObjectId, mongoose} = app.libs
 
 module.exports = exports = app.db.collection 'notifications'
 
-sample =
-  account_id: ObjectID()
-  group_name: 'root'
-  created_at: Date()
-  level: 'notice/event/log'
-  type: 'payment_success'
-  meta:
-    amount: 10
+Notification = mongoose.Schema
+  account_id:
+    type: ObjectId
+    ref: 'Account'
+    default: null
+
+  group_name:
+    type: String
+    default: null
+
+  type:
+    required: true
+    type: String
+    enum: ['payment_success']
+
+  level:
+    required: true
+    type: String
+    enum: ['notice', 'event', 'log']
+
+  created_at:
+    type: Date
+    default: Date.now
+
+  payload:
+    type: Object
+    default: {}
+
+module.exports = mongoose.model 'Notification', Notification
 
 exports.createNotice = (account, group_name, type, level, meta, callback) ->
   exports.insert

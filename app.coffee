@@ -21,6 +21,8 @@ app.libs =
   redisStore: require 'connect-redis'
   expressSession: require 'express-session'
 
+  ObjectId: (require 'mongoose').Schema.Types.ObjectId
+
 {cookieParser, crypto, bodyParser, depd, express, fs, harp, middlewareInjector, mongoose} = exports.libs
 {morgan, nodemailer, path, redis, redisStore, expressSession} = exports.libs
 
