@@ -44,16 +44,16 @@ exports.registerHook 'view.panel.widgets',
 
 exports.registerHook 'account.resources_limit_changed',
   always_notice: true
-  action: (account, callback) ->
+  filter: (account, callback) ->
     linux.setResourceLimit account, callback
 
 exports.registerServiceHook 'enable',
-  action: (req, callback) ->
+  filter: (req, callback) ->
     linux.createUser req.account, ->
       linux.setResourceLimit req.account, callback
 
 exports.registerServiceHook 'disable',
-  action: (req, callback) ->
+  filter: (req, callback) ->
     linux.deleteUser req.account, callback
 
 app.get '/public/monitor', requireAuthenticate, (req, res) ->

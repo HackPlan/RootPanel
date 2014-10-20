@@ -70,14 +70,7 @@ app.db = require './core/db'
 app.pluggable = require './core/pluggable'
 
 app.schemas = {}
-
-app.models =
-  Account: {}
-  BalanceLog: {}
-  CouponCode: {}
-  Notification: {}
-  SecurityLog: {}
-  Ticket: {}
+app.models = {}
 
 app.pluggable.initializePlugins()
 
@@ -89,7 +82,8 @@ require './core/model/security_log'
 require './core/model/ticket'
 
 for name, schema of app.schemas
-  copy(mongoose.model(name, schema)).to app.models[name]
+  model = mongoose.model name, schema
+  app.models[name] = model
 
 app.templates = require './core/templates'
 app.i18n = require './core/i18n'

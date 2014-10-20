@@ -1,5 +1,8 @@
 process.env.NODE_ENV = 'test'
 
+global.fs = require 'fs'
+global.async = require 'async'
+
 require("chai").should()
 
 if process.env.COV_TEST == 'true'

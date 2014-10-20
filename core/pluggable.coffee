@@ -15,7 +15,11 @@ hookHelper = (options) ->
 
 exports.hooks =
   app:
-    # action: function(callback)
+    # action: function
+    models_created: hookHelper
+      global_event: true
+
+    # action: function
     started: hookHelper
       global_event: true
 
@@ -35,7 +39,7 @@ exports.hooks =
     # filter: function(account, callback)
     before_register: hookHelper
       global_event: true
-    # action: function(account, callback)
+    # filter: function(account, callback)
     resources_limit_changed: []
 
   billing:
@@ -67,9 +71,9 @@ exports.hooks =
 
   service:
     'service_name':
-      # action: function(req, callback)
+      # filter: function(req, callback)
       enable: []
-      # action: function(req, callback)
+      # filter: function(req, callback)
       disable: []
 
   plugin:
