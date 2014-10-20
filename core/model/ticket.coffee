@@ -1,6 +1,6 @@
+{pluggable} = app
+{selectModelEnum} = pluggable
 {_, ObjectId, mongoose} = app.libs
-
-module.exports = exports = app.db.collection 'tickets'
 
 Reply = mongoose.Schema
   _id:
@@ -50,7 +50,7 @@ Ticket = mongoose.Schema
 
   status:
     type: String
-    enum: ['open', 'pending', 'finish', 'closed']
+    enum: ['open', 'pending', 'finish', 'closed'].concat selectModelEnum 'Ticket', 'type'
 
   option:
     type: Object
@@ -64,7 +64,8 @@ Ticket = mongoose.Schema
     Reply
   ]
 
-module.exports = mongoose.model 'Ticket', Ticket
+_.extend app.schemas,
+  Ticket: Ticket
 
 exports.createTicket = (account, title, content, members, status, options, callback) ->
   exports.insert

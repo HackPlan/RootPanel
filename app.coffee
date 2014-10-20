@@ -7,6 +7,7 @@ app.libs =
   async: require 'async'
   bodyParser: require 'body-parser'
   cookieParser: require 'cookie-parser'
+  copy: require 'copy-to'
   crypto: require 'crypto'
   depd: require 'depd'
   express: require 'express'
@@ -23,7 +24,7 @@ app.libs =
 
   ObjectId: (require 'mongoose').Schema.Types.ObjectId
 
-{cookieParser, crypto, bodyParser, depd, express, fs, harp, middlewareInjector, mongoose} = exports.libs
+{cookieParser, copy, crypto, bodyParser, depd, express, fs, harp, middlewareInjector, mongoose} = exports.libs
 {morgan, nodemailer, path, redis, redisStore, expressSession} = exports.libs
 
 RedisStore = redisStore expressSession
@@ -66,14 +67,35 @@ do  ->
 
 app.config = config
 app.db = require './core/db'
+app.pluggable = require './core/pluggable'
+
+app.schemas = {}
+
+app.models =
+  Account: {}
+  BalanceLog: {}
+  CouponCode: {}
+  Notification: {}
+  SecurityLog: {}
+  Ticket: {}
+
+app.pluggable.initializePlugins()
+
+require './core/model/account'
+require './core/model/balance_log'
+require './core/model/coupon_code'
+require './core/model/notification'
+require './core/model/security_log'
+require './core/model/ticket'
+
+for name, schema of app.schemas
+  copy(mongoose.model(name, schema)).to app.models[name]
+
 app.templates = require './core/templates'
 app.i18n = require './core/i18n'
 app.utils = require './core/utils'
 app.cache = require './core/cache'
-app.config = require './config'
-app.package = require './package.json'
 app.billing = require './core/billing'
-app.pluggable = require './core/pluggable'
 app.middleware = require './core/middleware'
 app.notification = require './core/notification'
 app.authenticator = require './core/authenticator'
@@ -83,16 +105,6 @@ app.express = express()
 
 app.redis = redis.createClient 6379, '127.0.0.1',
   auth_pass: config.redis.password
-
-app.schemas = {}
-
-app.models =
-  Account: require './core/model/account'
-  BalanceLog: require './core/model/balance_log'
-  CouponCode: require './core/model/coupon_code'
-  Notification: require './core/model/notification'
-  SecurityLog: require './core/model/security_log'
-  Ticket: require './core/model/ticket'
 
 app.express.use bodyParser.json()
 app.express.use morgan 'dev'
@@ -163,8 +175,6 @@ app.express.use '/billing', require './core/router/billing'
 app.express.use '/ticket', require './core/router/ticket'
 app.express.use '/admin', require './core/router/admin'
 app.express.use '/panel', require './core/router/panel'
-
-app.pluggable.initializePlugins()
 
 app.express.get '/', (req, res) ->
   unless res.headerSent

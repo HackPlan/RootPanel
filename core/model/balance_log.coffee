@@ -1,3 +1,5 @@
+{pluggable} = app
+{selectModelEnum} = pluggable
 {_, ObjectId, mongoose} = app.libs
 
 BalanceLog = mongoose.Schema
@@ -9,7 +11,7 @@ BalanceLog = mongoose.Schema
   type:
     required: true
     type: String
-    enum: ['deposit']
+    enum: ['deposit'].concat selectModelEnum 'BalanceLog', 'type'
 
   amount:
     required: true
@@ -23,4 +25,5 @@ BalanceLog = mongoose.Schema
     type: Object
     default: {}
 
-module.exports = mongoose.model 'BalanceLog', BalanceLog
+_.extend app.schemas,
+  BalanceLog: BalanceLog

@@ -1,13 +1,12 @@
-async = require 'async'
-_ = require 'underscore'
-
+{pluggable} = app
+{selectModelEnum} = pluggable
 {_, async, mongoose} = app.libs
 
 Token = mongoose.Schema
   type:
     required: true
     type: String
-    enum: ['full_access']
+    enum: ['full_access'].concat selectModelEnum 'Token', 'type'
 
   token:
     required: true
@@ -81,7 +80,9 @@ Account = mongoose.Schema
     type: Object
     default: {}
 
-module.exports = mongoose.model 'Account', Account
+_.extend app.schemas,
+  Account: Account
+  Token: Token
 
 # @param account: username, email, password
 # @param callback(account)

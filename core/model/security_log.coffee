@@ -1,3 +1,5 @@
+{pluggable} = app
+{selectModelEnum} = pluggable
 {_, ObjectId, mongoose} = app.libs
 
 SecurityLog = mongoose.Schema
@@ -9,7 +11,7 @@ SecurityLog = mongoose.Schema
   type:
     required: true
     type: String
-    enum: ['update_password', 'update_setting', 'update_email']
+    enum: ['update_password', 'update_setting', 'update_email'].concat selectModelEnum 'SecurityLog', 'type'
 
   created_at:
     type: Date
@@ -24,7 +26,8 @@ SecurityLog = mongoose.Schema
     type: ObjectId
     ref: 'Token'
 
-module.exports = mongoose.model 'SecurityLog', SecurityLog
+_.extend app.schemas,
+  SecurityLog: SecurityLog
 
 exports.create = (account, type, token, payload, callback) ->
   matched_token = _.findWhere account.tokens,

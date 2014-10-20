@@ -1,3 +1,5 @@
+{pluggable} = app
+{selectModelEnum} = pluggable
 {_, ObjectId, mongoose} = app.libs
 
 CouponCode = mongoose.Schema
@@ -16,7 +18,7 @@ CouponCode = mongoose.Schema
   type:
     required: true
     type: String
-    enum: ['amount']
+    enum: ['amount'].concat selectModelEnum 'CouponCode', 'type'
 
   meta:
     type: Object
@@ -33,7 +35,8 @@ CouponCode = mongoose.Schema
       default: Date.now
   ]
 
-module.exports = mongoose.model 'CouponCode', CouponCode
+_.extend app.schemas,
+  CouponCode: CouponCode
 
 exports.type_meta =
   amount:

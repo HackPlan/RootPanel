@@ -1,6 +1,6 @@
+{pluggable} = app
+{selectModelEnum} = pluggable
 {_, ObjectId, mongoose} = app.libs
-
-module.exports = exports = app.db.collection 'notifications'
 
 Notification = mongoose.Schema
   account_id:
@@ -15,12 +15,12 @@ Notification = mongoose.Schema
   type:
     required: true
     type: String
-    enum: ['payment_success']
+    enum: ['payment_success'].concat selectModelEnum 'Notification', 'type'
 
   level:
     required: true
     type: String
-    enum: ['notice', 'event', 'log']
+    enum: ['notice', 'event', 'log'].concat selectModelEnum 'Notification', 'type'
 
   created_at:
     type: Date
@@ -30,7 +30,8 @@ Notification = mongoose.Schema
     type: Object
     default: {}
 
-module.exports = mongoose.model 'Notification', Notification
+_.extend app.schemas,
+  Notification: Notification
 
 exports.createNotice = (account, group_name, type, level, meta, callback) ->
   exports.insert

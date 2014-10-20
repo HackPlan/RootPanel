@@ -14,13 +14,27 @@ hookHelper = (options) ->
   return _.extend [], options
 
 exports.hooks =
+  app:
+    # action: function(callback)
+    started: hookHelper
+      global_event: true
+
+  model:
+    # model: string, field: string, type: string
+    type_enum: hookHelper
+      global_event: true
+
+    # model: string, action(schema, callback)
+    middleware: hookHelper
+      global_event: true
+
   account:
     # filter: function(username, callback(is_allow))
     username_filter: hookHelper
-      always_notice: true
+      global_event: true
     # filter: function(account, callback)
     before_register: hookHelper
-      always_notice: true
+      global_event: true
     # action: function(account, callback)
     resources_limit_changed: []
 
@@ -105,7 +119,7 @@ exports.selectHook = (account, hook_name) ->
   return _.filter pointer, (hook) ->
     if hook.plugin_info.type == 'extension'
       return true
-    else if pointer.always_notice or hook.always_notice
+    else if pointer.global_event or hook.always_notice
       return true
     else if !account
       return false
@@ -113,6 +127,15 @@ exports.selectHook = (account, hook_name) ->
       return true
     else
       return false
+
+exports.selectModelEnum = (model, field) ->
+  result = []
+
+  for hook in exports.selectHook null, 'model.type_enum'
+    if hook.model == model and hook.field == field
+      result.push hook.type
+
+  return result
 
 exports.initializePlugins = (callback) ->
   checkDependencies = ->

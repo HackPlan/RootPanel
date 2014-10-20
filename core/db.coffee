@@ -11,3 +11,6 @@ else
 module.exports = mongoose.createConnection mongodb_uri
 
 exports.mongodb_uri = mongodb_uri
+
+mongoose.connection.on 'error', (err) ->
+  console.error err if err
