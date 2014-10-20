@@ -11,7 +11,7 @@
 
     用于提供功能性的扩展，拓展通常面向所有用户，如添加一种支付方式。
 
-插件需要被安装到 RootPanel 下的 `plugin` 目录，每个目录即为一个插件。插件需要在 `config.coffee` 中被开启才能使用：
+插件需要被安装到 RootPanel 下的 `plugin` 目录，每个目录即为一个插件。插件需要在 `config.coffee` 中被开启才会被加载：
 
     plugin:
       available_extensions: ['rpvhost', 'bitcoin', 'wiki']
@@ -65,7 +65,7 @@
 ### 注册钩子
 插件通过 `pluggable.registerHook` 注册钩子，来与主程序交互。
 
-所有插件的列表可在 `/core/pluggable.coffee` 中找到，其中标注了每个钩子的选项和参数。
+所有钩子的列表可在 `/core/pluggable.coffee` 中找到，其中标注了每个钩子的选项和参数。
 
 选项位于 hookHelper 后：
 
@@ -130,7 +130,7 @@
     渲染插件的 template 目录下的模板。
 
 ### app
-`app` 是一个全局变量，RootPanel 运行中的所有信息都挂在在这个全局变量上，插件可以从上面得到需要的资源：
+`app` 是一个全局变量，RootPanel 运行中的所有信息都挂载在这个全局变量上，插件可以从上面得到需要的资源：
 
 * libs
 
