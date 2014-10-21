@@ -41,7 +41,7 @@
     "mysql": "^2.4.2",
     "nodemailer": "^1.2.1",
     "redis": "^0.12.1",
-    "request": "^2.40.0",
+    "request": "^2.45.0",
     "tmp": "^0.0.24",
     "underscore": "^1.6.0",
     "json-stable-stringify": "^1.0.0",
@@ -54,7 +54,8 @@
     "mongoose": "^3.8.17",
     "depd": "^1.0.0",
     "body-parser": "^1.9.0",
-    "copy-to": "^1.0.1"
+    "copy-to": "^1.0.1",
+    "deepmerge": "^0.2.7"
   },
   "devDependencies": {
     "mocha": "^1.21.5",

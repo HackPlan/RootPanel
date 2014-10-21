@@ -164,6 +164,8 @@ app.express.get '/', (req, res) ->
 app.express.use harp.mount './core/static'
 
 app.express.listen config.web.listen, ->
+  app.started = true
+
   if fs.existsSync config.web.listen
     fs.chmodSync config.web.listen, 0o770
 

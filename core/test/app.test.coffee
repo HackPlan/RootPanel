@@ -12,6 +12,15 @@ describe 'app', ->
     , ->
       done()
 
+  it 'express should be started', (done) ->
+    async.forever (callback) ->
+      if app.started
+        callback true
+      else
+        setImmediate callback
+    , ->
+      done()
+
   it 'app.libs should be loaded', ->
     {_, express, fs, mongoose} = app.libs
     _.should.be.ok
