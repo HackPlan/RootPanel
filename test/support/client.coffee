@@ -1,15 +1,10 @@
 request = require 'request'
 
-if fs.existsSync config.web.listen
-  uri_prefix = "http://unix:#{config.web.listen}:"
-else
-  uri_prefix = "http://127.0.0.1:#{config.web.listen}"
-
 exports.get = (url, options, callback) ->
   options = deepmerge module.exports.default_options, options
 
   options = deepmerge options,
-    uri: "#{uri_prefix}#{options.uri_prefix ? ''}#{url}"
+    uri: "http://127.0.0.1:#{app.config.web.listen}#{options.uri_prefix ? ''}#{url}"
 
   request options, (err, res, body) ->
     throw err if err

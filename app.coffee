@@ -56,6 +56,9 @@ do ->
 
 config = require './config'
 
+if process.env.NODE_ENV == 'test'
+  config.web.listen = require('./sample/travis-ci.config').web.listen
+
 do  ->
   if fs.existsSync config.web.listen
     fs.unlinkSync config.web.listen

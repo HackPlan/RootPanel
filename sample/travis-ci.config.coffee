@@ -2,7 +2,7 @@ module.exports =
   web:
     t_name: 'plugins.rpvhost.site_name'
     url: 'http://rp.rpvhost.net'
-    listen: 3000
+    listen: 12558
     google_analytics_id: ''
 
   account:
