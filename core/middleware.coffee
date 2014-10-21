@@ -1,10 +1,27 @@
-{ObjectID} = require 'mongodb'
-_ = require 'underscore'
-
-mAccount = require './model/account'
-mTicket = require './model/ticket'
+{_} = app.libs
 
 authenticator = require './authenticator'
+
+exports.csrf = ->
+  csrf = app.libs.csrf()
+
+  return (req, res, next) ->
+    validator = ->
+      unless req.method == 'GET'
+        unless csrf.verify req.session.csrf_secret, req.body.csrf_token
+          return res.status(403).send
+            error: 'invalid_csrf_token'
+
+      next()
+
+    if req.session.csrf_secret
+      return validator()
+    else
+      csrf.secret (err, secret) ->
+        req.session.csrf_secret = secret
+        req.session.csrf_token = csrf.create secret
+
+        validator()
 
 exports.parseToken = (req, res, next) ->
   if req.headers['x-token']

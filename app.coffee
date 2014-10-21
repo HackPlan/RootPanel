@@ -8,6 +8,7 @@ app.libs =
   bodyParser: require 'body-parser'
   cookieParser: require 'cookie-parser'
   copy: require 'copy-to'
+  csrf: require 'csrf'
   crypto: require 'crypto'
   depd: require 'depd'
   express: require 'express'
@@ -94,16 +95,14 @@ app.middleware = require './core/middleware'
 app.notification = require './core/notification'
 app.authenticator = require './core/authenticator'
 
-app.mailer = nodemailer.createTransport config.email.account
-app.express = express()
-
 app.redis = redis.createClient 6379, '127.0.0.1',
   auth_pass: config.redis.password
 
-app.express.use bodyParser.json()
-app.express.use morgan 'dev'
-app.express.use cookieParser()
-app.express.use middlewareInjector
+app.mailer = nodemailer.createTransport config.email.account
+app.express = express()
+
+unless process.env.NODE_ENV == 'test'
+  app.express.use morgan 'dev'
 
 app.express.use expressSession
   store: new RedisStore
@@ -113,22 +112,10 @@ app.express.use expressSession
   saveUninitialized: false
   secret: fs.readFileSync(path.join __dirname, 'session.key').toString()
 
-app.express.use (req, res, next) ->
-  unless req.session.csrf_secret
-    csrf.secret (err, secret) ->
-      req.session.csrf_secret = secret
-      req.session.csrf_token = csrf.create secret
-      next()
-
-  next()
-
-app.express.use (req, res, next) ->
-  unless req.method == 'GET'
-    unless csrf.verify req.session.csrf_secret, req.body.csrf_token
-      return res.status(403).send
-        error: 'invalid_csrf_token'
-
-  next()
+app.express.use bodyParser.json()
+app.express.use cookieParser()
+app.express.use middlewareInjector
+app.express.use app.middleware.csrf()
 
 app.express.use (req, res, next) ->
   req.res = res
