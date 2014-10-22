@@ -18,7 +18,7 @@ CouponCode = mongoose.Schema
   type:
     required: true
     type: String
-    enum: ['amount'].concat selectModelEnum 'CouponCode', 'type'
+    enum: ['amount']
 
   meta:
     type: Object
@@ -35,8 +35,8 @@ CouponCode = mongoose.Schema
       default: Date.now
   ]
 
-_.extend app.schemas,
-  CouponCode: CouponCode
+_.extend app.models,
+  CouponCode: mongoose.model 'CouponCode', CouponCode
 
 exports.type_meta =
   amount:

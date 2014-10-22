@@ -15,12 +15,12 @@ Notification = mongoose.Schema
   type:
     required: true
     type: String
-    enum: ['payment_success'].concat selectModelEnum 'Notification', 'type'
+    enum: ['payment_success']
 
   level:
     required: true
     type: String
-    enum: ['notice', 'event', 'log'].concat selectModelEnum 'Notification', 'type'
+    enum: ['notice', 'event', 'log']
 
   created_at:
     type: Date
@@ -30,8 +30,8 @@ Notification = mongoose.Schema
     type: Object
     default: {}
 
-_.extend app.schemas,
-  Notification: Notification
+_.extend app.models,
+  Notification: mongoose.model 'Notification', Notification
 
 exports.createNotice = (account, group_name, type, level, meta, callback) ->
   exports.insert

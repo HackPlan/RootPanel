@@ -8,9 +8,9 @@ if user and password
 else
   mongodb_uri = "mongodb://#{host}/#{name}"
 
-module.exports = mongoose.createConnection mongodb_uri
-
-exports.mongodb_uri = mongodb_uri
+mongoose.connect mongodb_uri
 
 mongoose.connection.on 'error', (err) ->
   console.error err if err
+
+module.exports = mongoose.connection

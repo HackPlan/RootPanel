@@ -11,7 +11,7 @@ SecurityLog = mongoose.Schema
   type:
     required: true
     type: String
-    enum: ['update_password', 'update_setting', 'update_email'].concat selectModelEnum 'SecurityLog', 'type'
+    enum: ['update_password', 'update_setting', 'update_email']
 
   created_at:
     type: Date
@@ -26,8 +26,8 @@ SecurityLog = mongoose.Schema
     type: ObjectId
     ref: 'Token'
 
-_.extend app.schemas,
-  SecurityLog: SecurityLog
+_.extend app.models,
+  SecurityLog: mongoose.model 'SecurityLog', SecurityLog
 
 exports.create = (account, type, token, payload, callback) ->
   matched_token = _.findWhere account.tokens,

@@ -25,6 +25,7 @@ app.libs =
 
   ObjectId: (require 'mongoose').Schema.Types.ObjectId
 
+async = require 'async'
 {cookieParser, copy, crypto, bodyParser, depd, express, fs, harp, middlewareInjector, mongoose} = exports.libs
 {morgan, nodemailer, path, redis, redisStore, expressSession} = exports.libs
 
@@ -73,10 +74,7 @@ app.config = config
 app.db = require './core/db'
 app.pluggable = require './core/pluggable'
 
-app.schemas = {}
 app.models = {}
-
-app.pluggable.initializePlugins()
 
 require './core/model/account'
 require './core/model/balance_log'
@@ -85,9 +83,7 @@ require './core/model/notification'
 require './core/model/security_log'
 require './core/model/ticket'
 
-for name, schema of app.schemas
-  model = mongoose.model name, schema
-  app.models[name] = model
+app.pluggable.initializePlugins()
 
 app.templates = require './core/templates'
 app.i18n = require './core/i18n'

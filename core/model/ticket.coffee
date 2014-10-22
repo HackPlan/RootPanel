@@ -50,7 +50,7 @@ Ticket = mongoose.Schema
 
   status:
     type: String
-    enum: ['open', 'pending', 'finish', 'closed'].concat selectModelEnum 'Ticket', 'type'
+    enum: ['open', 'pending', 'finish', 'closed']
 
   option:
     type: Object
@@ -64,8 +64,8 @@ Ticket = mongoose.Schema
     Reply
   ]
 
-_.extend app.schemas,
-  Ticket: Ticket
+_.extend app.models,
+  Ticket: mongoose.model 'Ticket', Ticket
 
 exports.createTicket = (account, title, content, members, status, options, callback) ->
   exports.insert

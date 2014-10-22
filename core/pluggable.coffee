@@ -132,15 +132,6 @@ exports.selectHook = (account, hook_name) ->
     else
       return false
 
-exports.selectModelEnum = (model, field) ->
-  result = []
-
-  for hook in exports.selectHook null, 'model.type_enum'
-    if hook.model == model and hook.field == field
-      result.push hook.type
-
-  return result
-
 exports.initializePlugins = (callback) ->
   checkDependencies = ->
     all_plugins = _.union config.plugin.available_extensions, config.plugin.available_services

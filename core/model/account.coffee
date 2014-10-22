@@ -6,7 +6,7 @@ Token = mongoose.Schema
   type:
     required: true
     type: String
-    enum: ['full_access'].concat selectModelEnum 'Token', 'type'
+    enum: ['full_access']
 
   token:
     required: true
@@ -38,6 +38,10 @@ Account = mongoose.Schema
 
   password_salt:
     type: String
+
+  created_at:
+    type: Date
+    default: Date.now
 
   groups:
     type: Array
@@ -80,50 +84,32 @@ Account = mongoose.Schema
     type: Object
     default: {}
 
-_.extend app.schemas,
-  Account: Account
-  Token: Token
-
 # @param account: username, email, password
 # @param callback(account)
-exports.register = (account, callback) ->
+Account.statics.register = (account, callback) ->
   password_salt = utils.randomSalt()
 
   {username, email, password} = account
 
-  account =
+  account = new Account
     username: username
+    email: email
     password: utils.hashPassword(password, password_salt)
     password_salt: password_salt
-    email: email
-    created_at: new Date()
-
-    groups: []
 
     preferences:
       avatar_url: "//ruby-china.org/avatar/#{utils.md5(email)}?s=58"
       language: 'auto'
       timezone: config.i18n.default_timezone
 
-    billing:
-      services: []
-      plans: []
-
-      balance: 0
-      last_billing_at: {}
-      arrears_at: null
-
-    pluggable: {}
-
-    resources_limit: {}
-
-    tokens: []
-
   async.each pluggable.selectHook(account, 'account.before_register'), (hook, callback) ->
     hook.filter account, callback
   , ->
-    exports.insert account, (err, result) ->
-      callback _.first result
+    account.save ->
+      callback account
+
+_.extend app.models,
+  Account: mongoose.model 'Account', Account
 
 exports.updatePassword = (account, password, callback) ->
   password_salt = utils.randomSalt()

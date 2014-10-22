@@ -11,7 +11,7 @@ BalanceLog = mongoose.Schema
   type:
     required: true
     type: String
-    enum: ['deposit'].concat selectModelEnum 'BalanceLog', 'type'
+    enum: ['deposit']
 
   amount:
     required: true
@@ -25,5 +25,5 @@ BalanceLog = mongoose.Schema
     type: Object
     default: {}
 
-_.extend app.schemas,
-  BalanceLog: BalanceLog
+_.extend app.models,
+  BalanceLog: mongoose.model 'BalanceLog', BalanceLog

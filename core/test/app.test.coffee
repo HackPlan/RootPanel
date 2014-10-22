@@ -37,9 +37,6 @@ describe 'app', ->
   it 'session.key should exists', ->
     fs.existsSync("#{__dirname}/../../session.key").should.be.ok
 
-  it 'schemas should be created', ->
-    app.schemas.should.not.be.empty
-
   it 'models should be available', ->
     {Account, Ticket} = app.models
     Account.find.should.be.a 'function'
