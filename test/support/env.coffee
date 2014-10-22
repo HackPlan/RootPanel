@@ -14,4 +14,6 @@ global.deepmerge = require 'deepmerge'
 
 global.client = require './client'
 
-require("chai").should()
+chai = require 'chai'
+chai.should()
+chai.Assertion.includeStack = true
