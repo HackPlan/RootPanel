@@ -11,9 +11,10 @@ global._ = require 'underscore'
 global.fs = require 'fs'
 global.async = require 'async'
 global.deepmerge = require 'deepmerge'
+global.chai = require 'chai'
 
+global.expect = chai.expect
 global.client = require './client'
 
-chai = require 'chai'
 chai.should()
-chai.Assertion.includeStack = true
+chai.config.includeStack = true
