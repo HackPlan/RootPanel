@@ -39,3 +39,14 @@ exports.wrapAsync = (func) ->
   return (callback) ->
     func (result) ->
       callback null, result
+
+exports.pickErrorName = (error) ->
+  unless error and error.errors
+    return null
+
+  if _.isEmpty error.errors
+    return null
+
+  err = error.errors[_.first(_.keys(error.errors))]
+
+  return err.value

@@ -72,6 +72,7 @@ do  ->
 
 app.config = config
 app.db = require './core/db'
+app.utils = require './core/utils'
 app.pluggable = require './core/pluggable'
 
 app.models = {}
@@ -87,7 +88,6 @@ app.pluggable.initializePlugins()
 
 app.templates = require './core/templates'
 app.i18n = require './core/i18n'
-app.utils = require './core/utils'
 app.cache = require './core/cache'
 app.billing = require './core/billing'
 app.middleware = require './core/middleware'

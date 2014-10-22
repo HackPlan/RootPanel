@@ -1,6 +1,6 @@
-describe 'utils', ->
-  utils = require '../utils'
+utils = require '../utils'
 
+describe 'utils', ->
   describe 'rx', ->
     it 'username', ->
       utils.rx.username.test('jysperm').should.be.ok
@@ -72,7 +72,7 @@ describe 'utils', ->
     utils.hashPassword('passwd', 'salt').should.be.equal sha256
 
   describe 'wrapAsync', ->
-    it 'should work fine with basic usage', (done) ->
+    it 'should work with basic usage', (done) ->
       func = (callback) ->
         callback 'result'
 
@@ -82,7 +82,7 @@ describe 'utils', ->
 
         done()
 
-    it 'should work fine with async', (done) ->
+    it 'should work with async', (done) ->
       func = (callback) ->
         callback 'result'
 
@@ -95,3 +95,21 @@ describe 'utils', ->
         result[1].should.be.equal 'result'
 
         done()
+
+  describe 'pickErrorName', ->
+    it 'should work with two errors', ->
+      error =
+        errors:
+          email:
+            value: 'invalid_email'
+
+          username:
+            value: 'invalid_username'
+
+      expect(utils.pickErrorName(error) in [
+        'invalid_email', 'invalid_username'
+      ]).to.be.ok
+
+    it 'should work with no error', ->
+      expect(utils.pickErrorName({})).to.be.null
+      expect(utils.pickErrorName({errors: {}})).to.be.null
