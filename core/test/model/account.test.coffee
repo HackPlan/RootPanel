@@ -1,11 +1,20 @@
 utils = null
 Account = null
 
+test_account = null
+created_account_ids = []
+
 describe 'model/account', ->
   before ->
     require '../../../app'
     {utils} = app
     {Account} = app.models
+
+  after (done) ->
+    Account.remove
+      _id:
+        $in: created_account_ids
+    , done
 
   describe 'validators should be work', ->
     it 'invalid_email', (done) ->
@@ -43,4 +52,28 @@ describe 'model/account', ->
         account.email.should.be.equal email.toLowerCase()
         account.password.should.have.length 64
 
+        created_account_ids.push account._id
+        test_account = account
+
+        done()
+
+  describe 'search', ->
+    it 'should work with username', (done) ->
+      Account.search test_account.username, (result) ->
+        result.email.should.be.equal test_account.email
+        done()
+
+    it 'should work with email', (done) ->
+      Account.search test_account.email, (result) ->
+        result.username.should.be.equal test_account.username
+        done()
+
+    it 'should work with id', (done) ->
+      Account.search test_account.id, (result) ->
+        result.username.should.be.equal test_account.username
+        done()
+
+    it 'should not exist', (done) ->
+      Account.search 'username_not_exist', (result) ->
+        expect(result).to.not.exist
         done()

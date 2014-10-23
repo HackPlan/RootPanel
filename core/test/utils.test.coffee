@@ -4,6 +4,7 @@ describe 'utils', ->
   describe 'rx', ->
     it 'username', ->
       utils.rx.username.test('jysperm').should.be.ok
+      utils.rx.username.test('jy_sperm').should.be.ok
       utils.rx.username.test('JYSPERM').should.not.be.ok
       utils.rx.username.test('s').should.not.be.ok
       utils.rx.username.test('root-panel').should.not.be.ok

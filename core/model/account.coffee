@@ -147,7 +147,7 @@ Account.statics.search = (stuff, callback) ->
       if account
         return callback account
 
-      exports.findById stuff, (err, account) ->
+      @findById stuff, (err, account) ->
         callback account
 
 _.extend app.models,
