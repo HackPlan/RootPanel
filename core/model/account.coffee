@@ -150,20 +150,16 @@ Account.statics.search = (stuff, callback) ->
       @findById stuff, (err, account) ->
         callback account
 
+Account.methods.matchPassword = (password) ->
+  return @password == utils.hashPassword(password, @password_salt)
+
+Account.methods.updatePassword = (password, callback) ->
+  @password_salt = utils.randomSalt()
+  @password = utils.hashPassword password, @password_salt
+  @save callback
+
 _.extend app.models,
   Account: mongoose.model 'Account', Account
-
-exports.updatePassword = (account, password, callback) ->
-  password_salt = utils.randomSalt()
-
-  exports.update {_id: account._id},
-    $set:
-      password: utils.hashPassword password, password_salt
-      password_salt: password_salt
-  , callback
-
-exports.matchPassword = (account, password) ->
-  return utils.hashPassword(password, account.password_salt) == account.password
 
 exports.incBalance = (account, type, amount, payload, callback) ->
   exports.update {_id: account._id},

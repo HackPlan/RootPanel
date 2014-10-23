@@ -1,8 +1,11 @@
 utils = null
 Account = null
 
-test_account = null
-created_account_ids = []
+util =
+  account: null
+  password: null
+
+  created_account_ids: []
 
 describe 'model/account', ->
   before ->
@@ -13,7 +16,7 @@ describe 'model/account', ->
   after (done) ->
     Account.remove
       _id:
-        $in: created_account_ids
+        $in: util.created_account_ids
     , done
 
   describe 'validators should be work', ->
@@ -39,12 +42,12 @@ describe 'model/account', ->
     it 'should success', (done) ->
       username = "test#{utils.randomString(20).toLowerCase()}"
       email = "#{utils.randomString 20}@gmail.com"
-      password = utils.randomString 20
+      util.password = utils.randomString 20
 
       Account.register
         username: username
         email: email
-        password: password
+        password: util.password
       , (err, account) ->
         expect(err).to.not.exist
 
@@ -52,28 +55,46 @@ describe 'model/account', ->
         account.email.should.be.equal email.toLowerCase()
         account.password.should.have.length 64
 
-        created_account_ids.push account._id
-        test_account = account
+        util.created_account_ids.push account._id
+        util.account = account
 
         done()
 
   describe 'search', ->
     it 'should work with username', (done) ->
-      Account.search test_account.username, (result) ->
-        result.email.should.be.equal test_account.email
+      Account.search util.account.username, (account) ->
+        account.email.should.be.equal util.account.email
         done()
 
     it 'should work with email', (done) ->
-      Account.search test_account.email, (result) ->
-        result.username.should.be.equal test_account.username
+      Account.search util.account.email, (account) ->
+        account.username.should.be.equal util.account.username
         done()
 
     it 'should work with id', (done) ->
-      Account.search test_account.id, (result) ->
-        result.username.should.be.equal test_account.username
+      Account.search util.account.id, (account) ->
+        account.username.should.be.equal util.account.username
         done()
 
     it 'should not exist', (done) ->
-      Account.search 'username_not_exist', (result) ->
-        expect(result).to.not.exist
+      Account.search 'username_not_exist', (account) ->
+        expect(account).to.not.exist
         done()
+
+  describe 'matchPassword', ->
+    it 'should be matched', ->
+      util.account.matchPassword(util.password).should.be.ok
+
+    it 'should not matched', ->
+      util.account.matchPassword('wrong_password').should.not.ok
+
+  describe 'updatePassword', ->
+    it 'should success', (done) ->
+      old_password = util.password
+      util.password = utils.randomString 20
+
+      util.account.updatePassword util.password, ->
+        Account.findById util.account._id, (err, account) ->
+          account.matchPassword(util.password).should.be.ok
+          account.matchPassword(old_password).should.not.ok
+          done()
