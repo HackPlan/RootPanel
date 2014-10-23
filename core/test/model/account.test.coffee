@@ -25,3 +25,22 @@ describe 'model/account', ->
       account.save (err) ->
         utils.pickErrorName(err).should.be.equal 'invalid_username'
         done()
+
+  describe 'register', ->
+    it 'should success', (done) ->
+      username = utils.randomString(20).toLowerCase()
+      email = "#{utils.randomString 20}@gmail.com"
+      password = utils.randomString 20
+
+      Account.register
+        username: username
+        email: email
+        password: password
+      , (err, account) ->
+        expect(err).to.not.exist
+
+        account.username.should.be.equal username
+        account.email.should.be.equal email
+        account.password.should.have.length 64
+
+        done()

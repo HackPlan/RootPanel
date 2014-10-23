@@ -4,6 +4,7 @@ describe 'utils', ->
   describe 'rx', ->
     it 'username', ->
       utils.rx.username.test('jysperm').should.be.ok
+      utils.rx.username.test('JYSPERM').should.not.be.ok
       utils.rx.username.test('s').should.not.be.ok
       utils.rx.username.test('root-panel').should.not.be.ok
       utils.rx.username.test('184300584').should.not.be.ok
@@ -55,7 +56,7 @@ describe 'utils', ->
     random1 = utils.randomSalt()
     random2 = utils.randomSalt()
 
-    random1.should.be.length 64
+    random1.should.have.length 64
     random1.should.be.not.equal random2
 
   it 'randomString', ->
@@ -63,9 +64,9 @@ describe 'utils', ->
     random2 = utils.randomString 10
     random3 = utils.randomString 20
 
-    random1.should.be.length 10
+    random1.should.have.length 10
     random1.should.be.not.equal random2
-    random3.should.be.length 20
+    random3.should.have.length 20
 
   it 'hashPassword', ->
     sha256 = '016899230b83a136fea361680e3a0c687440cd866ae67448fa72b007b04269dc'

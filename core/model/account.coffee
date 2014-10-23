@@ -1,4 +1,4 @@
-{pluggable, utils} = app
+{pluggable, utils, config} = app
 {_, async, mongoose, mongooseUniqueValidator} = app.libs
 
 Token = mongoose.Schema
@@ -9,6 +9,7 @@ Token = mongoose.Schema
 
   token:
     required: true
+    sparse: true
     unique: true
     type: String
 
@@ -112,13 +113,13 @@ Account.path('username').validate (username, callback) ->
 , 'username_exist'
 
 # @param account: username, email, password
-# @param callback(account)
+# @param callback(err, account)
 Account.statics.register = (account, callback) ->
   password_salt = utils.randomSalt()
 
   {username, email, password} = account
 
-  account = new Account
+  account = new app.models.Account
     username: username
     email: email
     password: utils.hashPassword(password, password_salt)
@@ -135,6 +136,19 @@ Account.statics.register = (account, callback) ->
     account.save (err) ->
       callback err, account
 
+# @param callback(account)
+Account.statics.search = (stuff, callback) ->
+  @findOne {username: stuff}, (err, account) =>
+    if account
+      return callback account
+
+    @findOne {email: stuff}, (err, account) =>
+      if account
+        return callback account
+
+      exports.findById stuff, (err, account) ->
+        callback account
+
 _.extend app.models,
   Account: mongoose.model 'Account', Account
 
@@ -146,24 +160,6 @@ exports.updatePassword = (account, password, callback) ->
       password: utils.hashPassword password, password_salt
       password_salt: password_salt
   , callback
-
-exports.search = (username, callback) ->
-  exports.findOne
-    username: username
-  , (err, account) ->
-    if account
-      return callback null, account
-
-    exports.findOne
-      email: username
-    , (err, account) ->
-      if account
-        return callback null, account
-
-      exports.findOne
-        _id: new ObjectID username
-      , (err, account) ->
-        callback null, account
 
 exports.matchPassword = (account, password) ->
   return utils.hashPassword(password, account.password_salt) == account.password
