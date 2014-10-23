@@ -1,5 +1,4 @@
 {pluggable} = app
-{selectModelEnum} = pluggable
 {_, ObjectId, mongoose} = app.libs
 
 BalanceLog = mongoose.Schema

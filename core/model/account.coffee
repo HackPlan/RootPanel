@@ -1,6 +1,11 @@
 {pluggable, utils, config} = app
 {_, async, mongoose, mongooseUniqueValidator} = app.libs
 
+BalanceLog = null
+
+process.nextTick ->
+  {BalanceLog} = app.models
+
 Token = mongoose.Schema
   type:
     required: true
@@ -158,16 +163,31 @@ Account.methods.updatePassword = (password, callback) ->
   @password = utils.hashPassword password, @password_salt
   @save callback
 
+# @param callback(err)
+Account.methods.incBalance = (amount, type, payload, callback) ->
+  unless _.isNumber amount
+    return callback new Error 'amount must be a number'
+
+  balance_log = new BalanceLog
+    account_id: @_id
+    type: type
+    amount: amount
+    payload: payload
+
+  balance_log.validate (err) =>
+    return callback err if err
+
+    @update
+      $inc:
+        'billing.balance': amount
+    , (err) ->
+      return callback err if err
+
+      balance_log.save (err) ->
+        callback err
+
 Account.methods.inGroup = (group) ->
   return group in @groups
 
 _.extend app.models,
   Account: mongoose.model 'Account', Account
-
-exports.incBalance = (account, type, amount, payload, callback) ->
-  exports.update {_id: account._id},
-    $inc:
-      'billing.balance': amount
-  , ->
-    mBalance.create account, type, amount, payload, (err, balance_log) ->
-      callback balance_log

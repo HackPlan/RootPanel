@@ -1,5 +1,6 @@
 utils = null
 Account = null
+BalanceLog = null
 
 util =
   account: null
@@ -11,7 +12,13 @@ describe 'model/account', ->
   before ->
     require '../../../app'
     {utils} = app
-    {Account} = app.models
+    {Account, BalanceLog} = app.models
+
+  after (done) ->
+    BalanceLog.remove
+      account_id:
+        $in: util.created_account_ids
+    , done
 
   after (done) ->
     Account.remove
@@ -98,6 +105,29 @@ describe 'model/account', ->
           account.matchPassword(util.password).should.be.ok
           account.matchPassword(old_password).should.not.ok
           done()
+
+  describe 'incBalance', ->
+    it 'should success', (done) ->
+      util.account.incBalance -10, 'deposit', {meta: 'meta'}, (err) ->
+        BalanceLog.findOne
+          account_id: util.account._id
+        , (err, balance_log) ->
+          balance_log.amount.should.be.equal -10
+          balance_log.payload.meta.should.be.equal 'meta'
+
+          Account.findById util.account._id, (err, account) ->
+            account.billing.balance.should.be.equal -10
+            done()
+
+    it 'should fail with invalid amount', (done) ->
+      util.account.incBalance '10', 'deposit', {}, (err) ->
+        err.should.be.exist
+        done()
+
+    it 'should fail with invalid type', (done) ->
+      util.account.incBalance -10, 'invalid_type', {}, (err) ->
+        err.should.be.exist
+        done()
 
   describe 'inGroup', ->
     it 'should in it', ->
