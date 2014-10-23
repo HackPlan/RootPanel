@@ -1,24 +1,42 @@
-{ObjectID} = require 'mongodb'
-_ = require 'underscore'
+{pluggable} = app
+{selectModelEnum} = pluggable
+{_, ObjectId, mongoose} = app.libs
 
-module.exports = exports = app.db.collection 'coupon_codes'
+CouponCode = mongoose.Schema
+  code:
+    required: true
+    type: String
 
-mAccount = require './account'
+  expired:
+    type: Date
+    default: null
 
-utils = require '../utils'
+  available_times:
+    type: Number
+    default: null
 
-sample =
-  code: 'PmlFH2hpziDmyqPX'
-  expired: new Date()
-  available_times: 2
-  type: 'amount'
+  type:
+    required: true
+    type: String
+    enum: ['amount']
+
   meta:
-    amount: 10
-    category: '2014.9.20'
+    type: Object
+    default: {}
+
   apply_log: [
-    account_id: new ObjectID()
-    created_at: new Date()
+    account_id:
+      required: true
+      type: ObjectId
+      ref: 'Account'
+
+    created_at:
+      type: Date
+      default: Date.now
   ]
+
+_.extend app.models,
+  CouponCode: mongoose.model 'CouponCode', CouponCode
 
 exports.type_meta =
   amount:

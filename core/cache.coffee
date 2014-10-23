@@ -1,5 +1,6 @@
 stringify = require 'json-stable-stringify'
-CounterCache = require('counter-cache')
+CounterCache = require 'counter-cache'
+_ = require 'underscore'
 
 config = require '../config'
 
@@ -24,8 +25,13 @@ exports.try = (key, options, setter, callback) ->
 
   key = exports.hashKey key, options.param
 
+  if _.isEmpty options.param
+    original_setter = setter
+    setter = (param, callback) ->
+      original_setter callback
+
   redis.get key, (err, value) ->
-    if value != undefined
+    if value != undefined and value != null
       if options.is_json
         value = JSON.parse value
 

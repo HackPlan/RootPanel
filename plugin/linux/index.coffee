@@ -44,26 +44,34 @@ exports.registerHook 'view.panel.widgets',
 
 exports.registerHook 'account.resources_limit_changed',
   always_notice: true
-  action: (account, callback) ->
+  filter: (account, callback) ->
     linux.setResourceLimit account, callback
 
 exports.registerServiceHook 'enable',
-  action: (req, callback) ->
+  filter: (req, callback) ->
     linux.createUser req.account, ->
       linux.setResourceLimit req.account, callback
 
 exports.registerServiceHook 'disable',
-  action: (req, callback) ->
+  filter: (req, callback) ->
     linux.deleteUser req.account, callback
 
 app.get '/public/monitor', requireAuthenticate, (req, res) ->
   async.parallel
-    resources_usage: wrapAsync linux.getResourceUsageByAccounts
+    resources_usage: (callback) ->
+      linux.getResourceUsageByAccounts (result) ->
+        console.log result
+        callback null, result
     system: wrapAsync linux.getSystemInfo
     storage: wrapAsync linux.getStorageInfo
     process_list: wrapAsync linux.getProcessList
+    memory: wrapAsync linux.getMemoryInfo
+    x: (callback) ->
+      callback null, 'test'
 
   , (err, result) ->
+    console.log arguments
+
     exports.render 'monitor', req, result, (html) ->
       res.send html
 

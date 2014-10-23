@@ -5,8 +5,8 @@ exports.rx =
   username: /^[a-z][0-9a-z_]{2,23}$/
   email: /^\w+([-+.]\w+)*@\w+([-+.]\w+)*$/
   password: /^.+$/
-  domain: /(\*\.)?[A-Za-z0-9]+(\-[A-Za-z0-9]+)*(\.[A-Za-z0-9]+(\-[A-Za-z0-9]+)*)*/
-  filename: /[A-Za-z0-9_\-\.]+/
+  domain: /^(\*\.)?[A-Za-z0-9]+(\-[A-Za-z0-9]+)*(\.[A-Za-z0-9]+(\-[A-Za-z0-9]+)*)*$/
+  filename: /^[A-Za-z0-9_\-\.]+$/
   url: /^https?:\/\/[^\s;]*$/
 
 exports.sha256 = (data) ->
@@ -39,3 +39,14 @@ exports.wrapAsync = (func) ->
   return (callback) ->
     func (result) ->
       callback null, result
+
+exports.pickErrorName = (error) ->
+  unless error and error.errors
+    return null
+
+  if _.isEmpty error.errors
+    return null
+
+  err = error.errors[_.first(_.keys(error.errors))]
+
+  return err.message

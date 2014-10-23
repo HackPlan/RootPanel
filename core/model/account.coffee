@@ -1,107 +1,157 @@
-async = require 'async'
-_ = require 'underscore'
+{pluggable, utils, config} = app
+{_, async, mongoose, mongooseUniqueValidator} = app.libs
 
-module.exports = exports = app.db.collection 'accounts'
+Token = mongoose.Schema
+  type:
+    required: true
+    type: String
+    enum: ['full_access']
 
-billing = require '../billing'
-config = require '../../config'
-pluggable = require '../pluggable'
-utils = require '../utils'
+  token:
+    required: true
+    sparse: true
+    unique: true
+    type: String
 
-mBalance = require './balance_log'
+  created_at:
+    type: Date
+    default: Date.now
 
-sample =
-  username: 'jysperm'
-  password: '53673f434686ce045477f066f30eded55a9bb535a6cec7b73a60972ccafddb2a'
-  password_salt: '53673f434686b535a6cec7b73a60ce045477f066f30eded55a9b972ccafddb2a'
-  email: 'jysperm@gmail.com'
-  created_at: Date()
+  update_at:
+    type: Date
+    default: Date.now
 
-  groups: ['root']
+  payload:
+    type: Object
+    default: {}
 
-  preferences:
-    avatar_url: 'http://ruby-china.org/avatar/efcc15b92617a95a09f514a9bff9e6c3?s=58'
-    language: 'zh_CN'
-    timezone: 'Asia/Shanghai'
-    QQ: '184300584'
+Account = mongoose.Schema
+  username:
+    required: true
+    unique: true
+    type: String
 
-  billing:
-    services: ['shadowsocks']
-    plans: ['all']
+  email:
+    lowercase: true
+    required: true
+    unique: true
+    type: String
 
-    last_billing_at:
-      all: new Date()
+  password:
+    type: String
 
-    balance: 100
-    arrears_at: new Date()
+  password_salt:
+    type: String
 
-  pluggable:
-    bitcoin:
-      bitcoin_deposit_address: '13v2BTCMZMHg5v87susgg86HFZqXERuwUd'
-      bitcoin_secret: '53673f434686b535a6cec7b73a60ce045477f066f30eded55a9b972ccafddb2a'
+  created_at:
+    type: Date
+    default: Date.now
 
-    phpfpm:
-      is_enbale: false
-
-    nginx:
-      sites: []
-
-  resources_limit:
-    cpu: 144
-    storage: 520
-    transfer: 39
-    memory: 27
+  groups:
+    type: Array
+    default: []
 
   tokens: [
-    type: 'access_token'
-    token: 'b535a6cec7b73a60c53673f434686e04972ccafddb2a5477f066f30eded55a9b'
-    created_at: Date()
-    updated_at: Date()
-    payload:
-      ip: '123.184.237.163'
-      ua: 'Mozilla/5.0 (Intel Mac OS X) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.102'
+    Token
   ]
 
+  preferences:
+    type: Object
+    default: {}
+
+  billing:
+    services:
+      type: Array
+      default: []
+
+    plans:
+      type: Array
+      default: []
+
+    last_billing_at:
+      type: Object
+      default: {}
+
+    balance:
+      type: Number
+      default: 0
+
+    arrears_at:
+      type: Date
+      default: null
+
+  pluggable:
+    type: Object
+    default: {}
+
+  resources_limit:
+    type: Object
+    default: {}
+
+Account.plugin mongooseUniqueValidator
+
+Account.path('email').validate (email) ->
+  return utils.rx.email.test email
+, 'invalid_email'
+
+Account.path('username').validate (username) ->
+  return utils.rx.username.test username
+, 'invalid_username'
+
+Account.path('username').validate (username, callback) ->
+  async.each pluggable.selectHook(null, 'account.username_filter'), (hook, callback) ->
+    hook.filter username, (is_allow) ->
+      if is_allow
+        callback()
+      else
+        callback true
+
+  , (not_allow) ->
+    if not_allow
+      callback()
+    else
+      callback true
+, 'username_exist'
+
 # @param account: username, email, password
-# @param callback(account)
-exports.register = (account, callback) ->
+# @param callback(err, account)
+Account.statics.register = (account, callback) ->
   password_salt = utils.randomSalt()
 
   {username, email, password} = account
 
-  account =
+  account = new app.models.Account
     username: username
+    email: email
     password: utils.hashPassword(password, password_salt)
     password_salt: password_salt
-    email: email
-    created_at: new Date()
-
-    groups: []
 
     preferences:
       avatar_url: "//ruby-china.org/avatar/#{utils.md5(email)}?s=58"
       language: 'auto'
       timezone: config.i18n.default_timezone
 
-    billing:
-      services: []
-      plans: []
-
-      balance: 0
-      last_billing_at: {}
-      arrears_at: null
-
-    pluggable: {}
-
-    resources_limit: {}
-
-    tokens: []
-
   async.each pluggable.selectHook(account, 'account.before_register'), (hook, callback) ->
     hook.filter account, callback
   , ->
-    exports.insert account, (err, result) ->
-      callback _.first result
+    account.save (err) ->
+      callback err, account
+
+# @param callback(account)
+Account.statics.search = (stuff, callback) ->
+  @findOne {username: stuff}, (err, account) =>
+    if account
+      return callback account
+
+    @findOne {email: stuff}, (err, account) =>
+      if account
+        return callback account
+
+      exports.findById stuff, (err, account) ->
+        callback account
+
+_.extend app.models,
+  Account: mongoose.model 'Account', Account
 
 exports.updatePassword = (account, password, callback) ->
   password_salt = utils.randomSalt()
@@ -111,24 +161,6 @@ exports.updatePassword = (account, password, callback) ->
       password: utils.hashPassword password, password_salt
       password_salt: password_salt
   , callback
-
-exports.search = (username, callback) ->
-  exports.findOne
-    username: username
-  , (err, account) ->
-    if account
-      return callback null, account
-
-    exports.findOne
-      email: username
-    , (err, account) ->
-      if account
-        return callback null, account
-
-      exports.findOne
-        _id: new ObjectID username
-      , (err, account) ->
-        callback null, account
 
 exports.matchPassword = (account, password) ->
   return utils.hashPassword(password, account.password_salt) == account.password

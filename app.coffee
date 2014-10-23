@@ -1,172 +1,171 @@
-connect = require 'connect'
-nodemailer = require 'nodemailer'
-path = require 'path'
-harp = require 'harp'
-fs = require 'fs'
-morgan = require 'morgan'
-moment = require 'moment-timezone'
-redis = require 'redis'
-express = require 'express'
-{MongoClient} = require 'mongodb'
-session = require 'express-session'
-crypto = require 'crypto'
-csrf = require('csrf')()
-RedisStore = require('connect-redis')(session)
+#!/usr/bin/env coffee
 
-global.app = express()
+global.app = exports
 
-config = null
+app.libs =
+  _: require 'underscore'
+  async: require 'async'
+  bodyParser: require 'body-parser'
+  cookieParser: require 'cookie-parser'
+  copy: require 'copy-to'
+  csrf: require 'csrf'
+  crypto: require 'crypto'
+  depd: require 'depd'
+  express: require 'express'
+  fs: require 'fs'
+  harp: require 'harp'
+  middlewareInjector: require 'middleware-injector'
+  mongoose: require 'mongoose'
+  morgan: require 'morgan'
+  nodemailer: require 'nodemailer'
+  path: require 'path'
+  redis: require 'redis'
+  redisStore: require 'connect-redis'
+  expressSession: require 'express-session'
+  mongooseUniqueValidator: require 'mongoose-unique-validator'
 
-exports.checkEnvironment = ->
-  config_file_path = path.join __dirname, 'config.coffee'
-  session_key_path = path.join __dirname, 'session.key'
+  ObjectId: (require 'mongoose').Schema.Types.ObjectId
 
-  unless fs.existsSync config_file_path
-    default_config_file_path = path.join __dirname, './sample/rpvhost.config.coffee'
-    fs.writeFileSync config_file_path, fs.readFileSync default_config_file_path
-    console.log '[Warning] Copy sample config file to ./config.coffee'
+{cookieParser, copy, crypto, bodyParser, depd, express, fs, harp, middlewareInjector, mongoose} = exports.libs
+{morgan, nodemailer, path, redis, redisStore, expressSession} = exports.libs
 
-  fs.chmodSync config_file_path, 0o750
+RedisStore = redisStore expressSession
 
-  config = require './config'
+app.logger = do ->
+  unless process.env.NODE_ENV == 'test'
+    return console.log
 
+  return ->
+
+app.package = require './package'
+app.deprecate = depd 'rootpanel'
+
+do ->
+  config_path = path.join __dirname, 'config.coffee'
+
+  unless fs.existsSync config_path
+    unless process.env.TRAVIS == 'true'
+      app.deprecate 'config.coffee not found, copy sample config to ./config.coffee'
+
+      default_config = 'core'
+    else
+      default_config = 'travis-ci'
+
+    fs.writeFileSync config_path, fs.readFileSync path.join __dirname, "./sample/#{default_config}.config.coffee"
+
+  fs.chmodSync config_path, 0o750
+
+config = require './config'
+
+if process.env.NODE_ENV == 'test'
+  config.web.listen = require('./sample/travis-ci.config').web.listen
+
+do  ->
   if fs.existsSync config.web.listen
     fs.unlinkSync config.web.listen
 
+  session_key_path = path.join __dirname, 'session.key'
+
   unless fs.existsSync session_key_path
     fs.writeFileSync session_key_path, crypto.randomBytes(48).toString('hex')
+    fs.chmodSync session_key_path, 0o750
 
-exports.loadCoreTemplates = ->
-  app.template_data = {}
+app.config = config
+app.db = require './core/db'
+app.utils = require './core/utils'
+app.pluggable = require './core/pluggable'
 
-  for filename in fs.readdirSync "#{__dirname}/core/template"
-    template_name = path.basename filename, path.extname(filename)
-    app.template_data[template_name] = fs.readFileSync "#{__dirname}/core/template/#{filename}"
+app.models = {}
 
-exports.run = ->
-  exports.checkEnvironment()
-  exports.loadCoreTemplates()
+require './core/model/account'
+require './core/model/balance_log'
+require './core/model/coupon_code'
+require './core/model/notification'
+require './core/model/security_log'
+require './core/model/ticket'
 
-  {user, password, host, name} = config.mongodb
+app.pluggable.initializePlugins()
 
-  if user and password
-    mongodb_uri = "mongodb://#{user}:#{password}@#{host}/#{name}"
-  else
-    mongodb_uri = "mongodb://#{host}/#{name}"
+app.templates = require './core/templates'
+app.i18n = require './core/i18n'
+app.cache = require './core/cache'
+app.billing = require './core/billing'
+app.middleware = require './core/middleware'
+app.notification = require './core/notification'
+app.authenticator = require './core/authenticator'
 
-  MongoClient.connect mongodb_uri, (err, db) ->
-    throw err if err
-    app.db = db
+app.redis = redis.createClient 6379, '127.0.0.1',
+  auth_pass: config.redis.password
 
-    app.redis = redis.createClient 6379, '127.0.0.1',
-      auth_pass: config.redis.password
+app.mailer = nodemailer.createTransport config.email.account
+app.express = express()
 
-    app.mailer = nodemailer.createTransport config.email.account
+unless process.env.NODE_ENV == 'test'
+  app.express.use morgan 'dev'
 
-    app.models =
-      mAccount: require './core/model/account'
-      mBalanceLog: require './core/model/balance_log'
-      mCouponCode: require './core/model/coupon_code'
-      mNotification: require './core/model/notification'
-      mSecurityLog: require './core/model/security_log'
-      mTicket: require './core/model/ticket'
+app.express.use expressSession
+  store: new RedisStore
+    client: app.redis
 
-    app.i18n = require './core/i18n'
-    app.utils = require './core/utils'
-    app.cache = require './core/cache'
-    app.config = require './config'
-    app.package = require './package.json'
-    app.billing = require './core/billing'
-    app.pluggable = require './core/pluggable'
-    app.middleware = require './core/middleware'
-    app.notification = require './core/notification'
-    app.authenticator = require './core/authenticator'
+  resave: false
+  saveUninitialized: false
+  secret: fs.readFileSync(path.join __dirname, 'session.key').toString()
 
-    app.use connect.json()
-    app.use connect.urlencoded()
-    app.use morgan('dev')
-    app.use require('cookie-parser')()
+app.express.use bodyParser.json()
+app.express.use cookieParser()
+app.express.use middlewareInjector
+app.express.use app.middleware.csrf()
 
-    app.use require 'middleware-injector'
+app.express.use (req, res, next) ->
+  req.res = res
 
-    app.use session
-      store: new RedisStore
-        client: app.redis
+  res.language = req.cookies.language ? config.i18n.default_language
+  res.timezone = req.cookies.timezone ? config.i18n.default_timezone
 
-      resave: true
-      saveUninitialized: true
-      secret: fs.readFileSync(path.join __dirname, 'session.key').toString()
+  res.locals =
+    config: config
+    app: app
+    req: req
+    res: res
 
-    app.use (req, res, next) ->
-      unless req.session.csrf_secret
-        csrf.secret (err, secret) ->
-          req.session.csrf_secret = secret
-          req.session.csrf_token = csrf.create secret
-          next()
+    t: app.i18n.getTranslator req
 
-      next()
+    selectHook: (name) ->
+      return app.pluggable.selectHook req.account, name
 
-    app.use (req, res, next) ->
-      unless req.method == 'GET'
-        unless csrf.verify req.session.csrf_secret, req.body.csrf_token
-          return res.status(403).send
-            error: 'invalid_csrf_token'
+    moment: ->
+      return moment.apply(@, arguments).locale(res.language).tz(res.timezone)
 
-      next()
+  res.t = res.locals.t
+  res.moment = res.locals.moment
 
-    app.use (req, res, next) ->
-      req.res = res
+  res.locals.config.web.name = res.t app.config.web.t_name
 
-      res.language = req.cookies.language ? config.i18n.default_language
-      res.timezone = req.cookies.timezone ? config.i18n.default_timezone
+  next()
 
-      res.locals =
-        config: config
-        app: app
-        req: req
-        res: res
+app.express.use app.middleware.accountInfo
 
-        t: app.i18n.getTranslator req
+app.express.set 'views', path.join(__dirname, 'core/view')
+app.express.set 'view engine', 'jade'
 
-        selectHook: (name) ->
-          return app.pluggable.selectHook req.account, name
+app.express.get '/locale/:language?', app.i18n.downloadLocales
 
-        moment: ->
-          return moment.apply(@, arguments).locale(res.language).tz(res.timezone)
+app.express.use '/account', require './core/router/account'
+app.express.use '/billing', require './core/router/billing'
+app.express.use '/ticket', require './core/router/ticket'
+app.express.use '/admin', require './core/router/admin'
+app.express.use '/panel', require './core/router/panel'
 
-      res.t = res.locals.t
-      res.moment = res.locals.moment
+app.express.get '/', (req, res) ->
+  unless res.headerSent
+    res.redirect '/panel/'
 
-      res.locals.config.web.name = res.t app.config.web.t_name
+app.express.use harp.mount './core/static'
 
-      next()
+app.express.listen config.web.listen, ->
+  app.started = true
 
-    app.use app.middleware.accountInfo
+  if fs.existsSync config.web.listen
+    fs.chmodSync config.web.listen, 0o770
 
-    app.set 'views', path.join(__dirname, 'core/view')
-    app.set 'view engine', 'jade'
-
-    app.get '/locale/:language?', app.i18n.downloadLocales
-
-    app.use '/account', require './core/router/account'
-    app.use '/billing', require './core/router/billing'
-    app.use '/ticket', require './core/router/ticket'
-    app.use '/admin', require './core/router/admin'
-    app.use '/panel', require './core/router/panel'
-
-    app.pluggable.initializePlugins()
-
-    app.get '/', (req, res) ->
-      unless res.headerSent
-        res.redirect '/panel/'
-
-    app.use harp.mount './core/static'
-
-    app.billing.run()
-
-    app.listen config.web.listen, ->
-      fs.chmodSync config.web.listen, 0o770
-      console.log "RootPanel start at #{config.web.listen}"
-
-unless module.parent
-  exports.run()
+  app.logger "RootPanel start at #{config.web.listen}"

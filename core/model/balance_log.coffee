@@ -1,23 +1,29 @@
-{ObjectID} = require 'mongodb'
-_ = require 'underscore'
+{pluggable} = app
+{selectModelEnum} = pluggable
+{_, ObjectId, mongoose} = app.libs
 
-module.exports = exports = app.db.collection 'balance_log'
+BalanceLog = mongoose.Schema
+  account_id:
+    required: true
+    type: ObjectId
+    ref: 'Account'
 
-sample =
-  account_id: new ObjectID()
-  type: 'deposit'
-  amount: 10
-  created_at: new Date()
+  type:
+    required: true
+    type: String
+    enum: ['deposit']
+
+  amount:
+    required: true
+    type: Number
+
+  created_at:
+    type: Date
+    default: Date.now
+
   payload:
-    type: 'taobao'
-    order_id: '560097131641814'
+    type: Object
+    default: {}
 
-exports.create = (account, type, amount, payload, callback) ->
-  exports.insert
-    account_id: account._id
-    type: type
-    amount: amount
-    payload: payload
-    created_at: new Date()
-  , (err, result) ->
-    callback _.first result
+_.extend app.models,
+  BalanceLog: mongoose.model 'BalanceLog', BalanceLog

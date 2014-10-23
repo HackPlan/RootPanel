@@ -3,8 +3,8 @@ async = require 'async'
 _ = require 'underscore'
 
 {renderAccount, errorHandling, requireAuthenticate} = app.middleware
-{mAccount, mSecurityLog, mCouponCode} = app.models
-{pluggable, config, utils, authenticator} = app
+{Account, SecurityLog, CouponCode} = app.models
+{pluggable, config, utils, authenticator, logger} = app
 
 module.exports = exports = express.Router()
 
@@ -18,59 +18,18 @@ exports.get '/preferences', requireAuthenticate, (req, res) ->
   res.render 'account/preferences'
 
 exports.post '/register', errorHandling, (req, res) ->
-  unless utils.rx.username.test req.body.username
-    return res.error 'invalid_username'
+  mAccount.register req.body, (err, account) ->
+    logger err if err
 
-  unless utils.rx.email.test req.body.email
-    return res.error 'invalid_email'
+    authenticator.createToken account, 'full_access',
+      ip: req.headers['x-real-ip']
+      ua: req.headers['user-agent']
+    , (token) ->
+      res.cookie 'token', token,
+        expires: new Date(Date.now() + config.account.cookie_time)
 
-  unless utils.rx.password.test req.body.password
-    return res.error 'invalid_password'
-
-  async.each pluggable.selectHook(null, 'account.username_filter'), (hook, callback) ->
-    hook.filter req.body.username, (is_allow) ->
-      if is_allow
-        callback()
-      else
-        callback true
-
-  , (not_allow) ->
-    if not_allow
-      return res.error 'username_exist'
-
-    async.parallel
-      username: (callback) ->
-        mAccount.findOne
-          username: req.body.username
-        , (err, account) ->
-          if account
-            callback 'username_exist'
-          else
-            callback()
-
-      email: (callback) ->
-        mAccount.findOne
-          email: req.body.email
-        , (err, account) ->
-          if account
-            callback 'email_exist'
-          else
-            callback()
-
-    , (err) ->
-      if err
-        return res.error err
-
-      mAccount.register _.pick(req.body, 'username', 'email', 'password'), (account) ->
-        authenticator.createToken account, 'full_access',
-          ip: req.headers['x-real-ip']
-          ua: req.headers['user-agent']
-        , (token) ->
-          res.cookie 'token', token,
-            expires: new Date(Date.now() + config.account.cookie_time)
-
-          res.json
-            id: account._id
+      res.json
+        id: account._id
 
 exports.post '/login', errorHandling, (req, res) ->
   mAccount.search req.body.username, (err, account) ->
