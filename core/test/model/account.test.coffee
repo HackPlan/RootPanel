@@ -28,7 +28,7 @@ describe 'model/account', ->
 
   describe 'register', ->
     it 'should success', (done) ->
-      username = utils.randomString(20).toLowerCase()
+      username = "test#{utils.randomString(20).toLowerCase()}"
       email = "#{utils.randomString 20}@gmail.com"
       password = utils.randomString 20
 
@@ -40,7 +40,7 @@ describe 'model/account', ->
         expect(err).to.not.exist
 
         account.username.should.be.equal username
-        account.email.should.be.equal email
+        account.email.should.be.equal email.toLowerCase()
         account.password.should.have.length 64
 
         done()

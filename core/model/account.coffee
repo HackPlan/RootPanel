@@ -32,6 +32,7 @@ Account = mongoose.Schema
     type: String
 
   email:
+    lowercase: true
     required: true
     unique: true
     type: String
