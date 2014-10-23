@@ -28,6 +28,7 @@ exports.post = (url, options, callback) ->
 
 exports.defaultOptions = (options) ->
   default_options =
+    followRedirect: false
     uri_prefix: '/'
     expect_status_code: 200
     response_json: true
