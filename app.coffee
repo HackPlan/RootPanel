@@ -22,10 +22,10 @@ app.libs =
   redis: require 'redis'
   redisStore: require 'connect-redis'
   expressSession: require 'express-session'
+  mongooseUniqueValidator: require 'mongoose-unique-validator'
 
   ObjectId: (require 'mongoose').Schema.Types.ObjectId
 
-async = require 'async'
 {cookieParser, copy, crypto, bodyParser, depd, express, fs, harp, middlewareInjector, mongoose} = exports.libs
 {morgan, nodemailer, path, redis, redisStore, expressSession} = exports.libs
 

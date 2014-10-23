@@ -49,4 +49,4 @@ exports.pickErrorName = (error) ->
 
   err = error.errors[_.first(_.keys(error.errors))]
 
-  return err.value
+  return err.message

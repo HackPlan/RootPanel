@@ -1,6 +1,5 @@
-{pluggable} = app
-{selectModelEnum} = pluggable
-{_, async, mongoose} = app.libs
+{pluggable, utils} = app
+{_, async, mongoose, mongooseUniqueValidator} = app.libs
 
 Token = mongoose.Schema
   type:
@@ -10,6 +9,7 @@ Token = mongoose.Schema
 
   token:
     required: true
+    unique: true
     type: String
 
   created_at:
@@ -27,10 +27,12 @@ Token = mongoose.Schema
 Account = mongoose.Schema
   username:
     required: true
+    unique: true
     type: String
 
   email:
     required: true
+    unique: true
     type: String
 
   password:
@@ -84,6 +86,31 @@ Account = mongoose.Schema
     type: Object
     default: {}
 
+Account.plugin mongooseUniqueValidator
+
+Account.path('email').validate (email) ->
+  return utils.rx.email.test email
+, 'invalid_email'
+
+Account.path('username').validate (username) ->
+  return utils.rx.username.test username
+, 'invalid_username'
+
+Account.path('username').validate (username, callback) ->
+  async.each pluggable.selectHook(null, 'account.username_filter'), (hook, callback) ->
+    hook.filter username, (is_allow) ->
+      if is_allow
+        callback()
+      else
+        callback true
+
+  , (not_allow) ->
+    if not_allow
+      callback()
+    else
+      callback true
+, 'username_exist'
+
 # @param account: username, email, password
 # @param callback(account)
 Account.statics.register = (account, callback) ->
@@ -105,8 +132,8 @@ Account.statics.register = (account, callback) ->
   async.each pluggable.selectHook(account, 'account.before_register'), (hook, callback) ->
     hook.filter account, callback
   , ->
-    account.save ->
-      callback account
+    account.save (err) ->
+      callback err, account
 
 _.extend app.models,
   Account: mongoose.model 'Account', Account

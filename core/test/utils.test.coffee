@@ -101,10 +101,10 @@ describe 'utils', ->
       error =
         errors:
           email:
-            value: 'invalid_email'
+            message: 'invalid_email'
 
           username:
-            value: 'invalid_username'
+            message: 'invalid_username'
 
       expect(utils.pickErrorName(error) in [
         'invalid_email', 'invalid_username'
