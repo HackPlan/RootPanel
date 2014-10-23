@@ -158,6 +158,9 @@ Account.methods.updatePassword = (password, callback) ->
   @password = utils.hashPassword password, @password_salt
   @save callback
 
+Account.methods.inGroup = (group) ->
+  return group in @groups
+
 _.extend app.models,
   Account: mongoose.model 'Account', Account
 
@@ -168,6 +171,3 @@ exports.incBalance = (account, type, amount, payload, callback) ->
   , ->
     mBalance.create account, type, amount, payload, (err, balance_log) ->
       callback balance_log
-
-exports.inGroup = (account, group) ->
-  return group in account.groups

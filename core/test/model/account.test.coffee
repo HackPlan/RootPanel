@@ -98,3 +98,11 @@ describe 'model/account', ->
           account.matchPassword(util.password).should.be.ok
           account.matchPassword(old_password).should.not.ok
           done()
+
+  describe 'inGroup', ->
+    it 'should in it', ->
+      util.account.groups = ['test']
+      util.account.inGroup('test').should.be.ok
+
+    it 'should not in it', ->
+      util.account.inGroup('group_not_exist').should.not.ok
