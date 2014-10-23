@@ -88,6 +88,31 @@ describe 'model/account', ->
         expect(account).to.not.exist
         done()
 
+  describe 'generateToken', ->
+    it 'should success', (done) ->
+      Account.generateToken (token1) ->
+        Account.generateToken (token2) ->
+          token1.should.not.equal token2
+          token1.should.have.length 64
+          done()
+
+  describe 'createToken', ->
+    it 'should success', (done) ->
+      util.account.createToken 'full_access', {}, (err, token) ->
+        token.should.be.exist
+
+        Account.findById util.account._id, (err, account) ->
+          matched_token = _.findWhere account.tokens,
+            token: token.token
+
+          matched_token.should.be.exist
+          done()
+
+    it 'should fail with invalid type', (done) ->
+      util.account.createToken 'invalid_type', {}, (err) ->
+        err.should.be.exist
+        done()
+
   describe 'matchPassword', ->
     it 'should be matched', ->
       util.account.matchPassword(util.password).should.be.ok

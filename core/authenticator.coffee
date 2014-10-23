@@ -1,35 +1,3 @@
-_ = require 'underscore'
-
-utils = require './utils'
-
-mAccount = require './model/account'
-
-# @param callback(token)
-exports.generateToken = (callback) ->
-  token = utils.randomSalt()
-
-  mAccount.findOne
-    'tokens.token': token
-  , (err, result) ->
-    if result
-      exports.generateToken callback
-    else
-      callback token
-
-# @param callback(token)
-exports.createToken = (account, type, payload, callback) ->
-  exports.generateToken (token) ->
-    mAccount.update {_id: account._id},
-      $push:
-        tokens:
-          type: type
-          token: token
-          created_at: new Date()
-          updated_at: new Date()
-          payload: payload
-    , ->
-      callback token
-
 # @param payload must be flat
 # @param callback(is_found)
 exports.revokeToken = (token, callback) ->

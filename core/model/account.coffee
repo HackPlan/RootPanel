@@ -1,4 +1,4 @@
-{pluggable, utils, config} = app
+{pluggable, utils, config, models} = app
 {_, async, mongoose, mongooseUniqueValidator} = app.libs
 
 BalanceLog = null
@@ -125,7 +125,7 @@ Account.statics.register = (account, callback) ->
 
   {username, email, password} = account
 
-  account = new app.models.Account
+  account = new @
     username: username
     email: email
     password: utils.hashPassword(password, password_salt)
@@ -154,6 +154,36 @@ Account.statics.search = (stuff, callback) ->
 
       @findById stuff, (err, account) ->
         callback account
+
+# @param callback(token)
+Account.statics.generateToken = (callback) ->
+  token = utils.randomSalt()
+
+  @findOne
+    'tokens.token': token
+  , (err, result) ->
+    if result
+      @generateToken callback
+    else
+      callback token
+
+# @param callback(err, Token)
+Account.methods.createToken = (type, payload, callback) ->
+  models.Account.generateToken (token) =>
+    token = new models.Token
+      type: type
+      token: token
+      payload: payload
+
+    token.validate (err) =>
+      return callback err if err
+
+      @tokens.push token
+
+      @save (err) ->
+        return callback err if err
+
+        callback null, token
 
 Account.methods.matchPassword = (password) ->
   return @password == utils.hashPassword(password, @password_salt)
@@ -191,3 +221,4 @@ Account.methods.inGroup = (group) ->
 
 _.extend app.models,
   Account: mongoose.model 'Account', Account
+  Token: mongoose.model 'Token', Token
