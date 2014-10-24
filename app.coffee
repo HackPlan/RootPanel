@@ -29,8 +29,6 @@ app.libs =
 {cookieParser, copy, crypto, bodyParser, depd, express, fs, harp, middlewareInjector, mongoose} = exports.libs
 {morgan, nodemailer, path, redis} = exports.libs
 
-
-
 app.logger = do ->
   unless process.env.NODE_ENV == 'test'
     return console.log

@@ -1,4 +1,6 @@
 express = require 'express'
+bodyParser = require 'body-parser'
+cookieParser = require 'cookie-parser'
 
 Account = null
 middleware = null
@@ -10,7 +12,7 @@ describe 'middleware', ->
     {Account} = app.models
 
   describe 'errorHandling', ->
-    it 'should work', (done) ->
+    it 'should work with param', (done) ->
       server = express()
       server.use middleware.errorHandling()
 
@@ -24,6 +26,21 @@ describe 'middleware', ->
       .expect (res) ->
         res.body.error.should.be.equal 'error_name'
         res.body.message.should.be.equal 'error_message'
+        return null
+      .end done
+
+    it 'should work with status code', (done) ->
+      server = express()
+      server.use middleware.errorHandling()
+
+      server.use (req, res) ->
+        res.error 'error_name', null, 403
+
+      supertest server
+      .get '/'
+      .expect 403
+      .expect (res) ->
+        res.body.error.should.be.equal 'error_name'
         return null
       .end done
 
@@ -46,4 +63,38 @@ describe 'middleware', ->
       .expect 200
       .end done
 
+  describe 'csrf', ->
+    server = express()
+    agent = supertest.agent server
+    token = null
 
+    before ->
+      server.use bodyParser.json()
+      server.use cookieParser()
+      server.use middleware.session()
+      server.use middleware.errorHandling()
+      server.use middleware.csrf()
+
+      server.use (req, res) ->
+        req.session.csrf_token.should.be.exist
+        res.json
+          csrf_token: req.session.csrf_token
+
+    it 'should ignore GET request', (done) ->
+      agent.get '/'
+      .expect 200
+      .end (err, res) ->
+        token = res.body.csrf_token
+        done()
+
+    it 'should reject with no token', (done) ->
+      agent.post '/'
+      .expect 403
+      .end done
+
+    it 'should success with token', (done) ->
+      agent.post '/'
+      .send
+        csrf_token: token
+      .expect 200
+      .end done
