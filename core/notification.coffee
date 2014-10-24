@@ -1,6 +1,6 @@
 async = require 'async'
 
-mAccount = require './model/account'
+{Account} = app.models
 mNotification = require './model/notification'
 
 i18n = require './i18n'

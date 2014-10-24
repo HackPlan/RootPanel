@@ -1,7 +1,7 @@
 {pluggable} = app
 {_, ObjectId, mongoose} = app.libs
 
-BalanceLog = mongoose.Schema
+Financials = mongoose.Schema
   account_id:
     required: true
     type: ObjectId
@@ -25,4 +25,4 @@ BalanceLog = mongoose.Schema
     default: {}
 
 _.extend app.models,
-  BalanceLog: mongoose.model 'BalanceLog', BalanceLog
+  Financials: mongoose.model 'Financials', Financials

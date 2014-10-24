@@ -77,8 +77,8 @@ app.pluggable = require './core/pluggable'
 
 app.models = {}
 
-require './core/model/account'
-require './core/model/balance_log'
+require './core/model/Account'
+require './core/model/Financials'
 require './core/model/coupon_code'
 require './core/model/notification'
 require './core/model/security_log'

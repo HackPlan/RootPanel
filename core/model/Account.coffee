@@ -1,10 +1,10 @@
 {pluggable, utils, config, models} = app
 {_, async, mongoose, mongooseUniqueValidator} = app.libs
 
-BalanceLog = null
+Financial = null
 
 process.nextTick ->
-  {BalanceLog} = app.models
+  {Financial} = app.models
 
 Token = mongoose.Schema
   type:
@@ -198,13 +198,13 @@ Account.methods.incBalance = (amount, type, payload, callback) ->
   unless _.isNumber amount
     return callback new Error 'amount must be a number'
 
-  balance_log = new BalanceLog
+  financials = new models.Financials
     account_id: @_id
     type: type
     amount: amount
     payload: payload
 
-  balance_log.validate (err) =>
+  financials.validate (err) =>
     return callback err if err
 
     @update
@@ -213,7 +213,7 @@ Account.methods.incBalance = (amount, type, payload, callback) ->
     , (err) ->
       return callback err if err
 
-      balance_log.save (err) ->
+      financials.save (err) ->
         callback err
 
 Account.methods.inGroup = (group) ->

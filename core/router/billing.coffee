@@ -3,8 +3,7 @@ _ = require 'underscore'
 
 {config, pluggable, billing} = app
 {requireAuthenticate} = require './../middleware'
-
-mAccount = require '../model/account'
+{Account} = app.models
 
 module.exports = exports = express.Router()
 

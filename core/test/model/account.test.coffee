@@ -1,6 +1,6 @@
 utils = null
 Account = null
-BalanceLog = null
+Financials = null
 
 util =
   account: null
@@ -12,10 +12,10 @@ describe 'model/account', ->
   before ->
     require '../../../app'
     {utils} = app
-    {Account, BalanceLog} = app.models
+    {Account, Financials} = app.models
 
   after (done) ->
-    BalanceLog.remove
+    Financials.remove
       account_id:
         $in: util.created_account_ids
     , done
@@ -134,11 +134,11 @@ describe 'model/account', ->
   describe 'incBalance', ->
     it 'should success', (done) ->
       util.account.incBalance -10, 'deposit', {meta: 'meta'}, (err) ->
-        BalanceLog.findOne
+        Financials.findOne
           account_id: util.account._id
-        , (err, balance_log) ->
-          balance_log.amount.should.be.equal -10
-          balance_log.payload.meta.should.be.equal 'meta'
+        , (err, financials) ->
+          financials.amount.should.be.equal -10
+          financials.payload.meta.should.be.equal 'meta'
 
           Account.findById util.account._id, (err, account) ->
             account.billing.balance.should.be.equal -10

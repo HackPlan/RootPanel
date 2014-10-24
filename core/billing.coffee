@@ -2,8 +2,7 @@ stringify = require 'json-stable-stringify'
 async = require 'async'
 _ = require 'underscore'
 
-mAccount = require './model/account'
-mBalance = require './model/balance_log'
+{Account, Financials} = app.models
 
 config = require '../config'
 pluggable = require './pluggable'
