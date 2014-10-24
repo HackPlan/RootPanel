@@ -1,6 +1,25 @@
-{_} = app.libs
+{_, expressSession, redisStore, path} = app.libs
+{Account} = app.models
 
-authenticator = require './authenticator'
+exports.errorHandling = ->
+  return (req, res, next) ->
+    res.error = (name, param = {}, status = 400) ->
+      res.status(status).json _.extend param,
+        error: name
+
+    next()
+
+exports.session = ->
+  RedisStore = redisStore expressSession
+  secret = fs.readFileSync(path.join __dirname, '../session.key').toString()
+
+  return expressSession
+    store: new RedisStore
+      client: app.redis
+
+    resave: false
+    saveUninitialized: false
+    secret: secret
 
 exports.csrf = ->
   csrf = app.libs.csrf()
@@ -9,8 +28,7 @@ exports.csrf = ->
     validator = ->
       unless req.method == 'GET'
         unless csrf.verify req.session.csrf_secret, req.body.csrf_token
-          return res.status(403).send
-            error: 'invalid_csrf_token'
+          return res.error 'invalid_csrf_token', null, 403
 
       next()
 
@@ -37,32 +55,22 @@ exports.getParam = (req, res, next) ->
 
   next()
 
-exports.errorHandling = (req, res, next) ->
-  res.error = (name, param = {}) ->
-    param = _.extend param, error: name
-    res.status(400).json param
-  next()
-
 exports.accountInfo = (req, res, next) ->
   req.inject [exports.parseToken], ->
-    authenticator.authenticate req.token, (err, account) ->
-      if account
-        req.account = account
-        res.locals.account = _.extend account,
-          inGroup: (group_name) ->
-            return group_name in account.groups
+    Account.authenticate req.token, (token, account) ->
+      if token and token.type == 'full_access'
+        res.locals.account = req.account = account
 
       next()
 
 exports.requireAuthenticate = (req, res, next) ->
-  req.inject [exports.accountInfo, exports.errorHandling], ->
-    if req.account
-      next()
+  if req.account
+    next()
+  else
+    if req.method == 'GET'
+      res.redirect '/account/login/'
     else
-      if req.method == 'GET'
-        res.redirect '/account/login/'
-      else
-        res.error 'auth_failed'
+      res.error 'auth_failed'
 
 exports.requireAdminAuthenticate = (req, res, next) ->
   req.inject [exports.requireAuthenticate], ->

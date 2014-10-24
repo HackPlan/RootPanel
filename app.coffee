@@ -27,9 +27,9 @@ app.libs =
   ObjectId: (require 'mongoose').Schema.Types.ObjectId
 
 {cookieParser, copy, crypto, bodyParser, depd, express, fs, harp, middlewareInjector, mongoose} = exports.libs
-{morgan, nodemailer, path, redis, redisStore, expressSession} = exports.libs
+{morgan, nodemailer, path, redis} = exports.libs
 
-RedisStore = redisStore expressSession
+
 
 app.logger = do ->
   unless process.env.NODE_ENV == 'test'
@@ -92,7 +92,6 @@ app.cache = require './core/cache'
 app.billing = require './core/billing'
 app.middleware = require './core/middleware'
 app.notification = require './core/notification'
-app.authenticator = require './core/authenticator'
 
 app.redis = redis.createClient 6379, '127.0.0.1',
   auth_pass: config.redis.password
@@ -103,17 +102,11 @@ app.express = express()
 unless process.env.NODE_ENV == 'test'
   app.express.use morgan 'dev'
 
-app.express.use expressSession
-  store: new RedisStore
-    client: app.redis
-
-  resave: false
-  saveUninitialized: false
-  secret: fs.readFileSync(path.join __dirname, 'session.key').toString()
-
 app.express.use bodyParser.json()
 app.express.use cookieParser()
 app.express.use middlewareInjector
+app.express.use app.middleware.errorHandling()
+app.express.use app.middleware.session()
 app.express.use app.middleware.csrf()
 
 app.express.use (req, res, next) ->

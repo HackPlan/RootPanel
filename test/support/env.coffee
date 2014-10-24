@@ -12,6 +12,7 @@ global.fs = require 'fs'
 global.async = require 'async'
 global.deepmerge = require 'deepmerge'
 global.chai = require 'chai'
+global.supertest = require 'supertest'
 
 global.expect = chai.expect
 global.client = require './client'
