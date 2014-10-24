@@ -115,6 +115,28 @@ describe 'model/Account', ->
         err.should.be.exist
         done()
 
+  describe 'authenticate', ->
+    it 'should success', (done) ->
+      Account.authenticate util.token, (token, account) ->
+        token.token.should.equal util.token
+        account.id.should.equal util.account.id
+
+        done()
+
+    it 'should fail with no token', (done) ->
+      Account.authenticate '', (token, account) ->
+        expect(token).to.not.exist
+        expect(account).to.not.exist
+
+        done()
+
+    it 'should fail with invalid token', (done) ->
+      Account.authenticate 'invalid token', (token, account) ->
+        expect(token).to.not.exist
+        expect(account).to.not.exist
+
+        done()
+
   describe 'matchPassword', ->
     it 'should be matched', ->
       util.account.matchPassword(util.password).should.be.ok

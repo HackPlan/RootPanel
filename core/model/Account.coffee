@@ -177,6 +177,22 @@ Account.statics.generateToken = (callback) ->
     else
       callback token
 
+# @param callback(Token, Account)
+Account.statics.authenticate = (token, callback) ->
+  unless token
+    return callback()
+
+  @findOneAndUpdate
+    'tokens.token': token
+  ,
+    $set:
+      'tokens.$.updated_at': new Date()
+  , (err, account) ->
+    matched_token = _.findWhere account?.tokens,
+      token: token
+
+    callback matched_token, account
+
 # @param callback(err, Token)
 Account.methods.createToken = (type, payload, callback) ->
   models.Account.generateToken (token) =>
