@@ -14,7 +14,7 @@ describe 'middleware', ->
   describe 'errorHandling', ->
     it 'should work with param', (done) ->
       server = express()
-      server.use middleware.errorHandling()
+      server.use middleware.errorHandling
 
       server.use (req, res) ->
         res.error 'error_name',
@@ -31,7 +31,7 @@ describe 'middleware', ->
 
     it 'should work with status code', (done) ->
       server = express()
-      server.use middleware.errorHandling()
+      server.use middleware.errorHandling
 
       server.use (req, res) ->
         res.error 'error_name', null, 403
@@ -72,7 +72,7 @@ describe 'middleware', ->
       server.use bodyParser.json()
       server.use cookieParser()
       server.use middleware.session()
-      server.use middleware.errorHandling()
+      server.use middleware.errorHandling
       server.use middleware.csrf()
 
       server.use (req, res) ->
@@ -98,3 +98,18 @@ describe 'middleware', ->
         csrf_token: token
       .expect 200
       .end done
+
+  describe 'authenticate', ->
+    it 'pending'
+
+  describe 'accountHelpers', ->
+    it 'pending'
+
+  describe 'requireAuthenticate', ->
+    it 'pending'
+
+  describe 'requireAdminAuthenticate', ->
+    it 'pending'
+
+  describe 'requireInService', ->
+    it 'pending'

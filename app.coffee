@@ -103,38 +103,12 @@ unless process.env.NODE_ENV == 'test'
 app.express.use bodyParser.json()
 app.express.use cookieParser()
 app.express.use middlewareInjector
-app.express.use app.middleware.errorHandling()
+
+app.express.use app.middleware.errorHandling
 app.express.use app.middleware.session()
 app.express.use app.middleware.csrf()
-
-app.express.use (req, res, next) ->
-  req.res = res
-
-  res.language = req.cookies.language ? config.i18n.default_language
-  res.timezone = req.cookies.timezone ? config.i18n.default_timezone
-
-  res.locals =
-    config: config
-    app: app
-    req: req
-    res: res
-
-    t: app.i18n.getTranslator req
-
-    selectHook: (name) ->
-      return app.pluggable.selectHook req.account, name
-
-    moment: ->
-      return moment.apply(@, arguments).locale(res.language).tz(res.timezone)
-
-  res.t = res.locals.t
-  res.moment = res.locals.moment
-
-  res.locals.config.web.name = res.t app.config.web.t_name
-
-  next()
-
-app.express.use app.middleware.accountInfo
+app.express.use app.middleware.authenticate
+app.express.use app.middleware.accountHelpers
 
 app.express.set 'views', path.join(__dirname, 'core/view')
 app.express.set 'view engine', 'jade'

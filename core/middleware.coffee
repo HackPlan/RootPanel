@@ -1,13 +1,13 @@
-{_, expressSession, redisStore, path} = app.libs
+{config} = app
+{_, expressSession, redisStore, path, fs} = app.libs
 {Account} = app.models
 
-exports.errorHandling = ->
-  return (req, res, next) ->
-    res.error = (name, param = {}, status = 400) ->
-      res.status(status).json _.extend param,
-        error: name
+exports.errorHandling = (req, res, next) ->
+  res.error = (name, param = {}, status = 400) ->
+    res.status(status).json _.extend param,
+      error: name
 
-    next()
+  next()
 
 exports.session = ->
   RedisStore = redisStore expressSession
@@ -41,27 +41,50 @@ exports.csrf = ->
 
         validator()
 
-exports.parseToken = (req, res, next) ->
-  if req.headers['x-token']
-    req.token = req.headers['x-token']
-  else
-    req.token = req.cookies.token
+exports.authenticate = (req, res, next) ->
+  token_field = do ->
+    if req.headers['x-token']
+      return req.headers['x-token']
+    else
+      return req.cookies.token
+
+  unless token_field
+    return next()
+
+  Account.authenticate token_field, (token, account) ->
+    if token and token.type == 'full_access'
+      req.token = token
+      req.account = account
+
+    next()
+
+exports.accountHelpers = (req, res, next) ->
+  if req.account
+    _.extend req,
+      res: res
+
+    _.extend res,
+      language: req.cookies.language ? config.i18n.default_language
+      timezone: req.cookies.timezone ? config.i18n.default_timezone
+
+      t: app.i18n.getTranslator req
+
+      moment: ->
+        return moment.apply(@, arguments).locale(res.language).tz(res.timezone)
+
+    _.extend res.locals,
+      app: app
+      req: req
+      res: res
+      config: config
+
+      t: res.t
+      moment: res.moment
+
+      selectHook: (name) ->
+        return app.pluggable.selectHook req.account, name
 
   next()
-
-exports.getParam = (req, res, next) ->
-  if req.method == 'GET'
-    req.body = req.query
-
-  next()
-
-exports.accountInfo = (req, res, next) ->
-  req.inject [exports.parseToken], ->
-    Account.authenticate req.token, (token, account) ->
-      if token and token.type == 'full_access'
-        res.locals.account = req.account = account
-
-      next()
 
 exports.requireAuthenticate = (req, res, next) ->
   if req.account
@@ -70,7 +93,7 @@ exports.requireAuthenticate = (req, res, next) ->
     if req.method == 'GET'
       res.redirect '/account/login/'
     else
-      res.error 'auth_failed'
+      res.error 'auth_failed', null, 403
 
 exports.requireAdminAuthenticate = (req, res, next) ->
   req.inject [exports.requireAuthenticate], ->
@@ -85,15 +108,7 @@ exports.requireAdminAuthenticate = (req, res, next) ->
 exports.requireInService = (service_name) ->
   return (req, res, next) ->
     req.inject [exports.requireAuthenticate], ->
-      unless service_name in req.account.attribute.services
+      unless service_name in req.account.billing.services
         return res.error 'not_in_service'
 
       next()
-
-exports.constructObjectID = (fields = ['id']) ->
-  return (req, res, next) ->
-    for field in fields
-      if req.body[field]
-        req.body[field] = new ObjectID req.body[field]
-
-    next()

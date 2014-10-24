@@ -2,7 +2,7 @@ express = require 'express'
 async = require 'async'
 _ = require 'underscore'
 
-{requireAuthenticate, getParam, constructObjectID} = app.middleware
+{requireAuthenticate} = app.middleware
 {mAccount, mTicket} = app.models
 {config, notification} = app
 
@@ -39,7 +39,7 @@ exports.get '/list', requireAuthenticate, (req, res) ->
 exports.get '/create', requireAuthenticate, (req, res) ->
   res.render 'ticket/create'
 
-exports.get '/view', getParam, loadTicket, (req, res) ->
+exports.get '/view', loadTicket, (req, res) ->
   {ticket} = req
 
   async.map ticket.members, (member_id, callback) ->
