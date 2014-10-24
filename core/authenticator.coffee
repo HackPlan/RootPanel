@@ -1,13 +1,3 @@
-# @param payload must be flat
-# @param callback(is_found)
-exports.revokeToken = (token, callback) ->
-  mAccount.update {'tokens.token': token},
-    $pull:
-      tokens:
-        token: token
-  , (err, rows) ->
-    callback rows > 0
-
 # @param callback(type, account)
 exports.authenticate = (token, callback) ->
   unless token

@@ -30,6 +30,16 @@ Token = mongoose.Schema
     type: Object
     default: {}
 
+Token.methods.revoke = (callback) ->
+  @ownerDocument().update
+    $pull:
+      tokens:
+        token: @token
+  , callback
+
+_.extend app.models,
+  Token: mongoose.model 'Token', Token
+
 Account = mongoose.Schema
   username:
     required: true
@@ -57,7 +67,7 @@ Account = mongoose.Schema
     default: []
 
   tokens: [
-    Token
+    mongoose.modelSchemas.Token
   ]
 
   preferences:
@@ -221,4 +231,3 @@ Account.methods.inGroup = (group) ->
 
 _.extend app.models,
   Account: mongoose.model 'Account', Account
-  Token: mongoose.model 'Token', Token

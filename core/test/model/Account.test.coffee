@@ -5,26 +5,27 @@ Financials = null
 util =
   account: null
   password: null
+  token: null
 
   created_account_ids: []
 
-describe 'model/account', ->
+after (done) ->
+  Financials.remove
+    account_id:
+      $in: util.created_account_ids
+  , done
+
+after (done) ->
+  Account.remove
+    _id:
+      $in: util.created_account_ids
+  , done
+
+describe 'model/Account', ->
   before ->
     require '../../../app'
     {utils} = app
     {Account, Financials} = app.models
-
-  after (done) ->
-    Financials.remove
-      account_id:
-        $in: util.created_account_ids
-    , done
-
-  after (done) ->
-    Account.remove
-      _id:
-        $in: util.created_account_ids
-    , done
 
   describe 'validators should be work', ->
     it 'invalid_email', (done) ->
@@ -106,6 +107,7 @@ describe 'model/account', ->
             token: token.token
 
           matched_token.should.be.exist
+          util.token = matched_token.token
           done()
 
     it 'should fail with invalid type', (done) ->
@@ -161,3 +163,20 @@ describe 'model/account', ->
 
     it 'should not in it', ->
       util.account.inGroup('group_not_exist').should.not.ok
+
+describe 'model/Token', ->
+  describe 'revoke', ->
+    it 'should success', (done) ->
+      util.account.createToken 'full_access', {}, (err, token) ->
+        Account.findById util.account._id, (err, account) ->
+          matched_token = _.findWhere account.tokens,
+            token: token.token
+
+          matched_token.revoke ->
+            Account.findById util.account._id, (err, account) ->
+              matched_token = _.findWhere account.tokens,
+                token: token.token
+
+              expect(matched_token).to.not.exist
+
+              done()
