@@ -18,7 +18,7 @@ html
               span.icon-bar
               span.icon-bar
               span.icon-bar
-            a.navbar-brand(href='/')= config.web.name
+            a.navbar-brand(href='/')= t(config.web.t_name)
           #navbar-collapse.collapse.navbar-collapse
             ul.nav.navbar-nav
               for hook in selectHook('view.layout.menu_bar')
@@ -64,7 +64,7 @@ html
           #sidebar.col-md-3
             block sidebar
               .row
-                header= config.web.name
+                header= t(config.web.t_name)
                 ul
                   li v#{app.package.version}
                   li

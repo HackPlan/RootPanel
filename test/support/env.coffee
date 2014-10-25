@@ -15,7 +15,6 @@ global.chai = require 'chai'
 global.supertest = require 'supertest'
 
 global.expect = chai.expect
-global.client = require './client'
 
 chai.should()
 chai.config.includeStack = true

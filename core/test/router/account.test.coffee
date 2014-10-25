@@ -1,11 +1,28 @@
 describe 'router/account', ->
-  it 'GET register'
+  agent = null
 
-  it 'GET login'
+  before ->
+    require '../../../app'
+    agent = supertest.agent app.express
+
+  it 'GET register', (done) ->
+    agent.get '/account/register'
+    .expect 200
+    .end done
+
+  it 'GET login', (done) ->
+    agent.get '/account/login'
+    .expect 200
+    .end done
 
   it 'GET preferences'
 
-  it 'GET preferences with not logged'
+  it 'GET preferences with not logged', (done) ->
+    agent.get '/account/preferences'
+    .redirects 0
+    .expect 302
+    .expect 'location', '/account/login/'
+    .end done
 
   it 'POST register'
 

@@ -1,7 +1,7 @@
 extends ../../../core/view/layout
 
 prepend header
-  title #{t('')} | #{config.web.name}
+  title #{t('')} | #{t(config.web.t_name)}
 
 block main
   for category in category_list

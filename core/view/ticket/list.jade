@@ -31,7 +31,7 @@ mixin displayTicketsTable(status, tickets)
             mixin displayTicketStatus(ticket.status)
 
 prepend header
-  title #{t('ticket.ticket_list')} | #{config.web.name}
+  title #{t('ticket.ticket_list')} | #{t(config.web.t_name)}
 
 block main
   header= t('ticket.ticket_list')

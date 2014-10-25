@@ -59,30 +59,29 @@ exports.authenticate = (req, res, next) ->
     next()
 
 exports.accountHelpers = (req, res, next) ->
-  if req.account
-    _.extend req,
-      res: res
+  _.extend req,
+    res: res
 
-    _.extend res,
-      language: req.cookies.language ? config.i18n.default_language
-      timezone: req.cookies.timezone ? config.i18n.default_timezone
+  _.extend res,
+    language: req.cookies.language ? config.i18n.default_language
+    timezone: req.cookies.timezone ? config.i18n.default_timezone
 
-      t: app.i18n.getTranslator req
+    t: app.i18n.getTranslator req
 
-      moment: ->
-        return moment.apply(@, arguments).locale(res.language).tz(res.timezone)
+    moment: ->
+      return moment.apply(@, arguments).locale(res.language).tz(res.timezone)
 
-    _.extend res.locals,
-      app: app
-      req: req
-      res: res
-      config: config
+  _.extend res.locals,
+    app: app
+    req: req
+    res: res
+    config: config
 
-      t: res.t
-      moment: res.moment
+    t: res.t
+    moment: res.moment
 
-      selectHook: (name) ->
-        return app.pluggable.selectHook req.account, name
+    selectHook: (name) ->
+      return app.pluggable.selectHook req.account, name
 
   next()
 

@@ -1,7 +1,7 @@
 extends ../../../core/view/layout
 
 prepend head
-  title #{title} | #{config.web.name}
+  title #{title} | #{t(config.web.t_name)}
 
 block main
   header= title
