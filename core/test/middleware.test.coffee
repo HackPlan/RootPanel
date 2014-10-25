@@ -23,11 +23,10 @@ describe 'middleware', ->
       supertest server
       .get '/'
       .expect 400
-      .expect (res) ->
+      .end (err, res) ->
         res.body.error.should.be.equal 'error_name'
         res.body.message.should.be.equal 'error_message'
-        return null
-      .end done
+        done err
 
     it 'should work with status code', (done) ->
       server = express()
@@ -39,10 +38,9 @@ describe 'middleware', ->
       supertest server
       .get '/'
       .expect 403
-      .expect (res) ->
+      .end (err, res) ->
         res.body.error.should.be.equal 'error_name'
-        return null
-      .end done
+        done err
 
   describe 'session', ->
     it 'session should be available', (done) ->
@@ -85,7 +83,7 @@ describe 'middleware', ->
       .expect 200
       .end (err, res) ->
         token = res.body.csrf_token
-        done()
+        done err
 
     it 'should reject with no token', (done) ->
       agent.post '/'

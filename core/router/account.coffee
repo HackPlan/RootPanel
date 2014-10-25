@@ -1,10 +1,7 @@
-express = require 'express'
-async = require 'async'
-_ = require 'underscore'
-
-{renderAccount, errorHandling, requireAuthenticate} = app.middleware
+{_, async, express} = app.libs
+{requireAuthenticate} = app.middleware
 {Account, SecurityLog, CouponCode} = app.models
-{pluggable, config, utils, authenticator, logger} = app
+{pluggable, config, utils, logger} = app
 
 module.exports = exports = express.Router()
 
@@ -17,32 +14,47 @@ exports.get '/login', (req, res) ->
 exports.get '/preferences', requireAuthenticate, (req, res) ->
   res.render 'account/preferences'
 
-exports.post '/register', errorHandling, (req, res) ->
-  Account.register req.body, (err, account) ->
-    logger err if err
+exports.get '/session_info/', (req, res) ->
+  response =
+    csrf_token: req.session.csrf_token
 
-    authenticator.createToken account, 'full_access',
+  if req.account
+    _.extend response,
+      id: account.id
+      username: account.username
+
+  res.json response
+
+exports.post '/register', (req, res) ->
+  Account.register req.body, (err, account) ->
+    return res.error utils.pickErrorName err if err
+
+    account.createToken 'full_access',
       ip: req.headers['x-real-ip']
       ua: req.headers['user-agent']
-    , (token) ->
+    , (err, token) ->
+      logger.error err if err
+
       res.cookie 'token', token,
         expires: new Date(Date.now() + config.account.cookie_time)
 
       res.json
         id: account._id
 
-exports.post '/login', errorHandling, (req, res) ->
+exports.post '/login', (req, res) ->
   Account.search req.body.username, (err, account) ->
     unless account
       return res.error 'wrong_password'
 
-    unless Account.matchPassword account, req.body.password
+    unless account.matchPassword req.body.password
       return res.error 'wrong_password'
 
-    authenticator.createToken account, 'full_access',
+    account.createToken 'full_access',
       ip: req.headers['x-real-ip']
       ua: req.headers['user-agent']
-    , (token) ->
+    , (err, token) ->
+      logger.error err if err
+
       res.cookie 'token', token,
         expires: new Date(Date.now() + config.account.cookie_time)
 

@@ -31,9 +31,12 @@ app.libs =
 
 app.logger = do ->
   unless process.env.NODE_ENV == 'test'
-    return console.log
+    return console
 
-  return ->
+  return {
+    log: ->
+    error: console.error
+  }
 
 app.package = require './package'
 app.deprecate = depd 'rootpanel'
@@ -133,4 +136,4 @@ app.express.listen config.web.listen, ->
   if fs.existsSync config.web.listen
     fs.chmodSync config.web.listen, 0o770
 
-  app.logger "RootPanel start at #{config.web.listen}"
+  app.logger.log "RootPanel start at #{config.web.listen}"
