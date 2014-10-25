@@ -34,7 +34,7 @@ html
                   a(href='/account/preferences/')= account.username
                 li
                   a(href='/panel/')= t('panel.')
-                if app.models.mAccount.inGroup(account, 'root')
+                if account.inGroup('root')
                   li
                     a(href='/admin/')= t('admin.admin_panel')
                 li

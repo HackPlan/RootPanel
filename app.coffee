@@ -25,6 +25,7 @@ app.libs =
   mongooseUniqueValidator: require 'mongoose-unique-validator'
 
   ObjectId: (require 'mongoose').Schema.Types.ObjectId
+  Mixed: (require 'mongoose').Schema.Types.Mixed
 
 {cookieParser, copy, crypto, bodyParser, depd, express, fs, harp, middlewareInjector, mongoose} = exports.libs
 {morgan, nodemailer, path, redis} = exports.libs
@@ -82,7 +83,7 @@ require './core/model/Account'
 require './core/model/Financials'
 require './core/model/coupon_code'
 require './core/model/notification'
-require './core/model/security_log'
+require './core/model/SecurityLog'
 require './core/model/ticket'
 
 app.pluggable.initializePlugins()
@@ -121,6 +122,7 @@ app.express.get '/locale/:language?', app.i18n.downloadLocales
 app.express.use '/account', require './core/router/account'
 app.express.use '/billing', require './core/router/billing'
 app.express.use '/ticket', require './core/router/ticket'
+app.express.use '/coupon', require './core/router/coupon'
 app.express.use '/admin', require './core/router/admin'
 app.express.use '/panel', require './core/router/panel'
 

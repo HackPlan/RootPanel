@@ -1,10 +1,10 @@
 {pluggable, utils, config, models} = app
 {_, async, mongoose, mongooseUniqueValidator} = app.libs
 
-Financial = null
+{Financial, SecurityLog} = app.models
 
 process.nextTick ->
-  {Financial} = app.models
+  {Financial, SecurityLog} = app.models
 
 Token = mongoose.Schema
   type:
@@ -245,6 +245,14 @@ Account.methods.incBalance = (amount, type, payload, callback) ->
 
 Account.methods.inGroup = (group) ->
   return group in @groups
+
+Account.methods.createSecurityLog = (type, token, payload, callback) ->
+  SecurityLog.create
+    account_id: @_id
+    type: type
+    token: token
+    payload: payload
+  , callback
 
 _.extend app.models,
   Account: mongoose.model 'Account', Account

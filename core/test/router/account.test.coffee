@@ -68,7 +68,17 @@ describe 'router/account', ->
       res.body.error.should.be.equal 'username_exist'
       done err
 
-  it 'POST register with invalid email'
+  it 'POST register with invalid email', (done) ->
+    agent.post '/account/register'
+    .send
+      csrf_token: csrf_token
+      username: "test#{utils.randomString(20).toLowerCase()}"
+      email: "@gmail.com"
+      password: password
+    .expect 400
+    .end (err, res) ->
+      res.body.error.should.be.equal 'invalid_email'
+      done err
 
   it 'POST login', (done) ->
     agent.post '/account/login'
@@ -83,22 +93,58 @@ describe 'router/account', ->
       res.body.token.should.be.exist
       done err
 
-  it 'POST login with email'
+  it 'POST logout', (done) ->
+    agent.post '/account/logout'
+    .send
+      csrf_token: csrf_token
+    .expect 200
+    .expect 'set-cookie', /token=;/
+    .end done
 
-  it 'POST login with username does not exist'
+  it 'POST login with email', (done) ->
+    agent.post '/account/login'
+    .send
+      csrf_token: csrf_token
+      username: email.toLowerCase()
+      password: password
+    .expect 200
+    .expect 'set-cookie', /token=/
+    .end (err, res) ->
+      res.body.id.should.be.equal account_id
+      res.body.token.should.be.exist
+      done err
 
-  it 'POST login with invalid password'
+  it 'POST login with username does not exist', (done) ->
+    agent.post '/account/login'
+    .send
+      csrf_token: csrf_token
+      username: 'username_not_exist'
+      password: password
+    .expect 400
+    .end (err, res) ->
+      res.body.error.should.be.equal 'wrong_password'
+      expect(res.body.token).to.not.exist
+      done err
 
-  it 'GET preferences'
+  it 'POST login with invalid password', (done) ->
+    agent.post '/account/login'
+    .send
+      csrf_token: csrf_token
+      username: username
+      password: 'invalid password'
+    .expect 400
+    .end (err, res) ->
+      res.body.error.should.be.equal 'wrong_password'
+      expect(res.body.token).to.not.exist
+      done err
 
-  it 'POST logout'
+  it 'GET preferences', (done) ->
+    agent.get '/account/preferences'
+    .expect 200
+    .end done
 
   it 'POST update_password'
 
   it 'POST update_email'
 
   it 'POST update_preferences'
-
-  it 'GET coupon_info'
-
-  it 'POST apply_coupon'

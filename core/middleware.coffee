@@ -77,6 +77,8 @@ exports.accountHelpers = (req, res, next) ->
     res: res
     config: config
 
+    account: req.account
+
     t: res.t
     moment: res.moment
 

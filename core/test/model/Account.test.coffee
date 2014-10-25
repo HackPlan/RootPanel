@@ -186,6 +186,9 @@ describe 'model/Account', ->
     it 'should not in it', ->
       util.account.inGroup('group_not_exist').should.not.ok
 
+  describe 'createSecurityLog', ->
+    it 'pending'
+
 describe 'model/Token', ->
   describe 'validators should be work', ->
     it 'unique_validation_error'
