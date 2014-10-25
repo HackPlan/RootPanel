@@ -143,7 +143,7 @@ Account.statics.register = (account, callback) ->
     password_salt: password_salt
 
     preferences:
-      avatar_url: "//ruby-china.org/avatar/#{utils.md5(email)}?s=58"
+      avatar_url: "//cdn.v2ex.com/gravatar/#{utils.md5(email)}?s=58"
       language: 'auto'
       timezone: config.i18n.default_timezone
 

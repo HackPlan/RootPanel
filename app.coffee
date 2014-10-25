@@ -81,10 +81,10 @@ app.models = {}
 
 require './core/model/Account'
 require './core/model/Financials'
-require './core/model/coupon_code'
-require './core/model/notification'
+require './core/model/CouponCode'
+require './core/model/Notification'
 require './core/model/SecurityLog'
-require './core/model/ticket'
+require './core/model/Ticket'
 
 app.pluggable.initializePlugins()
 

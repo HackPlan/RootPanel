@@ -5,7 +5,6 @@ if process.env.COV_TEST == 'true'
     path: 'relative'
     basePath: "#{__dirname}/../.."
     exclude: ['test', 'node_modules', '.git', 'sample', 'core/static']
-    initAll: true
 
 global._ = require 'underscore'
 global.fs = require 'fs'

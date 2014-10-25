@@ -1,28 +1,29 @@
-express = require 'express'
-async = require 'async'
-_ = require 'underscore'
+{_, async, express} = app.libs
 
 {requireAuthenticate} = app.middleware
-{mAccount, mTicket} = app.models
-{config, notification} = app
+{Account, Ticket} = app.models
+{config, notification, logger} = app
 
 module.exports = exports = express.Router()
 
-loadTicket = (req, res, next) ->
-  req.inject [requireAuthenticate, constructObjectID()], ->
-    mTicket.findOne _id: req.body.id, (err, ticket) ->
-      unless ticket
-        return res.error 'ticket_not_exist'
+exports.use requireAuthenticate
 
-      unless mTicket.getMember ticket, req.account
-        unless 'root' in req.account.groups
-          return res.error 'forbidden'
+exports.param 'ticket_id', (req, res, next, ticket_id) ->
+  Ticket.findById ticket_id, (err, ticket) ->
+    logger.error err if err
 
-      req.ticket = ticket
+    unless ticket
+      return res.error 'ticket_not_exist', null, 404
 
-      next()
+    unless ticket.hasMember req.account
+      unless account.inGroup 'root'
+        return res.error 'forbidden', null, 403
 
-exports.get '/list', requireAuthenticate, (req, res) ->
+    req.ticket = ticket
+
+    next()
+
+exports.get '/list', (req, res) ->
   mTicket.find
     $or: [
       account_id: req.account._id
@@ -32,14 +33,14 @@ exports.get '/list', requireAuthenticate, (req, res) ->
   ,
     sort:
       updated_at: -1
-  .toArray (err, tickets) ->
+  , (err, tickets) ->
     res.render 'ticket/list',
       tickets: tickets
 
-exports.get '/create', requireAuthenticate, (req, res) ->
+exports.get '/create', (req, res) ->
   res.render 'ticket/create'
 
-exports.get '/view', loadTicket, (req, res) ->
+exports.get '/view/:ticket_id', (req, res) ->
   {ticket} = req
 
   async.map ticket.members, (member_id, callback) ->
@@ -63,7 +64,7 @@ exports.get '/view', loadTicket, (req, res) ->
         res.render 'ticket/view',
           ticket: ticket
 
-exports.post '/create', requireAuthenticate, (req, res) ->
+exports.post '/create', (req, res) ->
   unless /^.+$/.test req.body.title
     return res.error 'invalid_title'
 
@@ -81,7 +82,7 @@ exports.post '/create', requireAuthenticate, (req, res) ->
         config: config
     , ->
 
-exports.post '/reply', loadTicket, (req, res) ->
+exports.post '/reply', (req, res) ->
   {ticket} = req
 
   unless req.body.content
@@ -111,7 +112,7 @@ exports.post '/reply', loadTicket, (req, res) ->
           callback()
     , ->
 
-exports.post '/update_status', loadTicket, (req, res) ->
+exports.post '/update_status', (req, res) ->
   {ticket} = req
 
   if 'root' in req.account.groups

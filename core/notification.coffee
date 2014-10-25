@@ -1,25 +1,27 @@
-async = require 'async'
+{async, _} = app.libs
+{i18n, config, logger, mailer} = app
+{Account, Notification} = app.models
 
-{Account} = app.models
-mNotification = require './model/notification'
-
-i18n = require './i18n'
-config = require '../config'
-
-{NOTICE, EVENT, LOG} = module.exports = exports =
+{NOTICE, EVENT, LOG} = _.extend exports,
   NOTICE: 'notice'
   EVENT: 'event'
   LOG: 'log'
 
-exports.notice_level =
+exports.notices_level = notices_level =
   ticket_create: NOTICE
   ticket_reply: NOTICE
   ticket_update: EVENT
 
 exports.createNotice = (account, type, notice, callback) ->
-  level = exports.notice_level[type]
+  level = exports.notices_level[type]
 
-  mNotification.createNotice account, null, type, level, notice, (notification) ->
+  notification = new Notification
+    account_id: account._id
+    type: type
+    level: level
+    payload: notice
+
+  notification.save ->
     app.mailer.sendMail
       from: config.email.send_from
       to: account.email
@@ -29,15 +31,21 @@ exports.createNotice = (account, type, notice, callback) ->
       callback notification
 
 exports.createGroupNotice = (group, type, notice, callback) ->
-  level = exports.notice_level[type]
+  level = exports.notices_level[type]
 
-  mNotification.createNotice null, group, type, level, notice, (notification) ->
+  notification = new Notification
+    group_name: group
+    type: type
+    level: level
+    payload: notice
+
+  notification.save ->
     unless level == NOTICE
       callback notification
 
-    mAccount.find
+    Account.find
       groups: 'root'
-    .toArray (err, accounts) ->
+    , (err, accounts) ->
       async.each accounts, (account, callback) ->
         app.mailer.sendMail
           from: config.email.send_from
@@ -46,5 +54,5 @@ exports.createGroupNotice = (group, type, notice, callback) ->
           html: notice.body
         , callback
       , (err) ->
-        throw err if err
+        logger.error err if err
         callback notification
