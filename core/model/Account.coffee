@@ -103,7 +103,8 @@ Account = mongoose.Schema
     type: Object
     default: {}
 
-Account.plugin mongooseUniqueValidator
+Account.plugin mongooseUniqueValidator,
+  message: 'unique_validation_error'
 
 Account.path('email').validate (email) ->
   return utils.rx.email.test email

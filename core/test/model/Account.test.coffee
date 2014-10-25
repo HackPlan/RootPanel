@@ -187,6 +187,9 @@ describe 'model/Account', ->
       util.account.inGroup('group_not_exist').should.not.ok
 
 describe 'model/Token', ->
+  describe 'validators should be work', ->
+    it 'unique_validation_error'
+
   describe 'revoke', ->
     it 'should success', (done) ->
       util.account.createToken 'full_access', {}, (err, token) ->

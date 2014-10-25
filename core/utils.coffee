@@ -49,4 +49,7 @@ exports.pickErrorName = (error) ->
 
   err = error.errors[_.first(_.keys(error.errors))]
 
+  if err.message == 'unique_validation_error'
+    return "#{err.path}_exist"
+
   return err.message

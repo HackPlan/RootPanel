@@ -3,6 +3,7 @@ describe 'router/account', ->
   utils = null
   csrf_token = null
 
+  account_id = null
   username = null
   email = null
   password = null
@@ -52,9 +53,41 @@ describe 'router/account', ->
     .expect 'set-cookie', /token=/
     .end (err, res) ->
       res.body.id.should.have.length 24
+      account_id = res.body.id
       done err
 
-  it 'POST login'
+  it 'POST register with existed username', (done) ->
+    agent.post '/account/register'
+    .send
+      csrf_token: csrf_token
+      username: username
+      email: "#{utils.randomString 20}@gmail.com"
+      password: password
+    .expect 400
+    .end (err, res) ->
+      res.body.error.should.be.equal 'username_exist'
+      done err
+
+  it 'POST register with invalid email'
+
+  it 'POST login', (done) ->
+    agent.post '/account/login'
+    .send
+      csrf_token: csrf_token
+      username: username
+      password: password
+    .expect 200
+    .expect 'set-cookie', /token=/
+    .end (err, res) ->
+      res.body.id.should.be.equal account_id
+      res.body.token.should.be.exist
+      done err
+
+  it 'POST login with email'
+
+  it 'POST login with username does not exist'
+
+  it 'POST login with invalid password'
 
   it 'GET preferences'
 

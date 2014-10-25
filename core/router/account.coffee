@@ -42,7 +42,7 @@ exports.post '/register', (req, res) ->
         id: account._id
 
 exports.post '/login', (req, res) ->
-  Account.search req.body.username, (err, account) ->
+  Account.search req.body.username, (account) ->
     unless account
       return res.error 'wrong_password'
 
@@ -58,7 +58,7 @@ exports.post '/login', (req, res) ->
       res.cookie 'token', token,
         expires: new Date(Date.now() + config.account.cookie_time)
 
-      res.cookie 'language', account.settings.language,
+      res.cookie 'language', account.preferences.language,
         expires: new Date(Date.now() + config.account.cookie_time)
 
       res.json
