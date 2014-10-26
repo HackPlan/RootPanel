@@ -1,7 +1,7 @@
 {_, async, express} = app.libs
 {requireAuthenticate} = app.middleware
-{Account, SecurityLog, CouponCode} = app.models
-{pluggable, config, utils, logger} = app
+{Account, SecurityLog} = app.models
+{config, utils, logger} = app
 
 module.exports = exports = express.Router()
 
@@ -20,8 +20,9 @@ exports.get '/session_info/', (req, res) ->
 
   if req.account
     _.extend response,
-      id: account.id
-      username: account.username
+      id: req.account.id
+      username: req.account.username
+      preferences: req.account.preferences
 
   res.json response
 
@@ -56,10 +57,10 @@ exports.post '/login', (req, res) ->
       logger.error err if err
 
       res.cookie 'token', token.token,
-        expires: new Date(Date.now() + config.account.cookie_time)
+        expires: new Date Date.now() + config.account.cookie_time
 
       res.cookie 'language', account.preferences.language,
-        expires: new Date(Date.now() + config.account.cookie_time)
+        expires: new Date Date.now() + config.account.cookie_time
 
       res.json
         id: account._id
@@ -90,7 +91,7 @@ exports.post '/update_password', requireAuthenticate, (req, res) ->
       res.json {}
 
 exports.post '/update_email', requireAuthenticate, (req, res) ->
-  unless account.matchPassword req.body.password
+  unless req.account.matchPassword req.body.password
     return res.error 'wrong_password'
 
   unless utils.rx.email.test req.body.email
@@ -110,6 +111,8 @@ exports.post '/update_email', requireAuthenticate, (req, res) ->
       res.json {}
 
 exports.post '/update_preferences', requireAuthenticate, (req, res) ->
+  req.body = _.omit req.body, 'csrf_token'
+
   for k, v of req.body
     if k in ['qq', 'language', 'timezone']
       req.account.preferences[k] = v

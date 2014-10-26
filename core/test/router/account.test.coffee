@@ -93,6 +93,15 @@ describe 'router/account', ->
       res.body.token.should.be.exist
       done err
 
+  it 'GET session_info when logged', (done) ->
+    agent.get '/account/session_info'
+    .expect 200
+    .end (err, res) ->
+      res.body.csrf_token.should.be.exist
+      res.body.username.should.be.equal username
+      res.body.preferences.should.be.a 'object'
+      done err
+
   it 'POST logout', (done) ->
     agent.post '/account/logout'
     .send
@@ -143,8 +152,38 @@ describe 'router/account', ->
     .expect 200
     .end done
 
-  it 'POST update_password'
+  it 'POST update_password', (done) ->
+    new_password = utils.randomString 20
 
-  it 'POST update_email'
+    agent.post '/account/update_password'
+    .send
+      csrf_token: csrf_token
+      original_password: password
+      password: new_password
+    .expect 200
+    .end (err) ->
+      password = new_password
+      done err
 
-  it 'POST update_preferences'
+  it 'POST update_email', (done) ->
+    email = "#{utils.randomString 20}@gmail.com"
+
+    agent.post '/account/update_email'
+    .send
+      csrf_token: csrf_token
+      password: password
+      email: email
+    .expect 200
+    .end done
+
+  it 'POST update_email with invalid password'
+
+  it 'POST update_preferences', (done) ->
+    agent.post '/account/update_preferences'
+    .send
+      csrf_token: csrf_token
+      language: 'en'
+    .expect 200
+    .end done
+
+  it 'POST update_preferences with invalid key'
