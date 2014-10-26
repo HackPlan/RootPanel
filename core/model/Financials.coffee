@@ -22,7 +22,6 @@ Financials = mongoose.Schema
 
   payload:
     type: Object
-    default: {}
 
 _.extend app.models,
   Financials: mongoose.model 'Financials', Financials

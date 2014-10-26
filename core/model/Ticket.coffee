@@ -21,7 +21,6 @@ Reply = mongoose.Schema
 
   flags:
     type: Object
-    default: {}
 
 Reply.pre 'save', (next) ->
   @content_html = markdown.toHTML @content
@@ -63,7 +62,6 @@ Ticket = mongoose.Schema
 
   flags:
     type: Object
-    default: {}
 
   members: [
     ObjectId

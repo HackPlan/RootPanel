@@ -13,7 +13,6 @@ CouponCode = mongoose.Schema
 
   available_times:
     type: Number
-    default: null
 
   type:
     required: true
@@ -22,7 +21,6 @@ CouponCode = mongoose.Schema
 
   meta:
     type: Object
-    default: {}
 
   apply_log: [
     account_id:

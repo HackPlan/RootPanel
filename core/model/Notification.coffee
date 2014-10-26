@@ -24,7 +24,6 @@ Notification = mongoose.Schema
 
   payload:
     type: Object
-    default: {}
 
 _.extend app.models,
   Notification: mongoose.model 'Notification', Notification

@@ -250,7 +250,7 @@ Account.methods.createSecurityLog = (type, token, payload, callback) ->
   SecurityLog.create
     account_id: @_id
     type: type
-    token: token
+    token: _.pick token, 'type', 'token', 'created_at', 'payload'
     payload: payload
   , callback
 

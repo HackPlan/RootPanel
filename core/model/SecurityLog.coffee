@@ -1,4 +1,4 @@
-{_, ObjectId, Mixed, mongoose} = app.libs
+{_, ObjectId, mongoose} = app.libs
 
 SecurityLog = mongoose.Schema
   account_id:
@@ -17,13 +17,9 @@ SecurityLog = mongoose.Schema
 
   payload:
     type: Object
-    default: {}
 
   token:
-    type: String
-    token: String
-    created_at: Date
-    payload: Object
+    type: Object
 
 _.extend app.models,
   SecurityLog: mongoose.model 'SecurityLog', SecurityLog
