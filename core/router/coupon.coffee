@@ -1,36 +1,43 @@
 {_, express} = app.libs
 {requireAuthenticate} = app.middleware
-{Account, SecurityLog, CouponCode} = app.models
-{pluggable, config, utils, logger} = app
+{CouponCode} = app.models
+{config, utils, logger} = app
 
 module.exports = exports = express.Router()
 
-exports.get '/coupon_info', requireAuthenticate, (req, res) ->
-  CouponCode.getCode req.body.code, (coupon_code) ->
+exports.use requireAuthenticate
+
+exports.get '/coupon_info', (req, res) ->
+  CouponCode.findOne
+    code: req.body.code
+  , (err, coupon) ->
     unless coupon_code
       return res.error 'code_not_exist'
 
-    CouponCode.restrictCode req.account, coupon_code, (err) ->
-      if err
+    coupon.validate req.account, (is_available) ->
+      unless is_available
         return res.error 'code_not_available'
 
-      CouponCode.codeMessage coupon_code, (message) ->
+      coupon.getMessage (message) ->
         res.json
           message: message
 
-exports.post '/apply_coupon', requireAuthenticate, (req, res) ->
-  CouponCode.getCode req.body.code, (coupon_code) ->
-    if coupon_code.expired and Date.now() > coupon_code.expired.getTime()
+exports.post '/apply_coupon', (req, res) ->
+  CouponCode.findOne
+    code: req.body.code
+  , (err, coupon) ->
+    unless coupon
+      return res.error 'code_not_exist'
+
+    if coupon.expired and Date.now() > coupon.expired.getTime()
       return res.error 'code_expired'
 
-    unless coupon_code.available_times > 0
+    if coupon.available_times and coupon.available_times < 0
       return res.error 'code_not_available'
 
-    apply_log = _.find coupon_code.apply_log, (i) ->
-      return i.account_id.toString() == req.account._id.toString()
+    coupon.validate req.account, (is_available) ->
+      unless is_available
+        return res.error 'code_not_available'
 
-    if apply_log
-      return res.error 'already_used'
-
-    CouponCode.applyCode req.account, coupon_code, ->
-      res.json {}
+      coupon.applyCode req.account, ->
+        res.json {}

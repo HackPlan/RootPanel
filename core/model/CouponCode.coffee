@@ -1,10 +1,9 @@
-{pluggable} = app
-{selectModelEnum} = pluggable
-{_, ObjectId, mongoose} = app.libs
+{_, ObjectId, mongoose, mongooseUniqueValidator} = app.libs
 
 CouponCode = mongoose.Schema
   code:
     required: true
+    unique: true
     type: String
 
   expired:
@@ -33,6 +32,9 @@ CouponCode = mongoose.Schema
       default: Date.now
   ]
 
+CouponCode.plugin mongooseUniqueValidator,
+  message: 'unique_validation_error'
+
 exports.coupons_meta = coupons_meta =
   amount:
     validate: (account, coupon, callback) ->
@@ -44,10 +46,7 @@ exports.coupons_meta = coupons_meta =
           'apply_log.account_id': account._id
         ]
       , (err, result) ->
-        if result
-          callback true
-        else
-          callback null
+        callback not result
 
     message: (account, coupon, callback) ->
       callback "账户余额：#{coupon.meta.amount} CNY"
@@ -78,7 +77,7 @@ CouponCode.methods.getMessage = (account, callback) ->
 CouponCode.methods.validate = (account, callback) ->
   coupons_meta[@type].validate account, @, callback
 
-CouponCode.methods.apply = (account, callback) ->
+CouponCode.methods.applyCode = (account, callback) ->
   @update
     $inc:
       available_times: -1
