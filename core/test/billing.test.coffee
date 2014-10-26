@@ -1,0 +1,2 @@
+describe 'billing', ->
+  it 'pending'
