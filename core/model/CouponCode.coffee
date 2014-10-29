@@ -38,13 +38,16 @@ CouponCode.plugin mongooseUniqueValidator,
 exports.coupons_meta = coupons_meta =
   amount:
     validate: (account, coupon, callback) ->
+      apply_log = _.find coupon.apply_log, (item) ->
+        return item.account_id.toString() == account._id.toString()
+
+      if apply_log
+        return callback()
+
       coupon.constructor.findOne
         type: 'amount'
-        $or: [
-          'meta.category': coupon.meta.category
-        ,
-          'apply_log.account_id': account._id
-        ]
+        'meta.category': coupon.meta.category
+        'apply_log.account_id': account._id
       , (err, result) ->
         callback not result
 

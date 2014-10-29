@@ -1,12 +1,12 @@
 after (done) ->
-  app.models.Financials.remove
-    account_id:
+  app.models.Account.remove
+    _id:
       $in: created_objects.accounts
   , done
 
 after (done) ->
-  app.models.Account.remove
-    _id:
+  app.models.Financials.remove
+    account_id:
       $in: created_objects.accounts
   , done
 

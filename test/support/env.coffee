@@ -12,7 +12,7 @@ global.async = require 'async'
 global.deepmerge = require 'deepmerge'
 global.chai = require 'chai'
 global.supertest = require 'supertest'
-global.ObjectId = (require 'mongoose').Schema.Types.ObjectId
+global.ObjectId = (require 'mongoose').Types.ObjectId
 
 global.expect = chai.expect
 

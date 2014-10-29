@@ -13,6 +13,11 @@ describe 'router/account', ->
     {utils} = app
     agent = supertest.agent app.express
 
+  after ->
+    namespace.accountRouter =
+      csrf_token: csrf_token
+      agent: agent
+
   it 'GET login', (done) ->
     agent.get '/account/login'
     .expect 200
@@ -54,6 +59,7 @@ describe 'router/account', ->
     .end (err, res) ->
       res.body.id.should.have.length 24
       account_id = res.body.id
+      created_objects.accounts.push ObjectId account_id
       done err
 
   it 'POST register with existed username', (done) ->

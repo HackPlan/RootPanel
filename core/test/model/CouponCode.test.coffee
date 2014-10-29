@@ -70,7 +70,7 @@ describe 'model/CouponCode', ->
 
   describe 'validateCode', ->
     it 'should success', (done) ->
-      coupon2.validateCode {_id: new ObjectId}, (is_validated) ->
+      coupon2.validateCode {_id: ObjectId()}, (is_validated) ->
         is_validated.should.be.ok
         done()
 
