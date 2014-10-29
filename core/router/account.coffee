@@ -39,6 +39,8 @@ exports.post '/register', (req, res) ->
       res.cookie 'token', token.token,
         expires: new Date(Date.now() + config.account.cookie_time)
 
+      created_objects.accounts.push account._id
+
       res.json
         id: account._id
 

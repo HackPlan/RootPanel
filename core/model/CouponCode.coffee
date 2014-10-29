@@ -1,3 +1,4 @@
+{utils} = app
 {_, ObjectId, mongoose, mongooseUniqueValidator} = app.libs
 
 CouponCode = mongoose.Schema
@@ -8,7 +9,6 @@ CouponCode = mongoose.Schema
 
   expired:
     type: Date
-    default: null
 
   available_times:
     type: Number
@@ -38,7 +38,7 @@ CouponCode.plugin mongooseUniqueValidator,
 exports.coupons_meta = coupons_meta =
   amount:
     validate: (account, coupon, callback) ->
-      exports.findOne
+      @constructor.findOne
         type: 'amount'
         $or: [
           'meta.category': coupon.meta.category
@@ -57,6 +57,7 @@ exports.coupons_meta = coupons_meta =
         order_id: coupon.code
       , callback
 
+# @param template: [expired], available_times, type, meta
 # @param callback(err, coupons)
 CouponCode.statics.createCodes = (template, count, callback) ->
   coupons = _.map _.range(0, count), ->
@@ -74,7 +75,7 @@ CouponCode.statics.createCodes = (template, count, callback) ->
 CouponCode.methods.getMessage = (account, callback) ->
   coupons_meta[@type].message account, @, callback
 
-CouponCode.methods.validate = (account, callback) ->
+CouponCode.methods.validateCode = (account, callback) ->
   coupons_meta[@type].validate account, @, callback
 
 CouponCode.methods.applyCode = (account, callback) ->
