@@ -1,4 +1,4 @@
-{utils} = app
+{utils, config} = app
 {_, ObjectId, mongoose, mongooseUniqueValidator} = app.libs
 
 CouponCode = mongoose.Schema
@@ -48,8 +48,10 @@ exports.coupons_meta = coupons_meta =
       , (err, result) ->
         callback not result
 
-    message: (account, coupon, callback) ->
-      callback "账户余额：#{coupon.meta.amount} CNY"
+    message: (req, coupon, callback) ->
+      callback req.t 'coupons.amount.message',
+        amount: coupon.meta.amount
+        currency: req.t "plan.currency.#{config.billing.currency}"
 
     apply: (account, coupon, callback) ->
       account.incBalance 'deposit', coupon.meta.amount,
@@ -72,8 +74,8 @@ CouponCode.statics.createCodes = (template, count, callback) ->
 
   @create coupons, callback
 
-CouponCode.methods.getMessage = (account, callback) ->
-  coupons_meta[@type].message account, @, callback
+CouponCode.methods.getMessage = (req, callback) ->
+  coupons_meta[@type].message req, @, callback
 
 CouponCode.methods.validateCode = (account, callback) ->
   coupons_meta[@type].validate account, @, callback

@@ -146,5 +146,10 @@
       "order_id": "订单号"
     }
   },
+  "coupons": {
+    "amount": {
+      "message": "账户余额：__amount__ __currency__"
+    }
+  },
   "plugins": {}
 }

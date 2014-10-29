@@ -59,9 +59,6 @@ exports.authenticate = (req, res, next) ->
     next()
 
 exports.accountHelpers = (req, res, next) ->
-  _.extend req,
-    res: res
-
   _.extend res,
     language: req.cookies.language ? config.i18n.default_language
     timezone: req.cookies.timezone ? config.i18n.default_timezone
@@ -70,6 +67,10 @@ exports.accountHelpers = (req, res, next) ->
 
     moment: ->
       return moment.apply(@, arguments).locale(res.language).tz(res.timezone)
+
+  _.extend req,
+    res: res
+    t: req.t
 
   _.extend res.locals,
     app: app

@@ -1,4 +1,4 @@
-describe 'router/coupon', ->
+describe 'router/ticket', ->
   it 'GET list'
 
   it 'GET create'

@@ -5,13 +5,14 @@ after (done) ->
   , done
 
 describe 'model/CouponCode', ->
-  Account = null
   CouponCode = null
 
   account = null
+  coupon1 = null
+  coupon2 = null
 
   before ->
-    {Account, CouponCode} = app.models
+    {CouponCode} = app.models
     account = namespace.accountModel.account
 
   describe 'createCodes', ->
@@ -28,7 +29,28 @@ describe 'model/CouponCode', ->
         coupons[0].type.should.be.equal 'amount'
         coupons[0].meta.amount.should.be.equal 4
 
+        [coupon1, coupon2] = coupons
+
         for coupon in coupons
           created_objects.couponcodes.push coupon._id
 
         done()
+
+  describe 'getMessage', ->
+    it 'should success', (done) ->
+      req =
+        t: app.i18n.getTranslator
+          headers: {}
+          cookies: {}
+
+      coupon1.getMessage req, (message) ->
+        message.should.be.equal '账户余额：4 CNY'
+        done()
+
+  describe 'applyCode', ->
+    it 'should success'
+
+  describe 'validateCode', ->
+    it 'should success'
+
+    it 'should fail when used coupon'
