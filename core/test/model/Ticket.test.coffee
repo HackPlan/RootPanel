@@ -47,3 +47,6 @@ describe 'model/Ticket', ->
   describe 'hasMember', ->
     it 'should success', ->
       ticket.hasMember(account).should.be.ok
+
+  describe 'populateAccounts', ->
+    it 'pending'

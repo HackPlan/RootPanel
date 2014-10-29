@@ -1,5 +1,9 @@
-{models} = app
-{_, ObjectId, mongoose, markdown} = app.libs
+{models, logger} = app
+{Account} = app.models
+{_, ObjectId, mongoose, markdown, async} = app.libs
+
+process.nextTick ->
+  {Account} = app.models
 
 Reply = mongoose.Schema
   account_id:
@@ -93,6 +97,27 @@ Ticket.methods.hasMember = (account) ->
       return true
 
   return false
+
+Ticket.methods.populateAccounts = (callback) ->
+  accounts_id = _.uniq [@account_id].concat @members.concat _.pluck(@replies, 'account_id')
+
+  async.each accounts_id, (account_id, callback) ->
+    Account.findById account_id, callback
+
+  , (err, accounts) ->
+    logger.error err if err
+
+    accounts = _.indexBy accounts, '_id'
+
+    @account = accounts[@account_id]
+
+    @members = _.map @members, (member_id) ->
+      return accounts[member_id]
+
+    for reply in @replies
+      reply.account = accounts[reply.account_id]
+
+    callback()
 
 _.extend app.models,
   Ticket: mongoose.model 'Ticket', Ticket

@@ -16,7 +16,7 @@ exports.param 'id', (req, res, next, id) ->
       return res.error 'ticket_not_exist', null, 404
 
     unless ticket.hasMember req.account
-      unless account.inGroup 'root'
+      unless req.account.inGroup 'root'
         return res.error 'forbidden', null, 403
 
     req.ticket = ticket
@@ -24,7 +24,7 @@ exports.param 'id', (req, res, next, id) ->
     next()
 
 exports.get '/list', (req, res) ->
-  mTicket.find
+  Ticket.find
     $or: [
       account_id: req.account._id
     ,
@@ -41,36 +41,23 @@ exports.get '/create', (req, res) ->
   res.render 'ticket/create'
 
 exports.get '/view/:id', (req, res) ->
-  {ticket} = req
-
-  async.map ticket.members, (member_id, callback) ->
-    mAccount.findOne _id: member_id, callback
-  , (err, result) ->
-    ticket.members = result
-
-    async.map ticket.replies, (reply, callback) ->
-      mAccount.findOne _id: reply.account_id, (err, account) ->
-        reply.account = account
-        callback null, reply
-
-    , (err, result) ->
-      ticket.replies = result
-
-      mAccount.findOne _id: ticket.account_id, (err, account) ->
-        ticket.account = account
-
-        console.log ticket.created_at
-
-        res.render 'ticket/view',
-          ticket: ticket
+  req.ticket.populateAccounts ->
+    res.render 'ticket/view',
+      ticket: req.ticket
 
 exports.post '/create', (req, res) ->
   unless /^.+$/.test req.body.title
     return res.error 'invalid_title'
 
-  status = if 'root' in req.account.groups then 'open' else 'pending'
+  Ticket.create
+    account_id: req.account._id
+    title: req.body.title
+    content: req.body.content
+    status: if req.account.inGroup 'root' then 'open' else 'pending'
+    members: [req.account._id]
+  , (err, ticket) ->
+    logger.error err if err
 
-  mTicket.createTicket req.account, req.body.title, req.body.content, [req.account], status, {}, (ticket) ->
     res.json
       id: ticket._id
 
@@ -90,7 +77,9 @@ exports.post '/reply/:id', (req, res) ->
 
   status = if 'root' in req.account.groups then 'open' else 'pending'
 
-  mTicket.createReply ticket, req.account, req.body.content, status, (reply) ->
+  ticket.createReply req.account, content, status, {}, (err, reply) ->
+    logger.error err if err
+
     res.json
       id: reply._id
 
@@ -98,7 +87,7 @@ exports.post '/reply/:id', (req, res) ->
       if member_id.toString() == req.account._id.toString()
         return callback()
 
-      mAccount.findOne
+      Account.findOne
         _id: member_id
       , (err, account) ->
         notification.createNotice account, 'ticket_reply',
@@ -115,7 +104,7 @@ exports.post '/reply/:id', (req, res) ->
 exports.post '/update_status/:id', (req, res) ->
   {ticket} = req
 
-  if 'root' in req.account.groups
+  if req.account.inGroup 'root'
     allow_status = ['open', 'pending', 'finish', 'closed']
   else
     allow_status = ['closed']
@@ -126,7 +115,7 @@ exports.post '/update_status/:id', (req, res) ->
   else
     return res.error 'invalid_status'
 
-  mTicket.update {_id: ticket._id},
+  ticket.update
     $set:
       status: req.body.status
   , ->
