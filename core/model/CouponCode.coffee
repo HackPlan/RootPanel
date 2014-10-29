@@ -38,7 +38,7 @@ CouponCode.plugin mongooseUniqueValidator,
 exports.coupons_meta = coupons_meta =
   amount:
     validate: (account, coupon, callback) ->
-      @constructor.findOne
+      coupon.constructor.findOne
         type: 'amount'
         $or: [
           'meta.category': coupon.meta.category
@@ -77,9 +77,10 @@ CouponCode.statics.createCodes = (template, count, callback) ->
 CouponCode.methods.getMessage = (req, callback) ->
   coupons_meta[@type].message req, @, callback
 
+# @param callback(is_validated)
 CouponCode.methods.validateCode = (account, callback) ->
   if @available_times <= 0
-    return callback true
+    return callback()
 
   coupons_meta[@type].validate account, @, callback
 
@@ -91,7 +92,7 @@ CouponCode.methods.applyCode = (account, callback) ->
     $inc:
       available_times: -1
     $push:
-      log:
+      apply_log:
         account_id: account._id
         created_at: new Date()
   , (err) =>

@@ -22,6 +22,7 @@ describe 'model/CouponCode', ->
         available_times: 3
         type: 'amount'
         meta:
+          category: 'test'
           amount: 4
       , 5, (err, coupons...) ->
         expect(err).to.not.exist
@@ -56,6 +57,11 @@ describe 'model/CouponCode', ->
         CouponCode.findById coupon1._id, (err, coupon1) ->
           coupon1.available_times.should.be.equal 2
 
+          matched_account_id = _.find coupon1.apply_log, (item) ->
+            return item.account_id.toString() == account.id
+
+          matched_account_id.should.be.exist
+
           original_account = account
           Account.findById account._id, (err, account) ->
             (account.billing.balance - original_account.billing.balance).should.be.equal 4
@@ -63,8 +69,18 @@ describe 'model/CouponCode', ->
           done()
 
   describe 'validateCode', ->
-    it 'should success'
+    it 'should success', (done) ->
+      coupon2.validateCode {_id: new ObjectId}, (is_validated) ->
+        is_validated.should.be.ok
+        done()
 
-    it 'should fail when used coupon'
+    it 'should fail when used coupon', (done) ->
+      coupon1.validateCode account, (is_validated) ->
+        expect(is_validated).to.not.ok
+        done()
 
-    it 'should fail when available_times <= 0'
+    it 'should fail when available_times <= 0', (done) ->
+      coupon2.available_times = 0
+      coupon2.validateCode account, (is_validated) ->
+        expect(is_validated).to.not.ok
+        done()
