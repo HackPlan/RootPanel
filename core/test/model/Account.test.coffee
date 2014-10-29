@@ -1,31 +1,31 @@
-utils = null
-Account = null
-Financials = null
-
-util =
-  account: null
-  password: null
-  token: null
-
-  created_account_ids: []
-
 after (done) ->
-  Financials.remove
+  app.models.Financials.remove
     account_id:
-      $in: util.created_account_ids
+      $in: created_objects.accounts
   , done
 
 after (done) ->
-  Account.remove
+  app.models.Account.remove
     _id:
-      $in: util.created_account_ids
+      $in: created_objects.accounts
   , done
 
 describe 'model/Account', ->
+  utils = null
+  Account = null
+  Financials = null
+
+  account = null
+  password = null
+  token = null
+
   before ->
-    require '../../../app'
     {utils} = app
     {Account, Financials} = app.models
+
+  after ->
+    namespace.accountModel =
+      account: account
 
   describe 'validators should be work', ->
     it 'invalid_email', (done) ->
@@ -50,38 +50,38 @@ describe 'model/Account', ->
     it 'should success', (done) ->
       username = "test#{utils.randomString(20).toLowerCase()}"
       email = "#{utils.randomString 20}@gmail.com"
-      util.password = utils.randomString 20
+      password = utils.randomString 20
 
       Account.register
         username: username
         email: email
-        password: util.password
-      , (err, account) ->
+        password: password
+      , (err, created_account) ->
         expect(err).to.not.exist
+        account = created_account
 
         account.username.should.be.equal username
         account.email.should.be.equal email.toLowerCase()
         account.password.should.have.length 64
 
-        util.created_account_ids.push account._id
-        util.account = account
+        created_objects.accounts.push account._id
 
         done()
 
   describe 'search', ->
     it 'should work with username', (done) ->
-      Account.search util.account.username, (account) ->
-        account.email.should.be.equal util.account.email
+      Account.search account.username, (account) ->
+        account.email.should.be.equal account.email
         done()
 
     it 'should work with email', (done) ->
-      Account.search util.account.email, (account) ->
-        account.username.should.be.equal util.account.username
+      Account.search account.email, (account) ->
+        account.username.should.be.equal account.username
         done()
 
     it 'should work with id', (done) ->
-      Account.search util.account.id, (account) ->
-        account.username.should.be.equal util.account.username
+      Account.search account.id.toString(), (account) ->
+        account.username.should.be.equal account.username
         done()
 
     it 'should not exist', (done) ->
@@ -99,27 +99,27 @@ describe 'model/Account', ->
 
   describe 'createToken', ->
     it 'should success', (done) ->
-      util.account.createToken 'full_access', {}, (err, token) ->
-        token.should.be.exist
+      account.createToken 'full_access', {}, (err, created_token) ->
+        created_token.should.be.exist
 
-        Account.findById util.account._id, (err, account) ->
+        Account.findById account._id, (err, account) ->
           matched_token = _.findWhere account.tokens,
-            token: token.token
+            token: created_token.token
 
           matched_token.should.be.exist
-          util.token = matched_token.token
+          token = created_token.token
           done()
 
     it 'should fail with invalid type', (done) ->
-      util.account.createToken 'invalid_type', {}, (err) ->
+      account.createToken 'invalid_type', {}, (err) ->
         err.should.be.exist
         done()
 
   describe 'authenticate', ->
     it 'should success', (done) ->
-      Account.authenticate util.token, (token, account) ->
-        token.token.should.equal util.token
-        account.id.should.equal util.account.id
+      Account.authenticate token, (returned_token, account) ->
+        returned_token.token.should.equal token
+        account.id.should.equal account.id
 
         done()
 
@@ -139,69 +139,77 @@ describe 'model/Account', ->
 
   describe 'matchPassword', ->
     it 'should be matched', ->
-      util.account.matchPassword(util.password).should.be.ok
+      account.matchPassword(password).should.be.ok
 
     it 'should not matched', ->
-      util.account.matchPassword('wrong_password').should.not.ok
+      account.matchPassword('wrong_password').should.not.ok
 
   describe 'updatePassword', ->
     it 'should success', (done) ->
-      old_password = util.password
-      util.password = utils.randomString 20
+      old_password = password
+      password = utils.randomString 20
 
-      util.account.updatePassword util.password, ->
-        Account.findById util.account._id, (err, account) ->
-          account.matchPassword(util.password).should.be.ok
+      account.updatePassword password, ->
+        Account.findById account._id, (err, account) ->
+          account.matchPassword(password).should.be.ok
           account.matchPassword(old_password).should.not.ok
           done()
 
   describe 'incBalance', ->
     it 'should success', (done) ->
-      util.account.incBalance -10, 'deposit', {meta: 'meta'}, (err) ->
+      account.incBalance -10, 'deposit', {meta: 'meta'}, (err) ->
         Financials.findOne
-          account_id: util.account._id
+          account_id: account._id
         , (err, financials) ->
           financials.amount.should.be.equal -10
           financials.payload.meta.should.be.equal 'meta'
 
-          Account.findById util.account._id, (err, account) ->
+          Account.findById account._id, (err, account) ->
             account.billing.balance.should.be.equal -10
             done()
 
     it 'should fail with invalid amount', (done) ->
-      util.account.incBalance '10', 'deposit', {}, (err) ->
+      account.incBalance '10', 'deposit', {}, (err) ->
         err.should.be.exist
         done()
 
     it 'should fail with invalid type', (done) ->
-      util.account.incBalance -10, 'invalid_type', {}, (err) ->
+      account.incBalance -10, 'invalid_type', {}, (err) ->
         err.should.be.exist
         done()
 
   describe 'inGroup', ->
     it 'should in it', ->
-      util.account.groups = ['test']
-      util.account.inGroup('test').should.be.ok
+      account.groups = ['test']
+      account.inGroup('test').should.be.ok
 
     it 'should not in it', ->
-      util.account.inGroup('group_not_exist').should.not.ok
+      account.inGroup('group_not_exist').should.not.ok
 
   describe 'createSecurityLog', ->
     it 'pending'
 
 describe 'model/Token', ->
+  Account = null
+
+  account = null
+
+  before ->
+    account = namespace.accountModel.account
+    {Account} = app.models
+
   describe 'validators should be work', ->
     it 'unique_validation_error'
 
   describe 'revoke', ->
     it 'should success', (done) ->
-      util.account.createToken 'full_access', {}, (err, token) ->
-        Account.findById util.account._id, (err, account) ->
+      account.createToken 'full_access', {}, (err, token) ->
+        Account.findById account._id, (err, account) ->
           matched_token = _.findWhere account.tokens,
             token: token.token
 
           matched_token.revoke ->
-            Account.findById util.account._id, (err, account) ->
+            Account.findById account._id, (err, account) ->
               matched_token = _.findWhere account.tokens,
                 token: token.token
 

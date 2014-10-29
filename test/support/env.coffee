@@ -15,5 +15,10 @@ global.supertest = require 'supertest'
 
 global.expect = chai.expect
 
+global.created_objects =
+  accounts: []
+
+global.namespace = {}
+
 chai.should()
 chai.config.includeStack = true
