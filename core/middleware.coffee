@@ -70,7 +70,7 @@ exports.accountHelpers = (req, res, next) ->
 
   _.extend req,
     res: res
-    t: req.t
+    t: res.t
 
   _.extend res.locals,
     app: app

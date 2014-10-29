@@ -80,7 +80,7 @@ CouponCode.statics.createCodes = (template, count, callback) ->
 CouponCode.methods.getMessage = (req, callback) ->
   coupons_meta[@type].message req, @, callback
 
-# @param callback(is_validated)
+# @param callback(is_available)
 CouponCode.methods.validateCode = (account, callback) ->
   if @available_times <= 0
     return callback()

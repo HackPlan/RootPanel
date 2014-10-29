@@ -9,16 +9,16 @@ exports.use requireAuthenticate
 
 exports.get '/coupon_info', (req, res) ->
   CouponCode.findOne
-    code: req.body.code
+    code: req.query.code
   , (err, coupon) ->
-    unless coupon_code
+    unless coupon
       return res.error 'code_not_exist'
 
-    coupon.validate req.account, (is_available) ->
+    coupon.validateCode req.account, (is_available) ->
       unless is_available
         return res.error 'code_not_available'
 
-      coupon.getMessage (message) ->
+      coupon.getMessage req, (message) ->
         res.json
           message: message
 
@@ -35,7 +35,7 @@ exports.post '/apply_coupon', (req, res) ->
     if coupon.available_times and coupon.available_times < 0
       return res.error 'code_not_available'
 
-    coupon.validate req.account, (is_available) ->
+    coupon.validateCode req.account, (is_available) ->
       unless is_available
         return res.error 'code_not_available'
 

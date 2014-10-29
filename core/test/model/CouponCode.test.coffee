@@ -11,10 +11,15 @@ describe 'model/CouponCode', ->
   account = null
   coupon1 = null
   coupon2 = null
+  coupon3 = null
 
   before ->
     {Account, CouponCode} = app.models
     account = namespace.accountModel.account
+
+  after ->
+    namespace.couponCodeModel =
+      coupon3: coupon3
 
   describe 'createCodes', ->
     it 'should success', (done) ->
@@ -31,7 +36,7 @@ describe 'model/CouponCode', ->
         coupons[0].type.should.be.equal 'amount'
         coupons[0].meta.amount.should.be.equal 4
 
-        [coupon1, coupon2] = coupons
+        [coupon1, coupon2, coupon3] = coupons
 
         for coupon in coupons
           created_objects.couponcodes.push coupon._id
@@ -70,17 +75,17 @@ describe 'model/CouponCode', ->
 
   describe 'validateCode', ->
     it 'should success', (done) ->
-      coupon2.validateCode {_id: ObjectId()}, (is_validated) ->
-        is_validated.should.be.ok
+      coupon2.validateCode {_id: ObjectId()}, (is_available) ->
+        is_available.should.be.ok
         done()
 
     it 'should fail when used coupon', (done) ->
-      coupon1.validateCode account, (is_validated) ->
-        expect(is_validated).to.not.ok
+      coupon1.validateCode account, (is_available) ->
+        expect(is_available).to.not.ok
         done()
 
     it 'should fail when available_times <= 0', (done) ->
       coupon2.available_times = 0
-      coupon2.validateCode account, (is_validated) ->
-        expect(is_validated).to.not.ok
+      coupon2.validateCode account, (is_available) ->
+        expect(is_available).to.not.ok
         done()
