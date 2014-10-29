@@ -132,19 +132,18 @@ exports.selectHook = (account, hook_name) ->
     else
       return false
 
-exports.initializePlugins = (callback) ->
-  checkDependencies = ->
-    all_plugins = _.union config.plugin.available_extensions, config.plugin.available_services
+exports.initializePlugins = ->
+  all_plugins = _.union config.plugin.available_extensions, config.plugin.available_services
 
-    for plugin_name in all_plugins
-      plugin = require path.join __dirname, "../plugin/#{plugin_name}"
+  for plugin_name in all_plugins
+    plugin = require path.join __dirname, "../plugin/#{plugin_name}"
 
-      if plugin.dependencies
-        for dependence in plugin.dependencies
-          unless dependence in all_plugins
-            throw new Error "#{plugin_name} is Dependent on #{dependence} but not load"
+    if plugin.dependencies
+      for dependence in plugin.dependencies
+        unless dependence in all_plugins
+          throw new Error "#{plugin_name} is Dependent on #{dependence} but not load"
 
-  initializePlugin = (name, callback) ->
+  for plugin_name in all_plugins
     plugin_path = path.join __dirname, "../plugin/#{name}"
     plugin = require plugin_path
 
@@ -153,30 +152,6 @@ exports.initializePlugins = (callback) ->
 
     if fs.existsSync path.join(plugin_path, 'static')
       app.use harp.mount("/plugin/#{name}", path.join(plugin_path, 'static'))
-
-    callback plugin
-
-  initializeExtension = (plugin, callback) ->
-    callback()
-
-  initializeService = (plugin, callback) ->
-    callback()
-
-  checkDependencies()
-
-  async.parallel [
-    (callback) ->
-      async.each config.plugin.available_extensions, (name, callback) ->
-        initializePlugin name, (plugin) ->
-          initializeExtension plugin, callback
-      , callback
-
-    (callback) ->
-      async.each config.plugin.available_services, (name, callback) ->
-        initializePlugin name, (plugin) ->
-          initializeService plugin, callback
-      , callback
-  ], callback
 
 exports.createHelpers = (plugin) ->
   plugin.registerHook = (hook_name, payload) ->
