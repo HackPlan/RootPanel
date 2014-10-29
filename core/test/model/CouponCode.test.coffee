@@ -15,7 +15,7 @@ describe 'model/CouponCode', ->
 
   before ->
     {Account, CouponCode} = app.models
-    account = namespace.accountModel.account
+    {account} = namespace.accountModel
 
   after ->
     namespace.couponCodeModel =
@@ -32,11 +32,14 @@ describe 'model/CouponCode', ->
       , 5, (err, coupons...) ->
         expect(err).to.not.exist
         coupons.should.have.length 5
-        coupons[0].available_times.should.be.equal 3
-        coupons[0].type.should.be.equal 'amount'
-        coupons[0].meta.amount.should.be.equal 4
 
         [coupon1, coupon2, coupon3] = coupons
+
+        coupon1.available_times.should.be.equal 3
+        coupon1.type.should.be.equal 'amount'
+        coupon1.meta.amount.should.be.equal 4
+
+        coupon1.code.should.not.equal coupon2
 
         for coupon in coupons
           created_objects.couponcodes.push coupon._id

@@ -14,6 +14,7 @@ app.libs =
   express: require 'express'
   fs: require 'fs'
   harp: require 'harp'
+  markdown: require('markdown').markdown
   middlewareInjector: require 'middleware-injector'
   mongoose: require 'mongoose'
   morgan: require 'morgan'

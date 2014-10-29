@@ -16,15 +16,10 @@ Reply = mongoose.Schema
     type: String
 
   content_html:
-    required: true
     type: String
 
   flags:
     type: Object
-
-Reply.pre 'save', (next) ->
-  @content_html = markdown.toHTML @content
-  next()
 
 _.extend app.models,
   Reply: mongoose.model 'Reply', Reply
@@ -52,7 +47,6 @@ Ticket = mongoose.Schema
     type: String
 
   content_html:
-    required: true
     type: String
 
   status:
@@ -75,10 +69,11 @@ Ticket.pre 'save', (next) ->
   @content_html = markdown.toHTML @content
   next()
 
-Ticket.createReply = (account, content, status, flags, callback) ->
+Ticket.methods.createReply = (account, content, status, flags, callback) ->
   reply = new models.Reply
     account_id: account._id
     content: content
+    content_html: markdown.toHTML content
     flags: flags
 
   reply.validate (err) =>
@@ -92,7 +87,7 @@ Ticket.createReply = (account, content, status, flags, callback) ->
     @save (err) ->
       callback err, reply
 
-Ticket.hasMember = (account) ->
+Ticket.methods.hasMember = (account) ->
   for member in @members
     if member.equals account._id
       return true

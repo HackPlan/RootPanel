@@ -3,7 +3,7 @@ describe 'router/ticket', ->
 
   it 'GET create'
 
-  it 'GET view/:ticket_id'
+  it 'GET view/:id'
 
   it 'POST create'
 

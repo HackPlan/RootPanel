@@ -8,8 +8,8 @@ module.exports = exports = express.Router()
 
 exports.use requireAuthenticate
 
-exports.param 'ticket_id', (req, res, next, ticket_id) ->
-  Ticket.findById ticket_id, (err, ticket) ->
+exports.param 'id', (req, res, next, id) ->
+  Ticket.findById id, (err, ticket) ->
     logger.error err if err
 
     unless ticket
@@ -40,7 +40,7 @@ exports.get '/list', (req, res) ->
 exports.get '/create', (req, res) ->
   res.render 'ticket/create'
 
-exports.get '/view/:ticket_id', (req, res) ->
+exports.get '/view/:id', (req, res) ->
   {ticket} = req
 
   async.map ticket.members, (member_id, callback) ->
@@ -82,7 +82,7 @@ exports.post '/create', (req, res) ->
         config: config
     , ->
 
-exports.post '/reply', (req, res) ->
+exports.post '/reply/:id', (req, res) ->
   {ticket} = req
 
   unless req.body.content
@@ -112,7 +112,7 @@ exports.post '/reply', (req, res) ->
           callback()
     , ->
 
-exports.post '/update_status', (req, res) ->
+exports.post '/update_status/:id', (req, res) ->
   {ticket} = req
 
   if 'root' in req.account.groups

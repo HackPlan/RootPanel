@@ -19,6 +19,7 @@ global.expect = chai.expect
 global.created_objects =
   accounts: []
   couponcodes: []
+  tickets: []
 
 global.namespace = {}
 
