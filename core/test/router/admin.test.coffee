@@ -1,4 +1,4 @@
-describe 'router/coupon', ->
+describe 'router/admin', ->
   it 'GET /'
 
   it 'GET ticket'

@@ -5,6 +5,7 @@ after (done) ->
   , done
 
 describe 'model/CouponCode', ->
+  Account = null
   CouponCode = null
 
   account = null
@@ -12,7 +13,7 @@ describe 'model/CouponCode', ->
   coupon2 = null
 
   before ->
-    {CouponCode} = app.models
+    {Account, CouponCode} = app.models
     account = namespace.accountModel.account
 
   describe 'createCodes', ->
@@ -48,9 +49,22 @@ describe 'model/CouponCode', ->
         done()
 
   describe 'applyCode', ->
-    it 'should success'
+    it 'should success', (done) ->
+      coupon1.applyCode account, (err) ->
+        expect(err).to.not.exist
+
+        CouponCode.findById coupon1._id, (err, coupon1) ->
+          coupon1.available_times.should.be.equal 2
+
+          original_account = account
+          Account.findById account._id, (err, account) ->
+            (account.billing.balance - original_account.billing.balance).should.be.equal 4
+
+          done()
 
   describe 'validateCode', ->
     it 'should success'
 
     it 'should fail when used coupon'
+
+    it 'should fail when available_times <= 0'

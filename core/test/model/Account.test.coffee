@@ -164,7 +164,8 @@ describe 'model/Account', ->
           financials.amount.should.be.equal -10
           financials.payload.meta.should.be.equal 'meta'
 
-          Account.findById account._id, (err, account) ->
+          Account.findById account._id, (err, new_account) ->
+            account = new_account
             account.billing.balance.should.be.equal -10
             done()
 

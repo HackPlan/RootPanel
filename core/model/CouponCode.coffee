@@ -54,7 +54,7 @@ exports.coupons_meta = coupons_meta =
         currency: req.t "plan.currency.#{config.billing.currency}"
 
     apply: (account, coupon, callback) ->
-      account.incBalance 'deposit', coupon.meta.amount,
+      account.incBalance coupon.meta.amount, 'deposit',
         type: 'coupon'
         order_id: coupon.code
       , callback
@@ -78,9 +78,15 @@ CouponCode.methods.getMessage = (req, callback) ->
   coupons_meta[@type].message req, @, callback
 
 CouponCode.methods.validateCode = (account, callback) ->
+  if @available_times <= 0
+    return callback true
+
   coupons_meta[@type].validate account, @, callback
 
 CouponCode.methods.applyCode = (account, callback) ->
+  if @available_times <= 0
+    return callback true
+
   @update
     $inc:
       available_times: -1
@@ -88,7 +94,7 @@ CouponCode.methods.applyCode = (account, callback) ->
       log:
         account_id: account._id
         created_at: new Date()
-  , (err) ->
+  , (err) =>
     return callback err if err
     coupons_meta[@type].apply account, @, callback
 
