@@ -2,6 +2,8 @@ describe 'router/ticket', ->
   agent = null
   csrf_token = null
 
+  ticket_id = null
+
   before ->
     {agent, csrf_token} = namespace.accountRouter
 
@@ -26,10 +28,15 @@ describe 'router/ticket', ->
       content: '**CONTENT**'
     .expect 200
     .end (err, res) ->
-      created_objects.tickets.push res.body.id
+      ticket_id = res.body.id
+      created_objects.tickets.push ObjectId ticket_id
       done err
 
-  it 'GET list'
+  it 'GET list', (done) ->
+    agent.get '/ticket/list'
+    .expect 200
+    .expect /Title/
+    .end done
 
   it 'GET view/:id'
 

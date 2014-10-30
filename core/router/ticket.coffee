@@ -30,10 +30,11 @@ exports.get '/list', (req, res) ->
     ,
       members: req.account._id
     ]
-  ,
+  , null,
     sort:
       updated_at: -1
   , (err, tickets) ->
+    logger.error err if err
     res.render 'ticket/list',
       tickets: tickets
 
