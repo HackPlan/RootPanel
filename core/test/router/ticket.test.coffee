@@ -44,8 +44,41 @@ describe 'router/ticket', ->
     .expect /<p><strong>CONTENT<\/strong><\/p>/
     .end done
 
-  it 'POST reply'
+  it 'POST reply', (done) ->
+    agent.post "/ticket/reply/#{ticket_id}"
+    .send
+      csrf_token: csrf_token
+      content: '**REPLY**'
+    .expect 200
+    .end done
 
-  it 'GET list when replied'
+  it 'GET list when replied', (done) ->
+    agent.get "/ticket/view/#{ticket_id}"
+    .expect 200
+    .expect /<p><strong>CONTENT<\/strong><\/p>/
+    .expect /<p><strong>REPLY<\/strong><\/p>/
+    .end done
 
-  it 'POST update_status'
+  it 'POST update_status', (done) ->
+    agent.post "/ticket/update_status/#{ticket_id}"
+    .send
+      csrf_token: csrf_token
+      status: 'closed'
+    .expect 200
+    .end done
+
+  it 'POST update_status with already closed', (done) ->
+    agent.post "/ticket/update_status/#{ticket_id}"
+    .send
+      csrf_token: csrf_token
+      status: 'closed'
+    .expect 400
+    .end done
+
+  it 'POST update_status with no permission', (done) ->
+    agent.post "/ticket/update_status/#{ticket_id}"
+    .send
+      csrf_token: csrf_token
+      status: 'open'
+    .expect 400
+    .end done

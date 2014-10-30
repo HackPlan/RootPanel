@@ -79,7 +79,7 @@ exports.post '/reply/:id', (req, res) ->
 
   status = if 'root' in req.account.groups then 'open' else 'pending'
 
-  ticket.createReply req.account, content, status, {}, (err, reply) ->
+  ticket.createReply req.account, req.body.content, status, {}, (err, reply) ->
     logger.error err if err
 
     res.json
