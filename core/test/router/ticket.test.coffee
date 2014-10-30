@@ -38,7 +38,11 @@ describe 'router/ticket', ->
     .expect /Title/
     .end done
 
-  it 'GET view/:id'
+  it 'GET view/:id', (done) ->
+    agent.get "/ticket/view/#{ticket_id}"
+    .expect 200
+    .expect /<p><strong>CONTENT<\/strong><\/p>/
+    .end done
 
   it 'POST reply'
 

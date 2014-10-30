@@ -42,9 +42,9 @@ exports.get '/create', (req, res) ->
   res.render 'ticket/create'
 
 exports.get '/view/:id', (req, res) ->
-  req.ticket.populateAccounts ->
+  req.ticket.populateAccounts (ticket) ->
     res.render 'ticket/view',
-      ticket: req.ticket
+      ticket: ticket
 
 exports.post '/create', (req, res) ->
   unless /^.+$/.test req.body.title

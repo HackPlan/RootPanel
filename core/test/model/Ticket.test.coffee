@@ -49,4 +49,9 @@ describe 'model/Ticket', ->
       ticket.hasMember(account).should.be.ok
 
   describe 'populateAccounts', ->
-    it 'pending'
+    it 'should success', (done) ->
+      ticket.populateAccounts (result) ->
+        result.account.username.should.equal account.username
+        result.members[0].username.should.equal account.username
+        result.replies[0].account.username.should.equal account.username
+        done()

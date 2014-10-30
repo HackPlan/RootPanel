@@ -1,5 +1,5 @@
 {config} = app
-{_, expressSession, redisStore, path, fs} = app.libs
+{_, expressSession, redisStore, path, fs, moment} = app.libs
 {Account} = app.models
 
 exports.errorHandling = (req, res, next) ->

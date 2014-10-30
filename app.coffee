@@ -16,6 +16,7 @@ app.libs =
   harp: require 'harp'
   markdown: require('markdown').markdown
   middlewareInjector: require 'middleware-injector'
+  moment: require 'moment-timezone'
   mongoose: require 'mongoose'
   morgan: require 'morgan'
   nodemailer: require 'nodemailer'

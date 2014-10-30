@@ -101,23 +101,25 @@ Ticket.methods.hasMember = (account) ->
 Ticket.methods.populateAccounts = (callback) ->
   accounts_id = _.uniq [@account_id].concat @members.concat _.pluck(@replies, 'account_id')
 
-  async.each accounts_id, (account_id, callback) ->
+  async.map accounts_id, (account_id, callback) ->
     Account.findById account_id, callback
 
-  , (err, accounts) ->
+  , (err, accounts) =>
     logger.error err if err
 
     accounts = _.indexBy accounts, '_id'
 
-    @account = accounts[@account_id]
+    result = @toObject()
 
-    @members = _.map @members, (member_id) ->
+    result.account = accounts[result.account_id]
+
+    result.members = _.map result.members, (member_id) ->
       return accounts[member_id]
 
-    for reply in @replies
+    for reply in result.replies
       reply.account = accounts[reply.account_id]
 
-    callback()
+    callback result
 
 _.extend app.models,
   Ticket: mongoose.model 'Ticket', Ticket

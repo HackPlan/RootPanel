@@ -11,7 +11,7 @@ block main
     header
       | #{ticket.title} &nbsp;
 
-      - l_status = t('ticket_status.' + status)
+      - l_status = t('ticket_status.' + ticket.status)
 
       if ticket.status == 'closed'
         span.small.text-muted= l_status
@@ -53,9 +53,9 @@ block main
           button.btn.btn-lg.btn-primary.action-reply(type='button')= t('ticket.create_reply')
           button(type='button', data-status='closed').btn.btn-lg.btn-danger.action-update-status= t('ticket.close_ticket')
 
-        if inGroup('root') && (ticket.status == 'open' || ticket.status == 'pending')
+        if req.account.inGroup('root') && (ticket.status == 'open' || ticket.status == 'pending')
           button(type='button', data-status='finish').btn.btn-lg.btn-success.action-update-status= t('ticket.finish_ticket')
-        if inGroup('root') && ticket.status == 'closed'
+        if req.account.inGroup('root') && ticket.status == 'closed'
           button(type='button', data-status='open').btn.btn-lg.btn-success.action-update-status= t('ticket.reopen_ticket')
 
 prepend sidebar
