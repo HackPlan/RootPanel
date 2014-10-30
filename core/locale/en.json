@@ -92,7 +92,7 @@
     "day": "Day"
   },
   "notification_title": {
-    "ticket": "<%= title %> | Ticket"
+    "ticket": "__title__ | Ticket"
   },
   "view": {
     "layout": {

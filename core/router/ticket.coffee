@@ -62,8 +62,9 @@ exports.post '/create', (req, res) ->
       id: ticket._id
 
     notification.createGroupNotice 'root', 'ticket_create',
-      title: _.template(res.t('notification_title.ticket')) ticket
-      body: _.template(app.template_data['ticket_create_email'])
+      title: res.t 'notification_title.ticket', ticket
+      body: _.template(app.templates['ticket_create_email'])
+        t: res.t
         ticket: ticket
         account: req.account
         config: config
@@ -91,8 +92,9 @@ exports.post '/reply/:id', (req, res) ->
         _id: member_id
       , (err, account) ->
         notification.createNotice account, 'ticket_reply',
-          title: _.template(res.t('notification_title.ticket')) ticket
-          body: _.template(app.template_data['ticket_reply_email'])
+          title: res.t 'notification_title.ticket', ticket
+          body: _.template(app.templates['ticket_reply_email'])
+            t: res.t
             ticket: ticket
             reply: reply
             account: req.account

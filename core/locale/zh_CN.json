@@ -99,7 +99,7 @@
     "day": "天"
   },
   "notification_title": {
-    "ticket": "<%= title %> | 工单"
+    "ticket": "__title__ | 工单"
   },
   "view": {
     "layout": {
