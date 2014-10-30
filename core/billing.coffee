@@ -1,22 +1,6 @@
-stringify = require 'json-stable-stringify'
-async = require 'async'
-_ = require 'underscore'
-
+{config, pluggable, logger} = app
+{async, _} = app.libs
 {Account, Financials} = app.models
-
-config = require '../config'
-pluggable = require './pluggable'
-
-exports.cyclicalBilling = (callback) ->
-  mAccount.find
-    'billing.plans.0':
-      $exists: true
-  .toArray (err, accounts) ->
-    async.each accounts, (account, callback) ->
-      exports.triggerBilling account, ->
-        callback()
-    , ->
-      callback()
 
 exports.run = ->
   exports.cyclicalBilling ->
@@ -24,12 +8,16 @@ exports.run = ->
       exports.cyclicalBilling ->
     , config.billing.billing_cycle
 
-exports.forceLeaveAllPlans = (account, callback) ->
-  async.eachSeries account.billing.plans, (plan_name, callback) ->
-    exports.leavePlan account, plan_name, callback
-  , ->
-    mAccount.findOne {_id: account._id}, (err, account) ->
-      callback account
+exports.cyclicalBilling = (callback) ->
+  Account.find
+    'billing.plans.0':
+      $exists: true
+  , (err, accounts) ->
+    async.each accounts, (account, callback) ->
+      exports.triggerBilling account, ->
+        callback()
+    , ->
+      callback()
 
 exports.isForceFreeze = (account) ->
   if account.billing.balance < config.billing.force_freeze.when_balance_below
@@ -69,11 +57,17 @@ exports.triggerBilling = (account, callback) ->
       unless account.billing.arrears_at
         modifier.$set['billing.arrears_at'] = new Date()
 
-    mAccount.findAndModify {_id: account._id}, null, modifier, {new: true}, (err, account) ->
-      mBalance.create account, 'billing', modifier.$inc['billing.balance'], _.indexBy(billing_reports, 'plan_name'), ->
+    Account.findByIdAndUpdate account._id, modifier, (err, account) ->
+      logger.error err if err
+
+      Financials.create
+        account_id: account._id
+        type: 'billing'
+        amount: modifier.$inc['billing.balance']
+        payload: _.indexBy billing_reports, 'plan_name'
+      , ->
         if exports.isForceFreeze account
-          exports.forceLeaveAllPlans account, ->
-            callback()
+          exports.forceLeaveAllPlans account, callback
         else
           callback account
 
@@ -114,15 +108,15 @@ exports.joinPlan = (req, account, plan_name, callback) ->
 
   modifier.$set["billing.last_billing_at.#{plan_name}"] = new Date()
 
-  mAccount.findAndModify {_id: account._id}, null, modifier,
-    new: true
-  , (err, account) ->
+  Account.findByIdAndUpdate account._id, modifier, (err, account) ->
+    logger.error err if err
+
     async.each _.difference(account.billing.services, original_account.billing.services), (service_name, callback) ->
       async.each pluggable.selectHook(account, "service.#{service_name}.enable"), (hook, callback) ->
         hook.action req, callback
       , callback
     , ->
-      unless stringify(original_account.resources_limit) == stringify(account.resources_limit)
+      unless _.isEqual original_account.resources_limit, account.resources_limit
         async.each pluggable.selectHook(account, 'account.resources_limit_changed'), (hook, callback) ->
           hook.action account, callback
         , callback
@@ -150,20 +144,27 @@ exports.leavePlan = (req, account, plan_name, callback) ->
 
   modifier.$unset["billing.last_billing_at.#{plan_name}"] = true
 
-  mAccount.findAndModify {_id: account._id}, null, modifier,
-    new: true
-  , (err, account) ->
+  Account.findByIdAndUpdate account._id, modifier, (err, account) ->
+    logger.error err if err
+
     async.each leaved_services, (service_name, callback) ->
       async.each pluggable.selectHook(original_account, "service.#{service_name}.disable"), (hook, callback) ->
         hook.action req, callback
       , callback
     , ->
-      unless stringify(original_account.resources_limit) == stringify(account.resources_limit)
+      unless _.isEqual original_account.resources_limit, account.resources_limit
         async.each pluggable.selectHook(account, 'account.resources_limit_changed'), (hook, callback) ->
           hook.action account, callback
         , callback
       else
         callback()
+
+exports.forceLeaveAllPlans = (account, callback) ->
+  async.eachSeries account.billing.plans, (plan_name, callback) ->
+    exports.leavePlan account, plan_name, callback
+  , ->
+    Account.findById account._id, (err, account) ->
+      callback account
 
 exports.calcResourcesLimit = (plans) ->
   limit = {}

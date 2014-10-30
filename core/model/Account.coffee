@@ -28,7 +28,6 @@ Token = mongoose.Schema
 
   payload:
     type: Object
-    default: {}
 
 Token.methods.revoke = (callback) ->
   @ownerDocument().update
@@ -64,7 +63,6 @@ Account = mongoose.Schema
 
   groups:
     type: Array
-    default: []
 
   tokens: [
     mongoose.modelSchemas.Token
@@ -72,20 +70,16 @@ Account = mongoose.Schema
 
   preferences:
     type: Object
-    default: {}
 
   billing:
     services:
       type: Array
-      default: []
 
     plans:
       type: Array
-      default: []
 
     last_billing_at:
       type: Object
-      default: {}
 
     balance:
       type: Number
@@ -93,15 +87,12 @@ Account = mongoose.Schema
 
     arrears_at:
       type: Date
-      default: null
 
   pluggable:
     type: Object
-    default: {}
 
   resources_limit:
     type: Object
-    default: {}
 
 Account.plugin mongooseUniqueValidator,
   message: 'unique_validation_error'
