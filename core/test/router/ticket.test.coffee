@@ -44,6 +44,8 @@ describe 'router/ticket', ->
     .expect /<p><strong>CONTENT<\/strong><\/p>/
     .end done
 
+  it 'GET view/:id when not exist'
+
   it 'POST reply', (done) ->
     agent.post "/ticket/reply/#{ticket_id}"
     .send

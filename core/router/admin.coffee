@@ -1,19 +1,15 @@
-{ObjectID} = require 'mongodb'
-express = require 'express'
-async = require 'async'
-_ = require 'underscore'
-
+{express, async, _} = app.libs
 {requireAdminAuthenticate} = app.middleware
 {plaggable} = app
-{mAccount, mTicket, mBalanceLog, mCouponCode} = app.models
+{Account, Ticket, Financials, CouponCode} = app.models
 
 module.exports = exports = express.Router()
 
 exports.get '/', requireAdminAuthenticate, (req, res) ->
-  mAccount.find().toArray (err, accounts) ->
+  Account.find {}, (err, accounts) ->
     return res.render 'admin',
       accounts: accounts
-      coupon_code_types: _.keys mCouponCode.type_meta
+      coupon_code_types: _.keys CouponCode.coupons_meta
 
 exports.get '/ticket', requireAdminAuthenticate, (req, res) ->
   async.parallel
