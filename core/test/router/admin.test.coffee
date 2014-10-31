@@ -48,12 +48,13 @@ describe 'router/admin', ->
     .expect 200
     .end done
 
-  it 'GET ticket'
+  it 'GET ticket', (done) ->
+    agent.get '/admin/ticket'
+    .expect 200
+    .end done
 
   it 'POST confirm_payment'
 
   it 'POST delete_account'
-
-  it 'POST update_site'
 
   it 'POST generate_coupon_code'
