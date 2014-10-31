@@ -1,14 +1,13 @@
-express = require 'express'
-async = require 'async'
-_ = require 'underscore'
-
+{express, async, _} = app.libs
 {requireAuthenticate} = app.middleware
-{mAccount, mBalanceLog} = app.models
+{Account, Financials} = app.models
 {pluggable, billing, config} = app
 
 module.exports = exports = express.Router()
 
-exports.get '/pay', requireAuthenticate, (req, res) ->
+exports.use requireAuthenticate
+
+exports.get '/pay', (req, res) ->
   LIMIT = 10
 
   async.parallel
@@ -19,45 +18,44 @@ exports.get '/pay', requireAuthenticate, (req, res) ->
       , callback
 
     deposit_log: (callback) ->
-      mBalanceLog.find
+      Financials.find
         account_id: req.account._id
         type: 'deposit'
-      ,
+      , null,
         sort:
           created_at: -1
         limit: LIMIT
-      .toArray (err, deposit_logs) ->
-        async.each deposit_logs, (deposit_log, callback) ->
+      , (err, deposit_logs) ->
+        async.map deposit_logs, (deposit_log, callback) ->
+          deposit_log = deposit_log.toObject()
+
           matched_hook = _.find pluggable.selectHook(req.account, 'view.pay.display_payment_details'), (hook) ->
             return hook?.type == deposit_log.payload.type
 
           unless matched_hook
-            return callback()
+            return callback null, deposit_log
 
           matched_hook.filter req, deposit_log, (payment_details) ->
             deposit_log.payment_details = payment_details
+            callback null, deposit_log
 
-            callback()
-
-        , ->
-          callback null, deposit_logs
+        , callback
 
     billing_log: (callback) ->
-      mBalanceLog.find
+      Financials.find
         account_id: req.account._id
         type:
-          $in: ['billing', 'service_billing']
-      ,
+          $in: ['billing']
+      , null,
         sort:
           created_at: -1
         limit: LIMIT
-      .toArray callback
+      , callback
 
   , (err, result) ->
-    res.render 'panel/pay', _.extend result,
-      nodes: _.values(config.nodes)
+    res.render 'panel/pay', result
 
-exports.get '/', requireAuthenticate, (req, res) ->
+exports.get '/', (req, res) ->
   billing.triggerBilling req.account, (account) ->
     view_data =
       account: account
@@ -65,13 +63,14 @@ exports.get '/', requireAuthenticate, (req, res) ->
       widgets_html: []
 
     for name, info of config.plans
-      view_data.plans.push _.extend info,
+      view_data.plans.push _.extend _.clone(info),
         name: name
         is_enable: name in req.account.billing.plans
 
     async.map pluggable.selectHook(account, 'view.panel.widgets'), (hook, callback) ->
       hook.generator req, (html) ->
         callback null, html
+
     , (err, widgets_html) ->
       view_data.widgets_html = widgets_html
 

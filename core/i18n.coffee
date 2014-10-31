@@ -55,6 +55,8 @@ exports.calcLanguagePriority = (req) ->
   return result
 
 exports.translateByLanguage = (name, language) ->
+  return '' unless name
+
   keys = name.split '.'
   keys.unshift language
 

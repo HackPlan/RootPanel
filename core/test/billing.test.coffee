@@ -22,6 +22,8 @@ describe 'billing', ->
         arrears_at: null
 
     config.plans.billing_test =
+      t_name: 'billing_test'
+
       billing_by_time:
         unit: 24 * 3600 * 1000
         price: 10 / 30
@@ -34,6 +36,8 @@ describe 'billing', ->
         memory: 27
 
     config.plans.billing_test2 =
+      t_name: 'billing_test2'
+
       resources:
         cpu: 50
         storage: 200
