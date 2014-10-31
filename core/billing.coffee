@@ -43,9 +43,9 @@ exports.triggerBilling = (account, callback) ->
 
     if _.isEmpty billing_reports
       if exports.isForceFreeze account
-        exports.forceLeaveAllPlans account, callback
+        return exports.forceLeaveAllPlans account, callback
       else
-        callback account
+        return callback account
 
     modifier =
       $set: {}

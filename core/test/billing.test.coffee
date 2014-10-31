@@ -1,13 +1,15 @@
 describe 'billing', ->
   billing = null
   config = null
+
   Account = null
+  Financials = null
 
   account = null
 
   before ->
     {billing, config} = app
-    {Account} = app.models
+    {Account, Financials} = app.models
 
     account = new Account
       username: 'billing'
@@ -17,7 +19,25 @@ describe 'billing', ->
         plans: []
         last_billing_at: {}
         balance: 0
-        arrears_at: new Date
+        arrears_at: null
+
+    config.plans.billing_test =
+      billing_by_time:
+        unit: 24 * 3600 * 1000
+        price: 10 / 30
+
+      services: []
+      resources:
+        cpu: 144
+        storage: 520
+        transfer: 39
+        memory: 27
+
+    config.plans.billing_test2 =
+      resources:
+        cpu: 50
+        storage: 200
+        memory: 10
 
   describe 'isForceFreeze', ->
     it 'should be false when not in any services', ->
@@ -39,14 +59,6 @@ describe 'billing', ->
 
   describe 'generateBilling', ->
     it 'should success for billing_by_time plan', (done) ->
-      config.plans.billing_test =
-        billing_by_time:
-          unit: 24 * 3600 * 1000
-          price: 10 / 30
-
-        services: []
-        resources: {}
-
       last_billing_at = new Date Date.now() - 2 * 24 * 3600 * 1000 + 5000000
 
       account.plan = ['billing_test']
@@ -75,8 +87,53 @@ describe 'billing', ->
         expect(billing_report).to.not.exist
         done()
 
+  describe 'calcResourcesLimit', ->
+    it 'should success', ->
+      billing.calcResourcesLimit(['billing_test', 'billing_test2']).should.eql
+        cpu: 194
+        storage: 720
+        transfer: 39
+        memory: 37
+
   describe 'triggerBilling', ->
-    it 'pending'
+    last_billing_at = new Date Date.now() - 2 * 24 * 3600 * 1000 + 5000000
+    new_last_billing_at = new Date last_billing_at.getTime() + 2 * 24 * 3600 * 1000
+
+    before (done) ->
+      account.billing =
+        services: []
+        plans: ['billing_test']
+        last_billing_at:
+          billing_test: last_billing_at
+        balance: 10
+        arrears_at: null
+
+      created_objects.accounts.push account._id
+
+      account.save done
+
+    it 'should success', (done) ->
+      billing.triggerBilling account, (new_account) ->
+        account = new_account
+        account.billing.last_billing_at.billing_test.getTime().should.equal new_last_billing_at.getTime()
+        account.billing.balance.should.be.equal 10 - 10 / 15
+
+        Financials.findOne
+          account_id: account._id
+          type: 'billing'
+        , (err, financials) ->
+          financials.amount.should.be.equal -10 / 15
+          financials.payload.billing_test.billing_unit_count.should.be.equal 2
+          done()
+
+    it 'should not create billing when range less then unit', (done) ->
+      billing.triggerBilling account, (account) ->
+        Financials.find
+          account_id: account._id
+          type: 'billing'
+        , (err, financials) ->
+          financials.should.have.length 1
+          done()
 
   describe 'joinPlan', ->
     it 'pending'
@@ -85,7 +142,4 @@ describe 'billing', ->
     it 'pending'
 
   describe 'forceLeaveAllPlans', ->
-    it 'pending'
-
-  describe 'calcResourcesLimit', ->
     it 'pending'
