@@ -1,15 +1,15 @@
-express = require 'express'
-_ = require 'underscore'
-
-{config, pluggable, billing} = app
-{requireAuthenticate} = require './../middleware'
+{express, _} = app.libs
+{config, billing} = app
+{requireAuthenticate} = app.middleware
 {Account} = app.models
 
 module.exports = exports = express.Router()
 
-exports.post '/join_plan', requireAuthenticate, (req, res) ->
+exports.use requireAuthenticate
+
+exports.post '/join_plan', (req, res) ->
   unless req.body.plan in _.keys(config.plans)
-    return res.error 'invaild_plan'
+    return res.error 'invalid_plan'
 
   if req.body.plan in req.account.billing.plans
     return res.error 'already_in_plan'
@@ -21,7 +21,7 @@ exports.post '/join_plan', requireAuthenticate, (req, res) ->
     billing.joinPlan req, account, req.body.plan, ->
       res.json {}
 
-exports.post '/leave_plan', requireAuthenticate, (req, res) ->
+exports.post '/leave_plan', (req, res) ->
   unless req.body.plan in req.account.billing.plans
     return res.error 'not_in_plan'
 

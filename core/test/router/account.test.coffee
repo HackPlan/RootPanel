@@ -15,6 +15,7 @@ describe 'router/account', ->
 
   after ->
     namespace.accountRouter =
+      account_id: account_id
       csrf_token: csrf_token
       agent: agent
 
