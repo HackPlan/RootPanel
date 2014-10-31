@@ -4,7 +4,7 @@ if process.env.COV_TEST == 'true'
   require('coffee-coverage').register
     path: 'relative'
     basePath: "#{__dirname}/../.."
-    exclude: ['test', 'node_modules', '.git', 'sample', 'core/static']
+    exclude: ['test', 'node_modules', '.git', 'sample', 'core/static', 'migration/database']
 
 global._ = require 'underscore'
 global.fs = require 'fs'
