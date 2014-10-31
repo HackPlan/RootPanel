@@ -48,7 +48,7 @@ describe 'billing', ->
       expect(billing.isForceFreeze(account)).to.not.ok
 
     it 'should be true when balance below then 0', ->
-      account.billing.plans = ['sample']
+      account.billing.plans = ['billing_test']
       account.billing.balance = -5
       expect(billing.isForceFreeze(account)).to.be.ok
 

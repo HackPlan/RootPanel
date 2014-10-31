@@ -25,3 +25,12 @@ global.namespace = {}
 
 chai.should()
 chai.config.includeStack = true
+
+config = require '../config'
+config.web.listen = 12558
+
+if process.env.TRAVIS == 'true'
+  config.mongodb.user = undefined
+  config.mongodb.password = undefined
+
+  config.redis.password = undefined

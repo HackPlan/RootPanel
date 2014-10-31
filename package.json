@@ -18,9 +18,10 @@
   "scripts": {
     "start": "./node_modules/.bin/coffee app.coffee",
     "migrate": "./node_modules/.bin/coffee migration/migrate.coffee",
-    "test": "COV_TEST=true ./node_modules/.bin/mocha --compilers coffee:coffee-script/register --require test/support/env --reporter test/support/reporter-cov-summary.js -- core/test/*.test.coffee core/test/*/*.test.coffee plugin/*/test",
-    "test-only": "./node_modules/.bin/mocha --compilers coffee:coffee-script/register --require test/support/env -- core/test/*.test.coffee core/test/*/*.test.coffee plugin/*/test",
-    "test-cov-html": "COV_TEST=true ./node_modules/.bin/mocha --compilers coffee:coffee-script/register --require test/support/env --reporter html-cov -- core/test/*.test.coffee core/test/*/*.test.coffee plugin/*/test > coverage-reporter.html"
+    "test": "COV_TEST=true ./node_modules/.bin/mocha --compilers coffee:coffee-script/register --require test/env --reporter test/reporter-cov-summary.js -- core/test/*.test.coffee core/test/*/*.test.coffee plugin/*/test",
+    "test-only": "./node_modules/.bin/mocha --compilers coffee:coffee-script/register --require test/env -- core/test/*.test.coffee core/test/*/*.test.coffee plugin/*/test",
+    "test-full": "./node_modules/.bin/coffee test/full-test.coffee",
+    "test-cov-html": "COV_TEST=true ./node_modules/.bin/mocha --compilers coffee:coffee-script/register --require test/env --reporter html-cov -- core/test/*.test.coffee core/test/*/*.test.coffee plugin/*/test > coverage-reporter.html"
   },
   "bin": {
     "rp-fix-permissions": "./bin/rp-fix-permissions.coffee",

@@ -48,21 +48,12 @@ do ->
   config_path = path.join __dirname, 'config.coffee'
 
   unless fs.existsSync config_path
-    unless process.env.TRAVIS == 'true'
-      app.deprecate 'config.coffee not found, copy sample config to ./config.coffee'
-
-      default_config = 'core'
-    else
-      default_config = 'travis-ci'
-
-    fs.writeFileSync config_path, fs.readFileSync path.join __dirname, "./sample/#{default_config}.config.coffee"
+    app.deprecate 'config.coffee not found, copy sample config to ./config.coffee'
+    fs.writeFileSync config_path, fs.readFileSync path.join __dirname, "./sample/core.config.coffee"
 
   fs.chmodSync config_path, 0o750
 
 config = require './config'
-
-if process.env.NODE_ENV == 'test'
-  config.web.listen = require('./sample/travis-ci.config').web.listen
 
 do  ->
   if fs.existsSync config.web.listen
