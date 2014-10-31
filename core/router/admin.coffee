@@ -1,6 +1,5 @@
 {express, async, _} = app.libs
 {requireAdminAuthenticate} = app.middleware
-{plaggable} = app
 {Account, Ticket, Financials, CouponCode} = app.models
 
 module.exports = exports = express.Router()
@@ -56,30 +55,28 @@ exports.get '/ticket', (req, res) ->
     res.render 'ticket/list', result
 
 exports.post '/confirm_payment', (req, res) ->
-  Account.findOne req.body.account_id, (err, account) ->
+  Account.findById req.body.account_id, (err, account) ->
     unless account
       return res.error 'account_not_exist'
 
-    amount = parseFloat req.body.amount
-
-    if _.isNaN amount
+    unless _.isFinite req.body.amount
       return res.error 'invalid_amount'
 
-    account.incBalance amount, 'deposit',
+    account.incBalance req.body.amount, 'deposit',
       type: req.body.type
       order_id: req.body.order_id
     , ->
       res.json {}
 
 exports.post '/delete_account', (req, res) ->
-  Account.findOne req.body.account_id, (err, account) ->
+  Account.findById req.body.account_id, (err, account) ->
     unless account
       return res.error 'account_not_exist'
 
     unless _.isEmpty account.billing.plans
       return res.error 'already_in_plan'
 
-    unless account.attribute.balance <= 0
+    unless account.billing.balance <= 0
       return res.error 'balance_not_empty'
 
     Account.findByIdAndRemove account._id, ->
@@ -88,5 +85,5 @@ exports.post '/delete_account', (req, res) ->
 exports.post '/generate_coupon_code', (req, res) ->
   coupon_code = _.pick req.body, 'expired', 'available_times', 'type', 'meta'
 
-  CouponCode.createCodes coupon_code, req.body.count, (err, coupon_codes) ->
+  CouponCode.createCodes coupon_code, req.body.count, (err, coupon_codes...) ->
     res.json coupon_codes

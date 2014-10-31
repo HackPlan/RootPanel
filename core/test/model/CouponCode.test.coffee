@@ -39,7 +39,7 @@ describe 'model/CouponCode', ->
         coupon1.type.should.be.equal 'amount'
         coupon1.meta.amount.should.be.equal 4
 
-        coupon1.code.should.not.equal coupon2
+        coupon1.code.should.not.equal coupon2.code
 
         for coupon in coupons
           created_objects.couponcodes.push coupon._id
