@@ -20,6 +20,9 @@ exports.cyclicalBilling = (callback) ->
       callback()
 
 exports.isForceFreeze = (account) ->
+  if _.isEmpty account.billing.services
+    return false
+
   if account.billing.balance < config.billing.force_freeze.when_balance_below
     return true
 
@@ -39,7 +42,10 @@ exports.triggerBilling = (account, callback) ->
     billing_reports = _.compact result
 
     if _.isEmpty billing_reports
-      return callback account
+      if exports.isForceFreeze account
+        exports.forceLeaveAllPlans account, callback
+      else
+        callback account
 
     modifier =
       $set: {}
