@@ -44,7 +44,10 @@ describe 'router/ticket', ->
     .expect /<p><strong>CONTENT<\/strong><\/p>/
     .end done
 
-  it 'GET view/:id when not exist'
+  it 'GET view/:id when not exist', (done) ->
+    agent.get '/ticket/view/14534f8a3d9064cb116c315d'
+    .expect 404
+    .end done
 
   it 'POST reply', (done) ->
     agent.post "/ticket/reply/#{ticket_id}"
