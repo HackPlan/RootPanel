@@ -165,9 +165,10 @@ exports.leavePlan = (req, account, plan_name, callback) ->
       else
         callback()
 
+# @param callback(account)
 exports.forceLeaveAllPlans = (account, callback) ->
   async.eachSeries account.billing.plans, (plan_name, callback) ->
-    exports.leavePlan account, plan_name, callback
+    exports.leavePlan {}, account, plan_name, callback
   , ->
     Account.findById account._id, (err, account) ->
       callback account

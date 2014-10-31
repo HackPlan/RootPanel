@@ -135,11 +135,24 @@ describe 'billing', ->
           financials.should.have.length 1
           done()
 
+  describe 'forceLeaveAllPlans', ->
+    it 'should success', (done) ->
+      billing.forceLeaveAllPlans account, (new_account) ->
+        account = new_account
+        account.billing.plans.should.have.length 0
+        done()
+
   describe 'joinPlan', ->
-    it 'pending'
+    it 'should success', (done) ->
+      billing.joinPlan {}, account, 'billing_test', ->
+        Account.findById account._id, (err, new_account) ->
+          account = new_account
+          account.billing.plans.should.have.length 1
+          done()
 
   describe 'leavePlan', ->
-    it 'pending'
-
-  describe 'forceLeaveAllPlans', ->
-    it 'pending'
+    it 'should success', (done) ->
+      billing.leavePlan {}, account, 'billing_test', ->
+        Account.findById account._id, (err, new_account) ->
+          new_account.billing.plans.should.have.length 0
+          done()
