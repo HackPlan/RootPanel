@@ -20,7 +20,7 @@ exports.cyclicalBilling = (callback) ->
       callback()
 
 exports.isForceFreeze = (account) ->
-  if _.isEmpty account.billing.services
+  if _.isEmpty account.billing.plans
     return false
 
   if account.billing.balance < config.billing.force_freeze.when_balance_below
