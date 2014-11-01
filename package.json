@@ -58,7 +58,8 @@
     "request": "^2.45.0",
     "tmp": "^0.0.24",
     "underscore": "^1.6.0",
-    "semver": "^4.1.0"
+    "semver": "^4.1.0",
+    "get-parameter-names": "^0.2.0"
   },
   "devDependencies": {
     "mocha": "^2.0.0",

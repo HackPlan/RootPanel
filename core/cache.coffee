@@ -1,4 +1,5 @@
 stringify = require 'json-stable-stringify'
+getParameterNames = require 'get-parameter-names'
 CounterCache = require 'counter-cache'
 _ = require 'underscore'
 
@@ -8,57 +9,50 @@ config = require '../config'
 
 exports.counter = new CounterCache()
 
-exports.hashKey = (key, param) ->
-  return "#{config.redis.prefix}:#{key}" + stringify(param)
+exports.hashKey = (key) ->
+  if _.isString key
+    return "#{config.redis.prefix}:" + key
+  else
+    return "#{config.redis.prefix}:" + stringify key
 
-# @param [options] {param, command, is_json}
-# @param setter(callback(value), param)
+# @param key: string|object
+# @param setter(COMMAND(value, command_params...), key)
 # @param callback(value)
-exports.try = (key, options, setter, callback) ->
-  unless callback
-    callback = setter
-    setter = options
-    options = {}
-
-  options.param ?= {}
-  options.command ?= exports.SET()
-
-  key = exports.hashKey key, options.param
-
-  if _.isEmpty options.param
-    original_setter = setter
-    setter = (param, callback) ->
-      original_setter callback
+exports.try = (key, setter, callback) ->
+  original_key = key
+  key = exports.hashKey key
 
   redis.get key, (err, value) ->
     if value != undefined and value != null
-      if options.is_json
-        value = JSON.parse value
-
-      callback value
+      try
+        callback JSON.parse value
+      catch e
+        callback value
 
     else
-      setter options.param, (value) ->
-        if options.is_json
+      setter (value, command_params...) ->
+        original_value = value
+
+        if _.isObject value
           value = JSON.stringify value
 
-        options.command key, value, ->
-          callback value
+        command = _.first getParameterNames setter
+        command = exports[command.toUpperCase()]
 
-exports.delete = (key, param, callback) ->
-  unless callback
-    callback = param
-    param = {}
+        params = [key, value].concat command_params
+        params.push ->
+          callback original_value
 
-  key = exports.hashKey key, param
+        command.apply @, params
 
-  redis.del key, ->
+      , original_key
+
+exports.delete = (key, callback) ->
+  redis.del exports.hashKey(key), ->
     callback()
 
-exports.SET = ->
-  return (key, value, callback) ->
-    redis.set key, value, callback
+exports.SET = (key, value, callback) ->
+  redis.set key, value, callback
 
-exports.SETEX = (seconds) ->
-  return (key, value, callback) ->
-    redis.setex key, seconds, value, callback
+exports.SETEX = (key, value, seconds, callback) ->
+  redis.setex key, seconds, value, callback

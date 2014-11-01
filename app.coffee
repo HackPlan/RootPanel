@@ -65,6 +65,12 @@ do  ->
     fs.writeFileSync session_key_path, crypto.randomBytes(48).toString('hex')
     fs.chmodSync session_key_path, 0o750
 
+app.redis = redis.createClient 6379, '127.0.0.1',
+  auth_pass: config.redis.password
+
+app.mailer = nodemailer.createTransport config.email.account
+app.express = express()
+
 app.config = config
 app.db = require './core/db'
 app.utils = require './core/utils'
@@ -87,12 +93,6 @@ app.templates = require './core/templates'
 app.billing = require './core/billing'
 app.middleware = require './core/middleware'
 app.notification = require './core/notification'
-
-app.redis = redis.createClient 6379, '127.0.0.1',
-  auth_pass: config.redis.password
-
-app.mailer = nodemailer.createTransport config.email.account
-app.express = express()
 
 unless process.env.NODE_ENV == 'test'
   app.express.use morgan 'dev'
