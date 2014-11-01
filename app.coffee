@@ -14,6 +14,7 @@ app.libs =
   express: require 'express'
   fs: require 'fs'
   harp: require 'harp'
+  jade: require 'jade'
   markdown: require('markdown').markdown
   middlewareInjector: require 'middleware-injector'
   moment: require 'moment-timezone'
@@ -23,6 +24,7 @@ app.libs =
   path: require 'path'
   redis: require 'redis'
   redisStore: require 'connect-redis'
+  request: require 'request'
   expressSession: require 'express-session'
   mongooseUniqueValidator: require 'mongoose-unique-validator'
 

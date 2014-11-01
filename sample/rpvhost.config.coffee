@@ -14,7 +14,7 @@ module.exports =
     default_timezone: 'Asia/Shanghai'
 
   plugin:
-    available_extensions: []
+    available_extensions: ['bitcoin']
     available_services: []
 
   billing:

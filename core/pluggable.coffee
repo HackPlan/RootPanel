@@ -144,14 +144,14 @@ exports.initializePlugins = ->
           throw new Error "#{plugin_name} is Dependent on #{dependence} but not load"
 
   for plugin_name in all_plugins
-    plugin_path = path.join __dirname, "../plugin/#{name}"
+    plugin_path = path.join __dirname, "../plugin/#{plugin_name}"
     plugin = require plugin_path
 
     if fs.existsSync path.join(plugin_path, 'locale')
       i18n.loadForPlugin plugin
 
     if fs.existsSync path.join(plugin_path, 'static')
-      app.use harp.mount("/plugin/#{name}", path.join(plugin_path, 'static'))
+      app.use harp.mount("/plugin/#{plugin_name}", path.join(plugin_path, 'static'))
 
 exports.createHelpers = (plugin) ->
   plugin.registerHook = (hook_name, payload) ->

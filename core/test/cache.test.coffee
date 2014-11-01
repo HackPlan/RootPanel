@@ -22,8 +22,7 @@ describe 'cache', ->
 
         redis.get 'RP:test_key', (err, value) ->
           value.should.be.equal 'test_key_value'
-
-          done()
+          done err
 
     it 'should success when cache exist', (done) ->
       cache.try 'test_key', ->

@@ -1,6 +1,7 @@
 describe 'billing', ->
   billing = null
   config = null
+  utils = null
 
   Account = null
   Financials = null
@@ -8,12 +9,12 @@ describe 'billing', ->
   account = null
 
   before ->
-    {billing, config} = app
+    {billing, utils, config} = app
     {Account, Financials} = app.models
 
     account = new Account
-      username: 'billing'
-      email: 'billing@gmail.com'
+      username: "test#{utils.randomString(10).toLowerCase()}"
+      email: "#{utils.randomString 20}@gmail.com"
       billing:
         services: []
         plans: []

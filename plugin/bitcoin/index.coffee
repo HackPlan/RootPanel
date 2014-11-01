@@ -1,10 +1,8 @@
-jade = require 'jade'
-path = require 'path'
+{jade, path} = app.libs
+{Account} = app.models
+{pluggable, config, utils} = app
 
 bitcoin = require './bitcoin'
-
-{mAccount} = app.models
-{pluggable, config, utils} = app
 
 module.exports = pluggable.createHelpers exports =
   name: 'bitcoin'
@@ -35,8 +33,8 @@ exports.registerHook 'view.pay.display_payment_details',
       order_id: deposit_log.payload.order_id
       short_order_id: deposit_log.payload.order_id[0 .. 40]
 
-app.post '/bitcoin/coinbase_callback', (req, res) ->
-  mAccount.findOne
+app.express.post '/bitcoin/coinbase_callback', (req, res) ->
+  Account.findOne
     'pluggable.bitcoin.bitcoin_deposit_address': req.body.address
   , (err, account) ->
     unless account
@@ -48,7 +46,7 @@ app.post '/bitcoin/coinbase_callback', (req, res) ->
     bitcoin.getExchangeRate config.billing.currency, (rate) ->
       amount = req.body.amount / rate
 
-      mAccount.incBalance account, 'deposit', amount,
+      Account.incBalance amount, 'deposit',
         type: 'bitcoin'
         order_id: req.body.transaction.hash
       , ->

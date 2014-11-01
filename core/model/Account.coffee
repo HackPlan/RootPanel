@@ -138,6 +138,8 @@ Account.statics.register = (account, callback) ->
       language: 'auto'
       timezone: config.i18n.default_timezone
 
+    pluggable: {}
+
   async.each pluggable.selectHook(account, 'account.before_register'), (hook, callback) ->
     hook.filter account, callback
   , ->
