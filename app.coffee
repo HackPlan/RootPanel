@@ -89,8 +89,6 @@ require './core/model/Notification'
 require './core/model/SecurityLog'
 require './core/model/Ticket'
 
-app.pluggable.initializePlugins()
-
 app.templates = require './core/templates'
 app.billing = require './core/billing'
 app.middleware = require './core/middleware'
@@ -120,6 +118,8 @@ app.express.use '/ticket', require './core/router/ticket'
 app.express.use '/coupon', require './core/router/coupon'
 app.express.use '/admin', require './core/router/admin'
 app.express.use '/panel', require './core/router/panel'
+
+app.pluggable.initializePlugins()
 
 app.express.get '/', (req, res) ->
   unless res.headerSent

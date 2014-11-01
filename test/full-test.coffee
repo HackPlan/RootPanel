@@ -8,9 +8,16 @@ async.eachSeries fs.readdirSync("#{__dirname}/../sample"), (filename, callback) 
 
   console.log "Config: #{filename}"
 
-  proc = child_process.spawn "#{__dirname}/../node_modules/.bin/mocha", '--compilers coffee:coffee-script/register
-    --require test/env --reporter test/reporter-cov-summary.js --
-    core/test/*.test.coffee core/test/*/*.test.coffee'.split(' '),
+  params = '--compilers coffee:coffee-script/register --require test/env --reporter test/reporter-cov-summary.js --
+    core/test/*.test.coffee core/test/*/*.test.coffee'.split(' ')
+
+  config = require "#{__dirname}/../sample/#{filename}"
+
+  for plugin_name in _.union config.plugin.available_extensions, config.plugin.available_services
+    if fs.existsSync "plugin/#{plugin_name}/test"
+      params.push "plugin/#{plugin_name}/test/*.test.coffee"
+
+  proc = child_process.spawn "#{__dirname}/../node_modules/.bin/mocha", params,
     env: _.extend process.env,
       COV_TEST: 'true'
 

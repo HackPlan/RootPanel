@@ -1,9 +1,5 @@
-path = require 'path'
-fs = require 'fs'
-
+{fs, path} = app.libs
 {pluggable} = app
-
-wiki = require './wiki'
 
 module.exports = pluggable.createHelpers exports =
   name: 'wiki'
@@ -13,14 +9,14 @@ exports.registerHook 'view.layout.menu_bar',
   href: '/wiki/'
   t_body: 'plugins.wiki.'
 
-for category_name in fs.readdirSync("#{__dirname}/../../WIKI")
-  for file_name in fs.readdirSync("#{__dirname}/../../WIKI/#{category_name}")
+wiki_path = "#{__dirname}/../../WIKI"
+
+for category_name in fs.readdirSync(wiki_path)
+  for file_name in fs.readdirSync("#{wiki_path}/#{category_name}")
     exports.registerHook 'plugin.wiki.pages',
       t_category: category_name
       t_title: file_name
       language: 'zh_CN'
-      content_markdown: fs.readFileSync("#{__dirname}/../../WIKI/#{category_name}/#{file_name}").toString()
+      content_markdown: fs.readFileSync("#{wiki_path}/#{category_name}/#{file_name}").toString()
 
-app.get '/wiki', wiki.index
-
-app.get '/wiki/:category/:title', wiki.page
+app.express.use '/wiki', require './wiki'

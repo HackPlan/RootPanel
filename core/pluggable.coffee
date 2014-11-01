@@ -179,7 +179,6 @@ exports.createHelpers = (plugin) ->
 
     locals = _.extend _.clone(req.res.locals), view_data,
       account: req.account
-
       t: plugin.t req
 
     jade.renderFile template_path, locals, (err, html) ->
