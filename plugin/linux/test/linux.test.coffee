@@ -25,13 +25,57 @@ describe 'plugin/linux', ->
     it 'pending'
 
   describe 'getPasswdMap', ->
-    it 'pending'
+    before (done) ->
+      cache.delete 'linux.getPasswdMap', done
+
+    it 'should success', (done) ->
+      linux.getPasswdMap (passwd_map) ->
+        passwd_map.should.be.a 'object'
+
+        for k, v of passwd_map
+          parseInt(k).toString().should.be.equal k
+          v.should.be.a 'string'
+
+        done()
 
   describe 'getMemoryInfo', ->
-    it 'pending'
+    before (done) ->
+      cache.delete 'linux.getMemoryInfo', done
+
+    it 'should success', (done) ->
+      linux.getMemoryInfo (memory_info) ->
+        for field in [
+          'used', 'cached', 'buffers', 'free', 'total', 'swap_used', 'swap_free'
+          'swap_total', 'used_per', 'cached_per', 'buffers_per', 'free_per'
+          'swap_used_per', 'swap_free_per'
+        ]
+          expect(isNaN(memory_info[field])).to.be.false
+          memory_info[field].should.be.a 'number'
+
+        done()
 
   describe 'getProcessList', ->
-    it 'pending'
+    before (done) ->
+      cache.delete 'linux.getProcessList', done
+
+    it 'should success', (done) ->
+      linux.getProcessList (plist) ->
+        plist.should.be.a 'array'
+
+        for p in plist
+          p.user.should.be.a 'string'
+          p.time.should.be.a 'number'
+          p.pid.should.be.a 'number'
+          p.cpu_per.should.be.a 'number'
+          p.mem_per.should.be.a 'number'
+          p.vsz.should.be.a 'number'
+          p.rss.should.be.a 'number'
+          p.tty.should.be.a 'string'
+          p.stat.should.be.a 'string'
+          p.start.should.be.a 'string'
+          p.command.should.be.a 'string'
+
+        done()
 
   describe 'getStorageQuota', ->
     it 'pending'

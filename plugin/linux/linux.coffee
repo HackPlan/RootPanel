@@ -62,7 +62,7 @@ exports.getPasswdMap = (callback) ->
   , callback
 
 exports.getMemoryInfo = (callback) ->
-  cache.try 'linux.getProcessList', (SETEX) ->
+  cache.try 'linux.getMemoryInfo', (SETEX) ->
     fs.readFile '/proc/meminfo', (err, content) ->
       logger.error err if err
       mapping = {}
@@ -73,12 +73,13 @@ exports.getMemoryInfo = (callback) ->
           mapping[key.trim()] = parseInt (parseInt(value.trim().match(/\d+/)) / 1024).toFixed()
 
       used = mapping['MemTotal'] - mapping['MemFree'] - mapping['Buffers'] - mapping['Cached']
-      used_per = (used / mapping['MemTotal'] * 100).toFixed()
-      cached_per = (mapping['Cached'] / mapping['MemTotal'] * 100).toFixed()
-      buffers_per = (mapping['Buffers'] / mapping['MemTotal'] * 100).toFixed()
+      used_per = parseInt (used / mapping['MemTotal'] * 100).toFixed()
+      cached_per = parseInt (mapping['Cached'] / mapping['MemTotal'] * 100).toFixed()
+      buffers_per = parseInt (mapping['Buffers'] / mapping['MemTotal'] * 100).toFixed()
       free_per = 100 - used_per - cached_per - buffers_per
 
-      swap_free_per = (mapping['SwapFree'] / mapping['SwapTotal'] * 100).toFixed()
+      swap_free_per = parseInt (mapping['SwapFree'] / mapping['SwapTotal'] * 100).toFixed()
+      swap_free_per = 100 if _.isNaN swap_free_per
       swap_used_per = 100 - swap_free_per
 
       SETEX
@@ -96,8 +97,8 @@ exports.getMemoryInfo = (callback) ->
         buffers_per: buffers_per
         free_per: free_per
 
-        swap_used_per: swap_used_per
-        swap_free_per: swap_free_per
+        swap_used_per: swap_used_per ? 0
+        swap_free_per: swap_free_per ? 0
       , 3
 
   , callback
@@ -108,32 +109,32 @@ exports.getProcessList = (callback) ->
       child_process.exec "sudo ps awufxn", (err, stdout) ->
         logger.error err if err
 
-        result = _.map stdout.split('\n')[1 ... -1], (item) ->
+        plist = _.map stdout.split('\n')[1 ... -1], (item) ->
           result = /^\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(.+)$/.exec item
 
           return {
-          user: do ->
-            if passwd_map[result[1]]
-              return passwd_map[result[1]]
-            else
-              return result[1]
+            user: do ->
+              if passwd_map[result[1]]
+                return passwd_map[result[1]]
+              else
+                return result[1]
 
-          time: do ->
-            [minute, second] = result[10].split ':'
-            return parseInt(minute) * 60 + parseInt(second)
+            time: do ->
+              [minute, second] = result[10].split ':'
+              return parseInt(minute) * 60 + parseInt(second)
 
-          pid: parseInt result[2]
-          cpu_per: parseInt result[3]
-          mem_per: parseInt result[4]
-          vsz: parseInt result[5]
-          rss: parseInt result[6]
-          tty: result[7]
-          stat: result[8]
-          start: result[9]
-          command: result[11]
+            pid: parseInt result[2]
+            cpu_per: parseInt result[3]
+            mem_per: parseInt result[4]
+            vsz: parseInt result[5]
+            rss: parseInt result[6]
+            tty: result[7]
+            stat: result[8]
+            start: result[9]
+            command: result[11]
           }
 
-        SETEX result, 5
+        SETEX plist, 5
 
   , callback
 
@@ -228,7 +229,7 @@ exports.getStorageInfo = (callback) ->
   , callback
 
 exports.getResourceUsageByAccounts = (callback) ->
-  cache.try 'linux.getStorageInfo', (SETEX) ->
+  cache.try 'linux.getResourceUsageByAccounts', (SETEX) ->
     async.parallel
       storage_quota: wrapAsync exports.getStorageQuota
       process_list: wrapAsync exports.getProcessList
