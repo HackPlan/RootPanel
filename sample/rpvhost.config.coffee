@@ -15,7 +15,7 @@ module.exports =
 
   plugin:
     available_extensions: ['bitcoin', 'wiki', 'rpvhost']
-    available_services: []
+    available_services: ['linux']
 
   billing:
     currency: 'CNY'

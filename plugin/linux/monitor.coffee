@@ -1,11 +1,6 @@
-child_process = require 'child_process'
-os = require 'os'
-fs = require 'fs'
-async = require 'async'
-_ = require 'underscore'
-
+{child_process, os, fs, async, _} = app.libs
 {config} = app
-{mAccount} = app.models
+{Account} = app.models
 
 linux = require './linux'
 
@@ -63,7 +58,7 @@ exports.monitoring = (callback) ->
             usage.memory = parseFloat (usage.memory / base).toFixed(1)
 
           async.each _.keys(resources_usage), (username, callback) ->
-            mAccount.search username, (err, account) ->
+            Account.search username, (err, account) ->
               unless account
                 return callback()
 

@@ -1,6 +1,4 @@
-_ = require 'underscore'
-async = require 'async'
-
+{async, _} = app.libs
 {pluggable, config} = app
 {requireAuthenticate} = app.middleware
 {wrapAsync} = app.utils
@@ -39,8 +37,7 @@ exports.registerHook 'view.panel.widgets',
 
       exports.render 'widget', req,
         usage: resources_usage
-      , (html) ->
-        callback html
+      , callback
 
 exports.registerHook 'account.resources_limit_changed',
   always_notice: true
@@ -49,29 +46,24 @@ exports.registerHook 'account.resources_limit_changed',
 
 exports.registerServiceHook 'enable',
   filter: (req, callback) ->
-    linux.createUser req.account, ->
-      linux.setResourceLimit req.account, callback
+    linux.createUser req.account, callback
 
 exports.registerServiceHook 'disable',
   filter: (req, callback) ->
     linux.deleteUser req.account, callback
 
-app.get '/public/monitor', requireAuthenticate, (req, res) ->
+app.express.get '/public/monitor', requireAuthenticate, (req, res) ->
   async.parallel
     resources_usage: (callback) ->
       linux.getResourceUsageByAccounts (result) ->
-        console.log result
         callback null, result
     system: wrapAsync linux.getSystemInfo
     storage: wrapAsync linux.getStorageInfo
     process_list: wrapAsync linux.getProcessList
     memory: wrapAsync linux.getMemoryInfo
-    x: (callback) ->
-      callback null, 'test'
 
   , (err, result) ->
-    console.log arguments
-
+    logger.error err if err
     exports.render 'monitor', req, result, (html) ->
       res.send html
 
