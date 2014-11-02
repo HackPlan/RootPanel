@@ -1,11 +1,15 @@
-path = require 'path'
-jade = require 'jade'
-
+{jade, path} = app.libs
 {pluggable, config} = app
 
 module.exports = pluggable.createHelpers exports =
   name: 'rpvhost'
   type: 'extension'
+
+exports.registerHook 'plugin.wiki.pages',
+  t_category: 'rpvhost'
+  t_title: 'Terms.md'
+  language: 'zh_CN'
+  content_markdown: fs.readFileSync("#{__dirname}/wiki/Terms.md").toString()
 
 exports.registerHook 'view.layout.menu_bar',
   href: '//blog.rpvhost.net'
