@@ -1,13 +1,18 @@
 describe 'plugin/linux', ->
   linux = null
-  agent = null
   cache = null
   redis = null
+  utils = null
+
+  agent = null
+  username = null
 
   before ->
     linux = require '../linux'
-    {cache, redis} = app
+    {cache, redis, utils} = app
     {agent} = namespace.accountRouter
+
+    username = "linux_test#{utils.randomString(20)}"
 
   describe 'router', ->
     it 'GET monitor', (done) ->
@@ -16,10 +21,16 @@ describe 'plugin/linux', ->
       .end done
 
   describe 'createUser', ->
-    it 'pending'
+    it 'should success', (done) ->
+      linux.createUser {username: username}, ->
+        fs.existsSync("/home/#{username}").should.be.ok
+        done()
 
   describe 'deleteUser', ->
-    it 'pending'
+    it 'should success', (done) ->
+      linux.deleteUser {username: username}, ->
+        expect(fs.existsSync("/home/#{username}")).to.not.ok
+        done()
 
   describe 'setResourceLimit', ->
     it 'pending'
@@ -78,7 +89,17 @@ describe 'plugin/linux', ->
         done()
 
   describe 'getStorageQuota', ->
-    it 'pending'
+    before (done) ->
+      cache.delete 'linux.getStorageQuota', done
+
+    it 'should success', (done) ->
+      linux.getStorageQuota (storage_quota) ->
+        for k, v of storage_quota
+          v.username.should.be.equal k
+          v.size_used.should.be.a 'number'
+          v.inode_used.should.be.a 'number'
+
+        done()
 
   describe 'getSystemInfo', ->
     before (done) ->
@@ -96,7 +117,7 @@ describe 'plugin/linux', ->
         for address in system.address
           expect(
             address.match(/\d+\.\d+\.\d+\.\d+/) or
-            address.match(/::/)
+            address.match(/:.*:/)
           ).to.be.ok
 
         redis.get 'RP:linux.getSystemInfo', (err, system) ->
@@ -104,10 +125,32 @@ describe 'plugin/linux', ->
           done()
 
   describe 'getStorageInfo', ->
-    it 'pending'
+    before (done) ->
+      cache.delete 'linux.getStorageInfo', done
+
+    it 'should success', (done) ->
+      linux.getStorageInfo (storage_info) ->
+        storage_info.used.should.be.a 'number'
+        storage_info.free.should.be.a 'number'
+        storage_info.total.should.be.a 'number'
+        storage_info.used_per.should.be.a 'number'
+        storage_info.free_per.should.be.a 'number'
+        done()
 
   describe 'getResourceUsageByAccounts', ->
-    it 'pending'
+    before (done) ->
+      cache.delete 'linux.getResourceUsageByAccounts', done
+
+    it 'should success', (done) ->
+      linux.getResourceUsageByAccounts (resource_usage) ->
+        for item in resource_usage
+          item.username.should.be.a 'string'
+          item.cpu.should.be.a 'number'
+          item.memory.should.be.a 'number'
+          item.storage.should.be.a 'number'
+          item.process.should.be.a 'number'
+
+        done()
 
   describe 'getResourceUsageByAccount', ->
     it 'pending'

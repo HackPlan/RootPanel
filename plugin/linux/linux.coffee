@@ -14,8 +14,7 @@ exports.createUser = (account, callback) ->
 
   ], (err) ->
     logger.error err if err
-    cache.delete 'linux.getPasswdMap', ->
-      callback()
+    cache.delete 'linux.getPasswdMap', callback
 
 exports.deleteUser = (account, callback) ->
   async.series [
@@ -24,15 +23,15 @@ exports.deleteUser = (account, callback) ->
         callback()
 
     (callback) ->
-      child_process.exec "sudo userdel -rf #{account.username}", callback
+      child_process.exec "sudo userdel -rf #{account.username}", ->
+        callback()
 
     (callback) ->
       child_process.exec "sudo groupdel #{account.username}", callback
 
   ], (err) ->
     logger.error err if err
-    cache.delete 'linux.getPasswdMap', ->
-      callback()
+    cache.delete 'linux.getPasswdMap', callback
 
 exports.setResourceLimit = (account, callback) ->
   unless 'linux' in account.billing.services
@@ -214,7 +213,7 @@ exports.getStorageInfo = (callback) ->
       total = root_disk.size
       free = total - used
 
-      used_per = (used / total * 100).toFixed()
+      used_per = parseInt (used / total * 100).toFixed()
       free_per = 100 - used_per
 
       SETEX
@@ -241,8 +240,8 @@ exports.getResourceUsageByAccounts = (callback) ->
       for username, usage of monitor.resources_usage
         resources_usage_by_accounts.push
           username: username
-          cpu: usage.cpu
-          memory: usage.memory
+          cpu: usage.cpu ? 0
+          memory: usage.memory ? 0
           storage: result.storage_quota[username]?.size_used ? 0
           process: _.filter(result.process_list, (i) -> i.user == username).length
 
