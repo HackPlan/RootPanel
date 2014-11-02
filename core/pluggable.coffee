@@ -151,7 +151,7 @@ exports.initializePlugins = ->
       i18n.loadForPlugin plugin
 
     if fs.existsSync path.join(plugin_path, 'static')
-      app.use harp.mount("/plugin/#{plugin_name}", path.join(plugin_path, 'static'))
+      app.express.use harp.mount("/plugin/#{plugin_name}", path.join(plugin_path, 'static'))
 
 exports.createHelpers = (plugin) ->
   plugin.registerHook = (hook_name, payload) ->

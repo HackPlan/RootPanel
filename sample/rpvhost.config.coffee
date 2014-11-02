@@ -14,7 +14,7 @@ module.exports =
     default_timezone: 'Asia/Shanghai'
 
   plugin:
-    available_extensions: ['bitcoin', 'wiki']
+    available_extensions: ['bitcoin', 'wiki', 'rpvhost']
     available_services: []
 
   billing:
