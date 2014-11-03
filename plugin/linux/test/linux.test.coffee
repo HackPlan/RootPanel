@@ -26,14 +26,23 @@ describe 'plugin/linux', ->
         fs.existsSync("/home/#{username}").should.be.ok
         done()
 
+  describe 'setResourceLimit', ->
+    it 'should success', (done) ->
+      account =
+        username: username
+        billing:
+          services: ['linux']
+        resources_limit:
+          storage: 300
+
+      linux.setResourceLimit account, ->
+        done()
+
   describe 'deleteUser', ->
     it 'should success', (done) ->
       linux.deleteUser {username: username}, ->
         expect(fs.existsSync("/home/#{username}")).to.not.ok
         done()
-
-  describe 'setResourceLimit', ->
-    it 'pending'
 
   describe 'getPasswdMap', ->
     before (done) ->

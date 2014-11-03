@@ -8,7 +8,7 @@ async.eachSeries fs.readdirSync("#{__dirname}/../sample"), (filename, callback) 
 
   console.log "Config: #{filename}"
 
-  params = '--compilers coffee:coffee-script/register --require test/env --reporter test/reporter-cov-summary.js --
+  params = '--compilers coffee:coffee-script/register --require test/env --reporter node_modules/mocha-reporter-cov-summary --
     core/test/*.test.coffee core/test/*/*.test.coffee'.split(' ')
 
   config = require "#{__dirname}/../sample/#{filename}"

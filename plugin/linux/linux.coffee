@@ -45,7 +45,7 @@ exports.setResourceLimit = (account, callback) ->
 
   child_process.exec "sudo setquota -u #{account.username} #{soft_limit} #{hard_limit} #{soft_inode_limit} #{hard_inode_limit} -a", (err) ->
     logger.error err if err
-    callback()
+    cache.delete 'linux.getStorageQuota', callback
 
 exports.getPasswdMap = (callback) ->
   cache.try 'linux.getPasswdMap', (SETEX) ->

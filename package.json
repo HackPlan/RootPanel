@@ -18,7 +18,7 @@
   "scripts": {
     "start": "./node_modules/.bin/coffee app.coffee",
     "migrate": "./node_modules/.bin/coffee migration/migrate.coffee",
-    "test": "COV_TEST=true ./node_modules/.bin/mocha --compilers coffee:coffee-script/register --require test/env --reporter test/reporter-cov-summary.js -- core/test/*.test.coffee core/test/*/*.test.coffee plugin/*/test",
+    "test": "COV_TEST=true ./node_modules/.bin/mocha --compilers coffee:coffee-script/register --require test/env --reporter node_modules/mocha-reporter-cov-summary -- core/test/*.test.coffee core/test/*/*.test.coffee plugin/*/test",
     "test-only": "./node_modules/.bin/mocha --compilers coffee:coffee-script/register --require test/env -- core/test/*.test.coffee core/test/*/*.test.coffee plugin/*/test",
     "test-full": "./node_modules/.bin/coffee test/full-test.coffee",
     "test-cov-html": "COV_TEST=true ./node_modules/.bin/mocha --compilers coffee:coffee-script/register --require test/env --reporter html-cov -- core/test/*.test.coffee core/test/*/*.test.coffee plugin/*/test > coverage-reporter.html"
@@ -65,6 +65,7 @@
     "mocha": "^2.0.0",
     "chai": "^1.9.2",
     "coffee-coverage": "^0.4.2",
-    "supertest": "^0.14.0"
+    "supertest": "^0.14.0",
+    "mocha-reporter-cov-summary": "^0.1.0"
   }
 }
