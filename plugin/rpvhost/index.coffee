@@ -1,4 +1,4 @@
-{jade, path} = app.libs
+{jade, path, fs} = app.libs
 {pluggable, config} = app
 
 module.exports = pluggable.createHelpers exports =

@@ -8,7 +8,7 @@ $ ->
     unless password == password2
       return alert t 'view.account.password_inconsistent'
 
-    request '/account/register/',
+    request '/account/register',
       username: username
       password: password
       email: email

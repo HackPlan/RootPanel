@@ -7,7 +7,7 @@ module.exports = exports = express.Router()
 
 exports.use requireAuthenticate
 
-exports.get '/coupon_info', (req, res) ->
+exports.get '/info', (req, res) ->
   CouponCode.findOne
     code: req.query.code
   , (err, coupon) ->
@@ -22,7 +22,7 @@ exports.get '/coupon_info', (req, res) ->
         res.json
           message: message
 
-exports.post '/apply_coupon', (req, res) ->
+exports.post '/apply', (req, res) ->
   CouponCode.findOne
     code: req.body.code
   , (err, coupon) ->

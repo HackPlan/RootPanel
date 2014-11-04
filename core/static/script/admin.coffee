@@ -5,29 +5,13 @@ $ ->
 
   $('.action-delete-account').click (e) ->
     e.preventDefault()
-    $.post '/admin/delete_account/', JSON.stringify
+    $.post '/admin/delete_account', JSON.stringify
       account_id: $(@).parents('tr').data 'id'
     .success ->
       location.reload()
 
-  $('.action-disable-site').click (e) ->
-    e.preventDefault()
-    $.post '/admin/update_site/', JSON.stringify
-      site_id: $(@).parents('tr').data 'id'
-      is_enable: false
-    .success ->
-      location.reload()
-
-  $('.action-enable-site').click (e) ->
-    e.preventDefault()
-    $.post '/admin/update_site/', JSON.stringify
-      site_id: $(@).parents('tr').data 'id'
-      is_enable: true
-    .success ->
-      location.reload()
-
   $('.confirm-payment-modal .action-confirm-payment').click ->
-    request '/admin/confirm_payment/',
+    request '/admin/confirm_payment',
       account_id: $('.input-account-id').text()
       type: 'taobao'
       amount: $('.input-amount').val()
@@ -36,7 +20,7 @@ $ ->
       location.reload()
 
   $('.action-generate-code').click ->
-    request '/admin/generate_coupon_code/',
+    request '/admin/generate_coupon_code',
       expired: $('.input-expired').val()
       available_times: parseInt $('.input-available_times').val()
       type: $('.input-type').val()

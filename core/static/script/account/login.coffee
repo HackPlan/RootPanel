@@ -1,6 +1,6 @@
 $ ->
   $('.action-login').click ->
-    request '/account/login/',
+    request '/account/login',
       username: $('.input-username').val()
       password: $('.input-password').val()
     , ->

@@ -117,7 +117,7 @@
       "coupon_code": "兑换代码",
       "code": "代码",
       "update_password": "修改密码",
-      "old_password": "原密码",
+      "original_password": "原密码",
       "new_password": "新密码",
       "repeat_password": "重复密码",
       "update_email": "修改邮箱",

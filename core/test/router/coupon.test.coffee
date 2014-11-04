@@ -7,8 +7,8 @@ describe 'router/coupon', ->
     {agent, csrf_token} = namespace.accountRouter
     {coupon3} = namespace.couponCodeModel
 
-  it 'GET coupon_info', (done) ->
-    agent.get '/coupon/coupon_info'
+  it 'GET info', (done) ->
+    agent.get '/coupon/info'
     .query
       code: coupon3.code
     .expect 200
@@ -16,8 +16,8 @@ describe 'router/coupon', ->
       res.body.message.should.be.equal '账户余额：4 CNY'
       done err
 
-  it 'POST apply_coupon', (done) ->
-    agent.post '/coupon/apply_coupon'
+  it 'POST apply', (done) ->
+    agent.post '/coupon/apply'
     .send
       csrf_token: csrf_token
       code: coupon3.code

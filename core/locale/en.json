@@ -110,7 +110,7 @@
       "coupon_code": "Coupon Code",
       "code": "Code",
       "update_password": "Update password",
-      "old_password": "Old password",
+      "original_password": "Old password",
       "new_password": "New password",
       "repeat_password": "Repeat password",
       "update_email": "Update Email",

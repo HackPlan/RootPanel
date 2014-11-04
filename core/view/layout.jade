@@ -38,7 +38,7 @@ html
                   li
                     a(href='/admin/')= t('admin.admin_panel')
                 li
-                  a#logout(href='/account/logout/')= t('account.logout')
+                  a.action-logout(href='/account/logout/')= t('account.logout')
               else
                 li
                   a(href='/account/register/')= t('account.register')

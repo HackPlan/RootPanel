@@ -60,9 +60,9 @@ $ ->
   if window.location.hash == '#redirect'
     $('#site-not-exist').modal 'show'
 
-  $('#logout').click (e) ->
+  $('.action-logout').click (e) ->
     e.preventDefault()
-    $.post '/account/logout/', {}
+    $.post '/account/logout', {}
     .success ->
       location.reload()
 

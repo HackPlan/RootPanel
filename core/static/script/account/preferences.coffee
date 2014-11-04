@@ -1,6 +1,6 @@
 $ ->
   $('.action-save').click ->
-    request '/account/update_preferences/',
+    request '/account/update_preferences',
       qq: $('.form-setting .input-qq').val()
     , ->
       alert t 'common.success'
@@ -8,11 +8,11 @@ $ ->
   $('.action-use').click ->
     code = $('.form-coupon .input-coupon_code').val()
 
-    request '/account/coupon_info/',
+    request '/coupon/info',
       code: code
     , (result) ->
       if window.confirm result.message
-        request '/account/use_coupon/',
+        request '/coupon/apply',
           code: code
         , ->
           alert t 'common.success'
@@ -25,7 +25,7 @@ $ ->
       return alert t 'view.account.password_inconsistent'
 
     request '/account/update_password/',
-      old_password: $('.form-password .input-old_password').val()
+      original_password: $('.form-password .input-original_password').val()
       password: password
     , ->
       alert t 'common.success'
