@@ -5,6 +5,8 @@ module.exports = pluggable.createHelpers exports =
   type: 'service'
   dependencies: ['linux']
 
+supervisor = require './supervisor'
+
 exports.registerHook 'view.panel.scripts',
   path: '/plugin/linux/script/panel.css'
 
@@ -14,5 +16,6 @@ exports.registerHook 'view.panel.widgets',
 
 exports.registerServiceHook 'disable',
   filter: (req, callback) ->
+    supervisor.removePrograms req.account, callback
 
 app.express.use '/plugin/supervisor', require './router'
