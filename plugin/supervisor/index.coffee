@@ -12,4 +12,7 @@ exports.registerHook 'view.panel.widgets',
   generator: (req, callback) ->
     exports.render 'widget', req, {}, callback
 
+exports.registerServiceHook 'disable',
+  filter: (req, callback) ->
+
 app.express.use '/plugin/supervisor', require './router'
