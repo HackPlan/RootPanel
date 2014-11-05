@@ -15,7 +15,7 @@ module.exports =
 
   plugin:
     available_extensions: ['bitcoin', 'wiki', 'rpvhost']
-    available_services: ['linux']
+    available_services: ['linux', 'supervisor']
 
   billing:
     currency: 'CNY'
@@ -35,7 +35,7 @@ module.exports =
         unit: 24 * 3600 * 1000
         price: 10 / 30
 
-      services: ['ssh', 'linux']
+      services: ['supervisor', 'linux']
 
       resources:
         cpu: 144
