@@ -108,5 +108,14 @@ exports.post '/remove_program/:id', (req, res) ->
         res.json {}
 
 exports.get '/program_config/:id', (req, res) ->
+  req.program.id = req.program._id
+  delete req.program._id
+
+  res.json req.program
 
 exports.post '/program_control/:id', (req, res) ->
+  unless req.body.action in ['start', 'stop', 'restart']
+    return res.error 'invalid_action'
+
+  supervisor.programControl req.account, req.program, req.body.action, ->
+    res.json {}
