@@ -10,4 +10,4 @@ exports.removeConfig = (account, program, callback) ->
 
 exports.programControl = (account, program, action, callback) ->
 
-exports.programStatus = (callback) ->
+exports.programsStatus = (callback) ->

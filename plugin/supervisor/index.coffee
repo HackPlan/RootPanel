@@ -14,6 +14,13 @@ exports.registerHook 'view.panel.widgets',
   generator: (req, callback) ->
     exports.render 'widget', req, {}, callback
 
+exports.registerServiceHook 'enable',
+  filter: (req, callback) ->
+    req.account.update
+      $set:
+        'pluggable.supervisor.programs': []
+    , callback
+
 exports.registerServiceHook 'disable',
   filter: (req, callback) ->
     supervisor.removePrograms req.account, callback
