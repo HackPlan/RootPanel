@@ -41,6 +41,21 @@ restrictProgramFields = (req, res, next) ->
 
 exports.use requireInService 'supervisor'
 
+exports.param 'id', (req, res, next, id) ->
+  Account.findOne
+    'pluggable.supervisor.programs._id': ObjectId req.body
+  , (err, account) ->
+    req.program = _.find account?.pluggable.supervisor.programs, (program) ->
+      return program._id.toString() == req.body.id
+
+    unless req.program
+      return res.error 'program_not_exist'
+
+    unless account.id == req.account.id
+      return res.error 'program_forbidden'
+
+    next()
+
 exports.post '/create_program', restrictProgramFields, (req, res) ->
   program = _.pick req.body, _.keys(program_sample)
   program._id = ObjectId()
@@ -56,41 +71,41 @@ exports.post '/create_program', restrictProgramFields, (req, res) ->
   req.account.update
     $push:
       'pluggable.supervisor.programs': program
-  , ->
+  , (err) ->
+      return res.error err if err
+
     supervisor.writeConfig req.account, program, ->
       supervisor.updateProgram req.account, program, ->
         res.json {}
 
 exports.post '/update_program/:id', restrictProgramFields, (req, res) ->
-  Account.findOne
-    'pluggable.supervisor.programs._id': ObjectId req.body
-  , (err, account) ->
-    program = _.find account?.pluggable.supervisor.programs, (program) ->
-      return program._id.toString() == req.body.id
+  for k, v of _.pick req.program, configurable_fields
+    unless v == undefined
+      req.program[k] = v
 
-    unless program
-      return res.error 'program_not_exist'
+  Account.update
+    'pluggable.supervisor.programs._id': req.program._id
+  ,
+    $set:
+      'pluggable.supervisor.programs.$': req.program
+  , (err) ->
+    return res.error err if err
 
-    unless account.id == req.account.id
-      return res.error 'program_forbidden'
+    supervisor.writeConfig req.account, req.program, ->
+      supervisor.updateProgram req.account, req.program, ->
+        res.json {}
 
-    for k, v of _.pick program, configurable_fields
-      unless v == undefined
-        program[k] = v
+exports.post '/remove_program/:id', (req, res) ->
+  req.account.update
+    $pull:
+      'pluggable.supervisor.programs':
+        _id: req.program._id
+  , (err) ->
+    return res.error err if err
 
-    Account.update
-      'pluggable.supervisor.programs._id': program._id
-    ,
-      $set:
-        'pluggable.supervisor.programs.$': program
-    , (err) ->
-      return res.error err if err
-
-      supervisor.writeConfig account, program, ->
-        supervisor.updateProgram account, program, ->
-          res.json {}
-
-exports.post '/delete_program/:id', (req, res) ->
+    supervisor.removeConfig req.account, req.program, ->
+      supervisor.updateProgram req.account, null, ->
+        res.json {}
 
 exports.get '/program_config/:id', (req, res) ->
 
