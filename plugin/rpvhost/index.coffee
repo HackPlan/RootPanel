@@ -26,6 +26,7 @@ exports.registerHook 'view.pay.display_payment_details',
     callback exports.t(req) 'view.payment_details',
       order_id: deposit_log.payload.order_id
 
-app.express.get '/', (req, res) ->
-  exports.render 'index', req, {}, (html) ->
-    res.send html
+unless config.plugins.rpvhost.index_page == false
+  app.express.get '/', (req, res) ->
+    exports.render 'index', req, {}, (html) ->
+      res.send html

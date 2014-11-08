@@ -67,4 +67,5 @@ app.express.get '/public/monitor', requireAuthenticate, (req, res) ->
     exports.render 'monitor', req, result, (html) ->
       res.send html
 
-monitor.run()
+if config.plugins.linux.monitor_cycle
+  monitor.run()

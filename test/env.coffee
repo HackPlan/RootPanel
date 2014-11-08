@@ -1,6 +1,6 @@
 process.env.NODE_ENV = 'test'
 
-config = require '../config'
+global.config = require '../config'
 
 global._ = require 'underscore'
 global.fs = require 'fs'

@@ -1,7 +1,7 @@
 module.exports =
   web:
     t_name: 'plugins.rpvhost.site_name'
-    url: 'http://rp.rpvhost.net'
+    url: 'http://greenshadow.net'
     listen: '/home/rpadmin/rootpanel.sock'
     google_analytics_id: ''
 
@@ -15,7 +15,7 @@ module.exports =
 
   plugin:
     available_extensions: ['bitcoin', 'wiki', 'rpvhost']
-    available_services: ['linux', 'supervisor', 'ssh']
+    available_services: ['linux', 'supervisor', 'shadowsocks']
 
   billing:
     currency: 'CNY'
@@ -28,20 +28,13 @@ module.exports =
 
   plans:
     all:
-      t_name: 'plans.all.name'
-      t_description: 'plans.all.description'
+      t_name: 'plugins.rpvhost.plans.shadowsocks.name'
+      t_description: 'plugins.rpvhost.plans.shadowsocks.description'
 
-      billing_by_time:
-        unit: 24 * 3600 * 1000
-        price: 10 / 30
+      billing_by_usage:
+        auto_leave: 14 * 24 * 3600 * 1000
 
-      services: ['supervisor', 'linux', 'ssh']
-
-      resources:
-        cpu: 144
-        storage: 520
-        transfer: 39
-        memory: 27
+      services: ['shadowsocks']
 
   mongodb:
     user: 'rpadmin'
@@ -65,12 +58,19 @@ module.exports =
         pass: 'postmark-api-token'
 
   plugins:
+    linux:
+      monitor_cycle: null
+
     bitcoin:
       coinbase_api_key: 'coinbase-simple-api-key'
 
     rpvhost:
-      index_page: true
-      taobao_item_id: '38370649858'
+      index_page: false
+      taobao_item_id: '41040606505'
 
-    linux:
-      monitor_cycle: 30 * 1000
+    shadowsocks:
+      green_style: true
+
+      billing_bucket: 100 * 1024 * 1024
+      monitor_cycle: 5 * 60 * 1000
+      price_bucket: 0.06

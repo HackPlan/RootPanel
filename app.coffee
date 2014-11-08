@@ -136,4 +136,7 @@ app.express.listen config.web.listen, ->
   if fs.existsSync config.web.listen
     fs.chmodSync config.web.listen, 0o770
 
+  app.pluggable.selectHook(null, 'app.started').forEach (hook) ->
+    hook.action()
+
   app.logger.log "RootPanel start at #{config.web.listen}"

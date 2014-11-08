@@ -8,7 +8,7 @@ exports = module.exports = class SupervisorPlugin extends pluggable.Plugin
 supervisor = require './supervisor'
 
 exports.registerHook 'view.panel.scripts',
-  path: '/plugin/linux/script/panel.css'
+  path: '/plugin/linux/script/panel.js'
 
 exports.registerHook 'view.panel.widgets',
   generator: (req, callback) ->

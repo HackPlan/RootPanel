@@ -40,7 +40,7 @@ module.exports =
 
     test:
       t_name: 'plans.test.name'
-      t_description: 'plans.test.name.description'
+      t_description: 'plans.test.description'
 
       billing_by_usage:
         auto_leave: 7 * 24 * 3600 * 1000

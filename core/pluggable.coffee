@@ -6,10 +6,6 @@ exports.plugins = {}
 exports.hooks =
   app:
     # action: function
-    models_created: _.extend [],
-      global_event: true
-
-    # action: function
     started: _.extend [],
       global_event: true
 
