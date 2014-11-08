@@ -43,7 +43,7 @@ exports.use requireInService 'supervisor'
 
 exports.param 'id', (req, res, next, id) ->
   Account.findOne
-    'pluggable.supervisor.programs._id': ObjectId req.body
+    'pluggable.supervisor.programs._id': ObjectId id
   , (err, account) ->
     req.program = _.find account?.pluggable.supervisor.programs, (program) ->
       return program._id.toString() == req.body.id
@@ -59,6 +59,7 @@ exports.param 'id', (req, res, next, id) ->
 exports.post '/create_program', restrictProgramFields, (req, res) ->
   program = _.pick req.body, _.keys(program_sample)
   program._id = ObjectId()
+  program.program_name = "@#{account.username}-#{program.name}"
 
   for field in require_fields
     unless field in _.keys req.body
