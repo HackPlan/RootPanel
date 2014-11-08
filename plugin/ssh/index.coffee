@@ -1,9 +1,11 @@
-linux = require '../linux/linux'
+{pluggable} = app
 
-module.exports = pluggable.createHelpers exports =
-  name: 'ssh'
-  type: 'service'
-  dependencies: ['linux']
+exports = module.exports = class LinuxPlugin extends pluggable.Plugin
+  @NAME: 'ssh'
+  @type: 'service'
+  @dependencies: ['linux']
+
+linux = require '../linux/linux'
 
 exports.registerHook 'view.panel.scripts',
   path: '/plugin/ssh/style/panel.js'
@@ -19,7 +21,6 @@ exports.registerHook 'view.panel.widgets',
 
       exports.render 'widget', req,
         process_list: process_list
-      , (html) ->
-        callback html
+      , callback
 
-app.use '/plugin/ssh', require './router'
+app.express.use '/plugin/ssh', require './router'
