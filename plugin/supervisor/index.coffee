@@ -12,7 +12,9 @@ exports.registerHook 'view.panel.scripts',
 
 exports.registerHook 'view.panel.widgets',
   generator: (req, callback) ->
-    exports.render 'widget', req, {}, callback
+    exports.render 'widget', req,
+      programSummary: supervisor.programSummary
+    , callback
 
 exports.registerServiceHook 'enable',
   filter: (req, callback) ->
