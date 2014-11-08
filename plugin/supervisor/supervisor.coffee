@@ -1,6 +1,6 @@
 {child_process, fs, _} = app.libs
 
-supervisor_plugin = require './index'
+SupervisorPlugin = require './index'
 
 exports.removePrograms = (account, callback) ->
 
@@ -11,12 +11,12 @@ exports.updateProgram = (account, program, callback) ->
 exports.writeConfig = (account, program, callback) ->
   program_name = "@#{account.username}-#{program.name}"
 
-  supervisor_plugin.renderTemplate 'program.conf',
+  SupervisorPlugin.renderTemplate 'program.conf',
     name_prefix: '@'
     account: account
     program: program
   , (configure) ->
-    supervisor_plugin.writeConfigFile "/etc/supervisor/conf.d/#{program_name}.conf", configure, ->
+    SupervisorPlugin.writeConfigFile "/etc/supervisor/conf.d/#{program_name}.conf", configure, ->
       callback()
 
 exports.removeConfig = (account, program, callback) ->

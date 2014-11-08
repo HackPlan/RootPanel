@@ -1,43 +1,33 @@
-async = require 'async'
-path = require 'path'
-harp = require 'harp'
-jade = require 'jade'
-fs = require 'fs'
-_ = require 'underscore'
-
-i18n = require './i18n'
-config = require './../config'
+{async, path, harp, jade, temp, fs, _} = app.libs
+{i18n, config, logger} = app
 
 exports.plugins = {}
-
-hookHelper = (options) ->
-  return _.extend [], options
 
 exports.hooks =
   app:
     # action: function
-    models_created: hookHelper
+    models_created: _.extend [],
       global_event: true
 
     # action: function
-    started: hookHelper
+    started: _.extend [],
       global_event: true
 
   model:
     # model: string, field: string, type: string
-    type_enum: hookHelper
+    type_enum: _.extend [],
       global_event: true
 
     # model: string, action(schema, callback)
-    middleware: hookHelper
+    middleware: _.extend [],
       global_event: true
 
   account:
     # filter: function(username, callback(is_allow))
-    username_filter: hookHelper
+    username_filter: _.extend [],
       global_event: true
     # filter: function(account, callback)
-    before_register: hookHelper
+    before_register: _.extend [],
       global_event: true
     # filter: function(account, callback)
     resources_limit_changed: []
@@ -133,36 +123,37 @@ exports.selectHook = (account, hook_name) ->
       return false
 
 exports.initializePlugins = ->
-  all_plugins = _.union config.plugin.available_extensions, config.plugin.available_services
+  plugins = _.union config.plugin.available_extensions, config.plugin.available_services
 
-  for plugin_name in all_plugins
-    plugin = require path.join __dirname, "../plugin/#{plugin_name}"
+  for name in plugins
+    plugin = require "#{__dirname}/../plugin/#{name}"
 
     if plugin.dependencies
       for dependence in plugin.dependencies
-        unless dependence in all_plugins
-          throw new Error "#{plugin_name} is Dependent on #{dependence} but not load"
+        unless dependence in plugins
+          throw new Error "#{name} is Dependent on #{dependence} but not load"
 
-  for plugin_name in all_plugins
-    plugin_path = path.join __dirname, "../plugin/#{plugin_name}"
-    plugin = require plugin_path
+    exports.plugins[name] = plugin
+
+  for name, plugin in exports.plugins
+    plugin_path = "#{__dirname}/../plugin/#{name}"
 
     if fs.existsSync path.join(plugin_path, 'locale')
       i18n.loadForPlugin plugin
 
     if fs.existsSync path.join(plugin_path, 'static')
-      app.express.use harp.mount("/plugin/#{plugin_name}", path.join(plugin_path, 'static'))
+      app.express.use harp.mount("/plugin/#{name}", path.join(plugin_path, 'static'))
 
-exports.createHelpers = (plugin) ->
-  plugin.registerHook = (hook_name, payload) ->
-    return exports.registerHook hook_name, plugin, payload
+exports.Plugin = class Plugin
+  @registerHook: (hook_name, payload) ->
+    return exports.registerHook hook_name, @, payload
 
-  plugin.registerServiceHook = (hook_name, payload) ->
-    return plugin.registerHook "service.#{plugin.name}.#{hook_name}", payload
+  @registerServiceHook: (hook_name, payload) ->
+    return @registerHook "service.#{@NAME}.#{hook_name}", payload
 
-  plugin.t = (req) ->
-    return (name) ->
-      full_name = "plugins.#{plugin.name}.#{name}"
+  @t: (req) ->
+    return (name) =>
+      full_name = "plugins.#{@NAME}.#{name}"
 
       args = _.toArray arguments
       args[0] = full_name
@@ -174,15 +165,34 @@ exports.createHelpers = (plugin) ->
 
       return req.res.locals.t.apply @, _.toArray(arguments)
 
-  plugin.render = (template_name, req, view_data, callback) ->
-    template_path = path.join __dirname, "../plugin/#{plugin.name}/view/#{template_name}.jade"
+  @render: (template_name, req, view_data, callback) ->
+    template_path = "#{__dirname}/../plugin/#{@NAME}/view/#{template_name}.jade"
 
     locals = _.extend _.clone(req.res.locals), view_data,
       account: req.account
-      t: plugin.t req
+      t: @t req
 
     jade.renderFile template_path, locals, (err, html) ->
-      throw err if err
+      logger.error err if err
       callback html
 
-  return plugin
+  @renderTemplate: (name, view_data, callback) ->
+    template_path = "#{__dirname}/../plugin/#{@NAME}/template/#{name}"
+
+    fs.readFile template_path, (err, template_file) ->
+      callback _.template(template_file) view_data
+
+  @writeConfigFile: (filename, content, callback) ->
+    tmp.file
+      mode: 0o750
+    , (err, filepath, fd) ->
+      logger.error err if err
+
+      fs.writeSync fd, content, 0, 'utf8'
+      fs.closeSync fd
+
+      child_process.exec "sudo cp #{filepath} #{filename}", (err) ->
+        logger.error err if err
+
+        fs.unlink path, ->
+          callback()

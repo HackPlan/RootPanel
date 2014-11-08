@@ -14,6 +14,7 @@ app.libs =
   depd: require 'depd'
   express: require 'express'
   fs: require 'fs'
+  tmp: require 'tmp'
   harp: require 'harp'
   jade: require 'jade'
   markdown: require('markdown').markdown

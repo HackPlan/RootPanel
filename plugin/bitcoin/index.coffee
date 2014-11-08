@@ -2,11 +2,11 @@
 {Account} = app.models
 {pluggable, config, utils} = app
 
-bitcoin = require './bitcoin'
+exports = module.exports = class BitcoinPlugin extends pluggable.Plugin
+  @NAME: 'bitcoin'
+  @type: 'extension'
 
-module.exports = pluggable.createHelpers exports =
-  name: 'bitcoin'
-  type: 'extension'
+bitcoin = require './bitcoin'
 
 exports.registerHook 'account.before_register',
   filter: (account, callback) ->

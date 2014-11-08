@@ -1,9 +1,9 @@
 {fs, path} = app.libs
 {pluggable} = app
 
-module.exports = pluggable.createHelpers exports =
-  name: 'wiki'
-  type: 'extension'
+exports = module.exports = class WikiPlugin extends pluggable.Plugin
+  @NAME: 'wiki'
+  @type: 'extension'
 
 exports.registerHook 'view.layout.menu_bar',
   href: '/wiki/'

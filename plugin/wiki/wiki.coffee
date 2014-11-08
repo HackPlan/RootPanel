@@ -1,7 +1,7 @@
 {markdown, path, jade, fs, _, express} = app.libs
 {pluggable} = app
 
-wiki_plugin = require './index'
+WikiPlugin = require './index'
 
 module.exports = exports = express.Router()
 
@@ -27,7 +27,7 @@ exports.get '/', (req, res) ->
   view_data = _.extend res.locals,
     category_list: result
 
-  wiki_plugin.render 'index', req, view_data, (html) ->
+  WikiPlugin.render 'index', req, view_data, (html) ->
     res.send html
 
 exports.get '/:category/:title', (req, res) ->
@@ -42,5 +42,5 @@ exports.get '/:category/:title', (req, res) ->
     title: res.t matched_page.t_title
     content: markdown.toHTML matched_page.content_markdown
 
-  wiki_plugin.render 'page', req, view_data, (html) ->
+  WikiPlugin.render 'page', req, view_data, (html) ->
     res.send html

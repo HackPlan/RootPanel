@@ -17,9 +17,9 @@ for filename in fs.readdirSync "#{__dirname}/locale"
   config.i18n.available_language = _.union config.i18n.available_language, [language]
 
 exports.loadForPlugin = (plugin) ->
-  for filename in fs.readdirSync "#{__dirname}/../plugin/#{plugin.name}/locale"
+  for filename in fs.readdirSync "#{__dirname}/../plugin/#{plugin.NAME}/locale"
     language = path.basename filename, '.json'
-    i18n_data[language]['plugins'][plugin.name] = require "#{__dirname}/../plugin/#{plugin.name}/locale/#{filename}"
+    i18n_data[language]['plugins'][plugin.NAME] = require "#{__dirname}/../plugin/#{plugin.NAME}/locale/#{filename}"
     config.i18n.available_language = _.union config.i18n.available_language, [language]
 
 exports.parseLanguageCode = parseLanguageCode = (language) ->

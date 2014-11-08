@@ -1,9 +1,9 @@
 {pluggable} = app
 
-module.exports = pluggable.createHelpers exports =
-  name: 'supervisor'
-  type: 'service'
-  dependencies: ['linux']
+exports = module.exports = class SupervisorPlugin extends pluggable.Plugin
+  @NAME: 'supervisor'
+  @type: 'service'
+  @dependencies: ['linux']
 
 supervisor = require './supervisor'
 

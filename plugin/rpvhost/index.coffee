@@ -1,9 +1,9 @@
 {jade, path, fs} = app.libs
 {pluggable, config} = app
 
-module.exports = pluggable.createHelpers exports =
-  name: 'rpvhost'
-  type: 'extension'
+exports = module.exports = class RPVhostPlugin extends pluggable.Plugin
+  @NAME: 'rpvhost'
+  @type: 'extension'
 
 exports.registerHook 'plugin.wiki.pages',
   t_category: 'rpvhost'

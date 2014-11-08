@@ -3,12 +3,12 @@
 {requireAuthenticate} = app.middleware
 {wrapAsync} = app.utils
 
+exports = module.exports = class LinuxPlugin extends pluggable.Plugin
+  @NAME: 'linux'
+  @type: 'service'
+
 linux = require './linux'
 monitor = require './monitor'
-
-module.exports = pluggable.createHelpers exports =
-  name: 'linux'
-  type: 'service'
 
 exports.registerHook 'view.layout.menu_bar',
   href: '/public/monitor/'
