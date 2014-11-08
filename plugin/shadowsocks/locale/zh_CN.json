@@ -1,3 +1,11 @@
 {
-    "": "ShadowSocks"
+    "": "ShadowSocks",
+    "remote_access": "连接",
+    "remote_port": "端口",
+    "reset": "重置",
+    "transfer": "流量",
+    "transfer_remainder": "余额折合约 __traffic__ G 流量",
+    "24hours_ago": "过去 24 小时",
+    "7days_ago": "过去 7 天",
+    "30days_ago": "过去 30 天"
 }

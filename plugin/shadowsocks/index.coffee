@@ -25,7 +25,12 @@ if config.plugins.shadowsocks.green_style
 
 exports.registerHook 'view.panel.widgets',
   generator: (req, callback) ->
-    exports.render 'widget', req, {}, callback
+    exports.render 'widget', req,
+      transfer_remainder: account.billing.balance / config.plugins.shadowsocks.price_bucket / (1000 * 1000 * 1000 / config.plugins.shadowsocks.billing_bucket)
+      traffic_24hours: null
+      traffic_7days: null
+      traffic_30days: null
+    , callback
 
 exports.registerServiceHook 'enable',
   filter: (req, callback) ->

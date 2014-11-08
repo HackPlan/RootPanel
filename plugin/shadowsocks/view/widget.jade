@@ -1,32 +1,32 @@
-header ShadowSocks
+header= t('')
 .col-md-6
   .panel.panel-default
     .panel-heading
-      h3.panel-title 连接
+      h3.panel-title= t('remote_access')
     .panel-body
       .input-group
-        span.input-group-addon 端口
-        input.form-control(type='text', value=account.attribute.plugin.shadowsocks.port, disabled)
+        span.input-group-addon= t('remote_port')
+        p.form-control-static= account.pluggable.shadowsocks.port
       .input-group
-        span.input-group-addon 密码
-        input.form-control(type='text', value=account.attribute.plugin.shadowsocks.password, disabled)
+        span.input-group-addon= t('account.password')
+        p.form-control-static= account.pluggable.shadowsocks.password
         span.input-group-btn
-          button.btn.btn-default.action-reset-password(type='button') 重置
+          button.btn.btn-default.action-reset-password(type='button')= t('reset')
 
 .col-md-6
   .panel.panel-default
     .panel-heading
-      h3.panel-title 流量
+      h3.panel-title= t('transfer')
     .panel-body
-      p 余额折合约 #{(account.attribute.balance / config.plugins.shadowsocks.price_bucket / 10).toFixed(1)} G 流量
+      p= t('transfer_remainder', {traffic: transfer_remainder.toFixed(1)})
     table.table.table-hover
       tbody
         tr
           td #{(traffic_24hours / 1000).toFixed(1)}G
-          td 24 hour ago
+          td= t('24hours_ago')
         tr
           td #{(traffic_7days / 1000).toFixed(1)}G
-          td 7 days ago
+          td= t('7days_ago')
         tr
           td #{(traffic_30days / 1000).toFixed(1)}G
-          td 30 days ago
+          td= t('30days_ago')
