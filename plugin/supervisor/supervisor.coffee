@@ -32,7 +32,6 @@ exports.updateProgram = (account, program, callback) ->
 
 exports.writeConfig = (account, program, callback) ->
   SupervisorPlugin.renderTemplate 'program.conf',
-    name_prefix: '@'
     account: account
     program: program
   , (configure) ->

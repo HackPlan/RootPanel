@@ -1,4 +1,4 @@
-{async, path, harp, jade, temp, fs, _} = app.libs
+{async, path, harp, jade, tmp, fs, _, child_process} = app.libs
 {i18n, config, logger} = app
 
 exports.plugins = {}
@@ -176,7 +176,7 @@ exports.Plugin = class Plugin
     template_path = "#{__dirname}/../plugin/#{@NAME}/template/#{name}"
 
     fs.readFile template_path, (err, template_file) ->
-      callback _.template(template_file) view_data
+      callback _.template(template_file.toString()) view_data
 
   @writeConfigFile: (filename, content, callback) ->
     tmp.file
@@ -190,5 +190,5 @@ exports.Plugin = class Plugin
       child_process.exec "sudo cp #{filepath} #{filename}", (err) ->
         logger.error err if err
 
-        fs.unlink path, ->
+        fs.unlink filepath, ->
           callback()

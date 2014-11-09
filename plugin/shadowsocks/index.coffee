@@ -1,5 +1,4 @@
 {pluggable, config, utils} = app
-{Financials} = app.models
 
 exports = module.exports = class ShadowSocksPlugin extends pluggable.Plugin
   @NAME: 'shadowsocks'
@@ -26,30 +25,15 @@ if config.plugins.shadowsocks.green_style
 
 exports.registerHook 'view.panel.widgets',
   generator: (req, callback) ->
-    Financials.find
-      account_id: account._id
-      type: 'usage_billing'
-      'payload.service': 'shadowsocks'
-    , (err, financials) ->
-      time_range =
-        traffic_24hours: 24 * 3600 * 1000
-        traffic_7days: 7 * 24 * 3600 * 1000
-        traffic_30days: 30 * 24 * 3600 * 1000
-
-      result = {}
-
-      for name, range of time_range
-        logs = _.filter financials, (i) ->
-          return i.created_at.getTime() > Date.now() - range
-
-        result[name] = _.reduce logs, (memo, i) ->
-          return memo + i.payload.traffic_mb
-        , 0
-
+    shadowsocks.accountUsage req.account, (result) ->
       _.extend result,
         transfer_remainder: account.billing.balance / config.plugins.shadowsocks.price_bucket / (1000 * 1000 * 1000 / config.plugins.shadowsocks.billing_bucket)
 
       exports.render 'widget', req, result, callback
+
+exports.registerHook 'app.started',
+  action: ->
+    shadowsocks.initSupervisor ->
 
 exports.registerServiceHook 'enable',
   filter: (req, callback) ->

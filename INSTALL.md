@@ -130,6 +130,8 @@
     apt-get install python-pip python-m2crypto
     pip install shadowsocks
 
+    mkdir /etc/shadowsocks
+
     vi /etc/default/supervisor
 
         ulimit -n 51200
