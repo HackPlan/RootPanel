@@ -1,19 +1,34 @@
+{utils} = app
 {markdown, fs, path, express} = app.libs
-{renderAccount, requireInService, requireAuthenticate} = require '../../core/middleware'
+{requireInService} = app.middleware
+
+shadowsocks = require './shadowsocks'
 
 module.exports = exports = express.Router()
 
 exports.use requireInService 'shadowsocks'
 
 exports.post '/reset_password', (req, res) ->
-  password = mAccount.randomString 10
+  password = utils.randomString 10
 
-  mAccount.update _id: req.account._id,
+  req.account.update
     $set:
-      'attribute.plugin.shadowsocks.password': password
+      'pluggable.shadowsocks.password': password
   , ->
-    req.account.attribute.plugin.shadowsocks.password = password
+    req.account.pluggable.shadowsocks.password = password
 
-    service.restart req.account, ->
-      service.restartAccount req.account, ->
-        res.json {}
+    shadowsocks.updateConfigure req.account, ->
+      res.json {}
+
+exports.post '/switch_method', (req, res) ->
+  unless req.body.method in config.plugins.shadowsocks.available_ciphers
+    return res.error 'invalid_method'
+
+  req.account.update
+    $set:
+      'pluggable.shadowsocks.method': method
+  , ->
+    req.account.pluggable.shadowsocks.method = method
+
+    shadowsocks.updateConfigure req.account, ->
+      res.json {}

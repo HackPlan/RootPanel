@@ -80,6 +80,7 @@
         [program:RootPanel]
         command=node /home/rpadmin/RootPanel/start.js
         autorestart=true
+        redirect_stderr = true
         user=rpadmin
 
     service nginx restart
@@ -129,14 +130,12 @@
     apt-get install python-pip python-m2crypto
     pip install shadowsocks
 
-    mkdir /etc/shadowsocks
-
     vi /etc/default/supervisor
 
         ulimit -n 51200
 
     iptables -A OUTPUT -p tcp --dport 25 -j DROP
-    iptables -A OUTPUT -d smtp.postmarkapp.com  -j ACCEPT
+    iptables -A OUTPUT -p tcp --dport 25 -d smtp.postmarkapp.com -j ACCEPT
 
 ### Runtime
 

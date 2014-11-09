@@ -10,7 +10,7 @@ Financials = mongoose.Schema
   type:
     required: true
     type: String
-    enum: ['deposit', 'billing']
+    enum: ['deposit', 'billing', 'usage_billing']
 
   amount:
     required: true

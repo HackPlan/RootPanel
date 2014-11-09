@@ -71,6 +71,8 @@ module.exports =
     shadowsocks:
       green_style: true
 
+      available_ciphers: ['aes-256-cfb', 'rc4-md5']
+
       billing_bucket: 100 * 1024 * 1024
       monitor_cycle: 5 * 60 * 1000
       price_bucket: 0.06
