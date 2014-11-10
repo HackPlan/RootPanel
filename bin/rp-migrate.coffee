@@ -14,7 +14,7 @@ mongodb_uri = "mongodb://#{user}:#{password}@#{host}/#{name}"
 
 latest_version = require('../package.json').version
 
-migrations = _.map fs.readdirSync("#{__dirname}/database"), (filename) ->
+migrations = _.map fs.readdirSync("#{__dirname}/../migration/database"), (filename) ->
   return filename.match(/v(\d+\.\d+\.\d+)\.coffee/)[1]
 
 migrations.sort (a, b) ->
@@ -49,7 +49,7 @@ MongoClient.connect mongodb_uri, (err, db) ->
       if semver.gt(migration, current_version) and semver.lte(migration, latest_version)
         console.log "Running migration #{migration}..."
 
-        require("#{__dirname}/database/v#{migration}.coffee") db, (err) ->
+        require("#{__dirname}/../migration/database/v#{migration}.coffee") db, (err) ->
           return callback err if err
 
           db.collection('options').update

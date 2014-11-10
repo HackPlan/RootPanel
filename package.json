@@ -25,8 +25,7 @@
   },
   "bin": {
     "rp-fix-permissions": "./bin/rp-fix-permissions.coffee",
-    "rp-system-sync": "./bin/rp-system-sync.coffee",
-    "rp-clean": "./bin/rp-clean.coffee"
+    "rp-migrate": "./bin/migrate.coffee"
   },
   "dependencies": {
     "async": "^0.9.0",
