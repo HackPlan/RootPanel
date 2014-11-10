@@ -102,7 +102,8 @@ exports.selectHook = (account, hook_name) ->
 
   for item in keys
     if pointer[item] == undefined
-      throw new Error 'Invalid hook name'
+      pointer[item] = {}
+      pointer = pointer[item]
     else
       pointer = pointer[item]
 
@@ -113,7 +114,7 @@ exports.selectHook = (account, hook_name) ->
       return true
     else if !account
       return false
-    else if hook.plugin_info.name in account.billing.services
+    else if hook.plugin_info.NAME in account.billing.services
       return true
     else
       return false

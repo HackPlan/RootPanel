@@ -1,8 +1,8 @@
-header= t('plugins.ssh.')
+header= t('')
 .col-md-6
   .panel.panel-warning
     .panel-heading
-       h3.panel-title= t('plugins.ssh.view.update_password')
+       h3.panel-title= t('view.update_password')
     .panel-body
       .input-group.update-password
         input.form-control(type='password')
@@ -13,15 +13,15 @@ header= t('plugins.ssh.')
   table(style= 'table-layout: fixed;').table.table-hover
     thead
       tr
-        td(style= 'width: 250px;')= t('plugins.ssh.process')
-        td= t('plugins.ssh.memory')
-        td= t('plugins.ssh.cpu')
-        td= t('common.action')
+        td(style= 'width: 250px;')= t('process')
+        td= t('memory')
+        td= t('cpu')
+        td= t('common.actions')
     tbody
-      for process in plist
+      for process in process_list
         tr(data-id= '#{process.pid}')
           td(style= 'white-space: nowrap; overflow: hidden;', title= process.command)= process.command
           td #{(process.rss / 1024).toFixed(1)}M
           td #{process.cpu_per}%
           td
-            button.btn-kill.btn.btn-danger.btn-xs= t('plugins.ssh.kill')
+            button.btn-kill.btn.btn-danger.btn-xs= t('kill')
