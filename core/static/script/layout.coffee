@@ -62,9 +62,8 @@ $ ->
 
   $('.action-logout').click (e) ->
     e.preventDefault()
-    $.post '/account/logout', {}
-    .success ->
-      location.reload()
+    request '/account/logout', {}, ->
+      location.href = '/'
 
   $('.action-switch-language').click (e) ->
     e.preventDefault()

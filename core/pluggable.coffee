@@ -131,7 +131,7 @@ exports.initializePlugins = ->
 
     exports.plugins[name] = plugin
 
-  for name, plugin in exports.plugins
+  for name, plugin of exports.plugins
     plugin_path = "#{__dirname}/../plugin/#{name}"
 
     if fs.existsSync path.join(plugin_path, 'locale')

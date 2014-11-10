@@ -68,7 +68,10 @@ html
                 ul
                   li v#{app.package.version}
                   li
-                    a(href=app.package.repository.url) Github
+                    if config.web.repo.match(/^http/)
+                      a(href=config.web.repo, target='_blank') Source Code
+                    else
+                      a(href='https://github.com/#{config.web.repo}', target='_blank') Source on Github
 
     #footer
       if config.web.google_analytics_id

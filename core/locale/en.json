@@ -101,7 +101,7 @@
     "account": {
       "password2": "repeat",
       "already_register": "Already has account?",
-      "no_account": "Has no account？",
+      "no_account": "Has no account?",
       "password_inconsistent": "Passwords not matched"
     },
     "preferences": {

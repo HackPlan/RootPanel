@@ -3,6 +3,7 @@ module.exports =
     t_name: 'plugins.rpvhost.site_name'
     url: 'http://greenshadow.net'
     listen: '/home/rpadmin/rootpanel.sock'
+    repo: 'jysperm/RootPanel'
     google_analytics_id: ''
 
   account:

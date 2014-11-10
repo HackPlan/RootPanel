@@ -3,6 +3,7 @@ module.exports =
     t_name: 'plugins.rpvhost.site_name'
     url: 'http://rp.rpvhost.net'
     listen: '/home/rpadmin/rootpanel.sock'
+    repo: 'jysperm/RootPanel'
     google_analytics_id: ''
 
   account:
@@ -28,8 +29,8 @@ module.exports =
 
   plans:
     all:
-      t_name: 'plans.all.name'
-      t_description: 'plans.all.description'
+      t_name: 'plugins.rpvhost.plans.all.name'
+      t_description: 'plugins.rpvhost.plans.all.description'
 
       billing_by_time:
         unit: 24 * 3600 * 1000
