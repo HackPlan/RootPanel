@@ -1,27 +1,28 @@
-header= t('')
-.col-md-6
-  .panel.panel-warning
-    .panel-heading
-       h3.panel-title= t('view.update_password')
-    .panel-body
-      .input-group.update-password
-        input.form-control(type='password')
-        span.input-group-btn
-          button.btn.btn-default(type='button')= t('common.submit')
+.row.widget-ssh
+  header= t('')
+  .col-md-6
+    .panel.panel-warning
+      .panel-heading
+         h3.panel-title= t('view.update_password')
+      .panel-body
+        .input-group
+          input.input-password.form-control(type='password')
+          span.input-group-btn
+            button.btn.btn-default.action-update-password(type='button')= t('common.submit')
 
-.col-md-6
-  table(style= 'table-layout: fixed;').table.table-hover
-    thead
-      tr
-        td(style= 'width: 250px;')= t('process')
-        td= t('memory')
-        td= t('cpu')
-        td= t('common.actions')
-    tbody
-      for process in process_list
-        tr(data-id= '#{process.pid}')
-          td(style= 'white-space: nowrap; overflow: hidden;', title= process.command)= process.command
-          td #{(process.rss / 1024).toFixed(1)}M
-          td #{process.cpu_per}%
-          td
-            button.btn-kill.btn.btn-danger.btn-xs= t('kill')
+  .col-md-6
+    table(style= 'table-layout: fixed;').table.table-hover
+      thead
+        tr
+          td(style= 'width: 250px;')= t('process')
+          td= t('memory')
+          td= t('cpu')
+          td= t('common.actions')
+      tbody
+        for process in process_list
+          tr(data-id= '#{process.pid}')
+            td(style= 'white-space: nowrap; overflow: hidden;', title= process.command)= process.command
+            td #{(process.rss / 1024).toFixed(1)}M
+            td #{process.cpu_per}%
+            td
+              button.action-kill.btn.btn-danger.btn-xs= t('kill')

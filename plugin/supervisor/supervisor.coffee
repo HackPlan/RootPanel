@@ -12,10 +12,10 @@ exports.removePrograms = (account, callback) ->
       callback()
 
 exports.programSummary = (program) ->
-  summary = "autostart:#{program.autostart};autorestart:#{program.autorestart}"
+  summary = "autostart:#{program.autostart}; autorestart:#{program.autorestart}"
 
   if program.directory
-    summary += ";directory:#{program.directory}"
+    summary += "; directory:#{program.directory}"
 
   return summary
 
@@ -50,7 +50,7 @@ exports.programControl = (account, program, action, callback) ->
     callback()
 
 exports.programsStatus = (callback) ->
-  child_process.exec 'sudo supervisor status', (err, stdout) ->
+  child_process.exec 'sudo supervisorctl status', (err, stdout) ->
     callback _.map stdout.split('\n'), (line) ->
       [name, status] = line.split '\s'
 

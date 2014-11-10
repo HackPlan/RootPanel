@@ -6,7 +6,7 @@ node_js:
 
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -y quota quotatool
+  - sudo apt-get install -y quota quotatool supervisor
 
 script: npm run test-full
 

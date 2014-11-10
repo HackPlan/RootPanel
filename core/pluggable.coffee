@@ -48,8 +48,6 @@ exports.hooks =
       widgets: []
       # path
       styles: []
-      # name
-      switch_buttons: []
 
     pay:
       # type, filter: function(req, deposit_log, callback(l_details))

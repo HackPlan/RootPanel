@@ -1,78 +1,80 @@
-header= t('')
-table.table.table-hover
-  thead
-    tr
-      th= t('common.name')
-      th= t('common.command')
-      th= t('common.options')
-      th= t('common.status')
-      th
-        button.btn.btn-success.btn-xs(data-toggle='modal', data-target='#supervisor-creator')
-          span.glyphicon.glyphicon-plus-sign
+.row.widget-supervisor
+  header= t('')
+  table.table.table-hover
+    thead
+      tr
+        th= t('common.name')
+        th= t('common.command')
+        th= t('common.options')
+        th= t('common.status')
+        th
+          button.btn.btn-success.btn-xs.action-create(data-toggle='modal', data-target='#supervisor-dialog')
+            span.glyphicon.glyphicon-plus-sign
 
-  tbody
-    for program in account.pluggable.supervisor.programs
-      tr(data-id='#{program._id}')
-        td= program.name
-        td= program.command
-        td= programSummary(program)
-        td= program.status
-        td
-          button.btn.btn-warning.btn-xs.action-restart
-            span.glyphicon.glyphicon-repeat
-          if program.status != 'running'
-            button.btn.btn-success.btn-xs.action-start
-              span.glyphicon.glyphicon-play
-          if program.status == 'running'
-            button.btn.btn-danger.btn-xs.action-stop
-              span.glyphicon.glyphicon-stop
-          button.btn.btn-info.btn-xs.action-edit
-            span.glyphicon.glyphicon-edit
-          button.btn.btn-danger.btn-xs.action-remove
-            span.glyphicon.glyphicon-trash
+    tbody
+      for program in account.pluggable.supervisor.programs
+        tr(data-id=program._id)
+          td= program.name
+          td= program.command
+          td= programSummary(program)
+          td= program.status
+          td
+            button.btn.btn-warning.btn-xs.action-control(type='button', data-action='restart')
+              span.glyphicon.glyphicon-repeat
+            if program.status != 'running'
+              button.btn.btn-success.btn-xs.action-control(type='button', data-action='start')
+                span.glyphicon.glyphicon-play
+            if program.status == 'running'
+              button.btn.btn-danger.btn-xs.action-control(type='button', data-action='stop')
+                span.glyphicon.glyphicon-stop
+            button.btn.btn-info.btn-xs.action-edit(type='button')
+              span.glyphicon.glyphicon-edit
+            button.btn.btn-danger.btn-xs.action-remove(type='button')
+              span.glyphicon.glyphicon-trash
 
-#supervisor-creator.modal.fade(tabindex='-1', role='dialog', aria-hidden='true')
+#supervisor-dialog.modal.fade(tabindex='-1', role='dialog', aria-hidden='true')
   .modal-dialog
     .modal-content
       .modal-header
         button.close(type='button', data-dismiss='modal', aria-hidden='true') &times;
         h3.modal-title
           | #{t('')} &nbsp;
-          span.small.label-site-id
+          span.small.label-program-id
       .modal-body
-        .form-group
-          label.col-sm-2.control-label= t('common.name')
-          .col-sm-10
-            input.form-control.input-name(type='text', placeholder='myapp')
-        .form-group
-          label.col-sm-2.control-label= t('common.command')
-          .col-sm-10
-            input.form-control.input-command(type='text', placeholder='node /home/jysperm/app.js')
-        .form-group
-          label.col-sm-2.control-label= t('common.directory')
-          .col-sm-10
-            input.form-control.input-directory(type='text', placeholder='/home/jysperm')
-        .form-group
-          label.col-sm-2.control-label »
+        form.form-horizontal(role='form')
+          .form-group
+            label.col-sm-2.control-label= t('common.name')
+            .col-sm-10
+              input.form-control.input-name(type='text', name='name', placeholder='myapp')
+          .form-group
+            label.col-sm-2.control-label= t('common.command')
+            .col-sm-10
+              input.form-control.input-command(type='text', name='command', placeholder='node /home/jysperm/app.js')
+          .form-group
+            label.col-sm-2.control-label= t('common.directory')
+            .col-sm-10
+              input.form-control.input-directory(type='text', name='directory', placeholder='/home/jysperm')
+          .form-group
+            label.col-sm-2.control-label »
             .checkbox.col-sm-10
               label
-                input.input-autostart(type='checkbox', checked)
+                input.input-autostart(type='checkbox', name='autostart', checked)
                 | #{t('common.autostart')}
-        .form-group
-          label.col-sm-2.control-label »
-          .controls.col-sm-10.input-autorestart
-            .radio
-              label
-                input(type='radio', name='autorestart', value='unexpected', checked)
-                | #{t('autorestart.unexpected')}
-            .radio
-              label
-                input(type='radio', name='autorestart', value='true')
-                | #{t('autorestart.true')}
-            .radio
-              label
-                input(type='radio', name='autorestart', value='false')
-                | #{t('autorestart.false')}
+          .form-group
+            label.col-sm-2.control-label »
+            .controls.col-sm-10.input-autorestart
+              .radio
+                label
+                  input(type='radio', name='autorestart', value='unexpected', checked)
+                  | #{t('autorestart.unexpected')}
+              .radio
+                label
+                  input(type='radio', name='autorestart', value='true')
+                  | #{t('autorestart.true')}
+              .radio
+                label
+                  input(type='radio', name='autorestart', value='false')
+                  | #{t('autorestart.false')}
 
       .modal-footer
         button.btn.btn-success.action-submit(type='button')= t('common.save')

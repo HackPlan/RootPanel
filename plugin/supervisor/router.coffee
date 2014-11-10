@@ -1,4 +1,4 @@
-{express, ObjectId} = app.libs
+{express, ObjectId, _} = app.libs
 {Account} = app.models
 {requireInService} = app.middleware
 
@@ -58,8 +58,8 @@ exports.param 'id', (req, res, next, id) ->
 
 exports.post '/create_program', restrictProgramFields, (req, res) ->
   program = _.pick req.body, _.keys(program_sample)
-  program._id = ObjectId()
-  program.program_name = "@#{account.username}-#{program.name}"
+  program._id = new ObjectId()
+  program.program_name = "@#{req.account.username}-#{program.name}"
 
   for field in require_fields
     unless field in _.keys req.body

@@ -9,22 +9,23 @@ mixin displayProgressBar(now, limit, unit)
                   aria-valuemin='0', aria-valuemax='100', style='width: #{per}%;')
       span #{now} / #{limit} #{unit}
 
-header= t('')
-table.table.table-hover.linux-widget-table
-  tbody
-    tr
-      td= t('widget.hour_cpu')
-      td
-        mixin displayProgressBar(usage.cpu, limit.cpu, 's')
-    tr
-      td= t('widget.hour_memory')
-      td
-        mixin displayProgressBar(usage.memory, limit.memory, 'M')
-    tr
-      td= t('widget.storage')
-      td
-        mixin displayProgressBar(usage.storage, limit.storage, 'M')
-    tr
-      td= t('widget.month_transfer')
-      td
-        mixin displayProgressBar(0, limit.transfer, 'G')
+.row
+  header= t('')
+  table.table.table-hover.linux-widget-table
+    tbody
+      tr
+        td= t('widget.hour_cpu')
+        td
+          mixin displayProgressBar(usage.cpu, limit.cpu, 's')
+      tr
+        td= t('widget.hour_memory')
+        td
+          mixin displayProgressBar(usage.memory, limit.memory, 'M')
+      tr
+        td= t('widget.storage')
+        td
+          mixin displayProgressBar(usage.storage, limit.storage, 'M')
+      tr
+        td= t('widget.month_transfer')
+        td
+          mixin displayProgressBar(0, limit.transfer, 'G')

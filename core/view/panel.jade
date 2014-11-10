@@ -30,17 +30,8 @@ block main
               else
                 button.action-join-plan.btn.btn-success.btn-sm= t('plan.join')
 
-  if selectHook('view.panel.switch_buttons').length
-    #service-switch.row
-      header= t('view.panel.service_switch')
-      for hook in selectHook('view.panel.switch_buttons')
-        if account.attribute.plugin[hook.name].is_enable
-          button(data-name=hook.name).btn.btn-danger #{t('common.disable')} #{t('plugins.' + hook.name + '.name')}
-        else
-          button(data-name=hook.name).btn.btn-success #{t('common.enable')} #{t('plugins.' + hook.name + '.name')}
-
   for widget_html in widgets_html
-    .row!= widget_html
+    != widget_html
 
 prepend sidebar
   .row

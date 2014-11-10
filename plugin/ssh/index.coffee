@@ -9,7 +9,7 @@ exports = module.exports = class LinuxPlugin extends pluggable.Plugin
 linux = require '../linux/linux'
 
 exports.registerHook 'view.panel.scripts',
-  path: '/plugin/ssh/style/panel.js'
+  path: '/plugin/ssh/script/panel.js'
 
 exports.registerHook 'view.panel.widgets',
   generator: (req, callback) ->
