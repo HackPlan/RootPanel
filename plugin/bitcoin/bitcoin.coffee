@@ -24,12 +24,12 @@ exports.getExchangeRate = (currency, callback) ->
     key: 'bitcoin.getExchangeRate'
     currency: currency
   , (SETEX) ->
-    request 'https://blockchain.info/ticker', (err, res, body) ->
+    request 'https://api.coinbase.com/v1/currencies/exchange_rates', (err, res, body) ->
       logger.error if err
 
       body = JSON.parse body
-      rate = 1 / parseFloat(body[currency]['15m'])
+      rate = parseFloat body["#{currency.toLowerCase()}_to_btc"]
 
-      SETEX rate, 60
+      SETEX rate, 600
 
   , callback
