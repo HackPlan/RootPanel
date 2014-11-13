@@ -13,18 +13,18 @@
 
     tbody
       for program in account.pluggable.supervisor.programs
-        tr(data-id=program._id)
+        tr(data-id='#{program._id}')
           td= program.name
           td= program.command
           td= programSummary(program)
-          td= program.status
+          td(title= programs_status[program.program_name].info)= programs_status[program.program_name].status
           td
-            button.btn.btn-warning.btn-xs.action-control(type='button', data-action='restart')
-              span.glyphicon.glyphicon-repeat
-            if program.status != 'running'
+            if programs_status[program.program_name].status != 'running'
               button.btn.btn-success.btn-xs.action-control(type='button', data-action='start')
                 span.glyphicon.glyphicon-play
-            if program.status == 'running'
+            if programs_status[program.program_name].status == 'running'
+              button.btn.btn-warning.btn-xs.action-control(type='button', data-action='restart')
+                span.glyphicon.glyphicon-repeat
               button.btn.btn-danger.btn-xs.action-control(type='button', data-action='stop')
                 span.glyphicon.glyphicon-stop
             button.btn.btn-info.btn-xs.action-edit(type='button')

@@ -1,3 +1,4 @@
+{_} = app.libs
 {pluggable} = app
 
 exports = module.exports = class SupervisorPlugin extends pluggable.Plugin
@@ -15,9 +16,11 @@ exports.registerHook 'view.panel.styles',
 
 exports.registerHook 'view.panel.widgets',
   generator: (req, callback) ->
-    exports.render 'widget', req,
-      programSummary: supervisor.programSummary
-    , callback
+    supervisor.programsStatus (programs_status) ->
+      exports.render 'widget', req,
+        programSummary: supervisor.programSummary
+        programs_status: _.indexBy programs_status, 'name'
+      , callback
 
 exports.registerServiceHook 'enable',
   filter: (req, callback) ->

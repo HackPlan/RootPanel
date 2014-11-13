@@ -1,4 +1,4 @@
-{express, ObjectId, _} = app.libs
+{express, ObjectID, _} = app.libs
 {Account} = app.models
 {requireInService} = app.middleware
 
@@ -43,10 +43,10 @@ exports.use requireInService 'supervisor'
 
 exports.param 'id', (req, res, next, id) ->
   Account.findOne
-    'pluggable.supervisor.programs._id': ObjectId id
+    'pluggable.supervisor.programs._id': ObjectID id
   , (err, account) ->
     req.program = _.find account?.pluggable.supervisor.programs, (program) ->
-      return program._id.toString() == req.body.id
+      return program._id.toString() == id
 
     unless req.program
       return res.error 'program_not_exist'
@@ -58,7 +58,7 @@ exports.param 'id', (req, res, next, id) ->
 
 exports.post '/create_program', restrictProgramFields, (req, res) ->
   program = _.pick req.body, _.keys(program_sample)
-  program._id = new ObjectId()
+  program._id = ObjectID()
   program.program_name = "@#{req.account.username}-#{program.name}"
 
   for field in require_fields

@@ -31,6 +31,8 @@ app.libs =
   expressSession: require 'express-session'
   mongooseUniqueValidator: require 'mongoose-unique-validator'
 
+  ObjectID: (require 'mongoose').Types.ObjectId
+
   ObjectId: (require 'mongoose').Schema.Types.ObjectId
   Mixed: (require 'mongoose').Schema.Types.Mixed
 

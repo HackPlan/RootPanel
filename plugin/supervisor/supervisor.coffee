@@ -24,7 +24,7 @@ exports.updateProgram = (account, program, callback) ->
     logger.error err if err
 
     if program and program.autostart
-      child_process.exec "sudo supervisorctl start #{program.program_name}", (err) ->
+      child_process.exec "sudo supervisorctl start #{program.program_name}:#{program.name}", (err) ->
         logger.error err if err
         callback()
     else
@@ -45,14 +45,20 @@ exports.removeConfig = (account, program, callback) ->
 
 # @param action: start|stop|restart
 exports.programControl = (account, program, action, callback) ->
-  child_process.exec "sudo supervisorctl #{action} #{program.program_name}", (err) ->
+  child_process.exec "sudo supervisorctl #{action} #{program.program_name}:#{program.name}", (err) ->
     logger.error err if err
     callback()
 
 exports.programsStatus = (callback) ->
   child_process.exec 'sudo supervisorctl status', (err, stdout) ->
-    callback _.map stdout.split('\n'), (line) ->
-      [name, status] = line.split '\s'
+    lines = stdout.split '\n'
+    lines = lines[... lines.length - 1]
+
+    callback _.map lines, (line) ->
+      [__, name, status, info] = line.match /^(\S+)\s+(\S+)\s+(.*)/
+
+      if name.match /^([^:]+):/
+        [__, name] = name.match /^([^:]+):/
 
       status_mapping =
         STOPPED: 'stopped'
@@ -68,4 +74,5 @@ exports.programsStatus = (callback) ->
         name: name
         original_status: status
         status: status_mapping[status]
+        info: info
       }
