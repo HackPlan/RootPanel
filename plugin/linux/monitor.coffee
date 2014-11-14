@@ -4,15 +4,19 @@
 
 linux = require './linux'
 
-last_plist = []
-
+exports.last_plist = []
 exports.resources_usage = {}
 
+REDIS_LAST_PLIST = "#{config.redis.prefix}:linux.last_plist"
+
 exports.run = ->
-  exports.monitoring ->
-    setInterval ->
-      exports.monitoring ->
-    , config.plugins.linux.monitor_cycle
+  app.redis.get REDIS_LAST_PLIST, (err, last_plist) ->
+    exports.last_plist = JSON.parse(last_plist) ? []
+
+    exports.monitoring ->
+      setInterval ->
+        exports.monitoring ->
+      , config.plugins.linux.monitor_cycle
 
 exports.monitoring = (callback) ->
   REDIS_KEY = "#{config.redis.prefix}:linux.recent_resources_usage"
@@ -38,7 +42,7 @@ exports.monitoring = (callback) ->
 
           resources_usage = {}
 
-          IncreaseAccountUsage = (username, type, value) ->
+          increaseAccountUsage = (username, type, value) ->
             resources_usage[username] ?= {}
 
             if resources_usage[username][type]
@@ -48,14 +52,14 @@ exports.monitoring = (callback) ->
 
           for item in recent_resources_usage
             for account_name, cpu_usage of item.cpu
-              IncreaseAccountUsage account_name, 'cpu', cpu_usage
+              increaseAccountUsage account_name, 'cpu', cpu_usage
 
             for account_name, memory_usage of item.memory
-              IncreaseAccountUsage account_name, 'memory', memory_usage
+              increaseAccountUsage account_name, 'memory', memory_usage
 
           for username, usage of resources_usage
-            base = recent_resources_usage.length / config.plugins.linux.monitor_cycle * 1000
-            usage.memory = parseFloat (usage.memory / base).toFixed(1)
+            base = config.plugins.linux.monitor_cycle / 1000
+            usage.memory = parseFloat (usage.memory / recent_resources_usage.length / base).toFixed(1)
 
           async.each _.keys(resources_usage), (username, callback) ->
             Account.search username, (err, account) ->
@@ -74,14 +78,16 @@ exports.monitoring = (callback) ->
           , ->
             app.redis.set REDIS_KEY, JSON.stringify(recent_resources_usage), ->
               exports.resources_usage = resources_usage
-              last_plist = plist
-              callback()
+
+              app.redis.setex REDIS_LAST_PLIST, 60, JSON.stringify(plist), ->
+                exports.last_plist = plist
+                callback()
 
 exports.monitoringCpu = (plist, callback) ->
   total_time = {}
 
   findLastProcess = (process) ->
-    return _.find last_plist, (i) ->
+    return _.find exports.last_plist, (i) ->
       return i.pid == process.pid and i.user == process.user and i.command == process.command
 
   addTime = (account_name, time) ->
