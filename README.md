@@ -1,24 +1,19 @@
 # RootPanel
-## 简介
-RootPanel 是一个高度插件化的，基于 Linux 的虚拟服务销售平台，目标是成为虚拟主机界的 WordPress.
+RootPanel 是一个 PaaS 开发框架，提供了用户系统、计费和订单系统、工单系统，允许通过开发插件的方式来支持各种网络服务的管理和销售，默认实现了一些插件来支持例如虚拟主机，ShadowSocks, 用户也可以简单地自行编写插件来拓展 RootPanel 的功能。
 
-它的核心功能包括：用户和计费系统，工单系统，管理员面板；其余具体的功能均以插件实现，RootPanel 支持的典型服务有：
+RootPanel 具有良好的设计，高度的可定制性，支持多语言和多时区，以及非常高的单元测试覆盖率。
 
-* Linux 虚拟主机(Nginx, PHP, MySQL, MongoDB)
+## 安装
 
-    即最传统的，将一台 Linux 服务器划分给多个用户的方式。  
-    示例站点：<http://us1.rpvhost.net>
+稳定版本 [![Build Status](https://travis-ci.org/jysperm/RootPanel.svg?branch=stable)](https://travis-ci.org/jysperm/RootPanel)：
 
-* ShadowSocks 代理服务
+    git clone -b stable https://github.com/jysperm/RootPanel.git
 
-    按实际使用流量实时结算的 ShadowSocks 代理。  
-    示例站点：<http://greenshadow.net>
+开发版本 [![Build Status](https://travis-ci.org/jysperm/RootPanel.svg?branch=master)](https://travis-ci.org/jysperm/RootPanel)：
 
-## 安装和使用
+    git clone https://github.com/jysperm/RootPanel.git
 
-* 稳定版本：`git clone -b stable https://github.com/jysperm/RootPanel.git` [![Build Status](https://travis-ci.org/jysperm/RootPanel.svg?branch=stable)](https://travis-ci.org/jysperm/RootPanel)
-* 开发版本：`git clone https://github.com/jysperm/RootPanel.git` [![Build Status](https://travis-ci.org/jysperm/RootPanel.svg?branch=master)](https://travis-ci.org/jysperm/RootPanel)
-* Vagrant: <https://vagrantcloud.com/jysperm/boxes/rootpanel>
+[Vagrant box](https://vagrantcloud.com/jysperm/boxes/rootpanel)
 
 详细安装说明：[INSTALL.md](https://github.com/jysperm/RootPanel/blob/master/INSTALL.md)
 
@@ -27,14 +22,28 @@ RootPanel 是一个高度插件化的，基于 Linux 的虚拟服务销售平台
 请从 `sample` 中选择一个配置文件复制到根目录，重命名为 `config.coffee`:
 
     core.config.coffee          # 仅核心模块
-    shadowsocks.config.coffee   # ShadowSocks 代理服务 (重构中)
-    full.config.coffee          # 全功能虚拟主机 (重构中)
-    php-vhost.config.coffee     # PHP/MySQL 虚拟主机 (计划中)
-    node-vhost.config.coffee    # Node.js/Python/Golang 虚拟主机 (计划中)
-    share-vps.config.coffee     # 朋友合租 (计划中)
-    static.config.coffee        # 静态文件托管 (计划中)
-    git.config.coffee           # Git 托管 (计划中)
-    xen.config.coffee           # Xen VPS (计划中)
+    rpvhost.config.coffee       # 虚拟主机 (正在重构，目前支持 SSH 和 Supervisor)
+    shadowsocks.config.coffee   # ShadowSocks 代理服务
+
+## 从旧版本升级
+
+停止 RootPanel:
+
+    supervisorctl stop RootPanel
+
+更新源代码：
+
+    git pull
+
+根据 `/migration/system` 中新增的说明文件，执行相应命令来修改系统设置，如果跨越多个版本需要依次执行。
+
+使用 `mongodbdump` 来备份数据库，然后升级数据库：
+
+    npm run migrate
+
+启动 RootPanel:
+
+    supervisorctl start RootPanel
 
 ## 技术构成
 
@@ -56,8 +65,7 @@ RootPanel 是一个高度插件化的，基于 Linux 的虚拟服务销售平台
 * Akiyori 42 lines 0.5%
 * Tianhao Xiao 17 lines 0.2%
 
-贡献须知：当你向 RootPanel 贡献代码时，即代表你同意授予 RootPanel 维护团队永久的，不可撤回的代码使用权，包括但不限于以闭源的形式出售商业授权.
-
+贡献须知：当你向 RootPanel 贡献代码时，即代表你同意授予 RootPanel 维护团队永久的，不可撤回的代码使用权，包括但不限于以闭源的形式出售商业授权。
 在你首次向 RootPanel 贡献代码时，我们还会人工向你确认一次上述协议。
 
 ## 许可协议

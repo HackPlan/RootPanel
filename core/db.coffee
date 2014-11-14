@@ -13,4 +13,16 @@ mongoose.connect mongodb_uri
 mongoose.connection.on 'error', (err) ->
   console.error err if err
 
+mongoose.connection.on 'connected', ->
+  cOption = mongoose.connection.db.collection 'options'
+
+  cOption.findOne
+    key: 'db_version'
+  , (err, db_version) ->
+    unless db_version
+      cOption.insert
+        key: 'db_version'
+        version: app.package.version
+      , ->
+
 module.exports = mongoose.connection

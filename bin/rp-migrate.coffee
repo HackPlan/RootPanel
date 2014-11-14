@@ -35,13 +35,8 @@ MongoClient.connect mongodb_uri, (err, db) ->
     key: 'db_version'
   , (err, db_version) ->
     unless db_version
-      return cOption.insert
-        key: 'db_version'
-        version: latest_version
-      , (err) ->
-        throw err if err
-        console.log 'Created migration data'
-        process.exit 0
+      console.log 'Migration data not found'
+      process.exit 0
 
     current_version = db_version.version
 
