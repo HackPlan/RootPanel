@@ -58,12 +58,11 @@ RootPanel 具有良好的设计，高度的可定制性，支持多语言和多�
 * [Releases](https://github.com/jysperm/RootPanel/releases)
 * [TODO List](https://github.com/jysperm/RootPanel/labels/TODO)
 
-贡献列表(v0.7.1):
+贡献列表(v0.8.0):
 
-* jysperm 7542 lines 98.6%
-* yudong 48 lines 0.6%
-* Akiyori 42 lines 0.5%
-* Tianhao Xiao 17 lines 0.2%
+* jysperm 10149 lines 98%
+* yudong 48 lines 1.6%
+* kanakin 38 lines 0.4%
 
 贡献须知：当你向 RootPanel 贡献代码时，即代表你同意授予 RootPanel 维护团队永久的，不可撤回的代码使用权，包括但不限于以闭源的形式出售商业授权。
 在你首次向 RootPanel 贡献代码时，我们还会人工向你确认一次上述协议。

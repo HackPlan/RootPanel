@@ -1,3 +1,26 @@
+## v0.8.0
+对核心代码进行了完整的重构，实现了 supervisor 插件，部分插件等待下个版本进行重构。
+
+224 commits, 202 changed files with 6682 additions and 4047 deletions, by 1 contributors: jysperm, yudong.
+
+* (新增) 基于 Travis-CI 的自动测试，增加了 Vagrantfile
+* (新增) 完成了 Supervisor 插件
+* (改进) 重构了 linux, rpvhost, ssh, shadowsocks 插件
+* (改进) 重构了数据库升级迁移框架
+* (改进) 重构了所有 Model, 改为基于 mongoose
+* (改进) 重构了缓存框架，将邮件发送功能抽取为了一个通知框架
+* (改进) 重构了插件机制，增强了 hook 的功能，所有插件继承自 Plugin 类
+* (改进) 重构了结算机制
+* (改进) 重构了国际化组件，支持更好地 fallback, 为前端添加了国际化支持，添加了语言选择功能
+* (改进) 将视图文件中全部的字符串提取为了语言资源文件
+* (改进) 从源代码中移除配置文件，在 `sample` 目录提供一组默认配置文件
+* (改进) 将 WIKI 抽取为了一个独立的插件，自动生成 WIKI 列表，代替原 WIKI 首页
+* (改进) 将比特币支付功能抽取为了一个独立的插件
+* (更改) 将文档移动到了 Github WIKI
+* (更改) 更换到了 AGPL 授权协议
+* (安全) 增加了 CSRF Token 机制
+* (安全) 修复了比特币支付部分的一个安全问题
+
 ## v0.7.1(2014.9.2)
 有关 ShadowSocks 的漏洞修复，以及从 v0.6.0 升级的迁移脚本。
 
