@@ -9,7 +9,6 @@ describe 'router/account', ->
   password = null
 
   before ->
-    require '../../../app'
     {utils} = app
     agent = supertest.agent app.express
 

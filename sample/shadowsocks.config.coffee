@@ -28,12 +28,9 @@ module.exports =
     billing_cycle: 10 * 60 * 1000
 
   plans:
-    all:
+    shadowsocks:
       t_name: 'plugins.rpvhost.plans.shadowsocks.name'
       t_description: 'plugins.rpvhost.plans.shadowsocks.description'
-
-      billing_by_usage:
-        auto_leave: 14 * 24 * 3600 * 1000
 
       services: ['shadowsocks']
 

@@ -1,15 +1,15 @@
 # RootPanel
-RootPanel 是一个 PaaS 开发框架，提供了用户系统、计费和订单系统、工单系统，允许通过开发插件的方式来支持各种网络服务的管理和销售，默认实现了一些插件来支持例如虚拟主机，ShadowSocks, 用户也可以简单地自行编写插件来拓展 RootPanel 的功能。
+RootPanel 是一个 PaaS 开发框架，提供了用户系统、计费和订单系统、工单系统，允许通过开发插件的方式来支持各种网络服务的管理和销售，默认实现了一些插件来支持例如虚拟主机，ShadowSocks 等常见服务，用户也可以简单地自行编写插件来拓展 RootPanel 的功能。
 
 RootPanel 具有良好的设计，高度的可定制性，支持多语言和多时区，以及非常高的单元测试覆盖率。
 
 ## 安装
 
-稳定版本 [![Build Status](https://travis-ci.org/jysperm/RootPanel.svg?branch=stable)](https://travis-ci.org/jysperm/RootPanel)：
+稳定版本 [![Build Status](https://travis-ci.org/jysperm/RootPanel.svg?branch=stable)](https://travis-ci.org/jysperm/RootPanel)
 
     git clone -b stable https://github.com/jysperm/RootPanel.git
 
-开发版本 [![Build Status](https://travis-ci.org/jysperm/RootPanel.svg?branch=master)](https://travis-ci.org/jysperm/RootPanel)：
+开发版本 [![Build Status](https://travis-ci.org/jysperm/RootPanel.svg?branch=master)](https://travis-ci.org/jysperm/RootPanel)
 
     git clone https://github.com/jysperm/RootPanel.git
 

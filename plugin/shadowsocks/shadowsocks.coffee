@@ -4,6 +4,8 @@
 
 supervisor = require '../supervisor/supervisor'
 
+ShadowsocksPlugin = require './index'
+
 BILLING_BUCKET = config.plugins.shadowsocks.billing_bucket
 
 exports.initSupervisor = (callback) ->
@@ -11,19 +13,21 @@ exports.initSupervisor = (callback) ->
     async.each config.plugins.shadowsocks.available_ciphers, (method, callback) ->
       program_name = "shadowsocks-#{method}"
 
-      if program_name in _.keys program_status
+      if program_name in _.pluck program_status, 'name'
         return callback()
 
       shadowsocks_config_file = "/etc/shadowsocks/#{method}.json"
       configure = exports.generateConfigure [],
         method: method
 
-      fs.writeFile shadowsocks_config_file, configure, ->
+      ShadowsocksPlugin.writeConfigFile shadowsocks_config_file, configure, {mode: 0o755}, ->
         supervisor.writeConfig {username: 'nobody'},
+          program_name: program_name
           command: "ssserver -c #{shadowsocks_config_file}"
           name: program_name
           autostart: true
           autorestart: true
+          stdout_logfile: false
         , ->
           supervisor.updateProgram {}, {program_name: program_name}, ->
             callback()
@@ -45,7 +49,7 @@ exports.generateConfigure = (users, options = {}) ->
 
   return JSON.stringify configure
 
-exports.generatePort = (port) ->
+exports.generatePort = (callback) ->
   port = 10000 + Math.floor Math.random() * 10000
 
   Account.findOne
@@ -197,7 +201,7 @@ exports.updateConfigure = (account, callback) ->
           config = JSON.parse content
           config.port_password[port] = password
 
-          fs.writeFile shadowsocks_config_file, JSON.stringify(config), ->
+          ShadowsocksPlugin.writeConfigFile  shadowsocks_config_file, JSON.stringify(config), {mode: 0o755}, ->
             callback()
 
       (callback) ->

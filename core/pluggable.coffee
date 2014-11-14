@@ -177,9 +177,12 @@ exports.Plugin = class Plugin
     fs.readFile template_path, (err, template_file) ->
       callback _.template(template_file.toString()) view_data
 
-  @writeConfigFile: (filename, content, callback) ->
+  @writeConfigFile: (filename, content, options, callback) ->
+    unless callback
+      [options, callback] = [{}, options]
+
     tmp.file
-      mode: 0o750
+      mode: options.mode ? 0o750
     , (err, filepath, fd) ->
       logger.error err if err
 
