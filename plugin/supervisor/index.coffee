@@ -18,7 +18,6 @@ exports.registerHook 'view.panel.widgets',
   generator: (req, callback) ->
     supervisor.programsStatus (programs_status) ->
       exports.render 'widget', req,
-        programSummary: supervisor.programSummary
         programs_status: _.indexBy programs_status, 'name'
       , callback
 

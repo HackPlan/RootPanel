@@ -29,9 +29,13 @@ $ ->
 
     jQueryMethod = $[options.method ? 'post']
 
-    param.csrf_token = $('body').data 'csrf-token'
+    unless options.method == 'get'
+      param.csrf_token = $('body').data 'csrf-token'
+      param = JSON.stringify param
+    else
+      param = null
 
-    jQueryMethod url, JSON.stringify param
+    jQueryMethod url, param
     .fail (jqXHR) ->
       if jqXHR.responseJSON?.error
         alert window.t "error_code.#{jqXHR.responseJSON.error}"

@@ -11,20 +11,12 @@ exports.removePrograms = (account, callback) ->
     exports.updateProgram account, null, ->
       callback()
 
-exports.programSummary = (program) ->
-  summary = "autostart:#{program.autostart}; autorestart:#{program.autorestart}"
-
-  if program.directory
-    summary += "; directory:#{program.directory}"
-
-  return summary
-
 exports.updateProgram = (account, program, callback) ->
   child_process.exec 'sudo supervisorctl update', (err) ->
     logger.error err if err
 
     if program and program.autostart
-      child_process.exec "sudo supervisorctl start #{program.program_name}:#{program.name}", (err) ->
+      child_process.exec "sudo supervisorctl start #{program.program_name}", (err) ->
         logger.error err if err
         callback()
     else
@@ -45,7 +37,7 @@ exports.removeConfig = (account, program, callback) ->
 
 # @param action: start|stop|restart
 exports.programControl = (account, program, action, callback) ->
-  child_process.exec "sudo supervisorctl #{action} #{program.program_name}:#{program.name}", (err) ->
+  child_process.exec "sudo supervisorctl #{action} #{program.program_name}", (err) ->
     logger.error err if err
     callback()
 

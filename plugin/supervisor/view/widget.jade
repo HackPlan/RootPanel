@@ -16,7 +16,18 @@
         tr(data-id='#{program._id}')
           td= program.name
           td= program.command
-          td= programSummary(program)
+          td
+            if program.autostart
+              span(title='autostart=true').glyphicon.glyphicon-share-alt
+              | &nbsp;
+            if program.autorestart == 'true'
+              span(title='autorestart=true').glyphicon.glyphicon-repeat
+              | &nbsp;
+            else if program.autorestart == 'unexpected'
+              span(title='autorestart=unexpected').glyphicon.glyphicon-flash
+              | &nbsp;
+            if program.directory
+              span(title='directory') ~#{program.directory.match(/\/home\/[^\/]+(.*)/)[1]}
           td(title= programs_status[program.program_name].info)= programs_status[program.program_name].status
           td
             if programs_status[program.program_name].status != 'running'

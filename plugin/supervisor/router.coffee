@@ -14,7 +14,7 @@ program_sample =
   autorestart: 'true/false/unexpected'
   directory: '/home/jysperm'
 
-require_fields = ['name', 'command', 'autostart', 'autorestart', 'directory']
+require_fields = ['name', 'command', 'autostart', 'autorestart']
 configurable_fields = ['command', 'autostart', 'autorestart', 'directory']
 
 restrictProgramFields = (req, res, next) ->
@@ -80,20 +80,25 @@ exports.post '/create_program', restrictProgramFields, (req, res) ->
         res.json {}
 
 exports.post '/update_program/:id', restrictProgramFields, (req, res) ->
-  for k, v of _.pick req.program, configurable_fields
-    unless v == undefined
-      req.program[k] = v
+  modifier =
+    $set: {}
 
-  Account.update
+  for k, v of _.pick req.body, configurable_fields
+    unless v == undefined
+      modifier.$set["pluggable.supervisor.programs.$.#{k}"] = v
+
+  Account.findOneAndUpdate
     'pluggable.supervisor.programs._id': req.program._id
-  ,
-    $set:
-      'pluggable.supervisor.programs.$': req.program
-  , (err) ->
+  , modifier, (err, account) ->
     return res.error err if err
 
-    supervisor.writeConfig req.account, req.program, ->
-      supervisor.updateProgram req.account, req.program, ->
+    program = _.find account.pluggable.supervisor.programs, (program) ->
+      return program._id.toString() == req.program._id.toString()
+
+    console.log program, account
+
+    supervisor.writeConfig account, program, ->
+      supervisor.updateProgram account, program, ->
         res.json {}
 
 exports.post '/remove_program/:id', (req, res) ->
