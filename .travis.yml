@@ -7,6 +7,9 @@ node_js:
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -y quota quotatool supervisor
+  - sudo apt-get install -y python-pip python-m2crypto
+  - sudo pip install shadowsocks
+  - sudo mkdir /etc/shadowsocks
 
 script: npm run test-full
 
