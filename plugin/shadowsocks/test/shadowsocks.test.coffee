@@ -1,4 +1,4 @@
-describe 'plugin/shadowsocks', ->
+(if isPluginEnable('shadowsocks') then describe else describe.skip) 'plugin/shadowsocks', ->
   agent = null
   utils = null
   config = null

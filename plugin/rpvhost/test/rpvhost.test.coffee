@@ -1,4 +1,4 @@
-describe 'plugin/rpvhost', ->
+(if isPluginEnable('rpvhost') then describe else describe.skip) 'plugin/rpvhost', ->
   agent = null
 
   before ->

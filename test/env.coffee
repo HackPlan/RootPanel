@@ -41,3 +41,6 @@ if process.env.TRAVIS == 'true'
   config.mongodb.password = undefined
 
   config.redis.password = undefined
+
+global.isPluginEnable = (name) ->
+  return name in _.union config.plugin.available_extensions, config.plugin.available_services

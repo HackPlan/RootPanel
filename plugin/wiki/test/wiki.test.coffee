@@ -1,4 +1,4 @@
-describe 'plugin/wiki', ->
+(if isPluginEnable('wiki') then describe else describe.skip) 'plugin/wiki', ->
   agent = null
 
   before ->

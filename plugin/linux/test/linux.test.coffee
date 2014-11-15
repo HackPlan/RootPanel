@@ -1,4 +1,4 @@
-describe 'plugin/linux', ->
+(if isPluginEnable('linux') then describe else describe.skip) 'plugin/linux', ->
   linux = null
   cache = null
   redis = null

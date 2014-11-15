@@ -5,15 +5,17 @@ RootPanel 具有良好的设计，高度的可定制性，支持多语言和多�
 
 ## 安装
 
-稳定版本 [![Build Status](https://travis-ci.org/jysperm/RootPanel.svg?branch=stable)](https://travis-ci.org/jysperm/RootPanel)
+稳定版本
+[![Build Status](https://travis-ci.org/jysperm/RootPanel.svg?branch=stable)](https://travis-ci.org/jysperm/RootPanel)
 
     git clone -b stable https://github.com/jysperm/RootPanel.git
 
-开发版本 [![Build Status](https://travis-ci.org/jysperm/RootPanel.svg?branch=master)](https://travis-ci.org/jysperm/RootPanel)
+开发版本
+[![Build Status](https://travis-ci.org/jysperm/RootPanel.svg?branch=master)](https://travis-ci.org/jysperm/RootPanel)
 
     git clone https://github.com/jysperm/RootPanel.git
 
-[Vagrant box](https://vagrantcloud.com/jysperm/boxes/rootpanel)
+试运行和开发推荐使用 [Vagrant box](https://vagrantcloud.com/jysperm/boxes/rootpanel)
 
 详细安装说明：[INSTALL.md](https://github.com/jysperm/RootPanel/blob/master/INSTALL.md)
 
@@ -36,6 +38,9 @@ RootPanel 具有良好的设计，高度的可定制性，支持多语言和多�
     git pull
 
 根据 `/migration/system` 中新增的说明文件，执行相应命令来修改系统设置，如果跨越多个版本需要依次执行。
+检查更新日志和 `/sample` 中的默认配置文件，视情况修改配置文件(`config.coffee`), 若修改了配置文件，需要运行以下命令来应用变更。
+
+    npm run reconfigure
 
 使用 `mongodbdump` 来备份数据库，然后升级数据库：
 

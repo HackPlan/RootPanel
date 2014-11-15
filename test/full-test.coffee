@@ -9,13 +9,7 @@ async.eachSeries fs.readdirSync("#{__dirname}/../sample"), (filename, callback) 
   console.log "Config: #{filename}"
 
   params = '--compilers coffee:coffee-script/register --require test/env --reporter node_modules/mocha-reporter-cov-summary --
-    core/test/*.test.coffee core/test/*/*.test.coffee'.split(' ')
-
-  config = require "#{__dirname}/../sample/#{filename}"
-
-  for plugin_name in _.union config.plugin.available_extensions, config.plugin.available_services
-    if fs.existsSync "plugin/#{plugin_name}/test"
-      params.push "plugin/#{plugin_name}/test/*.test.coffee"
+    core/test/*.test.coffee core/test/*/*.test.coffee plugin/*/test/*.test.coffee'.split(' ')
 
   proc = child_process.spawn "#{__dirname}/../node_modules/.bin/mocha", params,
     env: _.extend process.env,

@@ -1,8 +1,8 @@
 {
   "name": "rootpanel",
   "version": "0.8.0",
-  "description": "A linux virtual host management system with extensibility",
-  "homepage": "http://rpvhost.net",
+  "description": "A pluggable PaaS framework",
+  "homepage": "https://rootpanel.io",
   "license": "AGPL-3.0",
   "repository": {
     "type": "git",
@@ -12,20 +12,17 @@
     {
       "name": "jysperm",
       "email": "jysperm@gmail.com",
-      "url": "http://jysperm.me"
+      "url": "https://jysperm.me"
     }
   ],
   "scripts": {
     "start": "./node_modules/.bin/coffee app.coffee",
-    "migrate": "./node_modules/.bin/coffee bin/rp-migrate.coffee",
+    "migrate": "./node_modules/.bin/coffee bin/migrate.coffee",
+    "reconfigure": "./node_modules/.bin/coffee bin/reconfigure.coffee",
     "test": "COV_TEST=true ./node_modules/.bin/mocha --compilers coffee:coffee-script/register --require test/env --reporter node_modules/mocha-reporter-cov-summary -- core/test/*.test.coffee core/test/*/*.test.coffee plugin/*/test",
     "test-only": "./node_modules/.bin/mocha --compilers coffee:coffee-script/register --require test/env -- core/test/*.test.coffee core/test/*/*.test.coffee plugin/*/test",
     "test-full": "./node_modules/.bin/coffee test/full-test.coffee",
     "test-cov-html": "COV_TEST=true ./node_modules/.bin/mocha --compilers coffee:coffee-script/register --require test/env --reporter html-cov -- core/test/*.test.coffee core/test/*/*.test.coffee plugin/*/test > coverage-reporter.html"
-  },
-  "bin": {
-    "rp-fix-permissions": "./bin/rp-fix-permissions.coffee",
-    "rp-migrate": "./bin/migrate.coffee"
   },
   "dependencies": {
     "async": "^0.9.0",
