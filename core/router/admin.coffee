@@ -1,6 +1,7 @@
 {express, async, _} = app.libs
 {requireAdminAuthenticate} = app.middleware
 {Account, Ticket, Financials, CouponCode} = app.models
+{config} = app
 
 module.exports = exports = express.Router()
 
@@ -10,7 +11,7 @@ exports.get '/', (req, res) ->
   Account.find {}, (err, accounts) ->
     return res.render 'admin',
       accounts: accounts
-      coupon_code_types: _.keys CouponCode.coupons_meta
+      coupon_code_types: _.keys config.coupons_meta
 
 exports.get '/ticket', (req, res) ->
   LIMIT = 10

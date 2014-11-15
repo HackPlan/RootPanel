@@ -8,9 +8,7 @@ $ ->
   $('.action-use').click ->
     code = $('.form-coupon .input-coupon_code').val()
 
-    request '/coupon/info',
-      code: code
-    , (result) ->
+    request "/coupon/info?code=#{code}", {}, {method: 'get'}, (result) ->
       if window.confirm result.message
         request '/coupon/apply',
           code: code

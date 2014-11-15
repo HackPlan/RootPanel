@@ -78,10 +78,11 @@
     vi /etc/supervisor/conf.d/rpadmin.conf
 
         [program:RootPanel]
-        command=node /home/rpadmin/RootPanel/start.js
-        autorestart=true
+        command = coffee /home/rpadmin/RootPanel/app.coffee
+        directory = /home/rpadmin/RootPanel
+        autorestart = true
         redirect_stderr = true
-        user=rpadmin
+        user = rpadmin
 
     service nginx restart
     service mongodb restart

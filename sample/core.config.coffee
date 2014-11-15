@@ -30,7 +30,7 @@ module.exports =
   plans:
     sample:
       t_name: 'plans.sample.name'
-      t_description: 'plans.sample.name.description'
+      t_description: 'plans.sample.description'
 
       billing_by_time:
         unit: 24 * 3600 * 1000

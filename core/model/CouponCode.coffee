@@ -35,7 +35,7 @@ CouponCode = mongoose.Schema
 CouponCode.plugin mongooseUniqueValidator,
   message: 'unique_validation_error'
 
-exports.coupons_meta = coupons_meta =
+config.coupons_meta = coupons_meta =
   amount:
     validate: (account, coupon, callback) ->
       apply_log = _.find coupon.apply_log, (item) ->
