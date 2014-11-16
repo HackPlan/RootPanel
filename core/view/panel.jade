@@ -10,7 +10,7 @@ append header
 
 block main
   .row
-    header= t('view.panel.billing')
+    header= t('view.panel.financials')
     p #{t('plan.balance')}: #{account.billing.balance.toFixed(2)} #{t('plan.currency.' + config.billing.currency)}
     p
       a(href= '/panel/pay/').btn.btn-success= t('common.charge')

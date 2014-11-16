@@ -1,16 +1,16 @@
 {
   "app": {
     "name": "RootPanel",
-    "description": "一个插件化的 Linux 虚拟主机管理系统。"
+    "description": "插件化 PaaS 服务开发框架"
   },
   "plans": {
     "sample": {
       "name": "示例",
-      "description": "每月 8 元，按小时计费"
+      "description": "每月 10 元，按小时计费"
     },
     "test": {
       "name": "测试",
-      "description": "按量付费，7 天不使用自动关闭"
+      "description": "按使用量付费"
     }
   },
   "common": {
@@ -88,7 +88,6 @@
     "join": "订购方案",
     "leave": "退订方案",
     "balance": "余额",
-    "remaining_time": "剩余时长",
     "currency": {
       "CNY": "CNY"
     }
@@ -126,8 +125,7 @@
       "new_email": "新邮箱"
     },
     "panel": {
-      "billing": "财务",
-      "service_switch": "服务开关"
+      "financials": "财务"
     },
     "pay": {
       "pay_log": "充值记录",
@@ -149,7 +147,7 @@
   },
   "coupons": {
     "amount": {
-      "message": "账户余额：__amount__ __currency__"
+      "message": "代金券：__amount__ __currency__"
     }
   },
   "plugins": {}

@@ -1,16 +1,16 @@
 {
   "app": {
     "name": "RootPanel",
-    "description": "A linux virtual host management system with extensibility"
+    "description": "Pluggable PaaS service development framework"
   },
   "plans": {
     "sample": {
-      "name": "Sample Services",
-      "description": "$1.25 per month, calculated by hour"
+      "name": "Sample Plan",
+      "description": "10 CNY per month, calculated by hour"
     },
     "test": {
-      "name": "Test Services",
-      "description": "Calculated by requirements, will be auto closed after 7 days absence"
+      "name": "Test Plan",
+      "description": "Calculated by usages"
     }
   },
   "common": {
@@ -43,7 +43,8 @@
     "email_exist": "Email already exists",
     "invalid_username": "Invalid username",
     "invalid_password": "Invalid password",
-    "invalid_email": "Invalid email"
+    "invalid_email": "Invalid email",
+    "insufficient_balance": "Insufficient Balance"
   },
   "account": {
     "": "Account",
@@ -56,11 +57,11 @@
     "preferences": "Preferences"
   },
   "panel": {
-    "": "Management",
+    "": "Panel",
     "overview": "Overview"
   },
   "ticket": {
-    "": "Support Tickets",
+    "": "Tickets",
     "title": "Title",
     "status": "Status",
     "create": "Create",
@@ -75,18 +76,24 @@
     "creator": "Creator",
     "members": "Members"
   },
+  "ticket_status": {
+    "closed": "Closed",
+    "open": "Open",
+    "pending": "Pending",
+    "finish": "Finish",
+    "related": "Related"
+  },
   "plan": {
     "": "Plan",
-    "join": "Subscribe",
-    "leave": "Unsubscribe",
+    "join": "Join",
+    "leave": "Leave",
     "balance": "Balance",
-    "remaining_time": "Time Remaining",
     "currency": {
       "CNY": "CNY"
     }
   },
   "admin": {
-    "admin_panel": "Admin Panel"
+    "admin_panel": "Admin Area"
   },
   "time": {
     "day": "Day"
@@ -99,7 +106,7 @@
       "navigation": "Extend"
     },
     "account": {
-      "password2": "repeat",
+      "password2": "Repeat",
       "already_register": "Already has account?",
       "no_account": "Has no account?",
       "password_inconsistent": "Passwords not matched"
@@ -110,7 +117,7 @@
       "coupon_code": "Coupon Code",
       "code": "Code",
       "update_password": "Update password",
-      "original_password": "Old password",
+      "original_password": "Original password",
       "new_password": "New password",
       "repeat_password": "Repeat password",
       "update_email": "Update Email",
@@ -118,8 +125,7 @@
       "new_email": "New Email"
     },
     "panel": {
-      "billing": "Billing",
-      "service_switch": "Switch"
+      "financials": "Financials"
     },
     "pay": {
       "pay_log": "Pay History",
@@ -137,6 +143,11 @@
       "count": "Amount",
       "meta": "Meta",
       "order_id": "Order Id"
+    }
+  },
+  "coupons": {
+    "amount": {
+      "message": "Cash: __amount__ __currency__"
     }
   },
   "plugins": {}

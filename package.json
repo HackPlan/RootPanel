@@ -1,7 +1,7 @@
 {
   "name": "rootpanel",
   "version": "0.8.0",
-  "description": "A pluggable PaaS framework",
+  "description": "A pluggable PaaS service development framework",
   "homepage": "https://rootpanel.io",
   "license": "AGPL-3.0",
   "repository": {

@@ -1,0 +1,8 @@
+{
+  "": "Bitcoin",
+  "view": {
+    "payment_tips": "You can transfer directly to this address. system will automatically recharge for you after first confirmed. The minimum payment amount: 0.0005 BTC.",
+    "exchange_rate_tips": "Real-time Exchange Rates: 10 CNY = __rate10__ BTC",
+    "payment_details": "Bitcoin Payment <a href='https://blockchain.info/tx/__order_id__'>__short_order_id__</a>"
+  }
+}

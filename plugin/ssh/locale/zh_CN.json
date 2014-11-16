@@ -1,6 +1,5 @@
 {
   "": "SSH",
-  "description": "SSH 提供了远程登录服务",
   "process": "进程",
   "memory": "内存",
   "cpu": "CPU",
