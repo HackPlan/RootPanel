@@ -11,7 +11,7 @@ Notification = mongoose.Schema
   type:
     required: true
     type: String
-    enum: ['payment_success']
+    enum: ['payment_success', 'ticket_create', 'ticket_reply']
 
   level:
     required: true

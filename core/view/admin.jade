@@ -32,7 +32,7 @@ block main
                 td= account.billing.plans.join(', ')
                 td= account.billing.balance.toFixed(2)
                 td
-                  button.btn.btn-info.btn-sm(type='button')= t('common.details')
+                  button.btn.btn-info.btn-sm.action-details(type='button')= t('common.details')
                   .btn-group
                     button(type='button', data-toggle='dropdown').btn.btn-primary.btn-sm.dropdown-toggle
                       | #{t('common.actions')} &nbsp;
@@ -73,8 +73,18 @@ block main
             .col-sm-5
               button.action-generate-code.btn.btn-lg.btn-primary(type='button')= t('common.generate')
 
-        .output-coupon-code
+        pre.output-coupon-code
 
+  .account-details-modal.modal.fade
+    .modal-dialog
+      .modal-content
+        .modal-header
+          button.close(type='button', data-dismiss='modal', aria-hidden='true') &times;
+          h4.label-account-id
+        .modal-body
+          pre.label-details
+        .modal-footer
+          button.btn.btn-danger(type='button', data-dismiss='modal')= t('common.close')
 
   .confirm-payment-modal.modal.fade
     .modal-dialog
@@ -98,7 +108,6 @@ block main
                 input.input-order-id.form-control(type='order_id')
 
         .modal-footer
-          button.btn.btn-danger(type='button', data-dismiss='modal')= t('common.close')
           button.btn.btn-success.action-confirm-payment(type='button')= t('common.create')
 
 prepend sidebar

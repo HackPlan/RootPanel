@@ -5,16 +5,23 @@ $ ->
 
   $('.action-delete-account').click (e) ->
     e.preventDefault()
-    $.post '/admin/delete_account', JSON.stringify
-      account_id: $(@).parents('tr').data 'id'
-    .success ->
-      location.reload()
+    if window.confirm 'Are you sure?'
+      request '/admin/delete_account',
+        account_id: $(@).parents('tr').data 'id'
+      , ->
+        location.reload()
+
+  $('.action-details').click ->
+    request "/admin/account_details?account_id=#{$(@).parents('tr').data 'id'}", {}, {method: 'get'}, (account) ->
+      $('.account-details-modal .label-account-id').text account._id
+      $('.account-details-modal .label-details').html JSON.stringify account, null, '    '
+      $('.account-details-modal').modal 'show'
 
   $('.confirm-payment-modal .action-confirm-payment').click ->
     request '/admin/confirm_payment',
       account_id: $('.input-account-id').text()
       type: 'taobao'
-      amount: $('.input-amount').val()
+      amount: parseFloat $('.input-amount').val()
       order_id: $('.input-order-id').val()
     , ->
       location.reload()

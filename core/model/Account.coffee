@@ -216,7 +216,7 @@ Account.methods.updatePassword = (password, callback) ->
 # @param callback(err)
 Account.methods.incBalance = (amount, type, payload, callback) ->
   unless _.isNumber amount
-    return callback new Error 'amount must be a number'
+    return callback 'invalid_amount'
 
   financials = new models.Financials
     account_id: @_id

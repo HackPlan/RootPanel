@@ -13,6 +13,10 @@ exports.get '/', (req, res) ->
       accounts: accounts
       coupon_code_types: _.keys config.coupons_meta
 
+exports.get '/account_details', (req, res) ->
+  Account.findById req.query.account_id, (err, account) ->
+    res.json _.omit account.toObject(), 'password', 'password_salt', 'tokens', '__v'
+
 exports.get '/ticket', (req, res) ->
   LIMIT = 10
 
@@ -66,7 +70,8 @@ exports.post '/confirm_payment', (req, res) ->
     account.incBalance req.body.amount, 'deposit',
       type: req.body.type
       order_id: req.body.order_id
-    , ->
+    , (err) ->
+      return res.error err if err
       res.json {}
 
 exports.post '/delete_account', (req, res) ->
