@@ -63,20 +63,22 @@ prepend sidebar
     a.btn.btn-lg.btn-success(href='/ticket/list/')= t('ticket.ticket_list')
 
   .row
-    header= t('ticket.creator')
-    li.list-group-item.clearfix
-      a.pull-left
-        img.img-avatar(src= ticket.account.preferences.avatar_url)
-      p
-        span.label.label-info= ticket.account.username
-        br
-        span.label.label-default(title=ticket.created_at)= moment(ticket.created_at).fromNow()
+    if ticket.account
+      header= t('ticket.creator')
+      li.list-group-item.clearfix
+        a.pull-left
+          img.img-avatar(src=ticket.account.preferences.avatar_url)
+        p
+          span.label.label-info= ticket.account.username
+          br
+          span.label.label-default(title=ticket.created_at)= moment(ticket.created_at).fromNow()
 
   .row
     header= t('ticket.members')
     for member in ticket.members
-      a.pull-left
-        img.img-avatar(src=member.preferences.avatar_url, alt=member.username)
+      if member
+        a.pull-left
+          img.img-avatar(src=member.preferences.avatar_url, alt=member.username)
 
 append footer
   script(src='/script/ticket/view.js')

@@ -6,7 +6,7 @@ exports = module.exports = class RPVhostPlugin extends pluggable.Plugin
   @type: 'extension'
 
 exports.registerHook 'plugin.wiki.pages',
-  t_category: 'rpvhost'
+  t_category: 'plugins.rpvhost.site_name'
   t_title: 'Terms.md'
   language: 'zh_CN'
   content_markdown: fs.readFileSync("#{__dirname}/wiki/Terms.md").toString()

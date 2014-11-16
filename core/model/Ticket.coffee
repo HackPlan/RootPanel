@@ -107,7 +107,7 @@ Ticket.methods.populateAccounts = (callback) ->
   , (err, accounts) =>
     logger.error err if err
 
-    accounts = _.indexBy accounts, '_id'
+    accounts = _.indexBy _.compact(accounts), '_id'
 
     result = @toObject()
 

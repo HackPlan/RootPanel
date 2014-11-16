@@ -13,7 +13,7 @@ describe 'router/coupon', ->
       code: coupon3.code
     .expect 200
     .end (err, res) ->
-      res.body.message.should.be.equal '账户余额：4 CNY'
+      res.body.message.should.be.equal '代金券：4 CNY'
       done err
 
   it 'POST apply', (done) ->

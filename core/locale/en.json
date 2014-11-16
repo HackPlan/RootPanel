@@ -117,9 +117,9 @@
       "coupon_code": "Coupon Code",
       "code": "Code",
       "update_password": "Update password",
-      "original_password": "Original password",
-      "new_password": "New password",
-      "repeat_password": "Repeat password",
+      "original_password": "Original",
+      "new_password": "New",
+      "repeat_password": "Repeat",
       "update_email": "Update Email",
       "current_email": "Current Email",
       "new_email": "New Email"
