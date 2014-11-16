@@ -9,6 +9,10 @@ exports.hooks =
     started: _.extend [],
       global_event: true
 
+    # path: string
+    ignore_csrf: _.extend [],
+      global_event: true
+
   model:
     # model: string, field: string, type: string
     type_enum: _.extend [],

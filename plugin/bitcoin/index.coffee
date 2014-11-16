@@ -33,6 +33,9 @@ exports.registerHook 'view.pay.display_payment_details',
       order_id: deposit_log.payload.order_id
       short_order_id: deposit_log.payload.order_id[0 .. 40]
 
+exports.registerHook 'app.ignore_csrf',
+  path: '/bitcoin/coinbase_callback'
+
 app.express.post '/bitcoin/coinbase_callback', (req, res) ->
   Account.findOne
     'pluggable.bitcoin.bitcoin_deposit_address': req.body.address
@@ -46,7 +49,7 @@ app.express.post '/bitcoin/coinbase_callback', (req, res) ->
     bitcoin.getExchangeRate config.billing.currency, (rate) ->
       amount = req.body.amount / rate
 
-      Account.incBalance amount, 'deposit',
+      account.incBalance amount, 'deposit',
         type: 'bitcoin'
         order_id: req.body.transaction.hash
       , ->

@@ -25,6 +25,9 @@ exports.csrf = ->
   csrf = app.libs.csrf()
 
   return (req, res, next) ->
+    if req.path in _.pluck app.pluggable.selectHook(null, 'app.ignore_csrf'), 'path'
+      return next()
+
     validator = ->
       unless req.method == 'GET'
         unless csrf.verify req.session.csrf_secret, req.body.csrf_token
