@@ -54,7 +54,8 @@
     "email": "邮箱",
     "password": "密码",
     "logout": "注销",
-    "preferences": "首选项"
+    "preferences": "首选项",
+    "financials": "财务"
   },
   "panel": {
     "": "管理面板",
@@ -124,11 +125,8 @@
       "current_email": "当前邮箱",
       "new_email": "新邮箱"
     },
-    "panel": {
-      "financials": "财务"
-    },
-    "pay": {
-      "pay_log": "充值记录",
+    "financials": {
+      "payment_log": "充值记录",
       "pay_method": "方式",
       "billing_log": "扣费记录"
     },

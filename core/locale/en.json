@@ -54,7 +54,8 @@
     "email": "Email",
     "password": "Password",
     "logout": "Logout",
-    "preferences": "Preferences"
+    "preferences": "Preferences",
+    "financials": "Financials"
   },
   "panel": {
     "": "Panel",
@@ -124,11 +125,8 @@
       "current_email": "Current Email",
       "new_email": "New Email"
     },
-    "panel": {
-      "financials": "Financials"
-    },
-    "pay": {
-      "pay_log": "Pay History",
+    "financials": {
+      "payment_log": "Payment History",
       "pay_method": "Pay Method",
       "billing_log": "Billing History"
     },

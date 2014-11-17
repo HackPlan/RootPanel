@@ -1,6 +1,6 @@
 module.exports =
   web:
-    t_name: 'plugins.rpvhost.site_name'
+    t_name: 'plugins.rpvhost.greenshadow'
     url: 'http://greenshadow.net'
     listen: '/home/rpadmin/rootpanel.sock'
     repo: 'jysperm/RootPanel'

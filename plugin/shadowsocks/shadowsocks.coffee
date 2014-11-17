@@ -189,7 +189,8 @@ exports.updateConfigure = (callback) ->
       filename = "/etc/shadowsocks/#{method}.json"
       ShadowsocksPlugin.writeConfigFile filename, configure, {mode: 0o755}, ->
         supervisor.updateProgram {}, {program_name: "shadowsocks-#{method}"}, ->
-          callback()
+          supervisor.programControl {}, {program_name: "shadowsocks-#{method}"}, 'restart', ->
+            callback()
 
   , ->
     callback()
@@ -236,7 +237,7 @@ exports.monitoring = ->
               amount: -amount
               payload:
                 service: 'shadowsocks'
-                traffic_mb: (billing_bucket * BILLING_BUCKET) / 1000 * 1000
+                traffic_mb: (billing_bucket * BILLING_BUCKET) / (1000 * 1000)
             , ->
               callback()
 

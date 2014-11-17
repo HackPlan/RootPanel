@@ -7,7 +7,7 @@ module.exports = exports = express.Router()
 
 exports.use requireAuthenticate
 
-exports.get '/pay', (req, res) ->
+exports.get '/financials', (req, res) ->
   LIMIT = 10
 
   async.parallel
@@ -45,7 +45,7 @@ exports.get '/pay', (req, res) ->
       Financials.find
         account_id: req.account._id
         type:
-          $in: ['billing']
+          $in: ['billing', 'usage_billing']
       , null,
         sort:
           created_at: -1
@@ -53,7 +53,7 @@ exports.get '/pay', (req, res) ->
       , callback
 
   , (err, result) ->
-    res.render 'panel/pay', result
+    res.render 'panel/financials', result
 
 exports.get '/', (req, res) ->
   billing.triggerBilling req.account, (account) ->
