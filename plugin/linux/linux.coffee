@@ -27,10 +27,10 @@ exports.deleteUser = (account, callback) ->
         callback()
 
     (callback) ->
-      child_process.exec "sudo groupdel #{account.username}", callback
+      child_process.exec "sudo groupdel #{account.username}", ->
+        callback()
 
-  ], (err) ->
-    logger.error err if err
+  ], ->
     cache.delete 'linux.getPasswdMap', callback
 
 exports.setResourceLimit = (account, callback) ->

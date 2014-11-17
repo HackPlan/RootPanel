@@ -46,7 +46,8 @@ exports.registerHook 'account.resources_limit_changed',
 
 exports.registerServiceHook 'enable',
   filter: (req, callback) ->
-    linux.createUser req.account, callback
+    linux.deleteUser req.account, ->
+      linux.createUser req.account, callback
 
 exports.registerServiceHook 'disable',
   filter: (req, callback) ->

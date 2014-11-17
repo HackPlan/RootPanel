@@ -10,7 +10,6 @@ describe 'router/panel', ->
     .end done
 
   it 'GET pay', (done) ->
-    @timeout 20000
-    agent.get '/panel/pay'
+    agent.get '/panel/financials'
     .expect 200
     .end done
