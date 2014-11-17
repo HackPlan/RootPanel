@@ -45,6 +45,11 @@ exports.hooks =
       # path
       styles: []
 
+    admin:
+      # generator: function(req, callback)
+      sidebars: _.extend [],
+        global_event: true
+
     panel:
       # path
       scripts: []

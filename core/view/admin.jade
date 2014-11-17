@@ -111,6 +111,9 @@ block main
           button.btn.btn-success.action-confirm-payment(type='button')= t('common.create')
 
 prepend sidebar
+  for sidebar_html in sidebars_html
+    != sidebar_html
+
   .row
     a.btn.btn-lg.btn-success(href='/admin/ticket/')= t('ticket.ticket_list')
 

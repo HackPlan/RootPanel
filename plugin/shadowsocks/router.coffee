@@ -1,4 +1,4 @@
-{utils} = app
+{utils, config} = app
 {markdown, fs, path, express} = app.libs
 {requireInService} = app.middleware
 
@@ -15,20 +15,19 @@ exports.post '/reset_password', (req, res) ->
     $set:
       'pluggable.shadowsocks.password': password
   , ->
-    req.account.pluggable.shadowsocks.password = password
-
-    shadowsocks.updateConfigure req.account, ->
+    shadowsocks.updateConfigure ->
       res.json {}
 
 exports.post '/switch_method', (req, res) ->
   unless req.body.method in config.plugins.shadowsocks.available_ciphers
     return res.error 'invalid_method'
 
+  if req.body.method == req.account.pluggable.shadowsocks.method
+    return res.error 'already_in_method'
+
   req.account.update
     $set:
-      'pluggable.shadowsocks.method': method
+      'pluggable.shadowsocks.method': req.body.method
   , ->
-    req.account.pluggable.shadowsocks.method = method
-
-    shadowsocks.updateConfigure req.account, ->
+    shadowsocks.updateConfigure ->
       res.json {}

@@ -13,6 +13,13 @@
           input.form-control(type='text', value=account.pluggable.shadowsocks.password, disabled)
           span.input-group-btn
             button.btn.btn-default.action-reset-password(type='button')= t('reset')
+        .input-group
+          span.input-group-addon= t('method')
+          select.input-method.form-control(style='-webkit-appearance: none;')
+            for method in config.plugins.shadowsocks.available_ciphers
+              option= method
+          span.input-group-btn
+            button.btn.btn-default.action-switch-method(type='button')= t('common.change')
 
   .col-md-6
     .panel.panel-default

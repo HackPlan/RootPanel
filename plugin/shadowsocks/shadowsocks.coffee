@@ -16,14 +16,14 @@ exports.initSupervisor = (callback) ->
       if program_name in _.pluck program_status, 'name'
         return callback()
 
-      shadowsocks_config_file = "/etc/shadowsocks/#{method}.json"
       configure = exports.generateConfigure [],
         method: method
 
-      ShadowsocksPlugin.writeConfigFile shadowsocks_config_file, configure, {mode: 0o755}, ->
+      filename = "/etc/shadowsocks/#{method}.json"
+      ShadowsocksPlugin.writeConfigFile filename, configure, {mode: 0o755}, ->
         supervisor.writeConfig {username: 'nobody'},
           program_name: program_name
-          command: "ssserver -c #{shadowsocks_config_file}"
+          command: "ssserver -c #{filename}"
           name: program_name
           autostart: true
           autorestart: true
@@ -109,12 +109,12 @@ exports.initAccount = (account, callback) ->
 
       child_process.exec "sudo iptables -I OUTPUT -p tcp --sport #{port}", ->
         child_process.exec 'sudo iptables-save | sudo tee /etc/iptables.rules', ->
-          exports.updateConfigure account, ->
+          exports.updateConfigure ->
             callback()
 
 exports.deleteAccount = (account, callback) ->
   exports.queryIptablesInfo (iptables_info) ->
-    {port, method} = account.pluggable.shadowsocks
+    {port} = account.pluggable.shadowsocks
 
     billing_traffic = iptables_info[port].bytes - account.pluggable.shadowsocks.last_traffic_value
     billing_traffic = iptables_info[port].bytes if billing_traffic < 0
@@ -136,10 +136,7 @@ exports.deleteAccount = (account, callback) ->
           child_process.exec 'sudo iptables-save | sudo tee /etc/iptables.rules', callback
 
         (callback) ->
-          exports.deleteAccountConfigure account, callback
-
-        (callback) ->
-          supervisor.updateProgram {}, {program_name: "shadowsocks-#{method}"}, callback
+          exports.updateConfigure callback
 
       ], ->
         if amount > 0
@@ -178,60 +175,24 @@ exports.accountUsage = (account, callback) ->
 
     callback result
 
-exports.updateConfigure = (account, callback) ->
-  {port, method, password} = account.pluggable.shadowsocks
-  original_method = null
-
+exports.updateConfigure = (callback) ->
   async.eachSeries config.plugins.shadowsocks.available_ciphers, (method, callback) ->
-    shadowsocks_config_file = "/etc/shadowsocks/#{method}.json"
+    Account.find
+      'pluggable.shadowsocks.method': method
+    , (err, accounts) ->
+      users = _.map accounts, (account) ->
+        return account.pluggable.shadowsocks
 
-    fs.readFile shadowsocks_config_file, (err, content) ->
-      if port.toString() in _.keys JSON.parse(content).port_password
-        original_method = method
-        callback true
-      else
-        callback()
+      configure = exports.generateConfigure users,
+        method: method
 
-  , ->
-    async.series [
-      (callback) ->
-        shadowsocks_config_file = "/etc/shadowsocks/#{method}.json"
-
-        fs.readFile shadowsocks_config_file, (err, content) ->
-          configure = JSON.parse content
-          configure.port_password[port] = password
-
-          ShadowsocksPlugin.writeConfigFile  shadowsocks_config_file, JSON.stringify(configure), {mode: 0o755}, ->
-            callback()
-
-      (callback) ->
+      filename = "/etc/shadowsocks/#{method}.json"
+      ShadowsocksPlugin.writeConfigFile filename, configure, {mode: 0o755}, ->
         supervisor.updateProgram {}, {program_name: "shadowsocks-#{method}"}, ->
           callback()
 
-      (callback) ->
-        if original_method == original_method
-          return callback()
-
-        account = account.toObject()
-        account.pluggable.shadowsocks.method = original_method
-
-        exports.deleteAccountConfigure account, ->
-          supervisor.updateProgram {}, {program_name: "shadowsocks-#{original_method}"}, ->
-            callback()
-
-    ], ->
-      callback()
-
-exports.deleteAccountConfigure = (account, callback) ->
-  {port, method} = account.pluggable.shadowsocks
-  shadowsocks_config_file = "/etc/shadowsocks/#{method}.json"
-
-  fs.readFile shadowsocks_config_file, (err, content) ->
-    configure = JSON.parse content
-    delete configure.port_password[port]
-
-    fs.writeFile shadowsocks_config_file, JSON.stringify(configure), ->
-      callback()
+  , ->
+    callback()
 
 exports.monitoring = ->
   exports.queryIptablesInfo (iptables_info) ->

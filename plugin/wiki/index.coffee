@@ -9,7 +9,7 @@ exports.registerHook 'view.layout.menu_bar',
   href: '/wiki/'
   t_body: 'plugins.wiki.'
 
-unless config.plugins.wiki.disable_default_wiki
+unless config.plugins.wiki?.disable_default_wiki
   wiki_path = "#{__dirname}/../../WIKI"
 
   for category_name in fs.readdirSync(wiki_path)

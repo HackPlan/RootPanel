@@ -9,9 +9,15 @@ exports.use requireAdminAuthenticate
 
 exports.get '/', (req, res) ->
   Account.find {}, (err, accounts) ->
-    return res.render 'admin',
-      accounts: accounts
-      coupon_code_types: _.keys config.coupons_meta
+    async.map pluggable.selectHook(null, 'view.admin.sidebars'), (hook, callback) ->
+      hook.generator req, (html) ->
+        callback null, html
+
+    , (err, sidebars_html) ->
+      res.render 'admin',
+        accounts: accounts
+        sidebars_html: sidebars_html
+        coupon_code_types: _.keys config.coupons_meta
 
 exports.get '/account_details', (req, res) ->
   Account.findById req.query.account_id, (err, account) ->
