@@ -34,9 +34,13 @@ block main
       thead
         tr
           td= t('common.time')
+          td= t('common.details')
           td= t('common.amount')
       tbody
         for item in billing_log
           tr
             td= moment(item.created_at).format('YYYY-MM-DD HH:mm:ss')
+            td
+              each info, plan_name in item.payload
+                p #{plan_name}: #{info.billing_unit_count} unit before #{info.last_billing_at}
             td #{item.amount.toFixed(2)} CNY

@@ -22,7 +22,7 @@ exports.monitoring = (callback) ->
   REDIS_KEY = "#{config.redis.prefix}:linux.recent_resources_usage"
   ITEM_IN_RESOURCES_LIST = 3600 * 1000 / config.plugins.linux.monitor_cycle
 
-  linux.getMemoryInfo (err, memory_info) ->
+  linux.getMemoryInfo (memory_info) ->
     linux.getProcessList (plist) ->
       plist = _.reject plist, (item) ->
         return item.rss == 0
@@ -62,7 +62,7 @@ exports.monitoring = (callback) ->
             usage.memory = parseFloat (usage.memory / recent_resources_usage.length / base).toFixed(1)
 
           async.each _.keys(resources_usage), (username, callback) ->
-            Account.search username, (err, account) ->
+            Account.search username, (account) ->
               unless account
                 return callback()
 

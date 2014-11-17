@@ -61,6 +61,7 @@
 
     vi /etc/rc.local
 
+        ln -s /dev/xvda /dev/root
         iptables-restore < /etc/iptables.rules
 
     su rpadmin
@@ -100,7 +101,6 @@
 
     reboot
 
-        ln -s /dev/xvda /dev/root
         quotacheck -am
         quotaon -au
 

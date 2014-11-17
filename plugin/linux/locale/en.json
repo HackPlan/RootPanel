@@ -2,8 +2,8 @@
   "": "Linux",
   "server_monitor": "Server Status",
   "widget": {
-    "hour_cpu": "CPU usage in last hour",
-    "hour_memory": "Memory usage in last hour",
+    "hour_cpu": "CPU in last hour",
+    "hour_memory": "Memory in last hour",
     "storage": "Storage used",
     "month_transfer": "traffic of this month"
   },

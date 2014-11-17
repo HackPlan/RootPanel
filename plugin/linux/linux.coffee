@@ -141,18 +141,17 @@ exports.getStorageQuota = (callback) ->
   cache.try 'linux.getStorageQuota', (SETEX) ->
     child_process.exec "sudo repquota -a", (err, stdout) ->
       logger.error err if err
-      lines = _.filter stdout.split('\n')[5...-1], (i) -> i
+      lines = _.filter stdout.split('\n')[5 ... -1], (i) -> i
 
       lines = _.map lines, (line) ->
-        fields = _.filter line.split(' '), (i) -> i and i != ' '
-        [username, __, size_used, size_soft, size_hard, inode_used, inode_soft, inode_hard, inode_grace] = fields
+        [username, __, size_used, size_soft, size_hard, inode_used, inode_soft, inode_hard, inode_grace] = line.split /\s+/
 
         if /days/.test inode_used
           [size_grace, inode_used, inode_soft, inode_hard, inode_grace] = [inode_used, inode_soft, inode_hard, inode_grace]
 
         return {
           username: username
-          size_used: parseFloat (parseInt(size_used) / 1024 / 1024).toFixed(1)
+          size_used: parseFloat (parseInt(size_used) / 1024).toFixed(1)
           inode_used: parseInt inode_used
         }
 
@@ -237,12 +236,15 @@ exports.getResourceUsageByAccounts = (callback) ->
       logger.error err if err
       resources_usage_by_accounts = []
 
-      for username, usage of monitor.resources_usage
+      for username in _.union _.keys(monitor.resources_usage), _.keys(result.storage_quota)
+        usage = monitor.resources_usage[username]
+        storage = result.storage_quota[username]
+
         resources_usage_by_accounts.push
           username: username
-          cpu: usage.cpu ? 0
-          memory: usage.memory ? 0
-          storage: result.storage_quota[username]?.size_used ? 0
+          cpu: usage?.cpu ? 0
+          memory: usage?.memory ? 0
+          storage: storage?.size_used ? 0
           process: _.filter(result.process_list, (i) -> i.user == username).length
 
       SETEX resources_usage_by_accounts, 20

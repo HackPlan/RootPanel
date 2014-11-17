@@ -14,10 +14,10 @@
     table(style= 'table-layout: fixed;').table.table-hover
       thead
         tr
-          td(style= 'width: 250px;')= t('process')
-          td= t('memory')
-          td= t('cpu')
-          td= t('common.actions')
+          th(style= 'width: 240px;')= t('process')
+          th= t('memory')
+          th= t('cpu')
+          th= t('common.actions')
       tbody
         for process in process_list
           tr(data-id= '#{process.pid}')
