@@ -1,3 +1,4 @@
+{_, fs} = app.libs
 {pluggable, config, utils} = app
 
 exports = module.exports = class ShadowSocksPlugin extends pluggable.Plugin
@@ -8,7 +9,8 @@ exports = module.exports = class ShadowSocksPlugin extends pluggable.Plugin
 shadowsocks = require './shadowsocks'
 
 exports.registerHook 'plugin.wiki.pages',
-  t_category: 'shadowsocks'
+  always_notice: true
+  t_category: 'plugins.shadowsocks.'
   t_title: 'README.md'
   language: 'zh_CN'
   content_markdown: fs.readFileSync("#{__dirname}/wiki/README.md").toString()
@@ -19,15 +21,13 @@ exports.registerHook 'view.panel.scripts',
 exports.registerHook 'view.panel.styles',
   path: '/plugin/shadowsocks/style/panel.css'
 
-if config.plugins.shadowsocks.green_style
-  exports.registerHook 'view.layout.styles',
-    path: '/plugin/shadowsocks/style/layout.css'
-
 exports.registerHook 'view.panel.widgets',
   generator: (req, callback) ->
+    price_gb = config.plugins.shadowsocks.price_bucket * (1000 * 1000 * 1000 / config.plugins.shadowsocks.billing_bucket)
+
     shadowsocks.accountUsage req.account, (result) ->
       _.extend result,
-        transfer_remainder: account.billing.balance / config.plugins.shadowsocks.price_bucket / (1000 * 1000 * 1000 / config.plugins.shadowsocks.billing_bucket)
+        transfer_remainder: req.account.billing.balance / price_gb
 
       exports.render 'widget', req, result, callback
 

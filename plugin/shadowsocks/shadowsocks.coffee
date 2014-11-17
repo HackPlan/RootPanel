@@ -1,5 +1,5 @@
 {_, child_process, async, fs} = app.libs
-{logger, utils} = app
+{logger, utils, config} = app
 {Account, Financials} = app.models
 
 supervisor = require '../supervisor/supervisor'
@@ -113,7 +113,7 @@ exports.initAccount = (account, callback) ->
             callback()
 
 exports.deleteAccount = (account, callback) ->
-  queryIptablesInfo (iptables_info) ->
+  exports.queryIptablesInfo (iptables_info) ->
     {port, method} = account.pluggable.shadowsocks
 
     billing_traffic = iptables_info[port].bytes - account.pluggable.shadowsocks.last_traffic_value
@@ -198,10 +198,10 @@ exports.updateConfigure = (account, callback) ->
         shadowsocks_config_file = "/etc/shadowsocks/#{method}.json"
 
         fs.readFile shadowsocks_config_file, (err, content) ->
-          config = JSON.parse content
-          config.port_password[port] = password
+          configure = JSON.parse content
+          configure.port_password[port] = password
 
-          ShadowsocksPlugin.writeConfigFile  shadowsocks_config_file, JSON.stringify(config), {mode: 0o755}, ->
+          ShadowsocksPlugin.writeConfigFile  shadowsocks_config_file, JSON.stringify(configure), {mode: 0o755}, ->
             callback()
 
       (callback) ->
@@ -227,14 +227,14 @@ exports.deleteAccountConfigure = (account, callback) ->
   shadowsocks_config_file = "/etc/shadowsocks/#{method}.json"
 
   fs.readFile shadowsocks_config_file, (err, content) ->
-    config = JSON.parse content
-    delete config.port_password[port]
+    configure = JSON.parse content
+    delete configure.port_password[port]
 
-    fs.writeFile shadowsocks_config_file, JSON.stringify(config), ->
+    fs.writeFile shadowsocks_config_file, JSON.stringify(configure), ->
       callback()
 
 exports.monitoring = ->
-  queryIptablesInfo (iptables_info) ->
+  exports.queryIptablesInfo (iptables_info) ->
     async.each _.values(iptables_info), (item, callback) ->
       {port, bytes} = item
 

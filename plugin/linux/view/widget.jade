@@ -25,7 +25,3 @@ mixin displayProgressBar(now, limit, unit)
         td= t('widget.storage')
         td
           mixin displayProgressBar(usage.storage, limit.storage, 'M')
-      tr
-        td= t('widget.month_transfer')
-        td
-          mixin displayProgressBar(0, limit.transfer, 'G')

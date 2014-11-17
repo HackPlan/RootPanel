@@ -11,6 +11,10 @@
     "all": {
       "name": "All Service (Default)",
       "description": "Storage 520MB, Memory: 27MB, Traffic of month: 37GB"
+    },
+    "shadowsocks": {
+      "name": "ShadowSocks",
+      "description": "Billing by usage, 0.6 CNY / G"
     }
   }
 }

@@ -32,6 +32,9 @@ exports.registerServiceHook 'disable',
   filter: (req, callback) ->
     supervisor.removePrograms req.account, ->
       supervisor.updateProgram req.account, null, ->
-        callback()
+        req.account.update
+          $unset:
+            'pluggable.supervisor': true
+        , callback
 
 app.express.use '/plugin/supervisor', require './router'

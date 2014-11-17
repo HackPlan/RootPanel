@@ -16,6 +16,10 @@ exports.registerHook 'view.layout.menu_bar',
   target: '_blank'
   t_body: 'plugins.rpvhost.official_blog'
 
+if config.plugins.rpvhost.green_style
+  exports.registerHook 'view.layout.styles',
+    path: '/plugin/rpvhost/style/green.css'
+
 exports.registerHook 'billing.payment_methods',
   widget_generator: (req, callback) ->
     exports.render 'payment_method', req, {}, callback

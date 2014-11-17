@@ -11,7 +11,6 @@ linux = require './linux'
 monitor = require './monitor'
 
 exports.registerHook 'view.layout.menu_bar',
-  always_notice: true
   href: '/public/monitor/'
   t_body: 'plugins.linux.server_monitor'
 

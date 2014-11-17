@@ -1,32 +1,33 @@
-header= t('')
-.col-md-6
-  .panel.panel-default
-    .panel-heading
-      h3.panel-title= t('remote_access')
-    .panel-body
-      .input-group
-        span.input-group-addon= t('remote_port')
-        p.form-control-static= account.pluggable.shadowsocks.port
-      .input-group
-        span.input-group-addon= t('account.password')
-        p.form-control-static= account.pluggable.shadowsocks.password
-        span.input-group-btn
-          button.btn.btn-default.action-reset-password(type='button')= t('reset')
+.row.widget-shadowsocks
+  header= t('')
+  .col-md-6
+    .panel.panel-default
+      .panel-heading
+        h3.panel-title= t('remote_access')
+      .panel-body
+        .input-group
+          span.input-group-addon= t('remote_port')
+          input.form-control(type='text', value=account.pluggable.shadowsocks.port, disabled)
+        .input-group
+          span.input-group-addon= t('account.password')
+          input.form-control(type='text', value=account.pluggable.shadowsocks.password, disabled)
+          span.input-group-btn
+            button.btn.btn-default.action-reset-password(type='button')= t('reset')
 
-.col-md-6
-  .panel.panel-default
-    .panel-heading
-      h3.panel-title= t('transfer')
-    .panel-body
-      p= t('transfer_remainder', {traffic: transfer_remainder.toFixed(1)})
-    table.table.table-hover
-      tbody
-        tr
-          td #{(traffic_24hours / 1000).toFixed(1)}G
-          td= t('24hours_ago')
-        tr
-          td #{(traffic_7days / 1000).toFixed(1)}G
-          td= t('7days_ago')
-        tr
-          td #{(traffic_30days / 1000).toFixed(1)}G
-          td= t('30days_ago')
+  .col-md-6
+    .panel.panel-default
+      .panel-heading
+        h3.panel-title= t('transfer')
+      .panel-body
+        p= t('transfer_remainder', {traffic: transfer_remainder.toFixed(1)})
+      table.table.table-hover
+        tbody
+          tr
+            td #{(traffic_24hours / 1000).toFixed(1)}G
+            td= t('24hours_ago')
+          tr
+            td #{(traffic_7days / 1000).toFixed(1)}G
+            td= t('7days_ago')
+          tr
+            td #{(traffic_30days / 1000).toFixed(1)}G
+            td= t('30days_ago')
