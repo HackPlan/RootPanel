@@ -16,22 +16,27 @@ exports.initSupervisor = (callback) ->
       if program_name in _.pluck program_status, 'name'
         return callback()
 
-      configure = exports.generateConfigure [],
-        method: method
+      exports.writeSupervisorConfigure method, ->
+        supervisor.updateProgram {}, {program_name: program_name}, ->
+          callback()
 
-      filename = "/etc/shadowsocks/#{method}.json"
-      ShadowsocksPlugin.writeConfigFile filename, configure, {mode: 0o755}, ->
-        supervisor.writeConfig {username: 'nobody'},
-          program_name: program_name
-          command: "ssserver -c #{filename}"
-          name: program_name
-          autostart: true
-          autorestart: true
-          stdout_logfile: false
-        , ->
-          supervisor.updateProgram {}, {program_name: program_name}, ->
-            callback()
+    , callback
 
+exports.writeSupervisorConfigure = (method, callback) ->
+  program_name = "shadowsocks-#{method}"
+
+  configure = exports.generateConfigure [],
+    method: method
+
+  filename = "/etc/shadowsocks/#{method}.json"
+  ShadowsocksPlugin.writeConfigFile filename, configure, {mode: 0o755}, ->
+    supervisor.writeConfig {username: 'nobody'},
+      program_name: program_name
+      command: "ssserver -c #{filename}"
+      name: program_name
+      autostart: true
+      autorestart: true
+      stdout_logfile: false
     , ->
       callback()
 

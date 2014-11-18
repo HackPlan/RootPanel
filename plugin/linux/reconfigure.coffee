@@ -1,5 +1,6 @@
 {async, fs, child_process, _} = app.libs
 {Account} = app.models
+{utils} = app
 
 linux = require './linux'
 
@@ -32,14 +33,9 @@ module.exports = (callback) ->
             return callback
 
           console.log "removed /home/#{user}"
+          backup_filename = "#{__dirname}/../.backup/linux/#{user}-#{utils.randomString(5)}"
+          child_process.exec "sudo mv /home/#{user} #{backup_filename}", callback
 
-          async.series [
-            (callback) ->
-              child_process.exec "sudo mv /home/#{user} #{__dirname}/../.backup/linux/#{user}-#{utils.randomString(5)}", callback
-
-            (callback) ->
-              child_process.exec "sudo rm -r #{user}", callback
-          ], callback
         , callback
 
   ], (err) ->
