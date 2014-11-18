@@ -4,7 +4,8 @@
 
 supervisor = require './supervisor'
 
-fs.mkdirSync "#{__dirname}/../.backup/supervisor", 0o750
+unless fs.existsSync "#{__dirname}/../../.backup/supervisor"
+  fs.mkdirSync "#{__dirname}/../../.backup/supervisor", 0o750
 
 module.exports = (callback) ->
   async.series [
@@ -36,7 +37,7 @@ module.exports = (callback) ->
             return callback()
           else
             console.log "removed /etc/supervisor/conf.d/#{filename}"
-            backup_filename = "#{__dirname}/../.backup/supervisor/#{filename}-#{utils.randomString(5)}"
+            backup_filename = "#{__dirname}/../../.backup/supervisor/#{filename}-#{utils.randomString(5)}"
             child_process.exec "sudo mv /etc/supervisor/conf.d/#{filename} #{backup_filename}", callback
 
       , callback

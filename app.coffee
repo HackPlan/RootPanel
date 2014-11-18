@@ -37,7 +37,7 @@ app.libs =
   Mixed: (require 'mongoose').Schema.Types.Mixed
 
 {cookieParser, copy, crypto, bodyParser, depd, express, fs, harp, middlewareInjector, mongoose} = exports.libs
-{morgan, nodemailer, path, redis} = exports.libs
+{morgan, nodemailer, path, redis, _} = exports.libs
 
 app.logger = do ->
   unless process.env.NODE_ENV == 'test'
