@@ -1,20 +1,11 @@
 describe 'app', ->
   it 'should can startup', ->
     @timeout 20000
-    require '../../app'
+    require('../../app').start()
 
   it 'should connected to mongodb', (done) ->
     async.forever (callback) ->
       if app.db.readyState == 1
-        callback true
-      else
-        setImmediate callback
-    , ->
-      done()
-
-  it 'express should be started', (done) ->
-    async.forever (callback) ->
-      if app.started
         callback true
       else
         setImmediate callback

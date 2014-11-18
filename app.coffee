@@ -132,7 +132,7 @@ app.express.get '/', (req, res) ->
 
 app.express.use harp.mount './core/static'
 
-unless module.parent
+exports.start = _.once ->
   app.express.listen config.web.listen, ->
     app.started = true
 
@@ -143,3 +143,6 @@ unless module.parent
       hook.action()
 
     app.logger.log "RootPanel start at #{config.web.listen}"
+
+unless module.parent
+  exports.start()
