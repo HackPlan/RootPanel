@@ -20,7 +20,7 @@ module.exports = (db, callback) ->
       async.forever (callback) ->
         cAccount.findOne
           signup_at:
-            $exist: true
+            $exists: true
         , (err, account) ->
           throw err if err
 
@@ -37,8 +37,8 @@ module.exports = (db, callback) ->
             account.attribute.plugin.shadowsocks.method = 'aes-256-cfb'
 
           account.attribute.plugin.bitcoin =
-            bitcoin_deposit_address: account.attribure.bitcoin_deposit_address
-            bitcoin_secret: account.attribure.bitcoin_secret
+            bitcoin_deposit_address: account.attribute.bitcoin_deposit_address
+            bitcoin_secret: account.attribute.bitcoin_secret
 
           for token in account.tokens
             token.type = 'full_access'
@@ -58,7 +58,7 @@ module.exports = (db, callback) ->
               preferences: account.setting
               pluggable: account.attribute.plugin
               resources_limit: account.attribute.resources_limit
-              tokens: tokens
+              tokens: account.tokens
               billing:
                 services: account.attribute.services
                 plans: account.attribute.plans
@@ -67,16 +67,18 @@ module.exports = (db, callback) ->
                 last_billing_at: last_billing_at
 
             $unset:
+              attribute: true
               setting: true
               signup_at: true
               group: true
 
           , (err) ->
             throw err if err
-            console.log "[accounts] updated #{account._id}(#{account.username})"
+            console.log "[accounts] updated #{account.username} (#{account._id})"
             callback()
 
-      , callback
+      , ->
+        callback()
 
     (callback) ->
       console.log '[financials] beginning'
@@ -99,7 +101,7 @@ module.exports = (db, callback) ->
             payload: balance_log.attribute
           , (err) ->
             throw err if err
-            console.log "[financials] created #{balance_log._id}}"
+            console.log "[financials] created #{balance_log._id}"
             callback()
 
       , ->
@@ -124,7 +126,7 @@ module.exports = (db, callback) ->
             apply_log: coupon.log
           , (err) ->
             throw err if err
-            console.log "[couponcodes] created #{coupon._id}}"
+            console.log "[couponcodes] created #{coupon._id}"
             callback()
 
       , ->
@@ -143,6 +145,21 @@ module.exports = (db, callback) ->
           if security_log.type == 'update_setting'
             security_log.type = 'update_preferences'
 
+            security_log.payload =
+              original_preferences: {}
+              preferences: {}
+
+            security_log.payload.original_preferences[security_log.attribute.name] = security_log.attribute.old_value
+            security_log.payload.preferences[security_log.attribute.name] = security_log.attribute.value
+
+          else if security_log.type == 'update_email'
+            security_log.payload =
+              original_email: security_log.attribute.old_email
+              email: security_log.attribute.email
+
+          else
+            security_log.payload = _.omit security_log.attribute, 'token'
+
           token = security_log.attribute.token
           token.type ?= 'full_access'
           token.payload = token.attribute
@@ -153,10 +170,10 @@ module.exports = (db, callback) ->
             type: security_log.type
             created_at: security_log.created_at
             token: token
-            payload: _.omit security_log.attribute, 'token'
+            payload: security_log.payload
           , (err) ->
             throw err if err
-            console.log "[securitylogs] created #{security_log._id}}"
+            console.log "[securitylogs] created #{security_log._id}"
             callback()
 
       , ->
@@ -168,7 +185,7 @@ module.exports = (db, callback) ->
       async.forever (callback) ->
         cTicket.findOne
           replys:
-            $exist: true
+            $exists: true
         , (err, ticket) ->
           throw err if err
 
@@ -193,6 +210,7 @@ module.exports = (db, callback) ->
             console.log "[tickets] updated #{ticket._id}"
             callback()
 
-      , callback
+      , ->
+        callback()
 
   ], callback
