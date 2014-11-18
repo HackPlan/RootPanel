@@ -63,13 +63,16 @@ exports.registerHook 'app.started',
     shadowsocks.initSupervisor ->
 
 exports.registerServiceHook 'enable',
-  filter: (req, callback) ->
-    shadowsocks.initAccount req.account, callback
+  filter: (account, callback) ->
+    shadowsocks.initAccount account, callback
 
 exports.registerServiceHook 'disable',
-  filter: (req, callback) ->
-    shadowsocks.deleteAccount req.account, callback
+  filter: (account, callback) ->
+    shadowsocks.deleteAccount account, callback
 
 app.express.use '/plugin/shadowsocks', require './router'
 
-setInterval shadowsocks.monitoring, config.plugins.shadowsocks.monitor_cycle
+if config.plugins.shadowsocks.monitor_cycle
+  exports.registerHook 'app.started',
+    action: ->
+      setInterval shadowsocks.monitoring, config.plugins.shadowsocks.monitor_cycle

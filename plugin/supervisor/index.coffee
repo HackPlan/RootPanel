@@ -22,17 +22,17 @@ exports.registerHook 'view.panel.widgets',
       , callback
 
 exports.registerServiceHook 'enable',
-  filter: (req, callback) ->
-    req.account.update
+  filter: (account, callback) ->
+    account.update
       $set:
         'pluggable.supervisor.programs': []
     , callback
 
 exports.registerServiceHook 'disable',
-  filter: (req, callback) ->
-    supervisor.removePrograms req.account, ->
-      supervisor.updateProgram req.account, null, ->
-        req.account.update
+  filter: (account, callback) ->
+    supervisor.removePrograms account, ->
+      supervisor.updateProgram account, null, ->
+        account.update
           $unset:
             'pluggable.supervisor': true
         , callback

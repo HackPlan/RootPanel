@@ -45,13 +45,18 @@ exports.registerHook 'account.resources_limit_changed',
     linux.setResourceLimit account, callback
 
 exports.registerServiceHook 'enable',
-  filter: (req, callback) ->
-    linux.deleteUser req.account, ->
-      linux.createUser req.account, callback
+  filter: (account, callback) ->
+    linux.deleteUser account, ->
+      linux.createUser account, callback
 
 exports.registerServiceHook 'disable',
-  filter: (req, callback) ->
-    linux.deleteUser req.account, callback
+  filter: (account, callback) ->
+    linux.deleteUser account, callback
+
+if config.plugins.linux.monitor_cycle
+  exports.registerHook 'app.started',
+    action: ->
+      monitor.run()
 
 app.express.get '/public/monitor', requireAuthenticate, (req, res) ->
   async.parallel
@@ -67,6 +72,3 @@ app.express.get '/public/monitor', requireAuthenticate, (req, res) ->
     logger.error err if err
     exports.render 'monitor', req, result, (html) ->
       res.send html
-
-if config.plugins.linux.monitor_cycle
-  monitor.run()

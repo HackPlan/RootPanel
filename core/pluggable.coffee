@@ -64,9 +64,9 @@ exports.hooks =
 
   service:
     'service_name':
-      # filter: function(req, callback)
+      # filter: function(account, callback)
       enable: []
-      # filter: function(req, callback)
+      # filter: function(account, callback)
       disable: []
 
   plugin:

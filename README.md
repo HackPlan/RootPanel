@@ -29,25 +29,25 @@ RootPanel 具有良好的设计，高度的可定制性，支持多语言和多�
 
 ## 从旧版本升级
 
-停止 RootPanel:
-
+    # 停止 RootPanel
     supervisorctl stop RootPanel
 
-更新源代码：
+    # 备份数据库
+    mongodump --db RootPanel --out .backup/db -u rpadmin -p
 
+    # 更新源代码
     git pull
 
 根据 `/migration/system` 中新增的说明文件，执行相应命令来修改系统设置，如果跨越多个版本需要依次执行。
-检查更新日志和 `/sample` 中的默认配置文件，视情况修改配置文件(`config.coffee`), 若修改了配置文件，需要运行以下命令来应用变更。
+检查更新日志和 `/sample` 中的默认配置文件，视情况修改配置文件(`config.coffee`).
 
-    npm run reconfigure
-
-使用 `mongodbdump` 来备份数据库，然后升级数据库：
-
+    # 升级数据库
     npm run migrate
 
-启动 RootPanel:
+    # 应用新的设置
+    npm run reconfigure
 
+    # 启动 RootPanel
     supervisorctl start RootPanel
 
 ## 技术构成

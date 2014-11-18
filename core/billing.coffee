@@ -119,7 +119,7 @@ exports.joinPlan = (req, account, plan_name, callback) ->
 
     async.each _.difference(account.billing.services, original_account.billing.services), (service_name, callback) ->
       async.each pluggable.selectHook(account, "service.#{service_name}.enable"), (hook, callback) ->
-        hook.filter req, callback
+        hook.filter account, callback
       , callback
     , ->
       unless _.isEqual original_account.resources_limit, account.resources_limit
@@ -155,7 +155,7 @@ exports.leavePlan = (req, account, plan_name, callback) ->
 
     async.each leaved_services, (service_name, callback) ->
       async.each pluggable.selectHook(original_account, "service.#{service_name}.disable"), (hook, callback) ->
-        hook.filter req, callback
+        hook.filter account, callback
       , callback
     , ->
       unless _.isEqual original_account.resources_limit, account.resources_limit

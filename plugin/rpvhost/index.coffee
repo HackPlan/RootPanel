@@ -16,10 +16,6 @@ exports.registerHook 'view.layout.menu_bar',
   target: '_blank'
   t_body: 'plugins.rpvhost.official_blog'
 
-if config.plugins.rpvhost.green_style
-  exports.registerHook 'view.layout.styles',
-    path: '/plugin/rpvhost/style/green.css'
-
 exports.registerHook 'billing.payment_methods',
   widget_generator: (req, callback) ->
     exports.render 'payment_method', req, {}, callback
@@ -29,6 +25,10 @@ exports.registerHook 'view.pay.display_payment_details',
   filter: (req, deposit_log, callback) ->
     callback exports.t(req) 'view.payment_details',
       order_id: deposit_log.payload.order_id
+
+if config.plugins.rpvhost.green_style
+  exports.registerHook 'view.layout.styles',
+    path: '/plugin/rpvhost/style/green.css'
 
 unless config.plugins.rpvhost.index_page == false
   app.express.get '/', (req, res) ->
