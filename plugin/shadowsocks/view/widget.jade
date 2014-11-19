@@ -17,7 +17,10 @@
           span.input-group-addon= t('method')
           select.input-method.form-control(style='-webkit-appearance: none;')
             for method in config.plugins.shadowsocks.available_ciphers
-              option= method
+              if account.pluggable.shadowsocks.method == method
+                option(selected='selected')= method
+              else
+                option= method
           span.input-group-btn
             button.btn.btn-default.action-switch-method(type='button')= t('common.change')
 

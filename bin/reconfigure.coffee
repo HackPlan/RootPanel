@@ -58,6 +58,7 @@ Account.find
     available_plugins = _.union config.plugin.available_extensions, config.plugin.available_services
 
     async.eachSeries available_plugins, (plugin_name, callback) ->
+      console.log "Running reconfigure for #{plugin_name}..."
       filename = "#{__dirname}/../plugin/#{plugin_name}/reconfigure.coffee"
 
       unless fs.existsSync filename

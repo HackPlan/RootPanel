@@ -6,7 +6,7 @@ supervisor = require '../supervisor/supervisor'
 
 ShadowsocksPlugin = require './index'
 
-BILLING_BUCKET = config.plugins.shadowsocks.billing_bucket
+BILLING_BUCKET = config.plugins.shadowsocks?.billing_bucket ? 100 * 1024 * 1024
 
 exports.initSupervisor = (callback) ->
   supervisor.programsStatus (program_status) ->

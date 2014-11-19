@@ -3,6 +3,8 @@ RootPanel 是一个 PaaS 开发框架，提供了用户系统、计费和订单�
 
 RootPanel 具有良好的设计，高度的可定制性，支持多语言和多时区，以及非常高的单元测试覆盖率。
 
+RootPanel 的文档位于 [Github Wiki](https://github.com/jysperm/RootPanel/wiki).
+
 ## 安装
 
 稳定版本
@@ -17,7 +19,7 @@ RootPanel 具有良好的设计，高度的可定制性，支持多语言和多�
 
 试运行和开发推荐使用 [Vagrant box](https://vagrantcloud.com/jysperm/boxes/rootpanel)
 
-详细安装说明：[INSTALL.md](https://github.com/jysperm/RootPanel/blob/master/INSTALL.md)
+详细安装步骤：[INSTALL.md](https://github.com/jysperm/RootPanel/blob/master/INSTALL.md)
 
 ## 配置文件示例
 

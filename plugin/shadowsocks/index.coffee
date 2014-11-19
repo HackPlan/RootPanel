@@ -72,7 +72,7 @@ exports.registerServiceHook 'disable',
 
 app.express.use '/plugin/shadowsocks', require './router'
 
-if config.plugins.shadowsocks.monitor_cycle
+if config.plugins.shadowsocks?.monitor_cycle
   exports.registerHook 'app.started',
     action: ->
       setInterval shadowsocks.monitoring, config.plugins.shadowsocks.monitor_cycle

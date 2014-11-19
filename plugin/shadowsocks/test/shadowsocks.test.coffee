@@ -41,6 +41,7 @@
             done err
 
     it 'POST join_plan', (done) ->
+      @timeout 10000
       agent.post '/billing/join_plan'
       .send
         csrf_token: csrf_token
