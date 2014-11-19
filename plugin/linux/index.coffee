@@ -1,18 +1,76 @@
-service = require './service'
+{async, _} = app.libs
+{pluggable, config} = app
+{requireAuthenticate} = app.middleware
+{wrapAsync} = app.utils
+
+exports = module.exports = class LinuxPlugin extends pluggable.Plugin
+  @NAME: 'linux'
+  @type: 'service'
+
+linux = require './linux'
 monitor = require './monitor'
 
-app.view_hook.menu_bar.push
+exports.registerHook 'view.layout.menu_bar',
   href: '/public/monitor/'
-  html: '服务器状态'
+  t_body: 'plugins.linux.server_monitor'
 
-module.exports =
-  name: 'linux'
-  type: 'service'
+exports.registerHook 'account.username_filter',
+  filter: (username, callback) ->
+    linux.getPasswdMap (passwd_map) ->
+      linux.getGroup (group_map) ->
+        if username in _.values passwd_map
+          callback false
+        else if username in _.values group_map
+          callback false
+        else
+          callback true
 
-  service: service
+exports.registerHook 'view.panel.styles',
+  path: '/plugin/linux/style/panel.css'
 
-  panel:
-    widget: service.widget
-    style:'/style/panel.css'
+exports.registerHook 'view.panel.widgets',
+  generator: (req, callback) ->
+    linux.getResourceUsageByAccount req.account, (resources_usage) ->
+      resources_usage ?=
+        username: req.account.username
+        cpu: 0
+        memory: 0
+        storage: 0
+        process: 0
 
-monitor.run()
+      exports.render 'widget', req,
+        usage: resources_usage
+      , callback
+
+exports.registerHook 'account.resources_limit_changed',
+  always_notice: true
+  filter: (account, callback) ->
+    linux.setResourceLimit account, callback
+
+exports.registerServiceHook 'enable',
+  filter: (account, callback) ->
+    linux.createUser account, callback
+
+exports.registerServiceHook 'disable',
+  filter: (account, callback) ->
+    linux.deleteUser account, callback
+
+if config.plugins.linux.monitor_cycle
+  exports.registerHook 'app.started',
+    action: ->
+      monitor.run()
+
+app.express.get '/public/monitor', requireAuthenticate, (req, res) ->
+  async.parallel
+    resources_usage: (callback) ->
+      linux.getResourceUsageByAccounts (result) ->
+        callback null, result
+    system: wrapAsync linux.getSystemInfo
+    storage: wrapAsync linux.getStorageInfo
+    process_list: wrapAsync linux.getProcessList
+    memory: wrapAsync linux.getMemoryInfo
+
+  , (err, result) ->
+    logger.error err if err
+    exports.render 'monitor', req, result, (html) ->
+      res.send html

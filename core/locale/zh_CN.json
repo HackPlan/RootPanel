@@ -1,25 +1,61 @@
 {
   "app": {
     "name": "RootPanel",
-    "description": "一个插件化的 Linux 虚拟主机管理系统。"
+    "description": "插件化 PaaS 服务开发框架"
   },
   "plans": {
-    "all": {
-      "name": "所有服务(默认)",
-      "description": "该套餐包含所有的服务"
+    "sample": {
+      "name": "示例",
+      "description": "每月 10 元，按小时计费"
+    },
+    "test": {
+      "name": "测试",
+      "description": "按使用量付费"
     }
   },
   "common": {
-    "error": "错误"
+    "error": "错误",
+    "success": "成功",
+    "save": "保存",
+    "apply": "使用",
+    "change": "修改",
+    "charge": "充值",
+    "enable": "启用",
+    "disable": "禁用",
+    "time": "时间",
+    "amount": "金额",
+    "actions": "操作",
+    "details": "详情",
+    "type": "类型",
+    "generate": "生成",
+    "id": "ID",
+    "close": "关闭",
+    "create": "创建",
+    "submit": "提交"
+  },
+  "languages": {
+    "zh_CN": "简体中文",
+    "en": "English",
+    "auto": "自动"
+  },
+  "error_code": {
+    "username_exist": "用户名已存在",
+    "email_exist": "邮箱已存在",
+    "invalid_username": "用户名不符合要求",
+    "invalid_password": "密码不符合要求",
+    "invalid_email": "邮箱不符合要求",
+    "insufficient_balance": "余额不足"
   },
   "account": {
     "": "帐号",
-    "signup": "注册",
+    "register": "注册",
     "login": "登录",
     "username": "用户名",
     "email": "邮箱",
     "password": "密码",
-    "logout": "注销"
+    "logout": "注销",
+    "preferences": "首选项",
+    "financials": "财务"
   },
   "panel": {
     "": "管理面板",
@@ -41,14 +77,20 @@
     "creator": "创建者",
     "members": "成员"
   },
+  "ticket_status": {
+    "closed": "已关闭",
+    "open": "开放的",
+    "pending": "等待处理",
+    "finish": "已完成",
+    "related": "与我相关"
+  },
   "plan": {
-    "": "套餐",
-    "subscribe": "订购",
-    "unsubscribe": "退订",
+    "": "付费方案",
+    "join": "订购方案",
+    "leave": "退订方案",
     "balance": "余额",
-    "remaining_time": "剩余时长",
     "currency": {
-      "cny": "CNY"
+      "CNY": "CNY"
     }
   },
   "admin": {
@@ -57,17 +99,54 @@
   "time": {
     "day": "天"
   },
+  "notification_title": {
+    "ticket": "__title__ | 工单"
+  },
   "view": {
     "layout": {
       "navigation": "展开导航"
     },
     "account": {
       "password2": "重复",
-      "already_signup": "已有帐号？",
-      "no_account": "还没有账户？"
+      "already_register": "已有帐号？",
+      "no_account": "还没有账户？",
+      "password_inconsistent": "两次输入的密码不一致"
+    },
+    "preferences": {
+      "options": "信息和偏好",
+      "qq": "QQ",
+      "coupon_code": "兑换代码",
+      "code": "代码",
+      "update_password": "修改密码",
+      "original_password": "原密码",
+      "new_password": "新密码",
+      "repeat_password": "重复密码",
+      "update_email": "修改邮箱",
+      "current_email": "当前邮箱",
+      "new_email": "新邮箱"
+    },
+    "financials": {
+      "payment_log": "充值记录",
+      "pay_method": "方式",
+      "billing_log": "扣费记录"
+    },
+    "admin": {
+      "account_list": "用户列表",
+      "coupon_code": "兑换代码",
+      "confirm_payment": "确认充值",
+      "delete_account": "删除账户",
+      "expired": "过期时间",
+      "empty_expired_tips": "留空表示无限制",
+      "available_times": "可用次数",
+      "count": "数量",
+      "meta": "参数",
+      "order_id": "订单号"
     }
   },
-  "plugins": {
-
-  }
+  "coupons": {
+    "amount": {
+      "message": "代金券：__amount__ __currency__"
+    }
+  },
+  "plugins": {}
 }

@@ -1,0 +1,10 @@
+{
+  "": "SSH",
+  "process": "Process",
+  "memory": "Mem",
+  "cpu": "CPU",
+  "kill": "Kill",
+  "view": {
+    "update_password": "Update SSH password"
+  }
+}

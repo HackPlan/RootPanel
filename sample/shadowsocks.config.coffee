@@ -1,38 +1,38 @@
 module.exports =
   web:
-    name: 'GreenShadow'
+    t_name: 'plugins.rpvhost.greenshadow'
     url: 'http://greenshadow.net'
     listen: '/home/rpadmin/rootpanel.sock'
-    google_analytics_id: 'UA-49193300-3'
+    repo: 'jysperm/RootPanel'
+    google_analytics_id: ''
 
   account:
     cookie_time: 30 * 24 * 3600 * 1000
 
   i18n:
-    defaultLanguage: 'zh_CN'
-    availableLanguage: ['zh_CN']
+    available_language: ['zh_CN', 'en']
+    default_language: 'zh_CN'
+    default_timezone: 'Asia/Shanghai'
 
   plugin:
-    available_extensions: ['rpvhost']
-    available_services: ['shadowsocks']
+    available_extensions: ['bitcoin', 'wiki', 'rpvhost']
+    available_services: ['linux', 'supervisor', 'shadowsocks']
 
   billing:
-    taobao_item_id: '40711140727'
+    currency: 'CNY'
 
-    force_unsubscribe:
+    force_freeze:
       when_balance_below: 0
       when_arrears_above: 0
 
-    cyclical_billing: 3600 * 1000
-    daily_billing_cycle: 24 * 3600 * 1000
+    billing_cycle: 10 * 60 * 1000
 
   plans:
     shadowsocks:
-      t_name: 'ShadowSocks'
-      t_service: '按量付费'
-      t_resources: '0.6 CNY / G'
+      t_name: 'plugins.rpvhost.plans.shadowsocks.name'
+      t_description: 'plugins.rpvhost.plans.shadowsocks.description'
+
       services: ['shadowsocks']
-      resources: {}
 
   mongodb:
     user: 'rpadmin'
@@ -40,7 +40,11 @@ module.exports =
     host: 'localhost'
     name: 'RootPanel'
 
-  redis_password: 'password'
+  redis:
+    host: '127.0.0.1'
+    port: 6379
+    password: 'password'
+    prefix: 'RP'
 
   email:
     send_from: 'robot@rpvhost.net'
@@ -51,14 +55,24 @@ module.exports =
         user: 'postmark-api-token'
         pass: 'postmark-api-token'
 
-  bitcoin:
-    coinbase_api_key: 'coinbase-simple-api-key'
-
   plugins:
+    linux:
+      monitor_cycle: null
+
+    bitcoin:
+      coinbase_api_key: 'coinbase-simple-api-key'
+
+    wiki:
+      disable_default_wiki: true
+
     rpvhost:
       index_page: false
+      green_style: true
+      taobao_item_id: '41040606505'
 
     shadowsocks:
+      available_ciphers: ['aes-256-cfb', 'rc4-md5']
+
+      billing_bucket: 100 * 1000 * 1000
+      monitor_cycle: 5 * 60 * 1000
       price_bucket: 0.06
-      monitor_cycle: 60 * 1000
-      billing_bucket: 100 * 1024 * 1024

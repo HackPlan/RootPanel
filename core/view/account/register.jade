@@ -1,0 +1,35 @@
+extends ../layout
+
+prepend header
+  title #{t('account.register')} | #{t(config.web.t_name)}
+
+block main
+  header= t('account.register')
+  form.form-horizontal.signup-form
+    .form-group
+      label.col-sm-2.col-md-offset-1.control-label= t('account.username')
+      .col-sm-5
+        input.input-username.form-control(type='text')
+    .form-group
+      label.col-sm-2.col-md-offset-1.control-label= t('account.email')
+      .col-sm-5
+        input.input-email.form-control(type='email')
+    .form-group
+      label.col-sm-2.col-md-offset-1.control-label= t('account.password')
+      .col-sm-5
+        input.input-password.form-control(type='password')
+    .form-group
+      label.col-sm-2.col-md-offset-1.control-label= t('view.account.password2')
+      .col-sm-5
+        input.input-password2.form-control(type='password')
+    .form-group
+      .col-sm-offset-3
+        button.action-register.btn.btn-lg.btn-primary(type='button')= t('account.register')
+
+prepend sidebar
+  .row
+    header= t('view.account.already_register')
+    a.btn.btn-lg.btn-success(href='/account/login/')= t('account.login')
+
+append footer
+  script(src='/script/account/register.js')

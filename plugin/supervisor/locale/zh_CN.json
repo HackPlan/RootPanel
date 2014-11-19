@@ -1,0 +1,17 @@
+{
+  "": "Supervisor",
+  "common": {
+    "name": "名称",
+    "command": "启动命令",
+    "options": "选项",
+    "status": "状态",
+    "directory": "启动目录",
+    "autostart": "随系统启动",
+    "autorestart": "自动重启"
+  },
+  "autorestart": {
+    "true": "总是重启",
+    "false": "不自动重启",
+    "unexpected": "错误时重启"
+  }
+}

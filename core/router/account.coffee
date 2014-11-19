@@ -1,158 +1,132 @@
-config = require '../../config'
-utils = require './utils'
-{renderAccount, errorHandling, requireAuthenticate} = require './middleware'
-
-mAccount = require '../model/account'
-mSecurityLog = require '../model/security_log'
-mCouponCode = require '../model/coupon_code'
+{_, async, express} = app.libs
+{requireAuthenticate} = app.middleware
+{Account, SecurityLog} = app.models
+{config, utils, logger} = app
 
 module.exports = exports = express.Router()
 
-exports.get '/signup', renderAccount, (req, res) ->
-  res.render 'account/signup'
+exports.get '/register', (req, res) ->
+  res.render 'account/register'
 
-exports.get '/login', renderAccount, (req, res) ->
+exports.get '/login', (req, res) ->
   res.render 'account/login'
 
-exports.get '/setting', requireAuthenticate, renderAccount, (req, res) ->
-  res.render 'account/setting'
+exports.get '/preferences', requireAuthenticate, (req, res) ->
+  res.render 'account/preferences'
 
-exports.post '/signup', errorHandling, (req, res) ->
-  unless utils.rx.username.test req.body.username
-    return res.error 'invalid_username'
+exports.get '/session_info/', (req, res) ->
+  response =
+    csrf_token: req.session.csrf_token
 
-  unless utils.rx.email.test req.body.email
-    return res.error 'invalid_email'
+  if req.account
+    _.extend response,
+      id: req.account.id
+      username: req.account.username
+      preferences: req.account.preferences
 
-  unless utils.rx.password.test req.body.password
-    return res.error 'invalid_password'
+  res.json response
 
-  callback = ->
-    mAccount.byUsername req.body.username, (err, account) ->
-      if account
-        return res.error 'username_exist'
+exports.post '/register', (req, res) ->
+  Account.register req.body, (err, account) ->
+    return res.error utils.pickErrorName err if err
 
-      mAccount.byEmail req.body.email, (err, account) ->
-        if account
-          return res.error 'email_exist'
-
-        mAccount.register req.body.username, req.body.email, req.body.password, (err, account) ->
-          mAccount.createToken account,
-            ip: req.headers['x-real-ip']
-            ua: req.headers['user-agent']
-          , (err, token)->
-            res.cookie 'token', token,
-              expires: new Date(Date.now() + config.account.cookie_time)
-
-            res.json
-              id: account._id
-
-  if 'linux' in config.plugin.available_services
-    require('../../plugin/linux/monitor').loadPasswd (passwd_cache) ->
-      if req.body.username in _.values(passwd_cache)
-        return res.error 'username_exist'
-
-      callback()
-  else
-    callback()
-
-exports.post '/login', errorHandling, (req, res) ->
-  mAccount.byUsernameOrEmailOrId req.body.username, (err, account) ->
-    unless account
-      return res.error 'wrong_password'
-
-    unless mAccount.matchPassword account, req.body.password
-      return res.error 'wrong_password'
-
-    mAccount.createToken account,
+    account.createToken 'full_access',
       ip: req.headers['x-real-ip']
       ua: req.headers['user-agent']
     , (err, token) ->
-      res.cookie 'token', token,
+      logger.error err if err
+
+      res.cookie 'token', token.token,
         expires: new Date(Date.now() + config.account.cookie_time)
+
+      res.json
+        id: account._id
+
+exports.post '/login', (req, res) ->
+  Account.search req.body.username, (account) ->
+    unless account
+      return res.error 'wrong_password'
+
+    unless account.matchPassword req.body.password
+      return res.error 'wrong_password'
+
+    account.createToken 'full_access',
+      ip: req.headers['x-real-ip']
+      ua: req.headers['user-agent']
+    , (err, token) ->
+      logger.error err if err
+
+      res.cookie 'token', token.token,
+        expires: new Date Date.now() + config.account.cookie_time
+
+      res.cookie 'language', account.preferences.language,
+        expires: new Date Date.now() + config.account.cookie_time
 
       res.json
         id: account._id
         token: token
 
 exports.post '/logout', requireAuthenticate, (req, res) ->
-  mAccount.removeToken req.token, ->
-    res.clearCookie 'token'
-    res.json {}
+  req.token.revoke ->
+    req.account.createSecurityLog 'revoke_token', req.token,
+      revoke_ip: req.headers['x-real-ip']
+      revoke_ua: req.headers['user-agent']
+    , (err) ->
+      logger.error err if err
+
+      res.clearCookie 'token'
+      res.json {}
 
 exports.post '/update_password', requireAuthenticate, (req, res) ->
-  unless mAccount.matchPassword req.account, req.body.old_password
+  unless req.account.matchPassword req.body.original_password
     return res.error 'wrong_password'
 
   unless utils.rx.password.test req.body.password
     return res.error 'invalid_password'
 
-  mAccount.updatePassword req.account, req.body.password, ->
-    token = _.first _.where req.account.tokens,
-      token: req.token
+  req.account.updatePassword req.body.password, ->
+    req.account.createSecurityLog 'update_password', req.token, {}, (err) ->
+      logger.error err if err
 
-    mSecurityLog.create req.account, 'update_password',
-      token: _.omit(token, 'updated_at')
-    , ->
       res.json {}
 
 exports.post '/update_email', requireAuthenticate, (req, res) ->
-  unless mAccount.matchPassword req.account, req.body.password
+  unless req.account.matchPassword req.body.password
     return res.error 'wrong_password'
 
   unless utils.rx.email.test req.body.email
     return res.error 'invalid_email'
 
-  mAccount.update _id: req.account._id,
-    $set:
-      email: req.body.email
-  , ->
-    token = _.first _.where req.account.tokens,
-      token: req.token
+  req.account.email = req.body.email
 
-    mSecurityLog.create req.account, 'update_email',
-      old_email: req.account.email
+  req.account.save (err) ->
+    logger.error err if err
+
+    req.account.createSecurityLog 'update_email', req.token,
+      original_email: req.account.email
       email: req.body.email
-      token: _.omit(token, 'updated_at')
-    , ->
+    , (err) ->
+      logger.error err if err
+
       res.json {}
 
-exports.post '/update_setting', requireAuthenticate, (req, res) ->
-  unless req.body.name in ['qq']
-    return res.error 'invalid_name'
+exports.post '/update_preferences', requireAuthenticate, (req, res) ->
+  req.body = _.omit req.body, 'csrf_token'
 
-  modifiers =
-    $set: {}
+  for k, v of req.body
+    if k in ['qq', 'language', 'timezone']
+      req.account.preferences[k] = v
+      req.account.markModified "preferences.#{k}"
+    else
+      return res.error 'invalid_field'
 
-  modifiers.$set["setting.#{req.body.name}"] = req.body.value
+  req.account.save (err) ->
+    logger.error err if err
 
-  mAccount.update _id: req.account._id, modifiers, ->
-    token = _.first _.where req.account.tokens,
-      token: req.token
+    req.account.createSecurityLog 'update_preferences', req.token,
+      original_preferences: _.pick.apply @, [req.account.preferences].concat _.keys(req.body)
+      preferences: req.body
+    , (err) ->
+      logger.error err if err
 
-    mSecurityLog.create req.account, 'update_setting',
-      name: req.body.name
-      old_value: req.account.setting[req.body.name]
-      value: req.body.value
-      token: _.omit(token, 'updated_at')
-    , ->
-      res.json {}
-
-exports.all '/coupon_info', requireAuthenticate, (req, res) ->
-  mCouponCode.getCode req.body.code, (coupon_code) ->
-    unless coupon_code
-      return res.error 'code_not_exist'
-
-    res.json
-      message: mCouponCode.codeMessage coupon_code
-
-exports.post '/use_coupon', requireAuthenticate, (req, res) ->
-  mCouponCode.getCode req.body.code, (coupon_code) ->
-    unless !coupon_code.expired or Date.now() < coupon_code.expired.getTime()
-      return res.error 'code_expired'
-
-    unless coupon_code.available_times > 0
-      return res.error 'code_not_available'
-
-    mCouponCode.applyCode req.account, coupon_code, ->
       res.json {}

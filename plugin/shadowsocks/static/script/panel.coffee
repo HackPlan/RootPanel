@@ -1,11 +1,11 @@
 $ ->
-  $('#widget-shadowsocks .action-reset-password').click ->
+  $('.widget-shadowsocks .action-reset-password').click ->
     if window.confirm 'Are you sure?'
-      $.post '/plugin/shadowsocks/reset_password/', {}
-      .fail (jqXHR) ->
-        if jqXHR.responseJSON?.error
-          alert jqXHR.responseJSON.error
-        else
-          alert jqXHR.statusText
-      .success ->
+      request '/plugin/shadowsocks/reset_password/', {}, ->
         location.reload()
+
+  $('.widget-shadowsocks .action-switch-method').click ->
+    request '/plugin/shadowsocks/switch_method/',
+      method: $('.widget-shadowsocks .input-method').val()
+    , ->
+      alert 'Success'

@@ -1,146 +1,101 @@
-{requireAdminAuthenticate, renderAccount} = require './middleware'
-
-mAccount = require '../model/account'
-mTicket = require '../model/ticket'
-mBalance = require '..//model/balance'
-
-plugin = require '../plugin'
+{express, async, _} = app.libs
+{requireAdminAuthenticate} = app.middleware
+{Account, Ticket, Financials, CouponCode} = app.models
+{config, pluggable} = app
 
 module.exports = exports = express.Router()
 
-exports.get '/', requireAdminAuthenticate, renderAccount, (req, res) ->
-  mBalance.find
-    type: 'service_billing'
-    'attribute.service': 'shadowsocks'
-    created_at:
-      $gte: new Date Date.now() - 30 * 24 * 3600 * 1000
-  .toArray (err, balance_logs) ->
-    time_range =
-      traffic_24hours: 24 * 3600 * 1000
-      traffic_3days: 3 * 24 * 3600 * 1000
-      traffic_7days: 7 * 24 * 3600 * 1000
-      traffic_30days: 30 * 24 * 3600 * 1000
+exports.use requireAdminAuthenticate
 
-    traffic_result = {}
+exports.get '/', (req, res) ->
+  Account.find {}, (err, accounts) ->
+    async.map pluggable.selectHook(null, 'view.admin.sidebars'), (hook, callback) ->
+      hook.generator req, (html) ->
+        callback null, html
 
-    for name, range of time_range
-      logs = _.filter balance_logs, (i) ->
-        return i.created_at.getTime() > Date.now() - range
-
-      traffic_result[name] = _.reduce logs, (memo, i) ->
-        return memo + i.attribute.traffic_mb
-      , 0
-
-    mAccount.find().toArray (err, accounts) ->
-      sites = []
-
-      pending_traffic = 0
-
-      for account in accounts
-        if account.attribute.plugin?.nginx?.sites
-          for site in account.attribute.plugin.nginx.sites
-            sites.push _.extend site,
-              account: account
-
-        account.traffic_30days = _.reduce balance_logs, (memo, item) ->
-          if item.account_id.toString() == account._id.toString()
-            return memo + item.attribute.traffic_mb
-          else
-            return memo
-        , 0
-
-        if account.attribute.plugin.shadowsocks?.pending_traffic
-          pending_traffic += account.attribute.plugin.shadowsocks.pending_traffic
-
-      res.render 'admin/index', _.extend traffic_result,
+    , (err, sidebars_html) ->
+      res.render 'admin',
         accounts: accounts
-        sites: sites
-        pending_traffic: pending_traffic
-        siteSummary: plugin.get('nginx').service.siteSummary
+        sidebars_html: sidebars_html
+        coupon_code_types: _.keys config.coupons_meta
 
-exports.get '/ticket', requireAdminAuthenticate, renderAccount, (req, res) ->
+exports.get '/account_details', (req, res) ->
+  Account.findById req.query.account_id, (err, account) ->
+    res.json _.omit account.toObject(), 'password', 'password_salt', 'tokens', '__v'
+
+exports.get '/ticket', (req, res) ->
+  LIMIT = 10
+
   async.parallel
     pending: (callback) ->
-      mTicket.find
+      Ticket.find
         status: 'pending'
-      ,
+      , null,
         sort:
           updated_at: -1
-      .toArray callback
+      , callback
 
     open: (callback) ->
-      mTicket.find
+      Ticket.find
         status: 'open'
-      ,
+      , null,
         sort:
           updated_at: -1
-        limit: 10
-      .toArray callback
+        limit: LIMIT
+      , callback
 
     finish: (callback) ->
-      mTicket.find
+      Ticket.find
         status: 'finish'
-      ,
+      , null,
         sort:
           updated_at: -1
-        limit: 10
-      .toArray callback
+        limit: LIMIT
+      , callback
 
     closed: (callback) ->
-      mTicket.find
+      Ticket.find
         status: 'closed'
-      ,
+      , null,
         sort:
           updated_at: -1
-        limit: 10
-      .toArray callback
+        limit: LIMIT
+      , callback
 
   , (err, result) ->
-    res.render 'ticket/list',
-      pending: result.pending
-      open: result.open
-      finish: result.finish
-      closed: result.closed
+    res.render 'ticket/list', result
 
-exports.post '/create_payment', requireAdminAuthenticate, (req, res) ->
-  mAccount.findId req.body.account_id, (err, account) ->
+exports.post '/confirm_payment', (req, res) ->
+  Account.findById req.body.account_id, (err, account) ->
     unless account
       return res.error 'account_not_exist'
 
-    amount = parseFloat req.body.amount
-
-    if _.isNaN amount
+    unless _.isFinite req.body.amount
       return res.error 'invalid_amount'
 
-    mAccount.incBalance account, 'deposit', amount,
+    account.incBalance req.body.amount, 'deposit',
       type: req.body.type
       order_id: req.body.order_id
-    , ->
+    , (err) ->
+      return res.error err if err
       res.json {}
 
-exports.post '/delete_account', requireAdminAuthenticate, (req, res) ->
-  mAccount.findId req.body.account_id, (err, account) ->
+exports.post '/delete_account', (req, res) ->
+  Account.findById req.body.account_id, (err, account) ->
     unless account
       return res.error 'account_not_exist'
 
-    unless _.isEmpty account.attribute.plans
-      return res.error 'aleady_in_plan'
+    unless _.isEmpty account.billing.plans
+      return res.error 'already_in_plan'
 
-    unless account.attribute.balance <= 0
+    unless account.billing.balance <= 0
       return res.error 'balance_not_empty'
 
-    mAccount.remove _id: account._id, ->
+    Account.findByIdAndRemove account._id, ->
       res.json {}
 
-exports.post '/update_site', requireAdminAuthenticate, (req, res) ->
-  mAccount.findOne
-    'attribute.plugin.nginx.sites._id': new ObjectID req.body.site_id
-  , (err, account) ->
-    mAccount.update
-      'attribute.plugin.nginx.sites._id': new ObjectID req.body.site_id
-    ,
-      $set:
-        'attribute.plugin.nginx.sites.$.is_enable': if req.body.is_enable then true else false
-    , ->
-      plugin.get('nginx').service.writeConfig account, ->
-        res.json {}
+exports.post '/generate_coupon_code', (req, res) ->
+  coupon_code = _.pick req.body, 'expired', 'available_times', 'type', 'meta'
+
+  CouponCode.createCodes coupon_code, req.body.count, (err, coupon_codes...) ->
+    res.json coupon_codes

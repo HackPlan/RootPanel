@@ -1,0 +1,8 @@
+extends ../../../core/view/layout
+
+prepend header
+  title #{title} | #{t(config.web.t_name)}
+
+block main
+  header= title
+  != content

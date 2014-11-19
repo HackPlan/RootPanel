@@ -1,87 +1,148 @@
-connect = require 'connect'
-path = require 'path'
-harp = require 'harp'
-fs = require 'fs'
-moment = require 'moment'
-mongomin = require 'mongo-min'
-redis = require 'redis'
+#!/usr/bin/env coffee
 
-global._ = require 'underscore'
-global.ObjectID = require('mongodb').ObjectID
-global.express = require 'express'
-global.async = require 'async'
-global.path = require 'path'
+global.app = exports
 
-global.app = express()
-global.config = require './config'
-global.i18n = require './core/i18n'
-global.utils = require './core/router/utils'
-global.plugin = require './core/plugin'
+app.libs =
+  _: require 'underscore'
+  async: require 'async'
+  bodyParser: require 'body-parser'
+  child_process: require 'child_process'
+  cookieParser: require 'cookie-parser'
+  copy: require 'copy-to'
+  csrf: require 'csrf'
+  crypto: require 'crypto'
+  depd: require 'depd'
+  express: require 'express'
+  fs: require 'fs'
+  tmp: require 'tmp'
+  harp: require 'harp'
+  jade: require 'jade'
+  markdown: require('markdown').markdown
+  middlewareInjector: require 'middleware-injector'
+  moment: require 'moment-timezone'
+  mongoose: require 'mongoose'
+  morgan: require 'morgan'
+  nodemailer: require 'nodemailer'
+  os: require 'os'
+  path: require 'path'
+  redis: require 'redis'
+  redisStore: require 'connect-redis'
+  request: require 'request'
+  expressSession: require 'express-session'
+  mongooseUniqueValidator: require 'mongoose-unique-validator'
 
-if fs.existsSync(config.web.listen)
-  fs.unlinkSync config.web.listen
+  ObjectID: (require 'mongoose').Types.ObjectId
 
-fs.chmodSync path.join(__dirname, 'config.coffee'), 0o750
+  ObjectId: (require 'mongoose').Schema.Types.ObjectId
+  Mixed: (require 'mongoose').Schema.Types.Mixed
 
-bindRouters = ->
-  app.use require 'middleware-injector'
+{cookieParser, copy, crypto, bodyParser, depd, express, fs, harp, middlewareInjector, mongoose} = exports.libs
+{morgan, nodemailer, path, redis, _} = exports.libs
 
-  for module_name in ['account', 'admin', 'panel', 'plan', 'ticket', 'bitcoin']
-    app.use "/#{module_name}", require './core/router/' + module_name
+app.logger = do ->
+  unless process.env.NODE_ENV == 'test'
+    return console
 
-  plugin.loadPlugins()
+  return {
+    log: ->
+    error: console.error
+  }
 
-  app.use '/wiki', require './core/router/wiki'
+app.package = require './package'
+app.deprecate = depd 'rootpanel'
 
-  app.get '/', (req, res) ->
+do ->
+  config_path = path.join __dirname, 'config.coffee'
+
+  unless fs.existsSync config_path
+    app.deprecate 'config.coffee not found, copy sample config to ./config.coffee'
+    fs.writeFileSync config_path, fs.readFileSync path.join __dirname, "./sample/core.config.coffee"
+
+  fs.chmodSync config_path, 0o750
+
+config = require './config'
+
+do  ->
+  if fs.existsSync config.web.listen
+    fs.unlinkSync config.web.listen
+
+  session_key_path = path.join __dirname, 'session.key'
+
+  unless fs.existsSync session_key_path
+    fs.writeFileSync session_key_path, crypto.randomBytes(48).toString('hex')
+    fs.chmodSync session_key_path, 0o750
+
+app.redis = redis.createClient 6379, '127.0.0.1',
+  auth_pass: config.redis.password
+
+app.mailer = nodemailer.createTransport config.email.account
+app.express = express()
+
+app.config = config
+app.db = require './core/db'
+app.utils = require './core/utils'
+app.cache = require './core/cache'
+app.i18n = require './core/i18n'
+app.pluggable = require './core/pluggable'
+
+app.models = {}
+
+require './core/model/Account'
+require './core/model/Financials'
+require './core/model/CouponCode'
+require './core/model/Notification'
+require './core/model/SecurityLog'
+require './core/model/Ticket'
+
+app.templates = require './core/templates'
+app.billing = require './core/billing'
+app.middleware = require './core/middleware'
+app.notification = require './core/notification'
+
+unless process.env.NODE_ENV == 'test'
+  app.express.use morgan 'dev'
+
+app.express.use bodyParser.json()
+app.express.use cookieParser()
+app.express.use middlewareInjector
+
+app.express.use app.middleware.errorHandling
+app.express.use app.middleware.session()
+app.express.use app.middleware.csrf()
+app.express.use app.middleware.authenticate
+app.express.use app.middleware.accountHelpers
+
+app.express.set 'views', path.join(__dirname, 'core/view')
+app.express.set 'view engine', 'jade'
+
+app.express.get '/locale/:language?', app.i18n.downloadLocales
+
+app.express.use '/account', require './core/router/account'
+app.express.use '/billing', require './core/router/billing'
+app.express.use '/ticket', require './core/router/ticket'
+app.express.use '/coupon', require './core/router/coupon'
+app.express.use '/admin', require './core/router/admin'
+app.express.use '/panel', require './core/router/panel'
+
+app.pluggable.initializePlugins()
+
+app.express.get '/', (req, res) ->
+  unless res.headerSent
     res.redirect '/panel/'
 
-exports.connectDatabase = (callback) ->
-  {user, password, host, name} = config.mongodb
-  mongomin "mongodb://#{user}:#{password}@#{host}/#{name}", (err, db) ->
-    app.db = db
+app.express.use harp.mount './core/static'
 
-    app.redis = redis.createClient 6379, '127.0.0.1',
-      auth_pass: config.redis_password
+exports.start = _.once ->
+  app.express.listen config.web.listen, ->
+    app.started = true
 
-    callback err
-
-exports.run = ->
-  exports.connectDatabase (err) ->
-    throw err if err
-
-    i18n.init
-      default_language: 'zh_CN'
-      available_language: ['zh_CN']
-
-    i18n.load path.join(__dirname, 'core/locale')
-
-    app.package = require './package.json'
-
-    app.use connect.json()
-    app.use connect.urlencoded()
-    app.use connect.cookieParser()
-    app.use connect.logger('dev')
-
-    moment.locale 'zh_CN'
-
-    app.use (req, res, next) ->
-      res.locals.app = app
-      res.locals.moment = moment
-      res.locals.t = i18n.getTranslator 'zh_CN'
-      res.locals.mAccount = require './core/model/account'
-
-      next()
-
-    app.set 'views', path.join(__dirname, 'core/view')
-    app.set 'view engine', 'jade'
-
-    bindRouters app
-
-    app.use harp.mount(path.join(__dirname, 'core/static'))
-
-    app.listen config.web.listen, ->
+    if fs.existsSync config.web.listen
       fs.chmodSync config.web.listen, 0o770
 
+    app.pluggable.selectHook(null, 'app.started').forEach (hook) ->
+      hook.action()
+
+    app.logger.log "RootPanel start at #{config.web.listen}"
+
 unless module.parent
-  exports.run()
+  exports.start()

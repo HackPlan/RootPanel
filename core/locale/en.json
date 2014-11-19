@@ -1,0 +1,152 @@
+{
+  "app": {
+    "name": "RootPanel",
+    "description": "Pluggable PaaS service development framework"
+  },
+  "plans": {
+    "sample": {
+      "name": "Sample Plan",
+      "description": "10 CNY per month, calculated by hour"
+    },
+    "test": {
+      "name": "Test Plan",
+      "description": "Calculated by usages"
+    }
+  },
+  "common": {
+    "error": "Error",
+    "success": "Success",
+    "save": "Save",
+    "apply": "Apply",
+    "change": "Modify",
+    "charge": "Recharge",
+    "enable": "Enable",
+    "disable": "Disable",
+    "time": "Time",
+    "amount": "Amount",
+    "actions": "Action",
+    "details": "Detail",
+    "type": "Type",
+    "generate": "Generate",
+    "id": "ID",
+    "close": "Close",
+    "create": "Create",
+    "submit": "Submit"
+  },
+  "languages": {
+    "zh_CN": "Chinese",
+    "en": "English",
+    "auto": "Auto"
+  },
+  "error_code": {
+    "username_exist": "Username already exists",
+    "email_exist": "Email already exists",
+    "invalid_username": "Invalid username",
+    "invalid_password": "Invalid password",
+    "invalid_email": "Invalid email",
+    "insufficient_balance": "Insufficient Balance"
+  },
+  "account": {
+    "": "Account",
+    "register": "Register",
+    "login": "Login",
+    "username": "Username",
+    "email": "Email",
+    "password": "Password",
+    "logout": "Logout",
+    "preferences": "Preferences",
+    "financials": "Financials"
+  },
+  "panel": {
+    "": "Panel",
+    "overview": "Overview"
+  },
+  "ticket": {
+    "": "Tickets",
+    "title": "Title",
+    "status": "Status",
+    "create": "Create",
+    "reply": "Reply",
+    "replies": "All Replies",
+    "create_ticket": "Create Ticket",
+    "create_reply": "Create Reply",
+    "ticket_list": "Tickets List",
+    "close_ticket": "Close",
+    "finish_ticket": "Finish",
+    "reopen_ticket": "Reopen",
+    "creator": "Creator",
+    "members": "Members"
+  },
+  "ticket_status": {
+    "closed": "Closed",
+    "open": "Open",
+    "pending": "Pending",
+    "finish": "Finish",
+    "related": "Related"
+  },
+  "plan": {
+    "": "Plan",
+    "join": "Join",
+    "leave": "Leave",
+    "balance": "Balance",
+    "currency": {
+      "CNY": "CNY"
+    }
+  },
+  "admin": {
+    "admin_panel": "Admin Area"
+  },
+  "time": {
+    "day": "Day"
+  },
+  "notification_title": {
+    "ticket": "__title__ | Ticket"
+  },
+  "view": {
+    "layout": {
+      "navigation": "Extend"
+    },
+    "account": {
+      "password2": "Repeat",
+      "already_register": "Already has account?",
+      "no_account": "Has no account?",
+      "password_inconsistent": "Passwords not matched"
+    },
+    "preferences": {
+      "options": "Options",
+      "qq": "QQ",
+      "coupon_code": "Coupon Code",
+      "code": "Code",
+      "update_password": "Update password",
+      "original_password": "Original",
+      "new_password": "New",
+      "repeat_password": "Repeat",
+      "update_email": "Update Email",
+      "current_email": "Current Email",
+      "new_email": "New Email"
+    },
+    "financials": {
+      "payment_log": "Payment History",
+      "pay_method": "Pay Method",
+      "billing_log": "Billing History"
+    },
+    "admin": {
+      "account_list": "Account lists",
+      "coupon_code": "Coupon Code",
+      "confirm_payment": "Confirm",
+      "delete_account": "Delete Account",
+      "expired": "Expired",
+      "empty_expired_tips": "Never expired if empty",
+      "available_times": "Available times",
+      "count": "Amount",
+      "meta": "Meta",
+      "order_id": "Order Id"
+    }
+  },
+  "coupons": {
+    "amount": {
+      "message": "Cash: __amount__ __currency__"
+    }
+  },
+  "plugins": {}
+}

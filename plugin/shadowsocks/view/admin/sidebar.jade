@@ -1,0 +1,16 @@
+.row
+  header= t('')
+  table.table.table-hover
+    tbody
+      tr
+        td #{(traffic_24hours / 1000).toFixed(1)}G
+        td= t('24hours_ago')
+      tr
+        td #{(traffic_3days / 1000).toFixed(1)}G
+        td= t('3days_ago')
+      tr
+        td #{(traffic_7days / 1000).toFixed(1)}G
+        td= t('7days_ago')
+      tr
+        td #{(traffic_30days / 1000).toFixed(1)}G
+        td= t('30days_ago')

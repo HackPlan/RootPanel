@@ -1,0 +1,13 @@
+{
+  "": "ShadowSocks",
+  "remote_access": "Remote Access",
+  "remote_port": "Port",
+  "reset": "Reset",
+  "transfer": "Traffic",
+  "method": "method",
+  "transfer_remainder": "About __traffic__ G remainder",
+  "24hours_ago": "24 hours ago",
+  "3days_ago": "3 days ago",
+  "7days_ago": "7 days ago",
+  "30days_ago": "30 days ago"
+}

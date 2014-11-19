@@ -1,74 +1,84 @@
 extends ../layout
 
-prepend head
-  title #{ticket.title} | #{config.web.name}
+prepend header
+  title #{ticket.title} | #{t(config.web.t_name)}
+
+append header
   link(rel='stylesheet', href='/style/ticket.css')
 
 block main
-  .row.content(data-id= '#{ticket._id}')
+  .row.content(data-id='#{ticket._id}')
     header
       | #{ticket.title} &nbsp;
+
+      - l_status = t('ticket_status.' + ticket.status)
+
       if ticket.status == 'closed'
-        span.small.text-muted 已关闭
+        span.small.text-muted= l_status
       else if ticket.status == 'open'
-        span.small.text-primary 开放的
+        span.small.text-primary= l_status
       else if ticket.status == 'pending'
-        span.small.text-warning 等待处理
+        span.small.text-warning= l_status
       else if ticket.status == 'finish'
-        span.small.text-success 已完成
+        span.small.text-success= l_status
 
     p!= ticket.content_html
 
   .row
     header= t('ticket.replies')
+
     ul.list-group
-      for reply in ticket.replys
+      for reply in ticket.replies
         li.list-group-item.clearfix
           a.pull-left
-            img(src= reply.account.setting.avatar_url)
+            img.img-avatar(src= reply.account.preferences.avatar_url)
           .list-content
             p!= reply.content_html
             p
               span.label.label-info= reply.account.username
-              span.label.label-default(title= reply.created_at)= moment(reply.created_at).fromNow()
+              span.label.label-default(title=reply.created_at)= moment(reply.created_at).fromNow()
 
   .row
     if ticket.status != 'closed'
       header= t('ticket.create_reply')
-    form.form-horizontal(method='post', role='form')
+
+    form.form-horizontal
       if ticket.status != 'closed'
         .form-group.padding
-          textarea.form-control#reply-content(name='content', rows='5', required)
+          textarea.form-control.input-content(rows='5')
       .form-group.padding
         if ticket.status == 'closed'
-          button(disabled).btn.btn-lg.btn-primary 已关闭
+          button(disabled).btn.btn-lg.btn-primary= t('ticket_status.closed')
         else
           button.btn.btn-lg.btn-primary.action-reply(type='button')= t('ticket.create_reply')
-          button(type='button', data-status='closed').btn.btn-lg.btn-danger.change-status= t('ticket.close_ticket')
-        if mAccount.inGroup(account, 'root') && (ticket.status == 'open' || ticket.status == 'pending')
-          button(type='button', data-status='finish').btn.btn-lg.btn-success.change-status= t('ticket.finish_ticket')
-        if mAccount.inGroup(account, 'root') && ticket.status == 'closed'
-          button(type='button', data-status='open').btn.btn-lg.btn-success.change-status= t('ticket.reopen_ticket')
+          button(type='button', data-status='closed').btn.btn-lg.btn-danger.action-update-status= t('ticket.close_ticket')
+
+        if req.account.inGroup('root') && (ticket.status == 'open' || ticket.status == 'pending')
+          button(type='button', data-status='finish').btn.btn-lg.btn-success.action-update-status= t('ticket.finish_ticket')
+        if req.account.inGroup('root') && ticket.status == 'closed'
+          button(type='button', data-status='open').btn.btn-lg.btn-success.action-update-status= t('ticket.reopen_ticket')
 
 prepend sidebar
   .row
     a.btn.btn-lg.btn-success(href='/ticket/list/')= t('ticket.ticket_list')
 
   .row
-    header= t('ticket.creator')
-    li.list-group-item.clearfix
-      a.pull-left
-        img(src= ticket.account.setting.avatar_url)
-      p
-        span.label.label-info= ticket.account.username
-        br
-        span.label.label-default(title= ticket.created_at)= moment(ticket.created_at).fromNow()
+    if ticket.account
+      header= t('ticket.creator')
+      li.list-group-item.clearfix
+        a.pull-left
+          img.img-avatar(src=ticket.account.preferences.avatar_url)
+        p
+          span.label.label-info= ticket.account.username
+          br
+          span.label.label-default(title=ticket.created_at)= moment(ticket.created_at).fromNow()
 
   .row
     header= t('ticket.members')
     for member in ticket.members
-      a.pull-left
-        img(src= member.setting.avatar_url, alt= member.username)
+      if member
+        a.pull-left
+          img.img-avatar(src=member.preferences.avatar_url, alt=member.username)
 
 append footer
   script(src='/script/ticket/view.js')

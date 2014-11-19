@@ -1,0 +1,8 @@
+<%= reply.content_html %>
+
+<hr />
+
+Replied by <%= account.username %> at <%= reply.created_at %>, View ticket:
+<a href='<%= config.web.url %>/ticket/view/<%= ticket._id %>'><%= ticket._id %></a>
+<br />
+Notice from <%= t(config.web.t_name) %>.

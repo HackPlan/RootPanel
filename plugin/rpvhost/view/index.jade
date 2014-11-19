@@ -1,9 +1,9 @@
 extends ../../../core/view/layout
 
-prepend head
-  title RP 主机：Linux 虚拟主机 | #{t('app.name')}
+prepend header
+  title RP 主机：Linux 虚拟主机 | #{t(config.web.t_name)}
 
-append head
+append header
   link(rel='stylesheet', href='/plugin/rpvhost/style/index.css')
 
 block content

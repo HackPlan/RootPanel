@@ -1,0 +1,49 @@
+extends ../layout
+
+prepend header
+  title #{t('account.financials')} | #{t(config.web.t_name)}
+
+block main
+  .row
+    header= t('account.financials')
+
+    for payment_method in payment_methods
+      != payment_method
+
+  .row
+    header= t('view.financials.payment_log')
+    table.table.table-hover
+      thead
+        tr
+          th= t('common.time')
+          th= t('common.amount')
+          th= t('view.financials.pay_method')
+      tbody
+        for item in deposit_log
+          tr
+            td= moment(item.created_at).format('YYYY-MM-DD HH:mm:ss')
+            td #{item.amount.toFixed(2)} #{t('plan.currency.' + config.billing.currency)}
+            if item.payment_details
+              td!= item.payment_details
+            else
+              td #{item.payload.type} #{item.payload.order_id}
+
+  .row
+    header= t('view.financials.billing_log')
+    table.table.table-hover
+      thead
+        tr
+          th= t('common.time')
+          th= t('common.details')
+          th= t('common.amount')
+      tbody
+        for item in billing_log
+          tr
+            td= moment(item.created_at).format('YYYY-MM-DD HH:mm:ss')
+            td
+              if item.type == 'billing'
+                each info, plan_name in item.payload
+                  p #{plan_name}: #{info.billing_unit_count} unit before #{info.last_billing_at}
+              else if item.type == 'usage_billing' && item.payload.service == 'shadowsocks'
+                p #{item.payload.service}: #{item.payload.traffic_mb.toFixed(1)} MB
+            td #{item.amount.toFixed(2)} CNY

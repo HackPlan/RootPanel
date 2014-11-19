@@ -1,4 +1,10 @@
 {
-  "name": "SSH",
-  "description": "SSH 提供了远程登录服务"
+  "": "SSH",
+  "process": "进程",
+  "memory": "内存",
+  "cpu": "CPU",
+  "kill": "Kill",
+  "view": {
+    "update_password": "设置 SSH 密码"
+  }
 }

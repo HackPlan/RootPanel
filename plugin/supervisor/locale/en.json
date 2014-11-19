@@ -1,0 +1,17 @@
+{
+  "": "Supervisor",
+  "common": {
+    "name": "Name",
+    "command": "Start Command",
+    "options": "Options",
+    "status": "Status",
+    "directory": "Start Directory",
+    "autostart": "Auto start with system",
+    "autorestart": "Auto restart"
+  },
+  "autorestart": {
+    "true": "Always restart",
+    "false": "Don't restart",
+    "unexpected": "Restart when error"
+  }
+}

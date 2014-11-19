@@ -1,19 +1,19 @@
 extends ../layout
 
-prepend head
-  title #{t('account.login')} | #{config.web.name}
+prepend header
+  title #{t('account.login')} | #{t(config.web.t_name)}
 
 block main
   header= t('account.login')
-  form.form-horizontal(method='post', role='form')
+  form.form-horizontal
     .form-group
-      label.col-sm-2.col-md-offset-1.control-label(for='username')= t('account.username')
+      label.col-sm-2.col-md-offset-1.control-label= t('account.username')
       .col-sm-5
-        input#username.form-control(type='text', name='username', required)
+        input.input-username.form-control(type='text', required)
     .form-group
-      label.col-sm-2.col-md-offset-1.control-label(for='password')= t('account.password')
+      label.col-sm-2.col-md-offset-1.control-label= t('account.password')
       .col-sm-5
-        input#password.form-control(type='password', name='password')
+        input.input-password.form-control(type='password')
     .form-group
       .col-sm-offset-3
         button.action-login.btn.btn-lg.btn-primary(type='button')= t('account.login')
@@ -21,7 +21,7 @@ block main
 prepend sidebar
   .row
     header= t('view.account.no_account')
-    a.btn.btn-lg.btn-success(href='/account/signup/')= t('account.signup')
+    a.btn.btn-lg.btn-success(href='/account/register/')= t('account.register')
 
 append footer
   script(src='/script/account/login.js')
