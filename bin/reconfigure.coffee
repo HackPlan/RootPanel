@@ -6,6 +6,10 @@ require '../app'
 {config, pluggable} = app
 {Account} = app.models
 
+for plugin in fs.readdirSync "#{__dirname}/../plugin"
+  unless pluggable.plugins[plugin]
+    pluggable.initializePlugin plugin
+
 Account.find
   'billing.plans.0':
     $exists: true

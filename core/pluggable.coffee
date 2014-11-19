@@ -126,6 +126,16 @@ exports.selectHook = (account, hook_name) ->
     else
       return false
 
+exports.initializePlugin = (name) ->
+  plugin_path = "#{__dirname}/../plugin/#{name}"
+  plugin = require plugin_path
+
+  if fs.existsSync path.join(plugin_path, 'locale')
+    i18n.loadForPlugin plugin
+
+  if fs.existsSync path.join(plugin_path, 'static')
+    app.express.use harp.mount("/plugin/#{name}", path.join(plugin_path, 'static'))
+
 exports.initializePlugins = ->
   plugins = _.union config.plugin.available_extensions, config.plugin.available_services
 
@@ -140,13 +150,7 @@ exports.initializePlugins = ->
     exports.plugins[name] = plugin
 
   for name, plugin of exports.plugins
-    plugin_path = "#{__dirname}/../plugin/#{name}"
-
-    if fs.existsSync path.join(plugin_path, 'locale')
-      i18n.loadForPlugin plugin
-
-    if fs.existsSync path.join(plugin_path, 'static')
-      app.express.use harp.mount("/plugin/#{name}", path.join(plugin_path, 'static'))
+    exports.initializePlugin name
 
 exports.Plugin = class Plugin
   @registerHook: (hook_name, payload) ->

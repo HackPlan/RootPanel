@@ -95,12 +95,21 @@ module.exports = (db, callback) ->
           if balance_log.type == 'service_billing'
             balance_log.type = 'usage_billing'
 
+          else if balance_log.type == 'billing'
+            balance_log.payload = {}
+
+            for plan in balance_log.attribute.plans
+              balance_log.payload[plan] =
+                billing_time: balance_log.attribute.billing_time
+                last_billing_at: balance_log.attribute.last_billing_at
+                is_force: balance_log.attribute.is_force
+
           cFinancials.insert
             account_id: balance_log.account_id
             type: balance_log.type
             amount: balance_log.amount
             created_at: balance_log.created_at
-            payload: balance_log.attribute
+            payload: balance_log.payload ? balance_log.attribute
           , (err) ->
             throw err if err
             console.log "[financials] created #{balance_log._id}"
