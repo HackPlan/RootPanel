@@ -1,7 +1,7 @@
 extends ../layout
 
 prepend header
-  title #{t('common.financials')} | #{t(config.web.t_name)}
+  title #{t('account.financials')} | #{t(config.web.t_name)}
 
 block main
   .row
@@ -33,9 +33,9 @@ block main
     table.table.table-hover
       thead
         tr
-          td= t('common.time')
-          td= t('common.details')
-          td= t('common.amount')
+          th= t('common.time')
+          th= t('common.details')
+          th= t('common.amount')
       tbody
         for item in billing_log
           tr

@@ -69,7 +69,12 @@ exports.accountHelpers = (req, res, next) ->
     t: app.i18n.getTranslator req
 
     moment: ->
-      return moment.apply(@, arguments).locale(res.language).tz(res.timezone)
+      if res.language and res.language != 'auto'
+        return moment.apply(@, arguments).locale(res.language).tz(res.timezone)
+      else if res.timezone
+        return moment.apply(@, arguments).tz(res.timezone)
+      else
+        return moment.apply(@, arguments)
 
   _.extend req,
     res: res
