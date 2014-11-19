@@ -33,7 +33,7 @@ RootPanel 具有良好的设计，高度的可定制性，支持多语言和多�
     supervisorctl stop RootPanel
 
     # 备份数据库
-    mongodump --db RootPanel --out .backup/db -u rpadmin -p
+    mongodump --authenticationDatabase admin --db RootPanel --out .backup/db -u rpadmin -p
 
     # 更新源代码
     git pull

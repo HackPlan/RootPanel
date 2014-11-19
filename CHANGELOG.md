@@ -4,6 +4,7 @@
 224 commits, 202 changed files with 6682 additions and 4047 deletions, by 1 contributors: jysperm, yudong.
 
 * (新增) 基于 Travis-CI 的自动测试，增加了 Vagrantfile
+* (新增) reconfigure 功能，重新应用配置
 * (新增) 完成了 Supervisor 插件
 * (改进) 重构了 linux, rpvhost, ssh, shadowsocks 插件
 * (改进) 重构了数据库升级迁移框架
@@ -12,7 +13,7 @@
 * (改进) 重构了插件机制，增强了 hook 的功能，所有插件继承自 Plugin 类
 * (改进) 重构了结算机制
 * (改进) 重构了国际化组件，支持更好地 fallback, 为前端添加了国际化支持，添加了语言选择功能
-* (改进) 将视图文件中全部的字符串提取为了语言资源文件
+* (改进) 将视图文件中全部的字符串提取为了语言资源文件，并翻译了英文版本
 * (改进) 从源代码中移除配置文件，在 `sample` 目录提供一组默认配置文件
 * (改进) 将 WIKI 抽取为了一个独立的插件，自动生成 WIKI 列表，代替原 WIKI 首页
 * (改进) 将比特币支付功能抽取为了一个独立的插件

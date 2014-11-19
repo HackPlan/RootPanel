@@ -34,17 +34,29 @@
     rm /etc/nginx/sites-enabled/default
     
     vi /etc/nginx/sites-enabled/rpadmin
-    
+
+        ssl_certificate /home/rpadmin/rpvhost.crt;
+        ssl_certificate_key /home/rpadmin/keys/rpvhost.key;
+
+        ssl_session_cache shared:SSL:10m;
+
         server {
             listen 80 default_server;
+            listen 443 ssl default_server;
             listen [::]:80 default_server ipv6only=on;
-            rewrite ^/(.*)$ http://rp.rpvhost.net/#redirect permanent;
+
+            rewrite .* $scheme://rp.rpvhost.net/#redirect redirect;
         }
 
         server {
             listen 80;
+            listen 443 ssl;
 
             server_name rp.rpvhost.net;
+
+            location ~ /\.git {
+                deny all;
+            }
 
             location / {
                 proxy_set_header X-Real-IP $remote_addr;
@@ -54,6 +66,8 @@
 
     useradd -m rpadmin
     usermod -G rpadmin -a www-data
+
+    mkdir -m 750 /home/rpadmin/keys
 
     vi /etc/sudoers
 
@@ -90,7 +104,7 @@
     service redis-server restart
     service supervisor restart
 
-### Plugin
+### Plugins
 
     # Linux
     apt-get install quota quotatool
@@ -118,7 +132,7 @@
         
     # PHP-FPM
         
-    apt-get install php5-cli php5-fpm php-pear php5-mysql php5-curl php5-gd php5-imap php5-mcrypt php5-memcache php5-tidy php5-xmlrpc php5-sqlite php5-mongo
+    apt-get install php5-fpm php-pear php5-readline php5-mysql php5-curl php5-gd php5-imap php5-mcrypt php5-memcache php5-tidy php5-xmlrpc php5-sqlite php5-mongo
     
     rm /etc/php5/fpm/pool.d/www.conf
 
@@ -137,13 +151,14 @@
 
         ulimit -n 51200
 
-    iptables -A OUTPUT -p tcp --dport 25 -j DROP
     iptables -A OUTPUT -p tcp --dport 25 -d smtp.postmarkapp.com -j ACCEPT
+    iptables -A OUTPUT -p tcp --dport 25 -j DROP
+    iptables-save > /etc/iptables.rules
 
 ### Runtime
 
     # Shell
-    aot-get install screen wget zip unzip iftop vim curl htop iptraf nethogs
+    apt-get install screen wget zip unzip iftop vim curl htop iptraf nethogs
     apt-get install libcurl4-openssl-dev axel unrar-free emacs subversion subversion-tools tmux mercurial postfix
 
     # Golang

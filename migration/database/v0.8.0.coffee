@@ -50,6 +50,9 @@ module.exports = (db, callback) ->
           for plan_name in account.attribute.plans
             last_billing_at[plan_name] = account.attribute.last_billing_at
 
+          if account.attribute.plugin.nginx
+            delete account.attribute.plugin.nginx
+
           cAccount.update {_id: account._id},
             $set:
               email: account.email.toLowerCase()
@@ -67,7 +70,6 @@ module.exports = (db, callback) ->
                 last_billing_at: last_billing_at
 
             $unset:
-              attribute: true
               setting: true
               signup_at: true
               group: true
@@ -105,7 +107,8 @@ module.exports = (db, callback) ->
             callback()
 
       , ->
-        db.dropCollection 'balance_log', callback
+        db.dropCollection 'balance_log', ->
+          callback()
 
     (callback) ->
       console.log '[couponcodes] beginning'
@@ -130,7 +133,8 @@ module.exports = (db, callback) ->
             callback()
 
       , ->
-        db.dropCollection 'coupon_code', callback
+        db.dropCollection 'coupon_code', ->
+          callback()
 
     (callback) ->
       console.log '[securitylogs] beginning'
@@ -177,7 +181,8 @@ module.exports = (db, callback) ->
             callback()
 
       , ->
-        db.dropCollection 'security_log', callback
+        db.dropCollection 'security_log', ->
+          callback()
 
     (callback) ->
       console.log '[tickets] beginning'

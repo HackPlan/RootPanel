@@ -17,10 +17,13 @@ exports.registerHook 'view.layout.menu_bar',
 exports.registerHook 'account.username_filter',
   filter: (username, callback) ->
     linux.getPasswdMap (passwd_map) ->
-      if username in _.values passwd_map
-        callback false
-      else
-        callback true
+      linux.getGroup (group_map) ->
+        if username in _.values passwd_map
+          callback false
+        else if username in _.values group_map
+          callback false
+        else
+          callback true
 
 exports.registerHook 'view.panel.styles',
   path: '/plugin/linux/style/panel.css'

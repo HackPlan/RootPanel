@@ -60,6 +60,19 @@ exports.getPasswdMap = (callback) ->
       SETEX result, 120
   , callback
 
+exports.getGroup = (callback) ->
+  cache.try 'linux.getGroup', (SETEX) ->
+    fs.readFile '/etc/group', (err, content) ->
+      logger.error err if err
+      result = {}
+
+      for line in _.compact(content.toString().split '\n')
+        [name, password, uid] = line.split ':'
+        result[uid] = name
+
+      SETEX result, 120
+  , callback
+
 exports.getMemoryInfo = (callback) ->
   cache.try 'linux.getMemoryInfo', (SETEX) ->
     fs.readFile '/proc/meminfo', (err, content) ->

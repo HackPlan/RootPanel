@@ -13,14 +13,18 @@ Account.find
   async.eachSeries accounts, (account, callback) ->
     original_account = account
 
-    services = _.flatten _.compact _.map account.billing.plans, (plan) ->
+    plans = _.filter account.billing.plans, (plan) ->
+      return config.plans[plan]
+
+    services = _.uniq _.flatten _.compact _.map plans, (plan) ->
       return config.plans[plan]?.services
 
-    if _.isEqual account.billing.services, services
+    if _.isEqual(account.billing.services, services) and _.isEqual(account.billing.plans, plans)
       return callback()
 
     Account.findByIdAndUpdate account._id,
       $set:
+        'billing.plans': plans
         'billing.services': services
     , (err, account) ->
       services = account.billing.services
