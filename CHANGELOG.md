@@ -1,8 +1,6 @@
 ## v0.8.0
 对核心代码进行了完整的重构，实现了 supervisor 插件，部分插件等待下个版本进行重构。
 
-224 commits, 202 changed files with 6682 additions and 4047 deletions, by 1 contributors: jysperm, yudong.
-
 * (新增) 基于 Travis-CI 的自动测试，增加了 Vagrantfile
 * (新增) reconfigure 功能，重新应用配置
 * (新增) 完成了 Supervisor 插件
@@ -21,6 +19,8 @@
 * (更改) 更换到了 AGPL 授权协议
 * (安全) 增加了 CSRF Token 机制
 * (安全) 修复了比特币支付部分的一个安全问题
+
+252 commits, 242 changed files with 7495 additions and 5327 deletions, by 2 contributors: jysperm, yudong.
 
 ## v0.7.1(2014.9.2)
 有关 ShadowSocks 的漏洞修复，以及从 v0.6.0 升级的迁移脚本。

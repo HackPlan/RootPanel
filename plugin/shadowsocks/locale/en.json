@@ -4,7 +4,7 @@
   "remote_port": "Port",
   "reset": "Reset",
   "transfer": "Traffic",
-  "method": "method",
+  "method": "Method",
   "transfer_remainder": "About __traffic__ G remainder",
   "24hours_ago": "24 hours ago",
   "3days_ago": "3 days ago",
