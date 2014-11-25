@@ -8,7 +8,6 @@ app.libs =
   bodyParser: require 'body-parser'
   child_process: require 'child_process'
   cookieParser: require 'cookie-parser'
-  copy: require 'copy-to'
   csrf: require 'csrf'
   crypto: require 'crypto'
   depd: require 'depd'
@@ -36,7 +35,7 @@ app.libs =
   ObjectId: (require 'mongoose').Schema.Types.ObjectId
   Mixed: (require 'mongoose').Schema.Types.Mixed
 
-{cookieParser, copy, crypto, bodyParser, depd, express, fs, harp, middlewareInjector, mongoose} = exports.libs
+{cookieParser, crypto, bodyParser, depd, express, fs, harp, middlewareInjector, mongoose} = exports.libs
 {morgan, nodemailer, path, redis, _} = exports.libs
 
 app.logger = do ->
