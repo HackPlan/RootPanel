@@ -97,6 +97,7 @@ require './core/model/CouponCode'
 require './core/model/Notification'
 require './core/model/SecurityLog'
 require './core/model/Ticket'
+require './core/model/Component'
 
 app.templates = require './core/templates'
 app.billing = require './core/billing'
