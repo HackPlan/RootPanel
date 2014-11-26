@@ -152,6 +152,9 @@ exports.initializePlugins = ->
   for name, plugin of exports.plugins
     exports.initializePlugin name
 
+exports.ComponentMeta = class ComponentMeta
+  constructor: (@info) ->
+
 exports.Plugin = class Plugin
   @registerHook: (hook_name, payload) ->
     return exports.registerHook hook_name, @, payload

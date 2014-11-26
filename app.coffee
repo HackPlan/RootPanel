@@ -101,6 +101,7 @@ require './core/model/Component'
 
 app.templates = require './core/templates'
 app.billing = require './core/billing'
+app.clusters = require './core/clusters'
 app.middleware = require './core/middleware'
 app.notification = require './core/notification'
 
@@ -126,6 +127,8 @@ app.express.use '/coupon', require './core/router/coupon'
 app.express.use '/admin', require './core/router/admin'
 app.express.use '/panel', require './core/router/panel'
 
+app.billing.initializePlans()
+app.clusters.initializeNodes()
 app.pluggable.initializePlugins()
 
 app.express.get '/', (req, res) ->

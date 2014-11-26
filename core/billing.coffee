@@ -2,6 +2,8 @@
 {async, _} = app.libs
 {Account, Financials} = app.models
 
+exports.plans = {}
+
 exports.run = ->
   exports.cyclicalBilling ->
     setInterval ->
@@ -183,3 +185,11 @@ exports.calcResourcesLimit = (plans) ->
         limit[k] += v
 
   return limit
+
+exports.initializePlans = ->
+  for name, info in config.plans
+    plan = new Plan info
+    exports.plans[name] = plan
+
+exports.Plan = Plan = class Plan
+  constructor: (@info) ->
