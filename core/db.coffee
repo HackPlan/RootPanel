@@ -14,7 +14,16 @@ mongoose.connection.on 'error', (err) ->
   console.error err if err
 
 mongoose.connection.on 'connected', ->
-  cOption = mongoose.connection.db.collection 'options'
+  db = mongoose.connection.db
+
+  db.createCollection 'logs',
+    capped: true
+    size: 32 * 1024 * 1024
+  , (err, cLogs) ->
+    app.bunyanMongo.collection = cLogs
+    app.bunyanMongo.dequeueCachedRecords()
+
+  cOption = db.collection 'options'
 
   cOption.findOne
     key: 'db_version'

@@ -5,9 +5,11 @@ global.app = exports
 app.libs =
   _: require 'underscore'
   async: require 'async'
+  bunyan: require 'bunyan'
   bodyParser: require 'body-parser'
   child_process: require 'child_process'
   cookieParser: require 'cookie-parser'
+  expressBunyanLogger: require 'express-bunyan-logger'
   csrf: require 'csrf'
   crypto: require 'crypto'
   depd: require 'depd'
@@ -17,7 +19,6 @@ app.libs =
   harp: require 'harp'
   jade: require 'jade'
   markdown: require('markdown').markdown
-  middlewareInjector: require 'middleware-injector'
   moment: require 'moment-timezone'
   mongoose: require 'mongoose'
   morgan: require 'morgan'
@@ -35,20 +36,25 @@ app.libs =
   ObjectId: (require 'mongoose').Schema.Types.ObjectId
   Mixed: (require 'mongoose').Schema.Types.Mixed
 
-{cookieParser, crypto, bodyParser, depd, express, fs, harp, middlewareInjector, mongoose} = exports.libs
+{bunyan, cookieParser, crypto, bodyParser, depd, express, fs, harp, mongoose} = exports.libs
 {morgan, nodemailer, path, redis, _} = exports.libs
-
-app.logger = do ->
-  unless process.env.NODE_ENV == 'test'
-    return console
-
-  return {
-    log: ->
-    error: console.error
-  }
 
 app.package = require './package'
 app.deprecate = depd 'rootpanel'
+app.utils = require './core/utils'
+
+app.bunyanMongo = new app.utils.bunyanMongo()
+
+app.logger = bunyan.createLogger
+  name: app.package.name
+  streams: [
+    type: 'raw'
+    level: 'info'
+    stream: app.bunyanMongo
+  ,
+    level: process.env.LOG_LEVEL ? 'debug'
+    stream: process.stdout
+  ]
 
 do ->
   config_path = path.join __dirname, 'config.coffee'
@@ -79,7 +85,6 @@ app.express = express()
 
 app.config = config
 app.db = require './core/db'
-app.utils = require './core/utils'
 app.cache = require './core/cache'
 app.i18n = require './core/i18n'
 app.pluggable = require './core/pluggable'
@@ -98,15 +103,12 @@ app.billing = require './core/billing'
 app.middleware = require './core/middleware'
 app.notification = require './core/notification'
 
-unless process.env.NODE_ENV == 'test'
-  app.express.use morgan 'dev'
-
 app.express.use bodyParser.json()
 app.express.use cookieParser()
-app.express.use middlewareInjector
 
-app.express.use app.middleware.errorHandling
 app.express.use app.middleware.session()
+app.express.use app.middleware.logger()
+app.express.use app.middleware.errorHandling
 app.express.use app.middleware.csrf()
 app.express.use app.middleware.authenticate
 app.express.use app.middleware.accountHelpers
@@ -141,7 +143,7 @@ exports.start = _.once ->
     app.pluggable.selectHook(null, 'app.started').forEach (hook) ->
       hook.action()
 
-    app.logger.log "RootPanel start at #{config.web.listen}"
+    app.logger.info "RootPanel start at #{config.web.listen}"
 
 unless module.parent
   exports.start()

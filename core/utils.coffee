@@ -53,3 +53,19 @@ exports.pickErrorName = (error) ->
     return "#{err.path}_exist"
 
   return err.message
+
+exports.bunyanMongo = class BunyanMongo
+  queue: []
+
+  collection: null
+
+  dequeueCachedRecords: ->
+    while @queue.length
+      @write @queue.shift()
+
+  write: (data) ->
+    if @collection
+      @collection.insert data, (err) ->
+        console.error err if err
+    else
+      @queue.push data

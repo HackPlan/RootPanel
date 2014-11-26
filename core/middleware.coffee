@@ -1,5 +1,5 @@
 {config} = app
-{_, expressSession, redisStore, path, fs, moment} = app.libs
+{_, expressSession, redisStore, path, fs, moment, expressBunyanLogger} = app.libs
 {Account} = app.models
 
 exports.errorHandling = (req, res, next) ->
@@ -8,6 +8,16 @@ exports.errorHandling = (req, res, next) ->
       error: name
 
   next()
+
+exports.logger = ->
+  return expressBunyanLogger
+    logger: app.logger
+    parseUA: false
+    excludes: [
+      'req', 'res', 'body', 'short-body', 'http-version',
+      'incoming', 'req-headers', 'res-headers'
+    ]
+    genReqId: (req) -> req.sessionID
 
 exports.session = ->
   RedisStore = redisStore expressSession
@@ -108,7 +118,7 @@ exports.requireAuthenticate = (req, res, next) ->
       res.error 'auth_failed', null, 403
 
 exports.requireAdminAuthenticate = (req, res, next) ->
-  req.inject [exports.requireAuthenticate], ->
+  exports.requireAuthenticate req, res, ->
     unless 'root' in req.account.groups
       if req.method == 'GET'
         return res.status(403).end()
@@ -119,7 +129,7 @@ exports.requireAdminAuthenticate = (req, res, next) ->
 
 exports.requireInService = (service_name) ->
   return (req, res, next) ->
-    req.inject [exports.requireAuthenticate], ->
+    exports.requireAuthenticate req, res, ->
       unless service_name in req.account.billing.services
         return res.error 'not_in_service'
 

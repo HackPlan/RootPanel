@@ -20,7 +20,7 @@ describe 'app', ->
     mongoose.should.be.ok
 
   it 'app.logger should be available', ->
-    app.logger.log.should.be.a 'function'
+    app.logger.info.should.be.a 'function'
     app.logger.error.should.be.a 'function'
 
   it 'config.coffee should exists', ->

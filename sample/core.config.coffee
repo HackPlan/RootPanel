@@ -1,6 +1,6 @@
 module.exports =
   web:
-    t_name: 'plugins.rpvhost.'
+    t_name: 'RootPanel'
     url: 'http://rp.rpvhost.net'
     listen: '/home/rpadmin/rootpanel.sock'
     repo: 'jysperm/RootPanel'
