@@ -32,7 +32,22 @@ module.exports =
       t_name: 'plugins.rpvhost.plans.shadowsocks.name'
       t_description: 'plugins.rpvhost.plans.shadowsocks.description'
 
-      services: ['shadowsocks']
+      available_components:
+        shadowsocks:
+          limit: 1
+
+      resource_limit: {}
+
+      billing:
+        'shadowsocks.traffic':
+          bucket: 100 * 1000 * 1000
+          price: 0.06
+
+  nodes:
+    master:
+      ip: 'localhost'
+      master: true
+      available_components: []
 
   mongodb:
     user: 'rpadmin'

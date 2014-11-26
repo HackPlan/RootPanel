@@ -32,19 +32,29 @@ module.exports =
       t_name: 'plans.sample.name'
       t_description: 'plans.sample.description'
 
-      billing_by_time:
-        unit: 24 * 3600 * 1000
-        price: 10 / 30
+      available_components: {}
+      resource_limit: {}
 
-      services: []
-      resources: {}
+      billing:
+        time:
+          interval: 24 * 3600 * 1000
+          price: 10 / 30
+          prepaid: true
 
     test:
       t_name: 'plans.test.name'
       t_description: 'plans.test.description'
 
-      services: []
-      resources: {}
+      available_components: {}
+      resource_limit: {}
+
+      billing: {}
+
+  nodes:
+    master:
+      ip: 'localhost'
+      master: true
+      available_components: []
 
   mongodb:
     user: 'rpadmin'

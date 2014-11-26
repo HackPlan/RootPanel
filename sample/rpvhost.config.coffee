@@ -32,17 +32,34 @@ module.exports =
       t_name: 'plugins.rpvhost.plans.all.name'
       t_description: 'plugins.rpvhost.plans.all.description'
 
-      billing_by_time:
-        unit: 24 * 3600 * 1000
-        price: 10 / 30
+      available_components:
+        supervisor: {}
+        linux:
+          limit: 1
+          default: (account) ->
+            return username: account.username
+        ssh:
+          limit:1
+          default: (account) ->
+            return username: account.username
 
-      services: ['supervisor', 'linux', 'ssh']
-
-      resources:
+      resource_limit:
         cpu: 144
         storage: 520
         transfer: 39
         memory: 27
+
+      billing:
+        time:
+          interval: 24 * 3600 * 1000
+          price: 10 / 30
+          prepaid: true
+
+  nodes:
+    master:
+      ip: 'localhost'
+      master: true
+      available_components: []
 
   mongodb:
     user: 'rpadmin'
