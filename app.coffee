@@ -12,7 +12,6 @@ app.libs =
   expressBunyanLogger: require 'express-bunyan-logger'
   csrf: require 'csrf'
   crypto: require 'crypto'
-  depd: require 'depd'
   express: require 'express'
   fs: require 'fs'
   tmp: require 'tmp'
@@ -40,7 +39,6 @@ app.libs =
 {morgan, nodemailer, path, redis, _} = exports.libs
 
 app.package = require './package'
-app.deprecate = depd 'rootpanel'
 app.utils = require './core/utils'
 
 app.bunyanMongo = new app.utils.bunyanMongo()
@@ -60,7 +58,6 @@ do ->
   config_path = path.join __dirname, 'config.coffee'
 
   unless fs.existsSync config_path
-    app.deprecate 'config.coffee not found, copy sample config to ./config.coffee'
     fs.writeFileSync config_path, fs.readFileSync path.join __dirname, "./sample/core.config.coffee"
 
   fs.chmodSync config_path, 0o750
