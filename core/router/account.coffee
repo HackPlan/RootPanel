@@ -1,7 +1,7 @@
 {_, async, express} = app.libs
 {requireAuthenticate} = app.middleware
 {Account, SecurityLog} = app.models
-{config, utils, logger} = app
+{config, utils, logger, i18n} = app
 
 module.exports = exports = express.Router()
 
@@ -10,6 +10,12 @@ exports.get '/register', (req, res) ->
 
 exports.get '/login', (req, res) ->
   res.render 'account/login'
+
+express.get '/locale/:language?', (req, res) ->
+  if req.params['language']
+    req.cookies['language'] = req.params['language']
+
+  res.json i18n.pickClientLocale i18n.getLanguagesByReq req
 
 exports.get '/preferences', requireAuthenticate, (req, res) ->
   res.render 'account/preferences'

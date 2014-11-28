@@ -1,28 +1,38 @@
-path = require 'path'
-fs = require 'fs'
-_ = require 'underscore'
+{path, fs, _, Negotiator, jsonStableStringify} = app.libs
+{utils, cache, config} = app
 
-stringify = require 'json-stable-stringify'
-Negotiator = require 'negotiator'
+i18n = exports
 
-utils = require './utils'
-cache = require './cache'
-config = require '../config'
+i18n.i18n_data = i18n_data = {}
 
-i18n_data = {}
+i18n.init = (callback) ->
+  fs.readdir path.join(__dirname, 'locale'), (err, files) ->
+    logger.error err if err
 
-for filename in fs.readdirSync "#{__dirname}/locale"
-  language = path.basename filename, '.json'
-  i18n_data[language] = require "#{__dirname}/locale/#{filename}"
-  config.i18n.available_language = _.union config.i18n.available_language, [language]
+    for filename in files
+      language = path.basename filename, '.json'
+      i18n_data[language] = require path.join(__dirname, 'locale', filename)
+      config.i18n.available_language = _.union config.i18n.available_language, [language]
 
-exports.loadForPlugin = (plugin) ->
-  for filename in fs.readdirSync "#{__dirname}/../plugin/#{plugin.NAME}/locale"
-    language = path.basename filename, '.json'
-    i18n_data[language]['plugins'][plugin.NAME] = require "#{__dirname}/../plugin/#{plugin.NAME}/locale/#{filename}"
-    config.i18n.available_language = _.union config.i18n.available_language, [language]
+    callback()
+    
+i18n.initPlugins = (plugin, callback) ->
+  fs.readdir path.join(__dirname, '../plugin', plugin.name, 'locale'), (err, files) ->
+    logger.error err if err
+    
+    for filename in files
+      language = path.basename filename, '.json'
+      file_path = path.join __dirname, '../plugin', plugin.name, 'locale', filename
+      
+      i18n_data[language] ?= {}
+      i18n_data[language]['plugins'] ?= {}
+      i18n_data[language]['plugins'][plugin.name] = require file_path
 
-exports.parseLanguageCode = parseLanguageCode = (language) ->
+      config.i18n.available_language = _.union config.i18n.available_language, [language]
+
+    callback()
+      
+i18n.parseLanguageCode = parseLanguageCode = (language) ->
   [lang, country] = language.replace('-', '_').split '_'
 
   return {
@@ -31,38 +41,19 @@ exports.parseLanguageCode = parseLanguageCode = (language) ->
     country: country?.toUpperCase()
   }
 
-exports.calcLanguagePriority = (req) ->
+i18n.getLanguagesByReq = getLanguagesByReq = (req) ->
   negotiator = new Negotiator req
+  return [req.cookies.language].concat negotiator.languages()
 
-  result = []
-
-  if req.cookies.language
-    language_info = parseLanguageCode req.cookies.language
-
-    result = _.union result, _.filter config.i18n.available_language, (i) ->
-      return i.language == language_info.language
-
-    result = _.union result, _.filter config.i18n.available_language, (i) ->
-      return parseLanguageCode(i).lang == language_info.lang
-
-  result = _.union result, _.filter config.i18n.available_language, (i) ->
-    return parseLanguageCode(i).lang in negotiator.languages()
-
-  result.push config.i18n.default_language
-
-  result = _.union result, config.i18n.available_language
-
-  return result
-
-exports.translateByLanguage = (name, language) ->
+i18n.translateByLanguage = (name, language) ->
   return '' unless name
 
-  keys = name.split '.'
-  keys.unshift language
+  words = name.split '.'
+  words.unshift language
 
   result = i18n_data
 
-  for item in keys
+  for item in words
     if result[item] == undefined
       return undefined
     else
@@ -70,20 +61,18 @@ exports.translateByLanguage = (name, language) ->
 
   return result
 
-exports.translate = (name, req) ->
-  priority_order = exports.calcLanguagePriority req
-
-  for language in priority_order
-    result = exports.translateByLanguage name, language
+i18n.translate = (name, languages) ->
+  for language in languages
+    result = i18n.translateByLanguage name, language
 
     if result != undefined
       return result
 
   return name
 
-exports.getTranslator = (req) ->
-  return  (name, payload) ->
-    result = exports.translate name, req
+i18n.getTranslator = (languages) ->
+  return (name, payload) ->
+    result = exports.translate name, languages
 
     if _.isObject payload
       for k, v of payload
@@ -91,29 +80,31 @@ exports.getTranslator = (req) ->
 
     return result
 
-exports.pickClientLocale = (req) ->
-  cache_key = "client.locale:#{req.cookies['language']}/#{req.headers['accept-language']}"
-  cached_result = cache.counter.get cache_key
+i18n.getTranslatorByReq = (req) ->
+  return i18n.getTranslator getLanguagesByReq req
 
-  if cached_result
-    return cached_result
-
-  priority_order = exports.calcLanguagePriority req
-
+i18n.pickClientLocale = _.memoize (languages) ->
   result = {}
 
-  for language in priority_order
-    result = _.extend result, i18n_data[language]
-
-  cache.counter.set cache_key, result, NaN
+  for language in languages
+    _.extend result, i18n_data[language]
 
   return result
 
-exports.clientLocaleHash = (req) ->
-  return utils.sha256 stringify exports.pickClientLocale req
+, (languages) -> languages.join()
 
-exports.downloadLocales = (req, res) ->
-  if req.params['language']
-    req.cookies['language'] = req.params['language']
+i18n.languagePriority = _.memoize (languages) ->
+  result = _.filter languages, (language) ->
+    return language in config.i18n.available_language
 
-  res.json exports.pickClientLocale req
+  result = _.union result, _.filter languages, (language) ->
+    for available_language in config.i18n.available_language
+      if parseLanguageCode(available_language).lang == parseLanguageCode(language).lang
+        return true
+
+  return _.union result, [config.i18n.default_language], config.i18n.available_language
+
+, (languages) -> languages.join()
+
+i18n.localeHash = (req) ->
+  return utils.sha256 jsonStableStringify exports.pickClientLocale getLanguagesByReq req

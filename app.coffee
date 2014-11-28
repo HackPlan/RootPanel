@@ -29,7 +29,9 @@ app.libs =
   request: require 'request'
   expressSession: require 'express-session'
   mongooseUniqueValidator: require 'mongoose-unique-validator'
+  jsonStableStringify: require 'json-stable-stringify'
 
+  Negotiator: require 'negotiator'
   ObjectID: (require 'mongoose').Types.ObjectId
 
   ObjectId: (require 'mongoose').Schema.Types.ObjectId
