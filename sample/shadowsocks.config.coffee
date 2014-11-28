@@ -15,8 +15,9 @@ module.exports =
     default_timezone: 'Asia/Shanghai'
 
   plugin:
-    available_extensions: ['bitcoin', 'wiki', 'rpvhost']
-    available_services: ['linux', 'supervisor', 'shadowsocks']
+    available_plugins: [
+      'bitcoin', 'wiki', 'rpvhost', 'linux', 'supervisor', 'shadowsocks'
+    ]
 
   billing:
     currency: 'CNY'

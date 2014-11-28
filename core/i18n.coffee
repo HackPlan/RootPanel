@@ -5,33 +5,23 @@ i18n = exports
 
 i18n.i18n_data = i18n_data = {}
 
-i18n.init = (callback) ->
-  fs.readdir path.join(__dirname, 'locale'), (err, files) ->
-    logger.error err if err
+i18n.init = ->
+  for filename in fs.readdirSync path.join(__dirname, 'locale')
+    language = path.basename filename, '.json'
+    i18n_data[language] = require path.join(__dirname, 'locale', filename)
+    config.i18n.available_language = _.union config.i18n.available_language, [language]
 
-    for filename in files
-      language = path.basename filename, '.json'
-      i18n_data[language] = require path.join(__dirname, 'locale', filename)
-      config.i18n.available_language = _.union config.i18n.available_language, [language]
+i18n.initPlugin = (plugin) ->
+  for filename in fs.readdirSync path.join(__dirname, '../plugin', plugin.name, 'locale')
+    language = path.basename filename, '.json'
+    file_path = path.join __dirname, '../plugin', plugin.name, 'locale', filename
 
-    callback()
-    
-i18n.initPlugins = (plugin, callback) ->
-  fs.readdir path.join(__dirname, '../plugin', plugin.name, 'locale'), (err, files) ->
-    logger.error err if err
-    
-    for filename in files
-      language = path.basename filename, '.json'
-      file_path = path.join __dirname, '../plugin', plugin.name, 'locale', filename
-      
-      i18n_data[language] ?= {}
-      i18n_data[language]['plugins'] ?= {}
-      i18n_data[language]['plugins'][plugin.name] = require file_path
+    i18n_data[language] ?= {}
+    i18n_data[language]['plugins'] ?= {}
+    i18n_data[language]['plugins'][plugin.name] = require file_path
 
-      config.i18n.available_language = _.union config.i18n.available_language, [language]
+    config.i18n.available_language = _.union config.i18n.available_language, [language]
 
-    callback()
-      
 i18n.parseLanguageCode = parseLanguageCode = (language) ->
   [lang, country] = language.replace('-', '_').split '_'
 

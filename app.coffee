@@ -89,6 +89,7 @@ app.i18n = require './core/i18n'
 app.pluggable = require './core/pluggable'
 
 app.models = {}
+app.classes = {}
 
 require './core/model/Account'
 require './core/model/Financials'
@@ -117,8 +118,6 @@ app.express.use app.middleware.accountHelpers
 app.express.set 'views', path.join(__dirname, 'core/view')
 app.express.set 'view engine', 'jade'
 
-app.express.get '/locale/:language?', app.i18n.downloadLocales
-
 app.express.use '/account', require './core/router/account'
 app.express.use '/billing', require './core/router/billing'
 app.express.use '/ticket', require './core/router/ticket'
@@ -126,9 +125,10 @@ app.express.use '/coupon', require './core/router/coupon'
 app.express.use '/admin', require './core/router/admin'
 app.express.use '/panel', require './core/router/panel'
 
-app.billing.initializePlans()
-app.clusters.initializeNodes()
-app.pluggable.initializePlugins()
+app.billing.initPlans()
+app.clusters.initNodes()
+app.i18n.init()
+app.pluggable.initPlugins()
 
 app.express.get '/', (req, res) ->
   unless res.headerSent

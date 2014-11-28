@@ -1,34 +1,31 @@
 {async, path, harp, jade, tmp, fs, _, child_process} = app.libs
 {i18n, config, logger} = app
 
-exports.plugins = {}
+pluggable = exports
 
-exports.hooks =
+pluggable.plugins = {}
+pluggable.components = {}
+
+pluggable.hooks =
   app:
     # action: function
-    started: _.extend [],
-      global_event: true
+    started: []
 
     # path: string
-    ignore_csrf: _.extend [],
-      global_event: true
+    ignore_csrf: []
 
   model:
     # model: string, field: string, type: string
-    type_enum: _.extend [],
-      global_event: true
+    type_enum: []
 
     # model: string, action(schema, callback)
-    middleware: _.extend [],
-      global_event: true
+    middleware: []
 
   account:
     # filter: function(username, callback(is_allow))
-    username_filter: _.extend [],
-      global_event: true
+    username_filter: []
     # filter: function(account, callback)
-    before_register: _.extend [],
-      global_event: true
+    before_register: []
     # filter: function(account, callback)
     resources_limit_changed: []
 
@@ -47,8 +44,7 @@ exports.hooks =
 
     admin:
       # generator: function(req, callback)
-      sidebars: _.extend [],
-        global_event: true
+      sidebars: []
 
     panel:
       # path
@@ -62,151 +58,120 @@ exports.hooks =
       # type, filter: function(req, deposit_log, callback(l_details))
       display_payment_details: []
 
-  service:
-    'service_name':
-      # filter: function(account, callback)
-      enable: []
-      # filter: function(account, callback)
-      disable: []
+Plugin = class Plugin
+  info: null
+  name: null
+  config: null
 
-  plugin:
-    wiki:
-      # t_category, t_title, language, content_markdown
-      pages: []
-
-exports.createHookPoint = (hook_name) ->
-  keys = hook_name.split '.'
-
-  pointer = exports.hooks
-
-  for item in keys
-    if pointer[item] == undefined
-      pointer[item] = {}
-
-    pointer = pointer[item]
-
-exports.registerHook = (hook_name, plugin, payload) ->
-  keys = hook_name.split '.'
-  last_key = keys.pop()
-
-  pointer = exports.hooks
-
-  for item in keys
-    if pointer[item] == undefined
-      pointer[item] = {}
-      pointer = pointer[item]
-    else
-      pointer = pointer[item]
-
-  pointer[last_key] ?= []
-  pointer[last_key].push _.extend payload,
-    plugin_info: plugin
-
-exports.selectHook = (account, hook_name) ->
-  keys = hook_name.split '.'
-
-  pointer = exports.hooks
-
-  for item in keys
-    if pointer[item] == undefined
-      pointer[item] = {}
-      pointer = pointer[item]
-    else
-      pointer = pointer[item]
-
-  return _.filter pointer, (hook) ->
-    if hook.plugin_info.type == 'extension'
-      return true
-    else if pointer.global_event or hook.always_notice
-      return true
-    else if !account
-      return false
-    else if hook.plugin_info.NAME in account.billing.services
-      return true
-    else
-      return false
-
-exports.initializePlugin = (name) ->
-  plugin_path = "#{__dirname}/../plugin/#{name}"
-  plugin = require plugin_path
-
-  if fs.existsSync path.join(plugin_path, 'locale')
-    i18n.loadForPlugin plugin
-
-  if fs.existsSync path.join(plugin_path, 'static')
-    app.express.use harp.mount("/plugin/#{name}", path.join(plugin_path, 'static'))
-
-exports.initializePlugins = ->
-  plugins = _.union config.plugin.available_extensions, config.plugin.available_services
-
-  for name in plugins
-    plugin = require "#{__dirname}/../plugin/#{name}"
-
-    if plugin.dependencies
-      for dependence in plugin.dependencies
-        unless dependence in plugins
-          throw new Error "#{name} is Dependent on #{dependence} but not load"
-
-    exports.plugins[name] = plugin
-
-  for name, plugin of exports.plugins
-    exports.initializePlugin name
-
-exports.ComponentMeta = class ComponentMeta
   constructor: (@info) ->
+    @name = @info.name
+    @config = config.plugins[@name] ? {}
 
-exports.Plugin = class Plugin
-  @registerHook: (hook_name, payload) ->
-    return exports.registerHook hook_name, @, payload
+  registerComponent: (info) ->
+    component_meta = new ComponentMeta _.extend info,
+      plugin: @
 
-  @registerServiceHook: (hook_name, payload) ->
-    return @registerHook "service.#{@NAME}.#{hook_name}", payload
+    pluggable.components[info.name] = component_meta
 
-  @t: (req) ->
+  registerHook: (name, payload) ->
+    words = name.split '.'
+    last_word = words.pop()
+
+    hook_path = pluggable.selectHookPath words.join('.')
+    hook_path[last_word] ?= []
+
+    hook_path[last_word].push _.extend payload,
+      plugin: @
+
+  getTranslator: (languages) ->
     return (name) =>
-      full_name = "plugins.#{@NAME}.#{name}"
+      if _.isArray languages
+        t = i18n.getTranslator languages
+      else
+        t = i18n.getTranslatorByReq languages
 
       args = _.toArray arguments
-      args[0] = full_name
+      args[0] = "plugins.#{@name}.#{name}"
 
-      full_result = req.res.locals.t.apply @, args
+      full_result = t.apply @, args
 
       unless full_result == full_name
         return full_result
 
-      return req.res.locals.t.apply @, _.toArray(arguments)
+      return t.apply @, _.toArray(arguments)
 
-  @render: (template_name, req, view_data, callback) ->
-    template_path = "#{__dirname}/../plugin/#{@NAME}/view/#{template_name}.jade"
+  render: (name, req, view_data, callback) ->
+    template_path = path.join __dirname, '../plugin', @name, 'view', "#{name}.jade"
 
     locals = _.extend _.clone(req.res.locals), view_data,
       account: req.account
-      t: @t req
+      t: @getTranslator req
 
     jade.renderFile template_path, locals, (err, html) ->
       logger.error err if err
       callback html
 
-  @renderTemplate: (name, view_data, callback) ->
-    template_path = "#{__dirname}/../plugin/#{@NAME}/template/#{name}"
+  renderTemplate: (name, view_data, callback) ->
+    template_path = path.join __dirname, '../plugin', @name, 'view', name
 
     fs.readFile template_path, (err, template_file) ->
       callback _.template(template_file.toString()) view_data
 
-  @writeConfigFile: (filename, content, options, callback) ->
-    unless callback
-      [options, callback] = [{}, options]
+ComponentMeta = class ComponentMeta
+  info: null
+  name: null
 
-    tmp.file
-      mode: options.mode ? 0o750
-    , (err, filepath, fd) ->
-      logger.error err if err
+  constructor: (@info) ->
+    @name = @info.name
 
-      fs.writeSync fd, content, 0, 'utf8'
-      fs.closeSync fd
+pluggable.selectHookPath = (name) ->
+  words = name.split '.'
 
-      child_process.exec "sudo cp #{filepath} #{filename}", (err) ->
-        logger.error err if err
+  hook_path = pluggable.hooks
 
-        fs.unlink filepath, ->
-          callback()
+  for word in words
+    hook_path[word] ?= {}
+    hook_path = hook_path[word]
+
+  return path
+
+pluggable.selectHook = (name) ->
+  return pluggable.selectHookPath name
+
+pluggable.initPlugin = (name) ->
+  plugin_path = path.join __dirname, '../plugin', name
+  plugin = require plugin_path
+
+  for path, payload in plugin.register_hooks ? {}
+    if payload.test and payload.test.apply @
+      plugin.registerHook path, payload
+
+  plugin.initialize()
+
+  if fs.existsSync path.join(plugin_path, 'locale')
+    i18n.initPlugin plugin, callback
+
+  if fs.existsSync path.join(plugin_path, 'static')
+    app.express.use harp.mount "/plugin/#{name}", path.join(plugin_path, 'static')
+
+pluggable.initPlugins = ->
+  plugins_name = config.plugin.available_plugins
+
+  for name in plugins_name
+    plugin = require path.join __dirname, '../plugin', name
+
+    if plugin.dependencies
+      for dependence in plugin.dependencies
+        unless dependence in plugins_name
+          err = new Error "#{name} is Dependent on #{dependence} but not load"
+          logger.fatal err
+          throw err
+
+    exports.plugins[name] = plugin
+
+  for name in plugins_name
+    pluggable.initPlugin name
+
+_.extend app.classes,
+  Plugin: Plguin
+  ComponentMeta: ComponentMeta

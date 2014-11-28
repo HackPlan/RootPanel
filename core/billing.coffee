@@ -186,10 +186,14 @@ exports.calcResourcesLimit = (plans) ->
 
   return limit
 
-exports.initializePlans = ->
+exports.initPlans = ->
   for name, info in config.plans
     plan = new Plan info
     exports.plans[name] = plan
 
 exports.Plan = Plan = class Plan
+  info: null
+  name: null
+
   constructor: (@info) ->
+    @name = @info.name

@@ -73,6 +73,19 @@ exports.getGroup = (callback) ->
       SETEX result, 120
   , callback
 
+# callback(is_available)
+exports.isUsernameAvailable = (username, callback) ->
+  async.parallel
+    passwd: wrapAsync exports.getPasswdMap
+    group: wrapAsync exports.getGroup
+  , (err, result) ->
+    if username in _.values result.passwd
+      callback false
+    else if username in _.values result.group
+      callback false
+    else
+      callback true
+
 exports.getMemoryInfo = (callback) ->
   cache.try 'linux.getMemoryInfo', (SETEX) ->
     fs.readFile '/proc/meminfo', (err, content) ->

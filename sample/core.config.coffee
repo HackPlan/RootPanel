@@ -15,8 +15,7 @@ module.exports =
     default_timezone: 'Asia/Shanghai'
 
   plugin:
-    available_extensions: []
-    available_services: []
+    available_plugins: []
 
   billing:
     currency: 'CNY'
