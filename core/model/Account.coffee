@@ -106,7 +106,7 @@ Account.path('username').validate (username) ->
 , 'invalid_username'
 
 Account.path('username').validate (username, callback) ->
-  async.each pluggable.selectHook(null, 'account.username_filter'), (hook, callback) ->
+  async.each pluggable.selectHook('account.username_filter'), (hook, callback) ->
     hook.filter username, (is_allow) ->
       if is_allow
         callback()
@@ -140,7 +140,7 @@ Account.statics.register = (account, callback) ->
 
     pluggable: {}
 
-  async.each pluggable.selectHook(account, 'account.before_register'), (hook, callback) ->
+  async.each pluggable.selectHook('account.before_register'), (hook, callback) ->
     hook.filter account, callback
   , ->
     account.save (err) ->

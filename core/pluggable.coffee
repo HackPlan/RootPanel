@@ -133,7 +133,7 @@ pluggable.selectHookPath = (name) ->
     hook_path[word] ?= {}
     hook_path = hook_path[word]
 
-  return path
+  return hook_path
 
 pluggable.selectHook = (name) ->
   return pluggable.selectHookPath name
@@ -173,5 +173,5 @@ pluggable.initPlugins = ->
     pluggable.initPlugin name
 
 _.extend app.classes,
-  Plugin: Plguin
+  Plugin: Plugin
   ComponentMeta: ComponentMeta

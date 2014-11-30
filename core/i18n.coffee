@@ -92,7 +92,7 @@ i18n.languagePriority = _.memoize (languages) ->
       if parseLanguageCode(available_language).lang == parseLanguageCode(language).lang
         return true
 
-  return _.union result, [config.i18n.default_language], config.i18n.available_language
+  return _.union result, config.i18n.available_language
 
 , (languages) -> languages.join()
 

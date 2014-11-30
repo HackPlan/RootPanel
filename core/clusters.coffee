@@ -1,3 +1,4 @@
+{SSHConnection, fs} = app.libs
 {config} = app
 
 exports.nodes = {}
@@ -9,10 +10,27 @@ exports.Node = Node = class Node
   constructor: (@info) ->
     @name = @info.name
 
-  writeConfigFile: (filename, content, options, callback) ->
-    unless callback
-      [options, callback] = [{}, options]
+  runCommand: (command, callback) ->
 
+  runCommandRemote: (command, callback) ->
+    connection = new SSHConnection()
+
+    connection.on 'ready', ->
+      connection.exec command, (err, stream) ->
+        result = ''
+
+        stream.on 'data', (data) ->
+          result += data
+
+        stream.on 'exit', ->
+          callback err, result
+
+    connection.connect
+      host: @info.host
+      username: 'rpadmin'
+      privateKey: fs.readFileSync '/home/rpadmin/.ssh/id_rsa'
+
+  writeFile: (filename, body, options, callback) ->
     tmp.file
       mode: options.mode ? 0o750
     , (err, filepath, fd) ->
@@ -26,6 +44,8 @@ exports.Node = Node = class Node
 
         fs.unlink filepath, ->
           callback()
+
+  writeFileRemote: (filename, body, options, callback) ->
 
 exports.initNodes = ->
   for name, info of config.nodes

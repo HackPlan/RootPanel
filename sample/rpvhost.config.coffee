@@ -58,7 +58,7 @@ module.exports =
 
   nodes:
     master:
-      ip: 'localhost'
+      host: 'localhost'
       master: true
       available_components: []
 

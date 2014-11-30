@@ -49,9 +49,7 @@ describe 'model/CouponCode', ->
   describe 'getMessage', ->
     it 'should success', (done) ->
       req =
-        t: app.i18n.getTranslator
-          headers: {}
-          cookies: {}
+        t: app.i18n.getTranslator ['zh_CN']
 
       coupon1.getMessage req, (message) ->
         message.should.be.equal '代金券：4 CNY'

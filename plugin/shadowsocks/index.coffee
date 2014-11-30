@@ -2,77 +2,76 @@
 {pluggable, config, utils} = app
 {Financials} = app.models
 
-exports = module.exports = class ShadowSocksPlugin extends pluggable.Plugin
-  @NAME: 'shadowsocks'
-  @type: 'service'
-  @dependencies: ['supervisor', 'linux']
-
 shadowsocks = require './shadowsocks'
 
-exports.registerHook 'plugin.wiki.pages',
-  always_notice: true
-  t_category: 'plugins.shadowsocks.'
-  t_title: 'README.md'
-  language: 'zh_CN'
-  content_markdown: fs.readFileSync("#{__dirname}/wiki/README.md").toString()
+shadowsocksPlugin = module.exports = new Plugin
+  name: 'shadowsocks'
+  dependencies: ['supervisor', 'linux']
 
-exports.registerHook 'view.panel.scripts',
-  path: '/plugin/shadowsocks/script/panel.js'
+  register_hooks:
+    'plugin.wiki.pages':
+      t_category: 'plugins.shadowsocks.'
+      t_title: 'README.md'
+      language: 'zh_CN'
+      content_markdown: fs.readFileSync("#{__dirname}/wiki/README.md").toString()
 
-exports.registerHook 'view.panel.styles',
-  path: '/plugin/shadowsocks/style/panel.css'
+    'app.started': [
+      action: shadowsocks.initSupervisor
+    ,
+      test: -> @config.monitor_cycle
+      action: ->
+        setInterval shadowsocks.monitoring, config.plugins.shadowsocks.monitor_cycle
+    ]
 
-exports.registerHook 'view.panel.widgets',
-  generator: (req, callback) ->
-    price_gb = config.plugins.shadowsocks.price_bucket * (1000 * 1000 * 1000 / config.plugins.shadowsocks.billing_bucket)
+    'view.admin.sidebars':
+      generator: (req, callback) ->
+        Financials.find
+          type: 'usage_billing'
+          'payload.service': 'shadowsocks'
+          created_at:
+            $gte: new Date Date.now() - 30 * 24 * 3600 * 1000
+        , (err, financials) ->
+          time_range =
+            traffic_24hours: 24 * 3600 * 1000
+            traffic_3days: 3 * 24 * 3600 * 1000
+            traffic_7days: 7 * 24 * 3600 * 1000
+            traffic_30days: 30 * 24 * 3600 * 1000
 
-    shadowsocks.accountUsage req.account, (result) ->
-      _.extend result,
-        transfer_remainder: req.account.billing.balance / price_gb
+          traffic_result = {}
 
-      exports.render 'widget', req, result, callback
+          for name, range of time_range
+            logs = _.filter financials, (i) ->
+              return i.created_at.getTime() > Date.now() - range
 
-exports.registerHook 'view.admin.sidebars',
-  generator: (req, callback) ->
-    Financials.find
-      type: 'usage_billing'
-      'payload.service': 'shadowsocks'
-      created_at:
-        $gte: new Date Date.now() - 30 * 24 * 3600 * 1000
-    , (err, financials) ->
-      time_range =
-        traffic_24hours: 24 * 3600 * 1000
-        traffic_3days: 3 * 24 * 3600 * 1000
-        traffic_7days: 7 * 24 * 3600 * 1000
-        traffic_30days: 30 * 24 * 3600 * 1000
+            traffic_result[name] = _.reduce logs, (memo, i) ->
+              return memo + i.payload.traffic_mb
+            , 0
 
-      traffic_result = {}
+          exports.render 'admin/sidebar', req, traffic_result, callback
 
-      for name, range of time_range
-        logs = _.filter financials, (i) ->
-          return i.created_at.getTime() > Date.now() - range
+  initialize: ->
+    app.express.use '/plugin/shadowsocks', require './router'
 
-        traffic_result[name] = _.reduce logs, (memo, i) ->
-          return memo + i.payload.traffic_mb
-        , 0
+shadowsocksPlugin.registerComponent
+  name: 'shadowsocks'
 
-      exports.render 'admin/sidebar', req, traffic_result, callback
+  initialize: shadowsocks.initAccount
+  destroy: shadowsocks.deleteAccount
 
-exports.registerHook 'app.started',
-  action: ->
-    shadowsocks.initSupervisor ->
+  register_hooks:
+    'view.panel.scripts':
+      path: '/plugin/shadowsocks/script/panel.js'
 
-exports.registerServiceHook 'enable',
-  filter: (account, callback) ->
-    shadowsocks.initAccount account, callback
+    'view.panel.styles':
+      path: '/plugin/shadowsocks/style/panel.css'
 
-exports.registerServiceHook 'disable',
-  filter: (account, callback) ->
-    shadowsocks.deleteAccount account, callback
+    'view.panel.widgets':
+      generator: (req, callback) ->
+        bucket_of_gb = 1000 * 1000 * 1000 / config.plugins.shadowsocks.billing_bucket
+        price_gb = config.plugins.shadowsocks.price_bucket * bucket_of_gb
 
-app.express.use '/plugin/shadowsocks', require './router'
+        shadowsocks.accountUsage req.account, (result) ->
+          _.extend result,
+            transfer_remainder: req.account.billing.balance / price_gb
 
-if config.plugins.shadowsocks?.monitor_cycle
-  exports.registerHook 'app.started',
-    action: ->
-      setInterval shadowsocks.monitoring, config.plugins.shadowsocks.monitor_cycle
+          exports.render 'widget', req, result, callback

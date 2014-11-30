@@ -2,15 +2,10 @@
 {async, _} = app.libs
 {Account, Financials} = app.models
 
-exports.plans = {}
+billing = exports
+billing.plans = {}
 
-exports.run = ->
-  exports.cyclicalBilling ->
-    setInterval ->
-      exports.cyclicalBilling ->
-    , config.billing.billing_cycle
-
-exports.cyclicalBilling = (callback) ->
+billing.start = ->
   Account.find
     'billing.plans.0':
       $exists: true
@@ -20,19 +15,6 @@ exports.cyclicalBilling = (callback) ->
         callback()
     , ->
       callback()
-
-exports.isForceFreeze = (account) ->
-  if _.isEmpty account.billing.plans
-    return false
-
-  if account.billing.balance < config.billing.force_freeze.when_balance_below
-    return true
-
-  if account.billing.arrears_at
-    if Date.now() > account.billing.arrears_at.getTime() + config.billing.force_freeze.when_arrears_above
-      return true
-
-  return false
 
 # @param callback(account)
 exports.triggerBilling = (account, callback) ->
@@ -120,12 +102,12 @@ exports.joinPlan = (req, account, plan_name, callback) ->
     logger.error err if err
 
     async.each _.difference(account.billing.services, original_account.billing.services), (service_name, callback) ->
-      async.each pluggable.selectHook(account, "service.#{service_name}.enable"), (hook, callback) ->
+      async.each pluggable.selectHook("service.#{service_name}.enable"), (hook, callback) ->
         hook.filter account, callback
       , callback
     , ->
       unless _.isEqual original_account.resources_limit, account.resources_limit
-        async.each pluggable.selectHook(account, 'account.resources_limit_changed'), (hook, callback) ->
+        async.each pluggable.selectHook('account.resources_limit_changed'), (hook, callback) ->
           hook.filter account, callback
         , callback
       else
@@ -156,16 +138,29 @@ exports.leavePlan = (req, account, plan_name, callback) ->
     logger.error err if err
 
     async.each leaved_services, (service_name, callback) ->
-      async.each pluggable.selectHook(original_account, "service.#{service_name}.disable"), (hook, callback) ->
+      async.each pluggable.selectHook("service.#{service_name}.disable"), (hook, callback) ->
         hook.filter account, callback
       , callback
     , ->
       unless _.isEqual original_account.resources_limit, account.resources_limit
-        async.each pluggable.selectHook(account, 'account.resources_limit_changed'), (hook, callback) ->
+        async.each pluggable.selectHook('account.resources_limit_changed'), (hook, callback) ->
           hook.filter account, callback
         , callback
       else
         callback()
+
+exports.isForceFreeze = (account) ->
+  if _.isEmpty account.billing.plans
+    return false
+
+  if account.billing.balance < config.billing.force_freeze.when_balance_below
+    return true
+
+  if account.billing.arrears_at
+    if Date.now() > account.billing.arrears_at.getTime() + config.billing.force_freeze.when_arrears_above
+      return true
+
+  return false
 
 # @param callback(account)
 exports.forceLeaveAllPlans = (account, callback) ->

@@ -12,7 +12,7 @@ exports.get '/financials', (req, res) ->
 
   async.parallel
     payment_methods: (callback) ->
-      async.map pluggable.selectHook(req.account, 'billing.payment_methods'), (hook, callback) ->
+      async.map pluggable.selectHook('billing.payment_methods'), (hook, callback) ->
         hook.widget_generator req, (html) ->
           callback null, html
       , callback
@@ -29,7 +29,7 @@ exports.get '/financials', (req, res) ->
         async.map deposit_logs, (deposit_log, callback) ->
           deposit_log = deposit_log.toObject()
 
-          matched_hook = _.find pluggable.selectHook(req.account, 'view.pay.display_payment_details'), (hook) ->
+          matched_hook = _.find pluggable.selectHook('view.pay.display_payment_details'), (hook) ->
             return hook?.type == deposit_log.payload.type
 
           unless matched_hook
@@ -67,7 +67,7 @@ exports.get '/', (req, res) ->
         name: name
         is_enable: name in req.account.billing.plans
 
-    async.map pluggable.selectHook(account, 'view.panel.widgets'), (hook, callback) ->
+    async.map pluggable.selectHook('view.panel.widgets'), (hook, callback) ->
       hook.generator req, (html) ->
         callback null, html
 

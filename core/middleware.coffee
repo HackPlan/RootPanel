@@ -35,7 +35,7 @@ exports.csrf = ->
   csrf = app.libs.csrf()
 
   return (req, res, next) ->
-    if req.path in _.pluck app.pluggable.selectHook(null, 'app.ignore_csrf'), 'path'
+    if req.path in _.pluck app.pluggable.selectHook('app.ignore_csrf'), 'path'
       return next()
 
     validator = ->
@@ -76,7 +76,7 @@ exports.accountHelpers = (req, res, next) ->
     language: req.cookies.language ? config.i18n.default_language
     timezone: req.cookies.timezone ? config.i18n.default_timezone
 
-    t: app.i18n.getTranslator req
+    t: app.i18n.getTranslatorByReq req
 
     moment: ->
       if res.language and res.language != 'auto'
@@ -103,8 +103,7 @@ exports.accountHelpers = (req, res, next) ->
     t: res.t
     moment: res.moment
 
-    selectHook: (name) ->
-      return app.pluggable.selectHook req.account, name
+    selectHook: app.pluggable.selectHook
 
   next()
 

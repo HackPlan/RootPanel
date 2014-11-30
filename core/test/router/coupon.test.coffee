@@ -7,7 +7,7 @@ describe 'router/coupon', ->
     {agent, csrf_token} = namespace.accountRouter
     {coupon3} = namespace.couponCodeModel
 
-  it 'GET info', (done) ->
+  it.skip 'GET info', (done) ->
     agent.get '/coupon/info'
     .query
       code: coupon3.code

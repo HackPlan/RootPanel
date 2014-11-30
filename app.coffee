@@ -31,6 +31,7 @@ app.libs =
   mongooseUniqueValidator: require 'mongoose-unique-validator'
   jsonStableStringify: require 'json-stable-stringify'
 
+  SSHConnection: require 'ssh2'
   Negotiator: require 'negotiator'
   ObjectID: (require 'mongoose').Types.ObjectId
 
@@ -143,7 +144,7 @@ exports.start = _.once ->
     if fs.existsSync config.web.listen
       fs.chmodSync config.web.listen, 0o770
 
-    app.pluggable.selectHook(null, 'app.started').forEach (hook) ->
+    app.pluggable.selectHook('app.started').forEach (hook) ->
       hook.action()
 
     app.logger.info "RootPanel start at #{config.web.listen}"

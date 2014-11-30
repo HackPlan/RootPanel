@@ -11,7 +11,7 @@ exports.get '/register', (req, res) ->
 exports.get '/login', (req, res) ->
   res.render 'account/login'
 
-express.get '/locale/:language?', (req, res) ->
+exports.get '/locale/:language?', (req, res) ->
   if req.params['language']
     req.cookies['language'] = req.params['language']
 
