@@ -24,16 +24,19 @@ i18n.initPlugin = (plugin) ->
 
 i18n.parseLanguageCode = parseLanguageCode = (language) ->
   [lang, country] = language.replace('-', '_').split '_'
+  lang = lang?.toLowerCase() ? null
+  country = country?.toUpperCase() ? null
 
   return {
     language: language
-    lang: lang?.toLowerCase()
-    country: country?.toUpperCase()
+    lang_country: if country then "#{lang}_#{country}" else lang
+    lang: lang
+    country: country
   }
 
 i18n.getLanguagesByReq = getLanguagesByReq = (req) ->
   negotiator = new Negotiator req
-  return [req.cookies.language].concat negotiator.languages()
+  return _.uniq _.compact [req.cookies.language].concat negotiator.languages()
 
 i18n.translateByLanguage = (name, language) ->
   return '' unless name
@@ -62,7 +65,7 @@ i18n.translate = (name, languages) ->
 
 i18n.getTranslator = (languages) ->
   return (name, payload) ->
-    result = exports.translate name, languages
+    result = exports.translate name, i18n.languagePriority languages
 
     if _.isObject payload
       for k, v of payload
@@ -84,15 +87,23 @@ i18n.pickClientLocale = _.memoize (languages) ->
 , (languages) -> languages.join()
 
 i18n.languagePriority = _.memoize (languages) ->
-  result = _.filter languages, (language) ->
-    return language in config.i18n.available_language
+  result = []
 
-  result = _.union result, _.filter languages, (language) ->
+  for language in languages
+    {lang_country} = parseLanguageCode language
     for available_language in config.i18n.available_language
-      if parseLanguageCode(available_language).lang == parseLanguageCode(language).lang
-        return true
+      if parseLanguageCode(available_language).lang_country == lang_country
+        result.push lang_country
 
-  return _.union result, config.i18n.available_language
+  for language in languages
+    {lang, lang_country} = parseLanguageCode language
+    for available_language in config.i18n.available_language
+      if parseLanguageCode(available_language).lang == lang
+        result.push lang_country
+
+  result = _.union _.uniq(result), config.i18n.available_language
+
+  return _.filter result, (i) -> i in config.i18n.available_language
 
 , (languages) -> languages.join()
 
