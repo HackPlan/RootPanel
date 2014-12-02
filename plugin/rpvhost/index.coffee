@@ -11,6 +11,14 @@ rpvhostPlugin = module.exports = new Plugin
       target: '_blank'
       t_body: 'official_blog'
 
+    'plugins.wiki.pages':
+      category: 'rpvhost'
+      name: 'Terms.md'
+      t_category: ''
+      t_title: 'terms'
+      language: 'zh_CN'
+      content_markdown: fs.readFileSync("#{__dirname}/wiki/Terms.md").toString()
+
     'billing.payment_methods':
       type: 'taobao'
       widget_generator: (req, callback) ->
