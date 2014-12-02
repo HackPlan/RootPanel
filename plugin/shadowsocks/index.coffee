@@ -18,7 +18,7 @@ shadowsocksPlugin = module.exports = new Plugin
     'app.started': [
       action: shadowsocks.initSupervisor
     ,
-      test: -> @config.monitor_cycle
+      register_if: -> @config.monitor_cycle
       action: ->
         setInterval shadowsocks.monitoring, config.plugins.shadowsocks.monitor_cycle
     ]

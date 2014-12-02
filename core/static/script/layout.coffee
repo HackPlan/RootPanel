@@ -49,7 +49,7 @@ $ ->
   if client_version == latest_version
     window.i18n_data = JSON.parse localStorage.getItem 'locale_cache'
   else
-    $.getJSON "/locale/", (result) ->
+    $.getJSON "/account/locale/", (result) ->
       window.i18n_data = result
 
       localStorage.setItem 'locale_version', latest_version

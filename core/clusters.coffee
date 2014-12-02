@@ -1,4 +1,4 @@
-{SSHConnection, fs, child_process} = app.libs
+{SSHConnection, fs, child_process, _, async} = app.libs
 {config, logger} = app
 
 clusters = exports
@@ -111,7 +111,6 @@ clusters.Node = Node = class Node
     stderr = ''
 
     @connectRemote (connection) ->
-      console.log command
       connection.exec command, (err, stream) ->
         return callback err if err
 

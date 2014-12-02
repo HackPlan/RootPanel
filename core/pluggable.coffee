@@ -30,7 +30,9 @@ pluggable.hooks =
     resources_limit_changed: []
 
   billing:
-    # widget_generator: function(req, callback(html))
+    # type
+    # widget_generator: function(req, callback(html)),
+    # details_message: function(req, deposit_log, callback(l_details))
     payment_methods: []
 
   view:
@@ -54,22 +56,41 @@ pluggable.hooks =
       # path
       styles: []
 
-    pay:
-      # type, filter: function(req, deposit_log, callback(l_details))
-      display_payment_details: []
-
 Plugin = class Plugin
   info: null
   name: null
   config: null
+  path: null
 
   constructor: (@info) ->
-    @name = @info.name
+    @name = info.name
     @config = config.plugins[@name] ? {}
+    @path = path.join __dirname, '../plugin', @name
+
+    for name, payload of info.register_hooks ? {}
+      if payload.register_if
+        unless payload.register_if.apply @
+          continue
+
+      @registerHook name, payload
+
+    if info.initialize
+      info.initialize.apply @
+
+    if fs.existsSync path.join(@path, 'locale')
+      i18n.initPlugin @
+
+    if fs.existsSync path.join(@path, 'static')
+      app.express.use harp.mount "/plugin/#{@name}", path.join(@path, 'static')
 
   registerComponent: (info) ->
     component_meta = new ComponentMeta _.extend info,
       plugin: @
+
+    for path, payload of info.register_hooks ? {}
+      if payload.register_if and payload.register_if.apply @
+        @registerComponentHook path, _.extend payload,
+          component_meta: component_meta
 
     pluggable.components[info.name] = component_meta
 
@@ -90,8 +111,10 @@ Plugin = class Plugin
       else
         t = i18n.getTranslatorByReq languages
 
+      full_name = "plugins.#{@name}.#{name}"
+
       args = _.toArray arguments
-      args[0] = "plugins.#{@name}.#{name}"
+      args[0] = full_name
 
       full_result = t.apply @, args
 
@@ -138,22 +161,6 @@ pluggable.selectHookPath = (name) ->
 pluggable.selectHook = (name) ->
   return pluggable.selectHookPath name
 
-pluggable.initPlugin = (name) ->
-  plugin_path = path.join __dirname, '../plugin', name
-  plugin = require plugin_path
-
-  for path, payload in plugin.register_hooks ? {}
-    if payload.test and payload.test.apply @
-      plugin.registerHook path, payload
-
-  plugin.initialize()
-
-  if fs.existsSync path.join(plugin_path, 'locale')
-    i18n.initPlugin plugin, callback
-
-  if fs.existsSync path.join(plugin_path, 'static')
-    app.express.use harp.mount "/plugin/#{name}", path.join(plugin_path, 'static')
-
 pluggable.initPlugins = ->
   plugins_name = config.plugin.available_plugins
 
@@ -168,9 +175,6 @@ pluggable.initPlugins = ->
           throw err
 
     exports.plugins[name] = plugin
-
-  for name in plugins_name
-    pluggable.initPlugin name
 
 _.extend app.classes,
   Plugin: Plugin

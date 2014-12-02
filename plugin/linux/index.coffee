@@ -19,7 +19,7 @@ linuxPlugin = module.exports = new Plugin
       filter: linux.isUsernameAvailable
 
     'app.started':
-      test: -> @config.monitor_cycle
+      register_if: -> @config.monitor_cycle
       action: monitor.run
 
   initialize: ->

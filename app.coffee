@@ -83,14 +83,14 @@ app.redis = redis.createClient 6379, '127.0.0.1',
 app.mailer = nodemailer.createTransport config.email.account
 app.express = express()
 
+app.models = {}
+app.classes = {}
+
 app.config = config
 app.db = require './core/db'
 app.cache = require './core/cache'
 app.i18n = require './core/i18n'
 app.pluggable = require './core/pluggable'
-
-app.models = {}
-app.classes = {}
 
 require './core/model/Account'
 require './core/model/Financials'
