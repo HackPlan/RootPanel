@@ -104,6 +104,16 @@
     service redis-server restart
     service supervisor restart
 
+### Clusters
+
+    useradd -m rpadmin
+
+    su rpadmin
+
+    mkdir ~/.ssh
+    echo 'master key' >> ~/.ssh/authorized_keys
+    chmod -R 700 ~/.ssh
+
 ### Plugins
 
     # Linux
