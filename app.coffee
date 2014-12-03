@@ -31,6 +31,7 @@ app.libs =
   mongooseUniqueValidator: require 'mongoose-unique-validator'
   jsonStableStringify: require 'json-stable-stringify'
 
+  Insight: require 'insight'
   SSHConnection: require 'ssh2'
   Negotiator: require 'negotiator'
   ObjectID: (require 'mongoose').Types.ObjectId
@@ -39,10 +40,20 @@ app.libs =
   Mixed: (require 'mongoose').Schema.Types.Mixed
 
 {bunyan, cookieParser, crypto, bodyParser, depd, express, fs, harp, mongoose} = exports.libs
-{morgan, nodemailer, path, redis, _} = exports.libs
+{morgan, Insight, nodemailer, path, redis, _} = exports.libs
 
 app.package = require './package'
 app.utils = require './core/utils'
+
+app.insight = new Insight
+  # 这个代码用于向 RootPanel 开发者提交匿名的统计信息，您不必修改这里
+  # This code used to send anonymous usage metrics to RootPanel developers
+  # You do not have to modify it
+  trackingCode: 'UA-49193300-7'
+  packageName: app.package.name
+  packageVersion: app.package.version
+
+app.insight.track 'app.coffee'
 
 app.bunyanMongo = new app.utils.bunyanMongo()
 

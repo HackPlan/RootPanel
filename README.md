@@ -59,6 +59,8 @@ RootPanel 的文档位于 [Github Wiki](https://github.com/jysperm/RootPanel/wik
 * 数据库：MongoDB(2.4), Redis
 * 操作系统支持：Ubuntu 14.04 amd64
 
+RootPanel 默认会通过 Google Analytics 向开发人员发送匿名的统计信息。
+
 ## 开发情况：
 
 * [ChangeLog](https://github.com/jysperm/RootPanel/blob/master/CHANGELOG.md)
