@@ -1,56 +1,57 @@
 {jade, path} = app.libs
 {Account} = app.models
 {pluggable, config, utils} = app
-
-exports = module.exports = class BitcoinPlugin extends pluggable.Plugin
-  @NAME: 'bitcoin'
-  @type: 'extension'
+{Plugin} = app.classes
 
 bitcoin = require './bitcoin'
 
-exports.registerHook 'account.before_register',
-  filter: (account, callback) ->
-    bitcoin_secret = utils.randomSalt()
+bitcoinPlugin = module.exports = new Plugin
+  name: 'bitcoin'
 
-    bitcoin.genAddress bitcoin_secret, (address) ->
-      account.pluggable.bitcoin =
-        bitcoin_deposit_address: address
-        bitcoin_secret: bitcoin_secret
+  register_hooks:
+    'app.ignore_csrf':
+      path: '/bitcoin/coinbase_callback'
 
-      callback()
+    'account.before_register':
+      filter: (account, callback) ->
+        bitcoin_secret = utils.randomSalt()
 
-exports.registerHook 'billing.payment_methods',
-  widget_generator: (req, callback) ->
-    bitcoin.getExchangeRate config.billing.currency, (rate) ->
-      exports.render 'payment_method', req,
-        exchange_rate: rate
-      , callback
+        bitcoin.genAddress bitcoin_secret, (address) ->
+          account.pluggable.bitcoin =
+            bitcoin_deposit_address: address
+            bitcoin_secret: bitcoin_secret
 
-exports.registerHook 'view.pay.display_payment_details',
-  type: 'bitcoin'
-  filter: (req, deposit_log, callback) ->
-    callback exports.t(req) 'view.payment_details',
-      order_id: deposit_log.payload.order_id
-      short_order_id: deposit_log.payload.order_id[0 .. 40]
+          callback()
 
-exports.registerHook 'app.ignore_csrf',
-  path: '/bitcoin/coinbase_callback'
+    'billing.payment_methods':
+      type: 'bitcoin'
+      widget_generator: (req, callback) ->
+        bitcoin.getExchangeRate config.billing.currency, (rate) ->
+          bitcoinPlugin.render 'payment_method', req,
+            exchange_rate: rate
+          , callback
 
-app.express.post '/bitcoin/coinbase_callback', (req, res) ->
-  Account.findOne
-    'pluggable.bitcoin.bitcoin_deposit_address': req.body.address
-  , (err, account) ->
-    unless account
-      return res.send 400, 'Invalid Address'
+      details_message: (req, deposit_log, callback) ->
+        callback bitcoinPlugin.getTranslator(req) 'view.payment_details',
+          order_id: deposit_log.payload.order_id
+          short_order_id: deposit_log.payload.order_id[0 .. 40]
 
-    unless req.query.secret == account.pluggable.bitcoin.bitcoin_secret
-      return res.send 400, 'Invalid Secret'
+  initialize: ->
+    app.express.post '/bitcoin/coinbase_callback', (req, res) ->
+      Account.findOne
+        'pluggable.bitcoin.bitcoin_deposit_address': req.body.address
+      , (err, account) ->
+        unless account
+          return res.send 400, 'Invalid Address'
 
-    bitcoin.getExchangeRate config.billing.currency, (rate) ->
-      amount = req.body.amount / rate
+        unless req.query.secret == account.pluggable.bitcoin.bitcoin_secret
+          return res.send 400, 'Invalid Secret'
 
-      account.incBalance amount, 'deposit',
-        type: 'bitcoin'
-        order_id: req.body.transaction.hash
-      , ->
-        res.send 'Success'
+        bitcoin.getExchangeRate config.billing.currency, (rate) ->
+          amount = req.body.amount / rate
+
+          account.incBalance amount, 'deposit',
+            type: 'bitcoin'
+            order_id: req.body.transaction.hash
+          , ->
+            res.send 'Success'
