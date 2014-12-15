@@ -1,9 +1,8 @@
 {config, pluggable, logger} = app
 {async, _} = app.libs
-{Account, Financials} = app.models
+{Account, Financials, Component} = app.models
 
 billing = exports
-billing.plans = {}
 
 billing.start = ->
   Account.find
@@ -84,71 +83,6 @@ exports.generateBilling = (account, plan_name, callback) ->
     last_billing_at: new_last_billing_at
     amount_inc: -amount
 
-exports.joinPlan = (req, account, plan_name, callback) ->
-  original_account = account
-  plan_info = config.plans[plan_name]
-
-  modifier =
-    $addToSet:
-      'billing.plans': plan_name
-      'billing.services':
-        $each: plan_info.services
-    $set:
-      'resources_limit': exports.calcResourcesLimit _.union account.billing.plans, [plan_name]
-
-  modifier.$set["billing.last_billing_at.#{plan_name}"] = new Date()
-
-  Account.findByIdAndUpdate account._id, modifier, (err, account) ->
-    logger.error err if err
-
-    async.each _.difference(account.billing.services, original_account.billing.services), (service_name, callback) ->
-      async.each pluggable.selectHook("service.#{service_name}.enable"), (hook, callback) ->
-        hook.filter account, callback
-      , callback
-    , ->
-      unless _.isEqual original_account.resources_limit, account.resources_limit
-        async.each pluggable.selectHook('account.resources_limit_changed'), (hook, callback) ->
-          hook.filter account, callback
-        , callback
-      else
-        callback()
-
-exports.leavePlan = (req, account, plan_name, callback) ->
-  leaved_services = _.reject account.billing.services, (service_name) ->
-    for item in _.without(account.billing.plans, plan_name)
-      if service_name in config.plans[item].services
-        return true
-
-    return false
-
-  original_account = account
-
-  modifier =
-    $pull:
-      'billing.plans': plan_name
-    $pullAll:
-      'billing.services': leaved_services
-    $set:
-      'resources_limit': exports.calcResourcesLimit _.without account.billing.plans, plan_name
-    $unset: {}
-
-  modifier.$unset["billing.last_billing_at.#{plan_name}"] = true
-
-  Account.findByIdAndUpdate account._id, modifier, (err, account) ->
-    logger.error err if err
-
-    async.each leaved_services, (service_name, callback) ->
-      async.each pluggable.selectHook("service.#{service_name}.disable"), (hook, callback) ->
-        hook.filter account, callback
-      , callback
-    , ->
-      unless _.isEqual original_account.resources_limit, account.resources_limit
-        async.each pluggable.selectHook('account.resources_limit_changed'), (hook, callback) ->
-          hook.filter account, callback
-        , callback
-      else
-        callback()
-
 exports.isForceFreeze = (account) ->
   if _.isEmpty account.billing.plans
     return false
@@ -180,15 +114,3 @@ exports.calcResourcesLimit = (plans) ->
         limit[k] += v
 
   return limit
-
-exports.initPlans = ->
-  for name, info in config.plans
-    plan = new Plan info
-    exports.plans[name] = plan
-
-exports.Plan = Plan = class Plan
-  info: null
-  name: null
-
-  constructor: (@info) ->
-    @name = @info.name

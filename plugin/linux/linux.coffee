@@ -4,34 +4,38 @@
 
 monitor = require './monitor'
 
-exports.createUser = (account, callback) ->
+exports.createUser = (component, callback) ->
+  {account, physical_node} = component
+
   async.series [
     (callback) ->
-      child_process.exec "sudo useradd -m -s /bin/bash #{account.username}", callback
+      physical_node.runCommand "sudo useradd -m -s /bin/bash #{account.username}", callback
 
     (callback) ->
-      child_process.exec "sudo usermod -G #{account.username} -a www-data", callback
+      physical_node.runCommand "sudo usermod -G #{account.username} -a www-data", callback
 
-  ], (err) ->
-    logger.error err if err
-    cache.delete 'linux.getPasswdMap', callback
+  ], callback
 
-exports.deleteUser = (account, callback) ->
+exports.deleteUser = (component, callback) ->
+  {account, physical_node} = component
+
   async.series [
     (callback) ->
-      child_process.exec "sudo pkill -u #{account.username}", ->
+      physical_node.runCommand "sudo pkill -u #{account.username}", (err) ->
+        logger.warn err if err
         callback()
 
     (callback) ->
-      child_process.exec "sudo userdel -rf #{account.username}", ->
+      physical_node.runCommand "sudo userdel -rf #{account.username}", (err) ->
+        logger.warn err if err
         callback()
 
     (callback) ->
-      child_process.exec "sudo groupdel #{account.username}", ->
+      physical_node.runCommand "sudo groupdel #{account.username}", (err) ->
+        logger.warn err if err
         callback()
 
-  ], ->
-    cache.delete 'linux.getPasswdMap', callback
+  ], callback
 
 exports.setResourceLimit = (account, callback) ->
   unless 'linux' in account.billing.services

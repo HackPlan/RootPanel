@@ -1,13 +1,17 @@
-{SSHConnection, fs, child_process, _, async} = app.libs
-{config, logger} = app
-
-clusters = exports
-clusters.nodes = {}
-
-clusters.Node = Node = class Node
+module.exports = class Node
   info: null
   name: null
   master: false
+
+  @nodes = {}
+
+  @initNodes: ->
+    for name, info of config.nodes
+      @nodes[name] = new @constructor _.extend info,
+        name: name
+
+  @get: (name) ->
+    return @nodes[name]
 
   constructor: (@info) ->
     @name = @info.name
@@ -157,8 +161,3 @@ clusters.Node = Node = class Node
   readFileRemote: (filename, callback) ->
     @runCommandRemote "sudo cat #{filename}", (err, stdout) ->
       callback err, stdout
-
-clusters.initNodes = ->
-  for name, info of config.nodes
-    clusters.nodes[name] = new Node _.extend info,
-      name: name

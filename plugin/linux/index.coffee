@@ -44,17 +44,25 @@ linuxPlugin.registerComponent
   initialize: linux.createUser
   destroy: linux.deleteUser
 
+  pickPayload: (info) ->
+    return {
+      username: info.username
+    }
+
   package: ->
   unpacking: ->
 
   register_hooks:
     'account.resources_limit_changed':
+      repeating: 'every_node'
       filter: linux.setResourceLimit
 
     'view.panel.styles':
+      repeating: 'once'
       path: '/plugin/linux/style/panel.css'
 
     'view.panel.widgets':
+      repeating: 'every'
       generator: (req, callback) ->
         linux.getResourceUsageByAccount req.account, (resources_usage) ->
           resources_usage ?=

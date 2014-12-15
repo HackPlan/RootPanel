@@ -10,7 +10,7 @@ getPasswdMap = (callback) ->
 
     callback result
 
-describe 'clusters', ->
+describe 'interface/Node', ->
   clusters = null
 
   master = null

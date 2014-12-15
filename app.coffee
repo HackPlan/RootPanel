@@ -95,7 +95,6 @@ app.mailer = nodemailer.createTransport config.email.account
 app.express = express()
 
 app.models = {}
-app.classes = {}
 
 app.config = config
 app.db = require './core/db'
@@ -113,9 +112,14 @@ require './core/model/Component'
 
 app.templates = require './core/templates'
 app.billing = require './core/billing'
-app.clusters = require './core/clusters'
 app.middleware = require './core/middleware'
 app.notification = require './core/notification'
+
+app.interfaces =
+  Node: require './core/interface/Node'
+  Plan: require './core/interface/Plan'
+  ComponentType: require './core/interface/ComponentType'
+  Plugin: require './core/interface/Plugin'
 
 app.express.use bodyParser.json()
 app.express.use cookieParser()
@@ -137,9 +141,9 @@ app.express.use '/coupon', require './core/router/coupon'
 app.express.use '/admin', require './core/router/admin'
 app.express.use '/panel', require './core/router/panel'
 
-app.billing.initPlans()
-app.clusters.initNodes()
 app.i18n.init()
+app.interfaces.Plan.initPlans()
+app.interfaces.Node.initNodes()
 app.pluggable.initPlugins()
 
 app.express.get '/', (req, res) ->

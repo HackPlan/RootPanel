@@ -27,6 +27,11 @@ Component = mongoose.Schema
       enum: ['readonly', 'readwrite']
   ]
 
+  status:
+    type: String
+    enum: ['running', 'initializing', 'destroying']
+    default: 'initializing'
+
   payload:
     type: Object
 
@@ -37,6 +42,11 @@ Component = mongoose.Schema
     required: true
     type: String
     enum: []
+
+Component.statics.markAsStatus = (component, status, callback) ->
+  @findByIdAndUpdate component._id,
+    status: status
+  , callback
 
 _.extend app.models,
   Component: mongoose.model 'Component', Component

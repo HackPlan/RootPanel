@@ -1,10 +1,11 @@
 {pluggable, utils, config, models} = app
 {_, async, mongoose, mongooseUniqueValidator} = app.libs
-
-{Financial, SecurityLog} = app.models
+{Financial, SecurityLog, Component} = app.models
+{Plan} = app.interfaces
 
 process.nextTick ->
-  {Financial, SecurityLog} = app.models
+  {Financial, SecurityLog, Component} = app.models
+  {Plan} = app.interfaces
 
 Token = mongoose.Schema
   type:
@@ -72,9 +73,6 @@ Account = mongoose.Schema
     type: Object
 
   billing:
-    services:
-      type: Array
-
     plans:
       type: Array
 
@@ -246,6 +244,55 @@ Account.methods.createSecurityLog = (type, token, payload, callback) ->
     token: _.pick token, 'type', 'token', 'created_at', 'payload'
     payload: payload
   , callback
+
+Account.methods.getComponents = (type, callback) ->
+  Component.find
+    type: type
+  , (err, components) ->
+    callback components
+
+Account.methods.getAvailableComponentsTypes = ->
+  return _.compact _.map @billing.plans, (plan_name) ->
+    return _.keys Plan.get(plan_name).available_components
+
+# callback(err)
+Account.methods.joinPlan = (plan, callback) ->
+  @billing.plans.addToSet plan.name
+
+  @save =>
+    async.each _.keys(plan.available_components), (component_type, callback) =>
+      plan_component_info = plan.available_components[component_type]
+      component_type = pluggable.components[component_type]
+
+      unless plan_component_info.default
+        return callback()
+
+      async.each plan_component_info.default, (defaultInfo, callback) =>
+        default_info = defaultInfo @
+
+        component_type.createComponent @,
+          physical_node: default_info.physical_node
+          name: default_info.name ? ''
+          payload: default_info
+        , callback
+
+    , callback
+
+# callback(err)
+Account.methods.leavePlan = (plan, callback) ->
+  @billing.plans.pull plan.name
+  available_component_types = @getAvailableComponentsTypes()
+
+  @save =>
+    @getComponents (components) ->
+      async.each components, (component, callback) ->
+        if component.component_type in available_component_types
+          return callback()
+
+        component_type = ComponentType.get component.component_type
+        component_type.destroyComponent component, callback
+
+      , callback
 
 _.extend app.models,
   Account: mongoose.model 'Account', Account
