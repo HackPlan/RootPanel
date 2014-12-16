@@ -1,11 +1,11 @@
 {pluggable, utils, config, models} = app
 {_, async, mongoose, mongooseUniqueValidator} = app.libs
 {Financial, SecurityLog, Component} = app.models
-{Plan} = app.interfaces
+
+Plan = require '../interface/Plan'
 
 process.nextTick ->
   {Financial, SecurityLog, Component} = app.models
-  {Plan} = app.interfaces
 
 Token = mongoose.Schema
   type:
@@ -88,6 +88,7 @@ Account = mongoose.Schema
 
   pluggable:
     type: Object
+    default: {}
 
   resources_limit:
     type: Object

@@ -1,6 +1,8 @@
 {async, path, harp, jade, tmp, fs, _, child_process} = app.libs
 {i18n, config, logger} = app
 
+Plugin = require './interface/Plugin'
+
 pluggable = exports
 
 pluggable.hooks =
@@ -28,8 +30,8 @@ pluggable.hooks =
 
   billing:
     # type
-    # widget_generator: function(req, callback(html)),
-    # details_message: function(req, deposit_log, callback(l_details))
+    # widgetGenerator: function(req, callback(html)),
+    # detailsMessage: function(req, deposit_log, callback(l_details))
     payment_methods: []
 
   view:
@@ -66,18 +68,3 @@ pluggable.selectHookPath = (name) ->
 
 pluggable.selectHook = (name) ->
   return pluggable.selectHookPath name
-
-pluggable.initPlugins = ->
-  plugins_name = config.plugin.available_plugins
-
-  for name in plugins_name
-    plugin = require path.join __dirname, '../plugin', name
-
-    if plugin.dependencies
-      for dependence in plugin.dependencies
-        unless dependence in plugins_name
-          err = new Error "#{name} is Dependent on #{dependence} but not load"
-          logger.fatal err
-          throw err
-
-    exports.plugins[name] = plugin

@@ -1,3 +1,7 @@
+{_, child_process, async} = app.libs
+{config, logger} = app
+{available_plugins} = config.plugin
+
 module.exports = class Node
   info: null
   name: null
@@ -7,15 +11,20 @@ module.exports = class Node
 
   @initNodes: ->
     for name, info of config.nodes
-      @nodes[name] = new @constructor _.extend info,
+      @nodes[name] = new Node _.extend info,
         name: name
 
   @get: (name) ->
     return @nodes[name]
 
   constructor: (@info) ->
-    @name = @info.name
-    @master = true if @info.master
+    _.extend @, info
+
+    for component_type in @available_components
+      unless component_type in available_plugins
+        err = new Error "Node:#{@name} include unknown Component:#{component_type}"
+        logger.fatal err
+        throw err
 
   # @param callback(err, stdout, stderr)
   runCommand: (command, callback) ->

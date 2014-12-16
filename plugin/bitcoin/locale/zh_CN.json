@@ -3,6 +3,7 @@
   "view": {
     "payment_tips": "你可以直接向该地址发送比特币。在经过一次确认后，系统会实时地，自动为你折算充值金额，最小支付金额为 0.0005 BTC.",
     "exchange_rate_tips": "实时汇率：10 CNY = __rate10__ BTC",
-    "payment_details": "比特币支付 <a href='https://blockchain.info/tx/__order_id__'>__short_order_id__</a>"
+    "payment_details": "比特币支付 <a href='https://blockchain.info/tx/__order_id__'>__short_order_id__</a>",
+    "no_address": "暂无地址"
   }
 }

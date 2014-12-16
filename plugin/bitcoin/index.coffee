@@ -1,7 +1,7 @@
 {jade, path} = app.libs
 {Account} = app.models
 {pluggable, config, utils} = app
-{Plugin} = app.classes
+{Plugin} = app.interfaces
 
 bitcoin = require './bitcoin'
 
@@ -25,16 +25,17 @@ bitcoinPlugin = module.exports = new Plugin
 
     'billing.payment_methods':
       type: 'bitcoin'
-      widget_generator: (req, callback) ->
+
+      widgetGenerator: (req, callback) ->
         bitcoin.getExchangeRate config.billing.currency, (rate) ->
           bitcoinPlugin.render 'payment_method', req,
             exchange_rate: rate
           , callback
 
-      details_message: (req, deposit_log, callback) ->
+      detailsMessage: (req, deposit_log, callback) ->
         callback bitcoinPlugin.getTranslator(req) 'view.payment_details',
           order_id: deposit_log.payload.order_id
-          short_order_id: deposit_log.payload.order_id[0 .. 40]
+          short_order_id: deposit_log.payload.order_id[... 40]
 
   initialize: ->
     app.express.post '/bitcoin/coinbase_callback', (req, res) ->
@@ -42,10 +43,10 @@ bitcoinPlugin = module.exports = new Plugin
         'pluggable.bitcoin.bitcoin_deposit_address': req.body.address
       , (err, account) ->
         unless account
-          return res.send 400, 'Invalid Address'
+          return res.status(400).send 'Invalid Address'
 
         unless req.query.secret == account.pluggable.bitcoin.bitcoin_secret
-          return res.send 400, 'Invalid Secret'
+          return res.status(400).send 'Invalid Secret'
 
         bitcoin.getExchangeRate config.billing.currency, (rate) ->
           amount = req.body.amount / rate

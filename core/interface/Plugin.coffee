@@ -1,13 +1,35 @@
+{_, path, fs, jade, harp} = app.libs
+{config, logger, i18n} = app
+{available_plugins} = config.plugin
+
+pluggable = require '../pluggable'
+
 module.exports = class Plugin
   info: null
   name: null
   config: null
   path: null
 
+  @plugins = {}
+
+  @get: (name) ->
+    return @plugins[name]
+
+  @initPlugins: ->
+    for name in available_plugins
+      Plugin.plugins[name] = require path.join __dirname, '../../plugin', name
+
   constructor: (@info) ->
     @name = info.name
     @config = config.plugins[@name] ? {}
-    @path = path.join __dirname, '../plugin', @name
+    @path = path.join __dirname, '../../plugin', @name
+
+    if info.dependencies
+      for dependence in plugin.dependencies
+        unless dependence in available_plugins
+          err = new Error "Plugin:#{@name} is Dependent on Plugin:#{dependence} but not load"
+          logger.fatal err
+          throw err
 
     for name, payload of info.register_hooks ? {}
       if payload.register_if
@@ -69,7 +91,7 @@ module.exports = class Plugin
       return t.apply @, _.toArray(arguments)
 
   render: (name, req, view_data, callback) ->
-    template_path = path.join __dirname, '../plugin', @name, 'view', "#{name}.jade"
+    template_path = path.join __dirname, '../../plugin', @name, 'view', "#{name}.jade"
 
     locals = _.extend _.clone(req.res.locals), view_data,
       account: req.account
@@ -80,7 +102,7 @@ module.exports = class Plugin
       callback html
 
   renderTemplate: (name, view_data, callback) ->
-    template_path = path.join __dirname, '../plugin', @name, 'view', name
+    template_path = path.join __dirname, '../../plugin', @name, 'view', name
 
     fs.readFile template_path, (err, template_file) ->
       callback _.template(template_file.toString()) view_data

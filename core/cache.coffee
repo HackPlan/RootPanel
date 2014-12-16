@@ -3,9 +3,7 @@ getParameterNames = require 'get-parameter-names'
 CounterCache = require 'counter-cache'
 _ = require 'underscore'
 
-config = require '../config'
-
-{redis} = app
+{redis, config} = app
 
 exports.counter = new CounterCache()
 

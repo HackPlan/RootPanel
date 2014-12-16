@@ -1,6 +1,6 @@
-{jade, path, fs} = app.libs
+{path, fs} = app.libs
 {pluggable, config} = app
-{Plugin} = app.classes
+{Plugin} = app.interfaces
 
 rpvhostPlugin = module.exports = new Plugin
   name: 'rpvhost'
@@ -21,10 +21,11 @@ rpvhostPlugin = module.exports = new Plugin
 
     'billing.payment_methods':
       type: 'taobao'
-      widget_generator: (req, callback) ->
+
+      widgetGenerator: (req, callback) ->
         rpvhostPlugin.render 'payment_method', req, {}, callback
 
-      details_message: (req, deposit_log, callback) ->
+      detailsMessage: (req, deposit_log, callback) ->
         callback rpvhostPlugin.getTranslator(req) 'view.payment_details',
           order_id: deposit_log.payload.order_id
 

@@ -4,7 +4,7 @@
 # @param callback(address)
 exports.genAddress = (bitcoin_secret, callback) ->
   if config.plugins.bitcoin.coinbase_api_key == 'coinbase-simple-api-key'
-    app.deprecate 'Invalid coinbase-simple-api-key'
+    logger.wran plugin: 'bitcoin', new Error 'Invalid coinbase-simple-api-key'
     return callback()
 
   request 'https://coinbase.com/api/v1/account/generate_receive_address',
