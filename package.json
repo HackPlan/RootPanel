@@ -16,17 +16,19 @@
     }
   ],
   "scripts": {
+    "install": "./node_modules/.bin/bower install",
     "start": "./node_modules/.bin/coffee app.coffee | ./node_modules/.bin/bunyan -o short",
     "migrate": "./node_modules/.bin/coffee bin/migrate.coffee",
     "tool": "./node_modules/.bin/coffee bin/tool.coffee",
     "reconfigure": "./node_modules/.bin/coffee bin/reconfigure.coffee",
     "test": "COV_TEST=true ./node_modules/.bin/mocha --compilers coffee:coffee-script/register --require test/env --reporter node_modules/mocha-reporter-cov-summary -- core/test/*.test.coffee core/test/*/*.test.coffee plugin/*/test",
     "test-only": "./node_modules/.bin/mocha --compilers coffee:coffee-script/register --require test/env -b -- core/test/*.test.coffee core/test/*/*.test.coffee plugin/*/test",
-    "test-full": "./node_modules/.bin/coffee test/full-test.coffee",
+    "test-all-config": "./node_modules/.bin/coffee test/full-all-config.coffee",
     "test-cov-html": "COV_TEST=true ./node_modules/.bin/mocha --compilers coffee:coffee-script/register --require test/env --reporter html-cov -- core/test/*.test.coffee core/test/*/*.test.coffee plugin/*/test > coverage-reporter.html"
   },
   "dependencies": {
     "async": "^0.9.0",
+    "bower": "^1.3.12",
     "body-parser": "^1.9.3",
     "bunyan": "^1.2.3",
     "insight": "^0.4.3",

@@ -151,6 +151,7 @@ app.express.get '/', (req, res) ->
   unless res.headerSent
     res.redirect '/panel/'
 
+app.express.use express.static './bower_components'
 app.express.use harp.mount './core/static'
 
 exports.start = _.once ->

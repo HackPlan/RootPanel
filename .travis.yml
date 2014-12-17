@@ -11,7 +11,7 @@ before_install:
   - sudo pip install shadowsocks
   - sudo mkdir /etc/shadowsocks
 
-script: npm run test-full
+script: npm run test-all-config
 
 services:
   - mongodb
