@@ -44,4 +44,4 @@ if process.env.TRAVIS == 'true'
   config.redis.password = undefined
 
 global.isPluginEnable = (name) ->
-  return name in _.union config.plugin.available_extensions, config.plugin.available_services
+  return name in config.plugin.available_plugins

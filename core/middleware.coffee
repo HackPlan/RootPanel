@@ -39,7 +39,7 @@ exports.csrf = ->
       return next()
 
     validator = ->
-      unless req.method == 'GET'
+      unless req.method in ['GET', 'OPTIONS']
         unless csrf.verify req.session.csrf_secret, req.body.csrf_token
           return res.error 'invalid_csrf_token', null, 403
 
