@@ -17,7 +17,7 @@ module.exports = class Plugin
 
   @initPlugins: ->
     for name in available_plugins
-      Plugin.plugins[name] = require path.join __dirname, '../../plugin', name
+      @plugins[name] = require path.join __dirname, '../../plugin', name
 
   constructor: (@info) ->
     @name = info.name

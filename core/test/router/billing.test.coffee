@@ -1,4 +1,4 @@
-describe 'router/billing', ->
+describe.skip 'router/billing', ->
   Account = null
 
   agent = null

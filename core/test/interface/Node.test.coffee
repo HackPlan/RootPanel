@@ -1,23 +1,9 @@
-fs = require 'fs'
-
-getPasswdMap = (callback) ->
-  fs.readFile '/etc/passwd', (err, content) ->
-    result = {}
-
-    for line in _.compact(content.toString().split '\n')
-      [username, password, uid] = line.split ':'
-      result[uid] = username
-
-    callback result
-
 describe 'interface/Node', ->
-  clusters = null
-
-  master = null
-  slave = null
+  {Node, master, slave} = {}
 
   before ->
-    {clusters, config} = app
+    {config} = app
+    {Node} = app.interfaces
 
     config.nodes =
       master:
@@ -33,8 +19,7 @@ describe 'interface/Node', ->
     catch err
 
   it 'initNodes', ->
-    clusters.initNodes()
-    {master, slave} = clusters.nodes
+    {master, slave} = Node.initNodes()
 
   it 'runCommand', (done) ->
     master.runCommand 'echo "hello world"', (err, stdout, stderr) ->
@@ -62,12 +47,13 @@ describe 'interface/Node', ->
       done err if err
 
       fs.stat '/tmp/test_file', (err, stat) ->
-        getPasswdMap (passwd_map) ->
-          parseInt(stat.mode.toString(8), 10).should.be.equal 100700
-          passwd_map[stat.uid].should.be.equal 'rpadmin'
-          done err
+        parseInt(stat.mode.toString(8), 10).should.be.equal 100700
+        stat.uid.should.be.equal process.getuid()
+        done err
 
   it 'writeFileRemote', (done) ->
+    @timeout 5000
+
     slave.writeFile '/tmp/test_file_remote', 'Remote',
       owner: 'rpadmin'
       mode: '700'
@@ -75,10 +61,9 @@ describe 'interface/Node', ->
       done err if err
 
       fs.stat '/tmp/test_file_remote', (err, stat) ->
-        getPasswdMap (passwd_map) ->
-          parseInt(stat.mode.toString(8), 10).should.be.equal 100700
-          passwd_map[stat.uid].should.be.equal 'rpadmin'
-          done err
+        parseInt(stat.mode.toString(8), 10).should.be.equal 100700
+        stat.uid.should.be.equal process.getuid()
+        done err
 
   it 'readFile', (done) ->
     master.readFile '/tmp/test_file', (err, body) ->

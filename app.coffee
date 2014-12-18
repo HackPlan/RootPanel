@@ -14,7 +14,6 @@ app.libs =
   crypto: require 'crypto'
   express: require 'express'
   fs: require 'fs'
-  tmp: require 'tmp'
   harp: require 'harp'
   jade: require 'jade'
   markdown: require('markdown').markdown

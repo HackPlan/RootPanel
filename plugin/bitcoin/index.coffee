@@ -5,7 +5,7 @@
 
 bitcoin = require './bitcoin'
 
-bitcoinPlugin = module.exports = new Plugin
+self = module.exports = new Plugin
   name: 'bitcoin'
 
   register_hooks:
@@ -28,12 +28,12 @@ bitcoinPlugin = module.exports = new Plugin
 
       widgetGenerator: (req, callback) ->
         bitcoin.getExchangeRate config.billing.currency, (rate) ->
-          bitcoinPlugin.render 'payment_method', req,
+          self.render 'payment_method', req,
             exchange_rate: rate
           , callback
 
       detailsMessage: (req, deposit_log, callback) ->
-        callback bitcoinPlugin.getTranslator(req) 'view.payment_details',
+        callback self.getTranslator(req) 'view.payment_details',
           order_id: deposit_log.payload.order_id
           short_order_id: deposit_log.payload.order_id[... 40]
 

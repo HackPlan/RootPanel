@@ -1,11 +1,11 @@
-{_, child_process, async} = app.libs
+{_, child_process, async, SSHConnection} = app.libs
 {config, logger} = app
 {available_plugins} = config.plugin
 
 module.exports = class Node
-  info: null
-  name: null
+  name: ''
   master: false
+  available_components: []
 
   @nodes = {}
 
@@ -13,6 +13,8 @@ module.exports = class Node
     for name, info of config.nodes
       @nodes[name] = new Node _.extend info,
         name: name
+
+    return @nodes
 
   @get: (name) ->
     return @nodes[name]
@@ -68,29 +70,35 @@ module.exports = class Node
 
     {mode, owner} = options
 
-    @exec 'sudo',
-      args: ['tee', filename]
-      stdin: body
-    , (err) ->
-      return callback err if err
+    async.auto
+      touch: (callback) ->
+        child_process.exec "sudo touch #{filename}", (err) ->
+          callback err
 
-      async.parallel [
-        (callback) ->
-          unless mode
-            return callback()
+      chmod: ['touch', (callback) ->
+        unless mode
+          return callback()
 
-          child_process.exec "sudo chmod #{mode} #{filename}", (err) ->
-            callback err
+        child_process.exec "sudo chmod #{mode} #{filename}", (err) ->
+          callback err
+      ]
 
-        (callback) ->
-          unless owner
-            return callback()
+      chown: ['touch', (callback) ->
+        unless owner
+          return callback()
 
-          child_process.exec "sudo chown #{owner}:#{owner} #{filename}", (err) ->
-            callback err
+        child_process.exec "sudo chown #{owner}:#{owner} #{filename}", (err) ->
+          callback err
+      ]
 
-      ], (err) ->
-        callback err
+      tee: ['chmod', 'chown', (callback) =>
+        @exec 'sudo',
+          args: ['tee', filename]
+          stdin: body
+        , callback
+      ]
+
+    , callback
 
   # @param callback(err, body)
   readFile: (filename, callback) ->
@@ -143,29 +151,35 @@ module.exports = class Node
   writeFileRemote: (filename, body, options, callback) ->
     {mode, owner} = options
 
-    @execRemote 'sudo',
-      args: ['tee', filename]
-      stdin: body
-    , (err) =>
-      return callback err if err
+    async.auto
+      touch: (callback) =>
+        @runCommandRemote "sudo touch #{filename}", (err) ->
+          callback err
 
-      async.parallel [
-        (callback) =>
-          unless mode
-            return callback()
+      chmod: ['touch', (callback) =>
+        unless mode
+          return callback()
 
-          @runCommandRemote "sudo chmod #{mode} #{filename}", (err) ->
-            callback err
+        @runCommandRemote "sudo chmod #{mode} #{filename}", (err) ->
+          callback err
+      ]
 
-        (callback) =>
-          unless owner
-            return callback()
+      chown: ['touch', (callback) =>
+        unless owner
+          return callback()
 
-          @runCommandRemote "sudo chown #{owner}:#{owner} #{filename}", (err) ->
-            callback err
+        @runCommandRemote "sudo chown #{owner}:#{owner} #{filename}", (err) ->
+          callback err
+      ]
 
-      ], (err) ->
-        callback err
+      tee: ['chmod', 'chown', (callback) =>
+        @execRemote 'sudo',
+          args: ['tee', filename]
+          stdin: body
+        , callback
+      ]
+
+    , callback
 
   readFileRemote: (filename, callback) ->
     @runCommandRemote "sudo cat #{filename}", (err, stdout) ->

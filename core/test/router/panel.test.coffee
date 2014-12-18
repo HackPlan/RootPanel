@@ -9,7 +9,7 @@ describe 'router/panel', ->
     .expect 200
     .end done
 
-  it 'GET pay', (done) ->
+  it.skip 'GET pay', (done) ->
     agent.get '/panel/financials'
     .expect 200
     .end done

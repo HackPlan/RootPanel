@@ -1,4 +1,6 @@
 module.exports =
+  skip: true
+
   web:
     t_name: 'plugins.rpvhost.'
     url: 'http://rp.rpvhost.net'

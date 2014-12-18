@@ -10,6 +10,8 @@ before_install:
   - sudo apt-get install -y python-pip python-m2crypto
   - sudo pip install shadowsocks
   - sudo mkdir /etc/shadowsocks
+  - ssh-keygen -b 2048 -t rsa -f ~/.ssh/id_rsa -q -N ''
+  - cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 
 script: npm run test-all-config
 

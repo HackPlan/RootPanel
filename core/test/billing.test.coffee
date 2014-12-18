@@ -1,4 +1,4 @@
-describe 'billing', ->
+describe.skip 'billing', ->
   billing = null
   config = null
   utils = null

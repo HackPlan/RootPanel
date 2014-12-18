@@ -1,16 +1,21 @@
 {request} = app.libs
 {config, cache, logger} = app
 
+self = null
+
+process.nextTick ->
+  self = require './index'
+
 # @param callback(address)
 exports.genAddress = (bitcoin_secret, callback) ->
-  if config.plugins.bitcoin.coinbase_api_key == 'coinbase-simple-api-key'
-    logger.wran plugin: 'bitcoin', new Error 'Invalid coinbase-simple-api-key'
+  if self.config.coinbase_api_key in [undefined, 'coinbase-simple-api-key']
+    logger.warn plugin: 'bitcoin', new Error 'Invalid coinbase-simple-api-key'
     return callback()
 
   request 'https://coinbase.com/api/v1/account/generate_receive_address',
     method: 'POST'
     json:
-      api_key: config.plugins.bitcoin.coinbase_api_key
+      api_key: self.config.coinbase_api_key
       address:
         callback_url: "#{config.web.url}/bitcoin/coinbase_callback?secret=#{bitcoin_secret}"
   , (err, res, body) ->

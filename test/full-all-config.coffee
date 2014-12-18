@@ -4,6 +4,11 @@ fs = require 'fs'
 _ = require 'underscore'
 
 async.eachSeries fs.readdirSync("#{__dirname}/../sample"), (filename, callback) ->
+  config = require "#{__dirname}/../sample/#{filename}"
+
+  if config.skip
+    return callback
+
   fs.writeFileSync "#{__dirname}/../config.coffee", fs.readFileSync "#{__dirname}/../sample/#{filename}"
 
   console.log "Config: #{filename}"
