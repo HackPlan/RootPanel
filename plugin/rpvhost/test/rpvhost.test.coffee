@@ -1,10 +1,10 @@
-(if isPluginEnable('rpvhost') then describe else describe.skip) 'plugin/rpvhost', ->
+ifEnabled('rpvhost') 'plugin/rpvhost', ->
   agent = null
 
   before ->
     agent = supertest.agent app.express
 
-  describe 'router', ->
+  describe.skip 'router', ->
     it 'GET /', (done) ->
       if config.plugins.rpvhost and config.plugins.rpvhost.index_page != false
         expect_code = 200

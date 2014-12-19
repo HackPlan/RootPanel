@@ -1,4 +1,4 @@
-(if isPluginEnable('supervisor') then describe else describe.skip) 'plugin/supervisor', ->
+ifEnabled('supervisor') 'plugin/supervisor', ->
   describe 'router', ->
     it 'POST update_program'
 

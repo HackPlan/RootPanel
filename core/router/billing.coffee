@@ -1,30 +1,37 @@
 {express, _} = app.libs
 {config, billing} = app
 {requireAuthenticate} = app.middleware
+{Plan} = app.interfaces
 {Account} = app.models
 
 module.exports = exports = express.Router()
 
 exports.use requireAuthenticate
 
+{when_balance_below} = config.billing.force_freeze
+
 exports.post '/join_plan', (req, res) ->
-  unless req.body.plan in _.keys(config.plans)
+  {plan} = req.body
+
+  unless Plan.get plan
     return res.error 'invalid_plan'
 
-  if req.body.plan in req.account.billing.plans
+  if plan in req.account.billing.plans
     return res.error 'already_in_plan'
 
-  billing.triggerBilling req.account, (account) ->
-    if account.billing.balance <= config.billing.force_freeze.when_balance_below
-      return res.error 'insufficient_balance'
+  if req.account.billing.balance <= when_balance_below
+    return res.error 'insufficient_balance'
 
-    billing.joinPlan req, account, req.body.plan, ->
-      res.json {}
+  req.account.joinPlan plan, (err) ->
+    res.error err if err
+    res.status(204).json {}
 
 exports.post '/leave_plan', (req, res) ->
-  unless req.body.plan in req.account.billing.plans
+  {plan} = req.body
+
+  unless plan in req.account.billing.plans
     return res.error 'not_in_plan'
 
-  billing.triggerBilling req.account, (account) ->
-    billing.leavePlan req, account, req.body.plan, ->
-      res.json {}
+  req.account.leavePlan plan, (err) ->
+    res.error err if err
+    res.status(204).json {}

@@ -1,4 +1,4 @@
-(if isPluginEnable('linux') then describe else describe.skip) 'plugin/linux', ->
+ifEnabled('linux') 'plugin/linux', ->
   linux = null
   cache = null
   redis = null

@@ -1,4 +1,4 @@
-{_, child_process, async, SSHConnection} = app.libs
+{_, child_process, async, SSHConnection, fs} = app.libs
 {config, logger} = app
 {available_plugins} = config.plugin
 

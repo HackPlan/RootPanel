@@ -247,9 +247,17 @@ Account.methods.createSecurityLog = (type, token, payload, callback) ->
   , callback
 
 Account.methods.getComponents = (type, callback) ->
-  Component.find
-    type: type
-  , (err, components) ->
+  if _.isArray
+    query =
+      type:
+        $in: type
+  else if _.isString type
+    query =
+      type: type
+  else
+    query = {}
+
+  Component.find query, (err, components) ->
     callback components
 
 Account.methods.getAvailableComponentsTypes = ->
@@ -285,7 +293,7 @@ Account.methods.leavePlan = (plan, callback) ->
   available_component_types = @getAvailableComponentsTypes()
 
   @save =>
-    @getComponents (components) ->
+    @getComponents null, (components) ->
       async.each components, (component, callback) ->
         if component.component_type in available_component_types
           return callback()

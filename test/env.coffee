@@ -41,7 +41,10 @@ if process.env.TRAVIS == 'true'
   config.mongodb.user = undefined
   config.mongodb.password = undefined
   config.redis.password = undefined
-  config.ssh.id_key = '/home/travis-ci/.ssh/id_rsa'
+  config.ssh.id_key = '/home/travis/.ssh/id_rsa'
 
-global.isPluginEnable = (name) ->
-  return name in config.plugin.available_plugins
+global.ifEnabled = (plugin_name) ->
+  if plugin_name in config.plugin.available_plugins
+    return describe
+  else
+    describe.skip
