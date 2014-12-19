@@ -2,6 +2,8 @@
 {config, logger} = app
 {available_plugins} = config.plugin
 
+id_key = fs.readFileSync config.ssh.id_key
+
 module.exports = class Node
   name: ''
   master: false
@@ -117,7 +119,7 @@ module.exports = class Node
     connection.connect
       host: @info.host
       username: 'rpadmin'
-      privateKey: fs.readFileSync '/home/rpadmin/.ssh/id_rsa'
+      privateKey: id_key
 
   runCommandRemote: (command, callback) ->
     @execRemote command, {}, callback

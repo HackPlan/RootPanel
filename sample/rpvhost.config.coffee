@@ -58,6 +58,9 @@ module.exports =
           price: 10 / 30
           prepaid: true
 
+  ssh:
+    id_key: '/home/rpadmin/.ssh/id_rsa'
+
   nodes:
     master:
       host: 'localhost'

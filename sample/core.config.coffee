@@ -49,6 +49,9 @@ module.exports =
 
       billing: {}
 
+  ssh:
+    id_key: '/home/rpadmin/.ssh/id_rsa'
+
   nodes:
     master:
       host: 'localhost'

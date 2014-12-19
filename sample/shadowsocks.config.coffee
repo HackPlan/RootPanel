@@ -46,6 +46,9 @@ module.exports =
           bucket: 100 * 1000 * 1000
           price: 0.06
 
+  ssh:
+    id_key: '/home/rpadmin/.ssh/id_rsa'
+
   nodes:
     master:
       host: 'localhost'
