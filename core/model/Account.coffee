@@ -72,19 +72,20 @@ Account = mongoose.Schema
   preferences:
     type: Object
 
-  billing:
-    plans:
-      type: Array
+  plans: [
+    name:
+      type: String
 
-    last_billing_at:
+    billing_state:
       type: Object
+  ]
 
-    balance:
-      type: Number
-      default: 0
+  balance:
+    type: Number
+    default: 0
 
-    arrears_at:
-      type: Date
+  arrears_at:
+    type: Date
 
   pluggable:
     type: Object
@@ -228,7 +229,7 @@ Account.methods.incBalance = (amount, type, payload, callback) ->
 
     @update
       $inc:
-        'billing.balance': amount
+        balance: amount
     , (err) ->
       return callback err if err
 
@@ -237,6 +238,9 @@ Account.methods.incBalance = (amount, type, payload, callback) ->
 
 Account.methods.inGroup = (group) ->
   return group in @groups
+
+Account.methods.inPlan = (plan_name) ->
+  return plan_name in _.pluck(@plans, 'name')
 
 Account.methods.createSecurityLog = (type, token, payload, callback) ->
   SecurityLog.create
@@ -261,47 +265,63 @@ Account.methods.getComponents = (type, callback) ->
     callback components
 
 Account.methods.getAvailableComponentsTypes = ->
-  return _.compact _.map @billing.plans, (plan_name) ->
+  return _.compact _.map _.pluck(@plans, 'name'), (plan_name) ->
     return _.keys Plan.get(plan_name).available_components
 
 # callback(err)
-Account.methods.joinPlan = (plan, callback) ->
-  @billing.plans.addToSet plan.name
+Account.methods.joinPlan = (plan_name, callback) ->
+  plan = Plan.get plan_name
 
-  @save =>
-    async.each _.keys(plan.available_components), (component_type, callback) =>
-      plan_component_info = plan.available_components[component_type]
-      component_type = pluggable.components[component_type]
+  plan.triggerBilling @, =>
+    app.models.Account.findByIdAndUpdate @_id,
+      $push:
+        plans:
+          name: plan.name
+          billing_state:
+            time:
+              expired_at: new Date()
 
-      unless plan_component_info.default
-        return callback()
+    , (err, account) ->
+      async.each _.keys(plan.available_components), (component_type, callback) =>
+        plan_component_info = plan.available_components[component_type]
+        component_type = pluggable.components[component_type]
 
-      async.each plan_component_info.default, (defaultInfo, callback) =>
-        default_info = defaultInfo @
-
-        component_type.createComponent @,
-          physical_node: default_info.physical_node
-          name: default_info.name ? ''
-          payload: default_info
-        , callback
-
-    , callback
-
-# callback(err)
-Account.methods.leavePlan = (plan, callback) ->
-  @billing.plans.pull plan.name
-  available_component_types = @getAvailableComponentsTypes()
-
-  @save =>
-    @getComponents null, (components) ->
-      async.each components, (component, callback) ->
-        if component.component_type in available_component_types
+        unless plan_component_info.default
           return callback()
 
-        component_type = ComponentType.get component.component_type
-        component_type.destroyComponent component, callback
+        async.each plan_component_info.default, (defaultInfo, callback) ->
+          default_info = defaultInfo account
+
+          component_type.createComponent account,
+            physical_node: default_info.physical_node
+            name: default_info.name ? ''
+            payload: default_info
+          , callback
 
       , callback
+
+# callback(err)
+Account.methods.leavePlan = (plan_name, callback) ->
+  plan = Plan.get plan_name
+
+  plan.triggerBilling @, =>
+    app.models.Account.findByIdAndUpdate @_id,
+      $pull:
+        plans:
+          name: plan.name
+
+    , (err, account) ->
+      available_component_types = account.getAvailableComponentsTypes()
+
+      @getComponents null, (components) ->
+        async.each components, (component, callback) ->
+          if component.component_type in available_component_types
+            return callback()
+
+          component_type = ComponentType.get component.component_type
+          component_type.destroyComponent component, callback
+
+        , callback
 
 _.extend app.models,
   Account: mongoose.model 'Account', Account

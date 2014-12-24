@@ -17,6 +17,8 @@ module.exports = class Plan
   constructor: (info) ->
     _.extend @, info
 
+    @available_components ?= {}
+
     for component_type, info of @available_components
       unless component_type in available_plugins
         err = new Error "Plan:#{@name} include unknown Component:#{component_type}"
@@ -26,3 +28,6 @@ module.exports = class Plan
       if info.default
         unless _.isArray info.default
           info.default = [info.default]
+
+  triggerBilling: (account, callback) ->
+    callback()

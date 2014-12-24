@@ -2,6 +2,7 @@
 {requireAuthenticate} = app.middleware
 {Account, Financials} = app.models
 {pluggable, billing, config} = app
+{Plan} = app.interfaces
 
 module.exports = exports = express.Router()
 
@@ -44,8 +45,7 @@ exports.get '/financials', (req, res) ->
     billing_log: (callback) ->
       Financials.find
         account_id: req.account._id
-        type:
-          $in: ['billing', 'usage_billing']
+        type: 'billing'
       , null,
         sort:
           created_at: -1
@@ -56,22 +56,20 @@ exports.get '/financials', (req, res) ->
     res.render 'panel/financials', result
 
 exports.get '/', (req, res) ->
-  billing.triggerBilling req.account, (account) ->
-    view_data =
-      account: account
-      plans: []
-      widgets_html: []
+  view_data =
+    account: req.account
+    plans: []
+    widgets_html: []
 
-    for name, info of config.plans
-      view_data.plans.push _.extend _.clone(info),
-        name: name
-        is_enable: name in req.account.billing.plans
+  for name, info of Plan.plans
+    view_data.plans.push _.extend _.clone(info),
+      is_enabled: req.account.inPlan name
 
-    async.map pluggable.selectHook('view.panel.widgets'), (hook, callback) ->
-      hook.generator req, (html) ->
-        callback null, html
+  async.map pluggable.selectHook('view.panel.widgets'), (hook, callback) ->
+    hook.generator req, (html) ->
+      callback null, html
 
-    , (err, widgets_html) ->
-      view_data.widgets_html = widgets_html
+  , (err, widgets_html) ->
+    view_data.widgets_html = widgets_html
 
-      res.render 'panel', view_data
+    res.render 'panel', view_data

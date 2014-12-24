@@ -157,6 +157,8 @@ exports.start = _.once ->
   app.express.listen config.web.listen, ->
     app.started = true
 
+    app.billing.start()
+
     if fs.existsSync config.web.listen
       fs.chmodSync config.web.listen, 0o770
 

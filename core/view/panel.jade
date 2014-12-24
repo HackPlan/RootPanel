@@ -11,7 +11,7 @@ append header
 block main
   .row
     header= t('account.financials')
-    p #{t('plan.balance')}: #{account.billing.balance.toFixed(2)} #{t('plan.currency.' + config.billing.currency)}
+    p #{t('plan.balance')}: #{account.balance.toFixed(2)} #{t('plan.currency.' + config.billing.currency)}
     p
       a(href= '/panel/financials/').btn.btn-success= t('common.charge')
 
@@ -25,7 +25,7 @@ block main
               strong= t(plan.t_name)
             td= t(plan.t_description)
             td
-              if plan.is_enable
+              if plan.is_enabled
                 button.action-leave-plan.btn.btn-danger.btn-sm= t('plan.leave')
               else
                 button.action-join-plan.btn.btn-success.btn-sm= t('plan.join')
