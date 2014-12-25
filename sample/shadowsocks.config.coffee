@@ -41,7 +41,7 @@ module.exports =
 
       resource_limit: {}
 
-      billing:
+      billing_trigger:
         'shadowsocks.traffic':
           bucket: 100 * 1000 * 1000
           price: 0.06

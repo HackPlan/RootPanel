@@ -34,7 +34,7 @@ module.exports =
       available_components: {}
       resource_limit: {}
 
-      billing:
+      billing_trigger:
         time:
           interval: 24 * 3600 * 1000
           price: 10 / 30

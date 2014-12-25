@@ -72,13 +72,9 @@ Account = mongoose.Schema
   preferences:
     type: Object
 
-  plans: [
-    name:
-      type: String
-
-    billing_state:
-      type: Object
-  ]
+  plans:
+    type: Object
+    default: {}
 
   balance:
     type: Number
@@ -240,7 +236,7 @@ Account.methods.inGroup = (group) ->
   return group in @groups
 
 Account.methods.inPlan = (plan_name) ->
-  return plan_name in _.pluck(@plans, 'name')
+  return plan_name in _.keys @plans
 
 Account.methods.createSecurityLog = (type, token, payload, callback) ->
   SecurityLog.create
@@ -251,7 +247,7 @@ Account.methods.createSecurityLog = (type, token, payload, callback) ->
   , callback
 
 Account.methods.getComponents = (type, callback) ->
-  if _.isArray
+  if _.isArray type
     query =
       type:
         $in: type
@@ -265,23 +261,23 @@ Account.methods.getComponents = (type, callback) ->
     callback components
 
 Account.methods.getAvailableComponentsTypes = ->
-  return _.compact _.map _.pluck(@plans, 'name'), (plan_name) ->
+  return _.compact _.map _.keys(@plans), (plan_name) ->
     return _.keys Plan.get(plan_name).available_components
 
 # callback(err)
 Account.methods.joinPlan = (plan_name, callback) ->
   plan = Plan.get plan_name
 
-  plan.triggerBilling @, =>
-    app.models.Account.findByIdAndUpdate @_id,
-      $push:
-        plans:
-          name: plan.name
-          billing_state:
-            time:
-              expired_at: new Date()
+  modifier =
+    $set: {}
 
-    , (err, account) ->
+  modifier.$set["plans.#{plan.name}"] =
+    billing_state:
+      time:
+        expired_at: new Date()
+
+  plan.triggerBilling @, =>
+    app.models.Account.findByIdAndUpdate @_id, modifier, (err, account) ->
       async.each _.keys(plan.available_components), (component_type, callback) =>
         plan_component_info = plan.available_components[component_type]
         component_type = pluggable.components[component_type]
@@ -304,16 +300,16 @@ Account.methods.joinPlan = (plan_name, callback) ->
 Account.methods.leavePlan = (plan_name, callback) ->
   plan = Plan.get plan_name
 
-  plan.triggerBilling @, =>
-    app.models.Account.findByIdAndUpdate @_id,
-      $pull:
-        plans:
-          name: plan.name
+  modifier =
+    $unset: {}
 
-    , (err, account) ->
+  modifier.$unset["plans.#{plan.name}"] = true
+
+  plan.triggerBilling @, =>
+    app.models.Account.findByIdAndUpdate @_id, modifier, (err, account) ->
       available_component_types = account.getAvailableComponentsTypes()
 
-      @getComponents null, (components) ->
+      account.getComponents null, (components) ->
         async.each components, (component, callback) ->
           if component.component_type in available_component_types
             return callback()

@@ -52,7 +52,7 @@ module.exports =
         transfer: 39
         memory: 27
 
-      billing:
+      billing_trigger:
         time:
           interval: 24 * 3600 * 1000
           price: 10 / 30

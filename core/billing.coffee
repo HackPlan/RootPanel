@@ -7,5 +7,3 @@ billing = exports
 billing.start = ->
 
 billing.runTimeBilling = ->
-
-billing.triggerTimeBilling = ->
