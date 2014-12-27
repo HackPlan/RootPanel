@@ -30,17 +30,40 @@ billing.triggerBilling = (account, callback) ->
     else
       callback err, account
 
+billing.acceptUsagesBilling = (account, trigger_name, volume, callback) ->
+  plan_names = _.filter billing.plans, (plan) ->
+    return plan.billing_trigger[trigger_name] and account.inPlan plan
+
+  async.each plan_names, (plan_name, callback) ->
+    billing.plans[plan_name].acceptUsagesBilling account, trigger_name, volume, callback
+  , callback
+
 billing.runTimeBilling = (callback = ->) ->
-  plans_billing_by_time = _.filter billing.plans, (plan) ->
+  plan_names = _.filter billing.plans, (plan) ->
     return plan.billing_trigger.time
 
   Account.find
     'plans':
-      $in: plans_billing_by_time
+      $in: plan_names
   , (err, accounts) ->
     async.each accounts, (account, callback) ->
       billing.triggerBilling account, callback
     , callback
+
+# @param callback(err, account)
+billing.checkArrearsAt = (account, callback) ->
+  if account.balance < 0 and !account.arrears_at
+    Account.findByIdAndUpdate account._id,
+      $set:
+        arrears_at: new Date()
+    , callback
+  else if account.balance > 0 and account.arrears_at
+    Account.findByIdAndUpdate account._id,
+      $set:
+        arrears_at: null
+    , callback
+  else
+    callback null, callback
 
 billing.isForceFreeze = (account) ->
   {force_freeze} = config.billing
