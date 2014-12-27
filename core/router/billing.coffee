@@ -13,7 +13,7 @@ exports.use requireAuthenticate
 exports.post '/join_plan', (req, res) ->
   {plan} = req.body
 
-  unless Plan.get plan
+  unless billing.plans[plan]
     return res.error 'invalid_plan'
 
   if req.account.inPlan plan

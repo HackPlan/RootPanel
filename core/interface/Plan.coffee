@@ -8,16 +8,6 @@ process.nextTick ->
 {available_plugins} = config.plugin
 
 module.exports = class Plan
-  @plans = {}
-
-  @initPlans: ->
-    for name, info of config.plans
-      @plans[name] = new Plan _.extend info,
-        name: name
-
-  @get: (name) ->
-    return @plans[name]
-
   constructor: (info) ->
     _.extend @, info
 
@@ -39,19 +29,9 @@ module.exports = class Plan
       return callback null, callback
 
     if @billing_trigger.time
-      @triggerTimeBilling account, (err, account) ->
-        if account.balance < 0 and !account.arrears_at
-          Account.findByIdAndUpdate account._id,
-            $set:
-              arrears_at: new Date()
-          , callback
-        else if account.balance > 0 and account.arrears_at
-          Account.findByIdAndUpdate account._id,
-            $set:
-              arrears_at: null
-          , callback
-        else
-          callback null, callback
+      @triggerTimeBilling account, (err, account) =>
+        return callback err if err
+        @checkArrearsAt account, callback
     else
       callback null, callback
 
@@ -64,8 +44,6 @@ module.exports = class Plan
       expect_paid = new Date Date.now() + interval
     else
       expect_paid = new Date()
-
-    console.log expired_at, expect_paid
 
     unless expired_at < expect_paid
       return callback null, account
@@ -99,3 +77,18 @@ module.exports = class Plan
           amount_inc: -amount
       , (err) ->
         callback err, account
+
+  # @param callback(err, account)
+  checkArrearsAt: (account, callback) ->
+    if account.balance < 0 and !account.arrears_at
+      Account.findByIdAndUpdate account._id,
+        $set:
+          arrears_at: new Date()
+      , callback
+    else if account.balance > 0 and account.arrears_at
+      Account.findByIdAndUpdate account._id,
+        $set:
+          arrears_at: null
+      , callback
+    else
+      callback null, callback

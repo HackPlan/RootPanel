@@ -48,3 +48,9 @@ global.ifEnabled = (plugin_name) ->
     return describe
   else
     describe.skip
+
+global.unlessTravis = ->
+  unless process.env.TRAVIS == 'true'
+    return describe
+  else
+    return describe.skip

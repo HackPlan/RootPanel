@@ -56,20 +56,23 @@ exports.get '/financials', (req, res) ->
     res.render 'panel/financials', result
 
 exports.get '/', (req, res) ->
-  view_data =
-    account: req.account
-    plans: []
-    widgets_html: []
+  billing.triggerBilling req.account, (err, account) ->
+    return res.error err if err
 
-  for name, info of Plan.plans
-    view_data.plans.push _.extend _.clone(info),
-      is_enabled: req.account.inPlan name
+    view_data =
+      account: account
+      plans: []
+      widgets_html: []
 
-  async.map pluggable.selectHook('view.panel.widgets'), (hook, callback) ->
-    hook.generator req, (html) ->
-      callback null, html
+    for name, info of billing.plans
+      view_data.plans.push _.extend _.clone(info),
+        is_enabled: account.inPlan name
 
-  , (err, widgets_html) ->
-    view_data.widgets_html = widgets_html
+    async.map pluggable.selectHook('view.panel.widgets'), (hook, callback) ->
+      hook.generator req, (html) ->
+        callback null, html
 
-    res.render 'panel', view_data
+    , (err, widgets_html) ->
+      view_data.widgets_html = widgets_html
+
+      res.render 'panel', view_data

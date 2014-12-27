@@ -7,9 +7,6 @@ pluggable = exports
 
 pluggable.hooks =
   app:
-    # action: function
-    started: []
-
     # path: string
     ignore_csrf: []
 

@@ -1,6 +1,8 @@
 #!/usr/bin/env coffee
 
-global.app = exports
+{EventEmitter} = require 'events'
+
+global.app = module.exports = new EventEmitter()
 
 app.libs =
   _: require 'underscore'
@@ -34,20 +36,21 @@ app.libs =
   SSHConnection: require 'ssh2'
   Negotiator: require 'negotiator'
   ObjectID: (require 'mongoose').Types.ObjectId
+  EventEmitter: EventEmitter
 
   ObjectId: (require 'mongoose').Schema.Types.ObjectId
   Mixed: (require 'mongoose').Schema.Types.Mixed
 
-{bunyan, cookieParser, crypto, bodyParser, depd, express, fs, harp, mongoose} = exports.libs
-{morgan, Insight, nodemailer, path, redis, _} = exports.libs
+{bunyan, cookieParser, crypto, bodyParser, depd, express, fs, harp, mongoose} = app.libs
+{morgan, Insight, nodemailer, path, redis, _} = app.libs
 
 app.package = require './package'
 app.utils = require './core/utils'
 
 app.insight = new Insight
-  # 这个代码用于向 RootPanel 开发者提交匿名的统计信息，您不必修改这里
+  # 这个代码用于向 RootPanel 开发者提交匿名的统计信息
   # This code used to send anonymous usage metrics to RootPanel developers
-  # You do not have to modify it
+  # 您不必修改这里 You do not have to modify it
   trackingCode: 'UA-49193300-7'
   packageName: app.package.name
   packageVersion: app.package.version
@@ -142,7 +145,7 @@ app.express.use '/admin', require './core/router/admin'
 app.express.use '/panel', require './core/router/panel'
 
 app.i18n.init()
-app.interfaces.Plan.initPlans()
+app.billing.initPlans()
 app.interfaces.Node.initNodes()
 app.interfaces.Plugin.initPlugins()
 
@@ -155,17 +158,12 @@ app.express.use harp.mount './core/static'
 
 exports.start = _.once ->
   app.express.listen config.web.listen, ->
-    app.started = true
-
-    app.billing.start()
-
     if fs.existsSync config.web.listen
       fs.chmodSync config.web.listen, 0o770
 
-    app.pluggable.selectHook('app.started').forEach (hook) ->
-      hook.action()
-
+    app.started = true
     app.logger.info "RootPanel start at #{config.web.listen}"
+    app.emit 'app.started'
 
 unless module.parent
   exports.start()

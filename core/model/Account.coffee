@@ -3,6 +3,7 @@
 {Financial, SecurityLog, Component} = app.models
 
 Plan = require '../interface/Plan'
+billing = require '../billing'
 
 process.nextTick ->
   {Financial, SecurityLog, Component} = app.models
@@ -266,7 +267,7 @@ Account.methods.getAvailableComponentsTypes = ->
 
 # callback(err)
 Account.methods.joinPlan = (plan_name, callback) ->
-  plan = Plan.get plan_name
+  plan = billing.plans[plan_name]
 
   modifier =
     $set: {}
@@ -298,7 +299,7 @@ Account.methods.joinPlan = (plan_name, callback) ->
 
 # callback(err)
 Account.methods.leavePlan = (plan_name, callback) ->
-  plan = Plan.get plan_name
+  plan = billing.plans[plan_name]
 
   modifier =
     $unset: {}
@@ -318,6 +319,14 @@ Account.methods.leavePlan = (plan_name, callback) ->
           component_type.destroyComponent component, callback
 
         , callback
+
+# @param callback(err, account)
+Account.methods.leaveAllPlans = (callback) ->
+  async.each @plans, (plan_name, callback) =>
+    @leavePlan plan_name, callback
+  , (err) =>
+    return callback err if err
+    Account.findById @_id, callback
 
 _.extend app.models,
   Account: mongoose.model 'Account', Account
