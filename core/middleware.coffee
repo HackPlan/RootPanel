@@ -3,9 +3,17 @@
 {Account} = app.models
 
 exports.errorHandling = (req, res, next) ->
-  res.error = (name, param = {}, status = 400) ->
-    res.status(status).json _.extend param,
-      error: name
+  res.error = (status, name, param) ->
+    unless _.isNumber status
+      [status, name, param] = [400, status, name]
+
+    param ?= {}
+
+    if req.method in ['GET', 'HEAD', 'OPTIONS']
+      res.status(status).send name
+    else
+      res.status(status).json _.extend param,
+        error: name
 
   next()
 
@@ -35,12 +43,18 @@ exports.csrf = ->
   csrf = app.libs.csrf()
 
   return (req, res, next) ->
-    if req.path in _.pluck app.pluggable.selectHook('app.ignore_csrf'), 'path'
+    if req.path in _.pluck app.pluggable.selectHooks('app.ignore_csrf'), 'path'
       return next()
 
+    csrf_token = do ->
+      if req.headers['x-csrf-token']
+        return req.headers['x-csrf-token']
+      else
+        return req.body.csrf_token
+
     validator = ->
-      unless req.method in ['GET', 'OPTIONS']
-        unless csrf.verify req.session.csrf_secret, req.body.csrf_token
+      unless req.method in ['GET', 'HEAD', 'OPTIONS']
+        unless csrf.verify req.session.csrf_secret, csrf_token
           return res.error 'invalid_csrf_token', null, 403
 
       next()
@@ -55,16 +69,16 @@ exports.csrf = ->
         validator()
 
 exports.authenticate = (req, res, next) ->
-  token_field = do ->
+  token_code = do ->
     if req.headers['x-token']
       return req.headers['x-token']
     else
       return req.cookies.token
 
-  unless token_field
+  unless token_code
     return next()
 
-  Account.authenticate token_field, (token, account) ->
+  Account.authenticate token_code, (token, account) ->
     if token and token.type == 'full_access'
       req.token = token
       req.account = account
@@ -103,7 +117,7 @@ exports.accountHelpers = (req, res, next) ->
     t: res.t
     moment: res.moment
 
-    selectHook: app.pluggable.selectHook
+    selectHooks: app.pluggable.selectHooks
 
   next()
 
@@ -117,14 +131,13 @@ exports.requireAuthenticate = (req, res, next) ->
       res.error 'auth_failed', null, 403
 
 exports.requireAdminAuthenticate = (req, res, next) ->
-  exports.requireAuthenticate req, res, ->
-    unless 'root' in req.account.groups
-      if req.method == 'GET'
-        return res.status(403).end()
-      else
-        return res.error 'forbidden'
+  unless 'root' in req.account?.groups
+    if req.method == 'GET'
+      return res.status(403).end()
+    else
+      return res.error 'forbidden'
 
-    next()
+  next()
 
 exports.requireInService = (service_name) ->
   return (req, res, next) ->

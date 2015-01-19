@@ -1,10 +1,7 @@
 ifEnabled('wiki') 'plugin/wiki', ->
   agent = null
 
-  before ->
-    agent = supertest.agent app.express
-
-  describe 'router', ->
+  describe.skip 'router', ->
     it 'GET /', (done) ->
       agent.get '/wiki'
       .expect 200

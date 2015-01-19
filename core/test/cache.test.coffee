@@ -1,4 +1,4 @@
-describe 'cache', ->
+describe.skip 'cache', ->
   cache = null
   redis = null
 

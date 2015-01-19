@@ -55,4 +55,6 @@ module.exports = class ComponentType
 
   movePhysicalNode: ->
 
-  package: ->
+  packing: ->
+
+  unpacking: ->

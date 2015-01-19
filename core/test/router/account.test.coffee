@@ -1,4 +1,4 @@
-describe 'router/account', ->
+describe.skip 'router/account', ->
   agent = null
   utils = null
   csrf_token = null

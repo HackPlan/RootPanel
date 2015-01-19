@@ -5,7 +5,7 @@ html
     block header
       link(rel='stylesheet', href='/bower_components/bootstrap/dist/css/bootstrap.min.css')
       link(rel='stylesheet', href='/style/layout.css')
-      for hook in selectHook('view.layout.styles')
+      for hook in selectHooks('view.layout.styles')
         link(rel='stylesheet', href=hook.path)
 
   body(data-username="#{account ? account.username : ''}", data-locale-version=app.i18n.localeHash(req), data-csrf-token=req.session.csrf_token)
@@ -21,7 +21,7 @@ html
             a.navbar-brand(href='/')= t(config.web.t_name)
           #navbar-collapse.collapse.navbar-collapse
             ul.nav.navbar-nav
-              for hook in selectHook('view.layout.menu_bar')
+              for hook in selectHooks('view.layout.menu_bar')
                 li
                   a(href=hook.href, target=hook.target)= hook.plugin.getTranslator(req)(hook.t_body)
             ul.nav.navbar-nav.navbar-right
@@ -81,8 +81,9 @@ html
       script(src='/bower_components/jquery/dist/jquery.min.js')
       script(src='/bower_components/jquery-cookie/jquery.cookie.js')
       script(src='/bower_components/underscore/underscore-min.js')
+      script(src='/bower_components/backbone/backbone.js')
       script(src='/bower_components/bootstrap/dist/js/bootstrap.min.js')
       script(src='/script/layout.js')
-      for hook in selectHook('view.layout.scripts')
+      for hook in selectHooks('view.layout.scripts')
         script(src=hook.path)
       block footer

@@ -1,4 +1,4 @@
-describe 'router/admin', ->
+describe.skip 'router/admin', ->
   utils = null
   Account = null
 

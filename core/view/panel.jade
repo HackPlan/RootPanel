@@ -5,7 +5,7 @@ prepend header
 
 append header
   link(rel='stylesheet', href='/style/panel.css')
-  for hook in selectHook('view.panel.styles')
+  for hook in selectHooks('view.panel.styles')
     link(rel='stylesheet', href=hook.path)
 
 block main
@@ -42,5 +42,5 @@ prepend sidebar
 
 append footer
   script(src='/script/panel.js')
-  for hook in selectHook('view.panel.scripts')
+  for hook in selectHooks('view.panel.scripts')
     script(src=hook.path)

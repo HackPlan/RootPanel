@@ -1,59 +1,63 @@
 $ ->
+  window.rp ?= {}
+
   $.ajaxSetup
-    contentType: 'application/json; charset=UTF-8'
+    headers:
+      'X-Csrf-Token': $('body').data 'csrf-token'
 
-  window.i18n_data = {}
+  _.extend window.rp,
+    i18n_data: {}
 
-  window.t = (name) ->
-    keys = name.split '.'
+    initLocale: ->
+      client_version = localStorage.getItem 'locale_version'
+      latest_version = $('body').data 'locale-version'
 
-    result = window.i18n_data
+      if client_version == latest_version
+        rp.i18n_data = JSON.parse localStorage.getItem 'locale_cache'
+      else
+        $.getJSON "/account/locale/", (result) ->
+          rp.i18n_data = result
+          localStorage.setItem 'locale_version', latest_version
+          localStorage.setItem 'locale_cache', JSON.stringify result
 
-    for item in keys
-      if result[item] == undefined
+    t: (name) ->
+      keys = name.split '.'
+
+      result = window.i18n_data
+
+      for item in keys
+        if result[item] == undefined
+          return name
+        else
+          result = result[item]
+
+      if result == undefined
         return name
       else
-        result = result[item]
+        return result
 
-    if result == undefined
-      return name
-    else
-      return result
+    tErr: (name) ->
+      return rp.t "error_code.#{name}"
 
-  window.tErr = (name) ->
-    return "error_code.#{name}"
+    request: (url, param, options, callback) ->
+      unless callback
+        [options, callback] = [{}, options]
 
-  window.request = (url, param, options, callback) ->
-    unless callback
-      callback = options
+      unless options.method.toUpperCase() == 'GET'
+        param.csrf_token = $('body').data 'csrf-token'
+        param = JSON.stringify param
 
-    jQueryMethod = $[options.method ? 'post']
-
-    unless options.method == 'get'
-      param.csrf_token = $('body').data 'csrf-token'
-      param = JSON.stringify param
-    else
-      param = null
-
-    jQueryMethod url, param
-    .fail (jqXHR) ->
-      if jqXHR.responseJSON?.error
-        alert window.t "error_code.#{jqXHR.responseJSON.error}"
-      else
-        alert jqXHR.statusText
-    .success callback
-
-  client_version = localStorage.getItem 'locale_version'
-  latest_version = $('body').data 'locale-version'
-
-  if client_version == latest_version
-    window.i18n_data = JSON.parse localStorage.getItem 'locale_cache'
-  else
-    $.getJSON "/account/locale/", (result) ->
-      window.i18n_data = result
-
-      localStorage.setItem 'locale_version', latest_version
-      localStorage.setItem 'locale_cache', JSON.stringify result
+      $.ajax
+        type: (options.method ? 'POST').toUpperCase()
+        contentType: 'application/json; charset=UTF-8'
+        url: url
+        data: param
+      .fail (jqXHR) ->
+        if jqXHR.responseJSON?.error
+          alert rp.tErr jqXHR.responseJSON.error
+        else
+          alert jqXHR.statusText
+      .success callback
 
   $('nav a').each ->
     if $(@).attr('href') == location.pathname
@@ -61,7 +65,7 @@ $ ->
 
   $('.label-language').text $.cookie('language')
 
-  if window.location.hash == '#redirect'
+  if location.hash == '#redirect'
     $('#site-not-exist').modal 'show'
 
   $('.action-logout').click (e) ->

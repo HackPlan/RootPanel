@@ -146,8 +146,8 @@ app.express.use '/panel', require './core/router/panel'
 
 app.i18n.init()
 app.billing.initPlans()
+app.pluggable.initPlugins()
 app.interfaces.Node.initNodes()
-app.interfaces.Plugin.initPlugins()
 
 app.express.get '/', (req, res) ->
   unless res.headerSent

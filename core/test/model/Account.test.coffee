@@ -1,16 +1,4 @@
-after (done) ->
-  app.models.Account.remove
-    _id:
-      $in: created_objects.accounts
-  , done
-
-after (done) ->
-  app.models.Financials.remove
-    account_id:
-      $in: created_objects.accounts
-  , done
-
-describe 'model/Account', ->
+describe.skip 'model/Account', ->
   utils = null
   Account = null
   Financials = null
@@ -190,7 +178,7 @@ describe 'model/Account', ->
   describe 'createSecurityLog', ->
     it 'pending'
 
-describe 'model/Token', ->
+describe.skip 'model/Token', ->
   Account = null
 
   account = null

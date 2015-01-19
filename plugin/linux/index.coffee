@@ -18,10 +18,6 @@ linuxPlugin = module.exports = new Plugin
     'account.username_filter':
       filter: linux.isUsernameAvailable
 
-    'app.started':
-      register_if: -> @config.monitor_cycle
-      action: monitor.run
-
   initialize: ->
     app.express.get '/public/monitor', requireAuthenticate, (req, res) ->
       async.parallel
@@ -38,6 +34,10 @@ linuxPlugin = module.exports = new Plugin
         exports.render 'monitor', req, result, (html) ->
           res.send html
 
+  started: ->
+    if @config.monitor_cycle
+      monitor.run()
+
 linuxPlugin.registerComponent
   name: 'linux'
 
@@ -48,9 +48,6 @@ linuxPlugin.registerComponent
     return {
       username: info.username
     }
-
-  package: ->
-  unpacking: ->
 
   register_hooks:
     'account.resources_limit_changed':

@@ -1,10 +1,4 @@
-after (done) ->
-  app.models.Ticket.remove
-    account_id:
-      $in: created_objects.accounts
-  , done
-
-describe 'model/Ticket', ->
+describe.skip 'model/Ticket', ->
   Ticket = null
 
   account = null

@@ -1,5 +1,5 @@
 {_, path, fs, jade, harp} = app.libs
-{config, logger, i18n} = app
+{config, logger, i18n, utils} = app
 {available_plugins} = config.plugin
 
 pluggable = require '../pluggable'
@@ -9,15 +9,6 @@ module.exports = class Plugin
   name: null
   config: null
   path: null
-
-  @plugins = {}
-
-  @get: (name) ->
-    return @plugins[name]
-
-  @initPlugins: ->
-    for name in available_plugins
-      @plugins[name] = require path.join __dirname, '../../plugin', name
 
   constructor: (@info) ->
     @name = info.name
@@ -40,6 +31,10 @@ module.exports = class Plugin
 
     if info.initialize
       info.initialize.apply @
+
+    if info.started
+      app.on 'app.started', ->
+        info.started.apply @
 
     if fs.existsSync path.join(@path, 'locale')
       i18n.initPlugin @
@@ -106,3 +101,7 @@ module.exports = class Plugin
 
     fs.readFile template_path, (err, template_file) ->
       callback _.template(template_file.toString()) view_data
+
+  triggerUsages: (account, trigger_name, volume, callback) ->
+    trigger_name = utils.formatBillingTrigger trigger_name
+    app.billing.acceptUsagesBilling account,trigger_name, volume, callback

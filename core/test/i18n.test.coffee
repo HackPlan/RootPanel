@@ -1,4 +1,4 @@
-describe 'i18n', ->
+describe.skip 'i18n', ->
   i18n = null
 
   before ->

@@ -57,3 +57,6 @@ prepend sidebar
       a.btn.btn-lg.btn-success(href='/ticket/create/')= t('ticket.create_ticket')
     else
       a.btn.btn-lg.btn-success(href='/admin/ticket/')= t('ticket.ticket_list')
+
+append footer
+  script(src='/script/ticket.js')

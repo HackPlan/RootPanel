@@ -68,7 +68,7 @@ exports.get '/', (req, res) ->
       view_data.plans.push _.extend _.clone(info),
         is_enabled: account.inPlan name
 
-    async.map pluggable.selectHook('view.panel.widgets'), (hook, callback) ->
+    async.map pluggable.selectHooks('view.panel.widgets'), (hook, callback) ->
       hook.generator req, (html) ->
         callback null, html
 

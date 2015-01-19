@@ -1,9 +1,5 @@
 {models, logger} = app
-{Account} = app.models
-{_, ObjectId, mongoose, markdown, async} = app.libs
-
-process.nextTick ->
-  {Account} = app.models
+{_, markdown, async, mongoose} = app.libs
 
 Reply = mongoose.Schema
   account_id:
@@ -70,9 +66,12 @@ Ticket = mongoose.Schema
   ]
 
 Ticket.pre 'save', (next) ->
-  @content_html = markdown.toHTML @content
+  @set
+    content_html: markdown.toHTML @content
+
   next()
 
+# @callback(err, reply)
 Ticket.methods.createReply = (account, content, status, flags, callback) ->
   reply = new models.Reply
     account_id: account._id
@@ -85,12 +84,15 @@ Ticket.methods.createReply = (account, content, status, flags, callback) ->
 
     @replies.push reply
     @members.addToSet account._id
-    @status = status
-    @update_at = new Date()
+
+    @set
+      status: status
+      update_at: new Date()
 
     @save (err) ->
       callback err, reply
 
+# return bool
 Ticket.methods.hasMember = (account) ->
   for member in @members
     if member.equals account._id
@@ -98,28 +100,16 @@ Ticket.methods.hasMember = (account) ->
 
   return false
 
+# @param callback({#id: #account})
 Ticket.methods.populateAccounts = (callback) ->
   accounts_id = _.uniq [@account_id].concat @members.concat _.pluck(@replies, 'account_id')
 
-  async.map accounts_id, (account_id, callback) ->
-    Account.findById account_id, callback
-
-  , (err, accounts) =>
+  app.models.Account.find
+    _id:
+      $in: accounts_id
+  , (err, accounts) ->
     logger.error err if err
-
-    accounts = _.indexBy _.compact(accounts), '_id'
-
-    result = @toObject()
-
-    result.account = accounts[result.account_id]
-
-    result.members = _.map result.members, (member_id) ->
-      return accounts[member_id]
-
-    for reply in result.replies
-      reply.account = accounts[reply.account_id]
-
-    callback result
+    callback _.indexBy accounts, '_id'
 
 _.extend app.models,
   Ticket: mongoose.model 'Ticket', Ticket

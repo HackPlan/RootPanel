@@ -5,7 +5,7 @@ cookieParser = require 'cookie-parser'
 Account = null
 middleware = null
 
-describe 'middleware', ->
+describe.skip 'middleware', ->
   before ->
     require '../../app'
     {middleware} = app

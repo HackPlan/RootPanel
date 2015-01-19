@@ -3,7 +3,8 @@
 
 Plugin = require './interface/Plugin'
 
-pluggable = exports
+pluggable = _.extend exports,
+  plugins: {}
 
 pluggable.hooks =
   app:
@@ -52,16 +53,23 @@ pluggable.hooks =
       # path
       styles: []
 
+pluggable.initPlugins = ->
+  for name in config.plugin.available_plugins
+    pluggable.plugins[name] = require path.join __dirname, '../plugin', name
+
 pluggable.selectHookPath = (name) ->
   words = name.split '.'
 
-  hook_path = pluggable.hooks
+  ref = pluggable.hooks
 
   for word in words
-    hook_path[word] ?= {}
-    hook_path = hook_path[word]
+    ref[word] ?= {}
+    ref = ref[word]
 
-  return hook_path
+  return ref
 
-pluggable.selectHook = (name) ->
-  return pluggable.selectHookPath name
+pluggable.selectHooks = (name, options) ->
+  return _.filter pluggable.selectHookPath(name), (hook) ->
+    return !hook.component_meta
+
+pluggable.selectComponentHooks = (name, account, callback) ->

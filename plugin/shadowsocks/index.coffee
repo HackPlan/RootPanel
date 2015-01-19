@@ -15,14 +15,6 @@ shadowsocksPlugin = module.exports = new Plugin
       language: 'zh_CN'
       content_markdown: fs.readFileSync("#{__dirname}/wiki/README.md").toString()
 
-    'app.started': [
-      action: shadowsocks.initSupervisor
-    ,
-      register_if: -> @config.monitor_cycle
-      action: ->
-        setInterval shadowsocks.monitoring, config.plugins.shadowsocks.monitor_cycle
-    ]
-
     'view.admin.sidebars':
       generator: (req, callback) ->
         Financials.find
@@ -52,6 +44,12 @@ shadowsocksPlugin = module.exports = new Plugin
   initialize: ->
     app.express.use '/plugin/shadowsocks', require './router'
 
+  started: ->
+    shadowsocks.initSupervisor()
+
+    if @config.monitor_cycle
+      setInterval shadowsocks.monitoring, config.plugins.shadowsocks.monitor_cycle
+
 shadowsocksPlugin.registerComponent
   name: 'shadowsocks'
 
@@ -60,9 +58,11 @@ shadowsocksPlugin.registerComponent
 
   register_hooks:
     'view.panel.scripts':
+      repeating: 'once'
       path: '/plugin/shadowsocks/script/panel.js'
 
     'view.panel.styles':
+      repeating: 'once'
       path: '/plugin/shadowsocks/style/panel.css'
 
     'view.panel.widgets':

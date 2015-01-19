@@ -38,6 +38,7 @@ module.exports =
       available_components:
         shadowsocks:
           limit: 1
+          default: ->
 
       resource_limit: {}
 

@@ -1,4 +1,4 @@
-describe 'interface/Node', ->
+describe.skip 'interface/Node', ->
   {Node, master, slave} = {}
 
   before ->

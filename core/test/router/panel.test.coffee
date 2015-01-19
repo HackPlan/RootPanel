@@ -1,4 +1,4 @@
-describe 'router/panel', ->
+describe.skip 'router/panel', ->
   agent = null
 
   before ->

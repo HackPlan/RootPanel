@@ -7,56 +7,57 @@ append header
   link(rel='stylesheet', href='/style/ticket.css')
 
 block main
-  .row.content(data-id='#{ticket._id}')
-    header
-      | #{ticket.title} &nbsp;
+  #ticket-view.row
+    .row.content(data-id='#{ticket._id}')
+      header
+        | #{ticket.title} &nbsp;
 
-      - l_status = t('ticket_status.' + ticket.status)
+        - l_status = t('ticket_status.' + ticket.status)
 
-      if ticket.status == 'closed'
-        span.small.text-muted= l_status
-      else if ticket.status == 'open'
-        span.small.text-primary= l_status
-      else if ticket.status == 'pending'
-        span.small.text-warning= l_status
-      else if ticket.status == 'finish'
-        span.small.text-success= l_status
-
-    p!= ticket.content_html
-
-  .row
-    header= t('ticket.replies')
-
-    ul.list-group
-      for reply in ticket.replies
-        li.list-group-item.clearfix
-          a.pull-left
-            img.img-avatar(src= reply.account.preferences.avatar_url)
-          .list-content
-            p!= reply.content_html
-            p
-              span.label.label-info= reply.account.username
-              span.label.label-default(title=reply.created_at)= moment(reply.created_at).fromNow()
-
-  .row
-    if ticket.status != 'closed'
-      header= t('ticket.create_reply')
-
-    form.form-horizontal
-      if ticket.status != 'closed'
-        .form-group.padding
-          textarea.form-control.input-content(rows='5')
-      .form-group.padding
         if ticket.status == 'closed'
-          button(disabled).btn.btn-lg.btn-primary= t('ticket_status.closed')
-        else
-          button.btn.btn-lg.btn-primary.action-reply(type='button')= t('ticket.create_reply')
-          button(type='button', data-status='closed').btn.btn-lg.btn-danger.action-update-status= t('ticket.close_ticket')
+          span.small.text-muted= l_status
+        else if ticket.status == 'open'
+          span.small.text-primary= l_status
+        else if ticket.status == 'pending'
+          span.small.text-warning= l_status
+        else if ticket.status == 'finish'
+          span.small.text-success= l_status
 
-        if req.account.inGroup('root') && (ticket.status == 'open' || ticket.status == 'pending')
-          button(type='button', data-status='finish').btn.btn-lg.btn-success.action-update-status= t('ticket.finish_ticket')
-        if req.account.inGroup('root') && ticket.status == 'closed'
-          button(type='button', data-status='open').btn.btn-lg.btn-success.action-update-status= t('ticket.reopen_ticket')
+      p!= ticket.content_html
+
+    .row
+      header= t('ticket.replies')
+
+      ul.list-group
+        for reply in ticket.replies
+          li.list-group-item.clearfix
+            a.pull-left
+              img.img-avatar(src= reply.account.preferences.avatar_url)
+            .list-content
+              p!= reply.content_html
+              p
+                span.label.label-info= reply.account.username
+                span.label.label-default(title=reply.created_at)= moment(reply.created_at).fromNow()
+
+    .row
+      if ticket.status != 'closed'
+        header= t('ticket.create_reply')
+
+      form.form-horizontal
+        if ticket.status != 'closed'
+          .form-group.padding
+            textarea.form-control.input-content(rows='5')
+        .form-group.padding
+          if ticket.status == 'closed'
+            button(disabled).btn.btn-lg.btn-primary= t('ticket_status.closed')
+          else
+            button.btn.btn-lg.btn-primary.action-reply(type='button')= t('ticket.create_reply')
+            button(type='button', data-status='closed').btn.btn-lg.btn-danger.action-update-status= t('ticket.close_ticket')
+
+          if req.account.inGroup('root') && (ticket.status == 'open' || ticket.status == 'pending')
+            button(type='button', data-status='finish').btn.btn-lg.btn-success.action-update-status= t('ticket.finish_ticket')
+          if req.account.inGroup('root') && ticket.status == 'closed'
+            button(type='button', data-status='open').btn.btn-lg.btn-success.action-update-status= t('ticket.reopen_ticket')
 
 prepend sidebar
   .row
@@ -81,4 +82,4 @@ prepend sidebar
           img.img-avatar(src=member.preferences.avatar_url, alt=member.username)
 
 append footer
-  script(src='/script/ticket/view.js')
+  script(src='/script/ticket.js')

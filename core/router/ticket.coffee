@@ -13,15 +13,49 @@ exports.param 'id', (req, res, next, id) ->
     logger.error err if err
 
     unless ticket
-      return res.error 'ticket_not_exist', null, 404
+      return res.error 404, 'ticket_not_exist'
 
     unless ticket.hasMember req.account
       unless req.account.inGroup 'root'
-        return res.error 'forbidden', null, 403
+        return res.error 403, 'forbidden'
 
-    req.ticket = ticket
+    _.extend req,
+      ticket: ticket
 
     next()
+
+exports.use '/resource', do ->
+  resource = new express.Router mergeParams: true
+
+  resource.get '/', (req, res) ->
+    Ticket.find
+      $or: [
+        account_id: req.account._id
+      ,
+        members: req.account._id
+      ]
+    , null,
+      sort:
+        updated_at: -1
+    , (err, tickets) ->
+      if err
+        res.error err
+      else
+        res.json tickets
+
+  resource.post '/', (req, res) ->
+
+  resource.get '/:id', (req, res) ->
+
+  resource.put '/:id', (req, res) ->
+
+  resource.patch '/:id', (req, res) ->
+
+  resource.delete '/:id', (req, res) ->
+
+  resource.post '/:id/reply', (req, res) ->
+
+  resource.put '/:id/status', (req, res) ->
 
 exports.get '/list', (req, res) ->
   Ticket.find

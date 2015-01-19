@@ -1,10 +1,4 @@
-after (done) ->
-  app.models.CouponCode.remove
-    _id:
-      $in: created_objects.couponcodes
-  , done
-
-describe 'model/CouponCode', ->
+describe.skip 'model/CouponCode', ->
   Account = null
   CouponCode = null
 

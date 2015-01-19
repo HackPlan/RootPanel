@@ -1,4 +1,4 @@
-describe 'router/coupon', ->
+describe.skip 'router/coupon', ->
   agent = null
   coupon3 = null
   csrf_token = null

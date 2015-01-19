@@ -1,6 +1,6 @@
 {fs, path} = app.libs
 {pluggable, config} = app
-{Plugin} = app.classes
+{Plugin} = app.interfaces
 
 wikiPlugin = module.exports = new Plugin
   name: 'wiki'

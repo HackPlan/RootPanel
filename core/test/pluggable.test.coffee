@@ -1,2 +1,0 @@
-describe 'pluggable', ->
-  it 'pending'

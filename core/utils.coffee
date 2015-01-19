@@ -54,18 +54,10 @@ exports.pickErrorName = (error) ->
 
   return err.message
 
-exports.bunyanMongo = class BunyanMongo
-  queue: []
+exports.formatBillingTrigger = (name, plugin_name) ->
+  [part1, part2] = name.split '.'
 
-  collection: null
-
-  dequeueCachedRecords: ->
-    while @queue.length
-      @write @queue.shift()
-
-  write: (data) ->
-    if @collection
-      @collection.insert data, (err) ->
-        console.error err if err
-    else
-      @queue.push data
+  if part2
+    return name
+  else
+    return "#{plugin_name}.#{part1}"
