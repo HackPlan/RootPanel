@@ -3,7 +3,7 @@ RootPanel 是一个 PaaS 开发框架，提供了用户系统、计费和订单�
 
 RootPanel 具有良好的设计，高度的可定制性，支持多语言和多时区，以及非常高的单元测试覆盖率。
 
-RootPanel 的文档位于 [Github Wiki](https://github.com/jysperm/RootPanel/wiki).
+RootPanel 的文档位于 [Github Wiki](https://github.com/jysperm/RootPanel/wiki), 包括常见问题、终端用户文档、使用文档、开发文档。
 
 ## 安装
 
@@ -12,7 +12,7 @@ RootPanel 的文档位于 [Github Wiki](https://github.com/jysperm/RootPanel/wik
 
     git clone -b stable https://github.com/jysperm/RootPanel.git
 
-开发版本
+主分支
 [![Build Status](https://travis-ci.org/jysperm/RootPanel.svg?branch=master)](https://travis-ci.org/jysperm/RootPanel)
 
     git clone https://github.com/jysperm/RootPanel.git
@@ -25,9 +25,9 @@ RootPanel 的文档位于 [Github Wiki](https://github.com/jysperm/RootPanel/wik
 
 请从 `sample` 中选择一个配置文件复制到根目录，重命名为 `config.coffee`:
 
-    core.config.coffee          # 仅核心模块
-    rpvhost.config.coffee       # 虚拟主机 (正在重构，目前支持 SSH 和 Supervisor)
-    shadowsocks.config.coffee   # ShadowSocks 代理服务
+    core.config.coffee         # 仅核心模块
+    rpvhost.config.coffee      # 虚拟主机 (正在重构，目前支持 SSH 和 Supervisor)
+    shadowsocks.config.coffee  # ShadowSocks 代理服务
 
 ## 从旧版本升级
 
@@ -54,9 +54,9 @@ RootPanel 的文档位于 [Github Wiki](https://github.com/jysperm/RootPanel/wik
 
 ## 技术构成
 
-* 前端：Bootstrap(3), jQuery, Jade, Less
+* 前端：Bootstrap, jQuery, Jade, Less
 * 后端：Express, Coffee
-* 数据库：MongoDB(2.4), Redis
+* 数据库：MongoDB, Redis
 * 操作系统支持：Ubuntu 14.04 amd64
 
 RootPanel 默认会通过 Google Analytics 向开发人员发送匿名的统计信息。
@@ -77,6 +77,7 @@ RootPanel 默认会通过 Google Analytics 向开发人员发送匿名的统计�
 在你首次向 RootPanel 贡献代码时，我们还会人工向你确认一次上述协议。
 
 ## 许可协议
+RootPanel 采用开源与商业双授权模式。
 
 * 开源授权：[AGPLv3](https://github.com/jysperm/RootPanel/blob/master/LICENSE) | [CC-SA](http://creativecommons.org/licenses/sa/1.0/) (文档) | Public Domain (配置文件和示例)
 * 商业授权(计划中)

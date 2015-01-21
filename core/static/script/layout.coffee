@@ -1,11 +1,16 @@
 $ ->
-  window.rp ?= {}
+  window.RP ?= {}
 
   $.ajaxSetup
     headers:
       'X-Csrf-Token': $('body').data 'csrf-token'
 
-  _.extend window.rp,
+  _.templateSettings =
+    evaluate: /\{%([\s\S]+?)%\}/g,
+    interpolate: /\{:([\s\S]+?)\}\}/g
+    escape: /\{\{([\s\S]+?)\}\}/g
+
+  _.extend window.RP,
     i18n_data: {}
 
     initLocale: ->
@@ -13,17 +18,17 @@ $ ->
       latest_version = $('body').data 'locale-version'
 
       if client_version == latest_version
-        rp.i18n_data = JSON.parse localStorage.getItem 'locale_cache'
+        RP.i18n_data = JSON.parse localStorage.getItem 'locale_cache'
       else
         $.getJSON "/account/locale/", (result) ->
-          rp.i18n_data = result
+          RP.i18n_data = result
           localStorage.setItem 'locale_version', latest_version
           localStorage.setItem 'locale_cache', JSON.stringify result
 
     t: (name) ->
       keys = name.split '.'
 
-      result = window.i18n_data
+      result = RP.i18n_data
 
       for item in keys
         if result[item] == undefined
@@ -37,7 +42,7 @@ $ ->
         return result
 
     tErr: (name) ->
-      return rp.t "error_code.#{name}"
+      return RP.t "error_code.#{name}"
 
     request: (url, param, options, callback) ->
       unless callback
@@ -54,10 +59,12 @@ $ ->
         data: param
       .fail (jqXHR) ->
         if jqXHR.responseJSON?.error
-          alert rp.tErr jqXHR.responseJSON.error
+          alert RP.tErr jqXHR.responseJSON.error
         else
           alert jqXHR.statusText
       .success callback
+
+  RP.initLocale()
 
   $('nav a').each ->
     if $(@).attr('href') == location.pathname

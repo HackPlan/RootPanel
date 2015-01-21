@@ -1,62 +1,30 @@
 extends ../layout
 
-mixin displayTicketStatus(status)
-  - l_status = t('ticket_status.' + status)
-
-  if status == 'closed'
-    span.text-muted= l_status
-  else if status == 'open'
-    span.text-primary= l_status
-  else if status == 'pending'
-    span.text-warning= l_status
-  else if status == 'finish'
-    span.text-success= l_status
-  else
-    | #{l_status}
-
-mixin displayTicketsTable(status, tickets)
-  h4= t('ticket_status.' + status)
-
-  table.table.table-hover
-    thead
-      tr
-        th= t('ticket.title')
-        th= t('ticket.status')
-    tbody
-      for ticket in tickets
-        tr(data-id='#{ticket._id}')
-          td
-            a(href='/ticket/view/#{ticket._id}')= ticket.title
-          td
-            mixin displayTicketStatus(ticket.status)
-
 prepend header
   title #{t('ticket.ticket_list')} | #{t(config.web.t_name)}
 
 block main
-  header= t('ticket.ticket_list')
-
-  if tickets
-    mixin displayTicketsTable('related', tickets)
-
-  if pending && pending.length
-    mixin displayTicketsTable('pending', pending)
-
-  if open && open.length
-    mixin displayTicketsTable('open', open)
-
-  if finish && finish.length
-    mixin displayTicketsTable('finish', finish)
-
-  if closed && closed.length
-    mixin displayTicketsTable('closed', closed)
+  #list-view
+    header= t('ticket.ticket_list')
+    
+    table.table.table-hover
+      thead
+        tr
+          th= t('ticket.title')
+          th= t('ticket.status')
+      tbody
 
 prepend sidebar
   .row
-    if tickets
-      a.btn.btn-lg.btn-success(href='/ticket/create/')= t('ticket.create_ticket')
-    else
+    if account.isAdmin()
       a.btn.btn-lg.btn-success(href='/admin/ticket/')= t('ticket.ticket_list')
+    else
+      a.btn.btn-lg.btn-success(href='/ticket/create/')= t('ticket.create_ticket')
 
 append footer
   script(src='/script/ticket.js')
+  script(id='list-item-template', type='text/template')
+    td
+      a(href='/ticket/view/{{_id}}') {{title}}
+    td
+      span(class='text-{{color}}') {{RP.t('ticket_status.' + status)}}

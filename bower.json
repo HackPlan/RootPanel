@@ -5,6 +5,7 @@
     "jquery-cookie": "~1.4.1",
     "underscore": "~1.7.0",
     "jquery": "~2.1.2",
-    "backbone": "~1.1.2"
+    "backbone": "~1.1.2",
+    "moment": "~2.9.0"
   }
 }

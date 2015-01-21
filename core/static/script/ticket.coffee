@@ -1,7 +1,31 @@
 $ ->
-  Ticket = Backbone.Model.extend
-    url: '/ticket/resource/'
+  color_mapping =
+    closed: 'muted'
+    open: 'primary'
+    pending: 'warning'
+    finish: 'success'
+
+  Reply = Backbone.Model.extend
     idAttribute: '_id'
+
+  Ticket = Backbone.Model.extend
+    urlRoot: '/ticket/resource/'
+    idAttribute: '_id'
+
+    initialize: ->
+      ReplyCollection = Backbone.Collection.extend
+        url: @url() + '/replies'
+        model: Reply
+
+      @replies = new ReplyCollection()
+      @replies.url = @url() + '/replies'
+
+      @once 'change', =>
+        @replies.reset @get 'replies'
+
+  TicketCollection = Backbone.Collection.extend
+    model: Ticket
+    url: '/ticket/resource/'
 
   CreateView = Backbone.View.extend
     el: '#create-view'
@@ -11,34 +35,104 @@ $ ->
 
     createTicket: ->
       ticket = new Ticket
-        title: @$('.input-title').val()
-        content: @$('.input-content').val()
+        title: @$('[name=title]').val()
+        content: @$('[name=content]').val()
 
       ticket.save().success (ticket) ->
-        location.href = "/ticket/view/#{ticket.id}"
+        location.href = "/ticket/view/#{ticket._id}"
+
+  ReplyView = Backbone.View.extend
+    tagName: 'li'
+    className: 'list-group-item clearfix'
+
+    initialize: ->
+      @template = _.template $('#reply-template').html()
+      @model.on 'change', @render.bind @
+
+    render: ->
+      @$el.html @template @model.toJSON()
+      return @
 
   TicketView = Backbone.View.extend
-    el: '#ticket-view'
+    el: 'body'
 
     events:
       'click .action-reply': 'replyTicket'
-      'click .action-update-status': 'updateStatus'
+      'click .action-status': 'setStatus'
+
+    id: null
+    model: null
+
+    initialize: (options) ->
+      @id = options.id
+      @model = new Ticket _id: @id
+
+      @model.on 'change', @render.bind @
+      @model.replies.on 'add', @appendReply.bind @
+      @model.replies.on 'reset', (replies) =>
+        replies.each @appendReply.bind @
+
+      @model.fetch()
+
+      @templateContent = _.template $('#content-template').html()
+      @templateActions = _.template $('#actions-template').html()
+      @templateAccountInfo = _.template $('#account-info-template').html()
+      @templateMembers = _.template $('#members-template').html()
+
+    render: ->
+      view_data = @model.toJSON()
+      view_data.color = color_mapping[view_data.status]
+      @$('.content').html @templateContent view_data
+      @$('.actions').html @templateActions view_data
+      @$('.account-info').html @templateAccountInfo view_data
+      @$('.members').html @templateMembers view_data
+      return @
+
+    appendReply: (reply) ->
+      view = new ReplyView
+        model: reply
+      @$('.replies').append view.render().el
 
     replyTicket: ->
-      request "/ticket/reply/#{id}",
-        content: $('.input-content').val()
-      , ->
-        location.reload()
+      @model.replies.create
+        # TODO: use current account
+        account: @model.get 'account'
+        content: @$('[name=content]').val()
+        content_html: null
+        created_at: null
+      @$('[name=content]').val ''
 
-    updateStatus: ->
-      request "/ticket/update_status/#{id}",
-        status: $(@).data 'status'
-      , ->
-        location.reload()
+    setStatus: (e) ->
+      @model.save
+        status: $(e.target).data 'status'
+      ,
+        url: @model.url() + '/status'
 
-  ListItemView = Backbone.View.extend()
+  ListItemView = Backbone.View.extend
+    tagName: 'tr'
 
-  ListView = Backbone.View.extend()
+    initialize: ->
+      @template = _.template $('#list-item-template').html()
+
+    render: ->
+      view_data = @model.toJSON()
+      view_data.color = color_mapping[view_data.status]
+      @$el.html @template view_data
+      return @
+
+  ListView = Backbone.View.extend
+    el: '#list-view'
+
+    tickets: new TicketCollection()
+
+    initialize: ->
+      @tickets.on 'reset', =>
+        @tickets.each (ticket) =>
+          view = new ListItemView
+            model: ticket
+          @$('tbody').append view.render().el
+
+      @tickets.fetch reset: true
 
   TicketRouter = Backbone.Router.extend
     routes:
@@ -46,12 +140,9 @@ $ ->
       'ticket/list(/)': 'list'
       'ticket/view/:id(/)': 'view'
 
-    create: ->
-      new CreateView()
-
-    list: ->
-
-    view: (id) ->
+    create: -> new CreateView()
+    list: -> new ListView()
+    view: (id) -> new TicketView id: id
 
   new TicketRouter()
   Backbone.history.loadUrl location.pathname

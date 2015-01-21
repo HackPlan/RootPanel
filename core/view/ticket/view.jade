@@ -1,85 +1,89 @@
 extends ../layout
 
 prepend header
-  title #{ticket.title} | #{t(config.web.t_name)}
+  title #{req.ticket.title} | #{t(config.web.t_name)}
 
 append header
   link(rel='stylesheet', href='/style/ticket.css')
 
 block main
-  #ticket-view.row
-    .row.content(data-id='#{ticket._id}')
-      header
-        | #{ticket.title} &nbsp;
+  .row.content
 
-        - l_status = t('ticket_status.' + ticket.status)
+  .row
+    header= t('ticket.replies')
+    ul.replies.list-group
 
-        if ticket.status == 'closed'
-          span.small.text-muted= l_status
-        else if ticket.status == 'open'
-          span.small.text-primary= l_status
-        else if ticket.status == 'pending'
-          span.small.text-warning= l_status
-        else if ticket.status == 'finish'
-          span.small.text-success= l_status
-
-      p!= ticket.content_html
-
-    .row
-      header= t('ticket.replies')
-
-      ul.list-group
-        for reply in ticket.replies
-          li.list-group-item.clearfix
-            a.pull-left
-              img.img-avatar(src= reply.account.preferences.avatar_url)
-            .list-content
-              p!= reply.content_html
-              p
-                span.label.label-info= reply.account.username
-                span.label.label-default(title=reply.created_at)= moment(reply.created_at).fromNow()
-
-    .row
-      if ticket.status != 'closed'
-        header= t('ticket.create_reply')
-
-      form.form-horizontal
-        if ticket.status != 'closed'
-          .form-group.padding
-            textarea.form-control.input-content(rows='5')
-        .form-group.padding
-          if ticket.status == 'closed'
-            button(disabled).btn.btn-lg.btn-primary= t('ticket_status.closed')
-          else
-            button.btn.btn-lg.btn-primary.action-reply(type='button')= t('ticket.create_reply')
-            button(type='button', data-status='closed').btn.btn-lg.btn-danger.action-update-status= t('ticket.close_ticket')
-
-          if req.account.inGroup('root') && (ticket.status == 'open' || ticket.status == 'pending')
-            button(type='button', data-status='finish').btn.btn-lg.btn-success.action-update-status= t('ticket.finish_ticket')
-          if req.account.inGroup('root') && ticket.status == 'closed'
-            button(type='button', data-status='open').btn.btn-lg.btn-success.action-update-status= t('ticket.reopen_ticket')
-
+  .row.actions
+      
 prepend sidebar
   .row
     a.btn.btn-lg.btn-success(href='/ticket/list/')= t('ticket.ticket_list')
 
-  .row
-    if ticket.account
-      header= t('ticket.creator')
-      li.list-group-item.clearfix
-        a.pull-left
-          img.img-avatar(src=ticket.account.preferences.avatar_url)
-        p
-          span.label.label-info= ticket.account.username
-          br
-          span.label.label-default(title=ticket.created_at)= moment(ticket.created_at).fromNow()
+  .row.account-info
 
-  .row
-    header= t('ticket.members')
-    for member in ticket.members
-      if member
-        a.pull-left
-          img.img-avatar(src=member.preferences.avatar_url, alt=member.username)
+  .row.members
 
 append footer
+  script(src='/bower_components/moment/moment.js')
   script(src='/script/ticket.js')
+  script(id='content-template', type='text/template')
+    header
+      | {{title}} &nbsp;
+      span.small(class='text-{{color}}') {{RP.t('ticket_status.' + status)}}
+      
+    p {:content_html}}
+  script(id='reply-template', type='text/template')
+    a.pull-left
+      img.img-avatar(src='{{account.preferences.avatar_url}}')
+    .list-content
+      {% if (content_html) { %}
+      p {:content_html}}
+      {% } else { %}
+      p {{content}}
+      {% }; %}
+      p
+        span.label.label-info {{account.username}}
+        {% if (created_at) { %}
+        span.label.label-default(title='{{created_at}}') {{moment(created_at).fromNow()}}
+        {% } else { %}
+        span.label.label-default ...
+        {% }; %}
+  script(id='actions-template', type='text/template')
+    {% if (status != 'closed') { %}
+    header= t('ticket.create_reply')
+    {% }; %}
+      
+    form.form-horizontal
+      {% if (status != 'closed') { %}
+      .form-group.padding
+        textarea.form-control(name='content', rows='5')
+      {% }; %}
+      .form-group.padding
+        {% if (status == 'closed') { %}
+        button(disabled).btn.btn-lg.btn-primary= t('ticket_status.closed')
+        {% } else { %}
+        button.btn.btn-lg.btn-primary.action-reply(type='button')= t('ticket.create_reply')
+        button(type='button', data-status='closed').btn.btn-lg.btn-danger.action-status= t('ticket.close_ticket')
+        {% }; %}
+        if account.isAdmin()
+          {% if (status == 'open' || status == 'pending') { %}
+          button(type='button', data-status='finish').btn.btn-lg.btn-success.action-status= t('ticket.finish_ticket')
+          {% }; %}
+          {% if (status == 'closed') { %}
+          button(type='button', data-status='open').btn.btn-lg.btn-success.action-status= t('ticket.reopen_ticket')
+          {% }; %}
+  script(id='account-info-template', type='text/template')
+    {% if (account) { %}
+    a.pull-left
+      img.img-avatar(src='{{account.preferences.avatar_url}}')
+    p
+      span.label.label-info {{account.username}}
+      br
+      span.label.label-default(title='{{created_at}}') {{moment(created_at).fromNow()}}
+    {% }; %}
+  script(id='members-template', type='text/template')
+    header= t('ticket.members')
+    {% members.forEach(function(member) { %}
+    a.pull-left
+      img.img-avatar(src='{{member.preferences.avatar_url}}', alt='{{member.username}}')
+    {% }); %}
