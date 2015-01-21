@@ -6,48 +6,49 @@ global.app = module.exports = new EventEmitter()
 
 app.libs =
   _: require 'underscore'
-  async: require 'async'
-  bunyan: require 'bunyan'
-  bodyParser: require 'body-parser'
-  child_process: require 'child_process'
-  cookieParser: require 'cookie-parser'
-  expressBunyanLogger: require 'express-bunyan-logger'
-  csrf: require 'csrf'
-  crypto: require 'crypto'
-  express: require 'express'
   fs: require 'fs'
-  harp: require 'harp'
-  jade: require 'jade'
-  markdown: require('markdown').markdown
-  moment: require 'moment-timezone'
-  mongoose: require 'mongoose'
-  morgan: require 'morgan'
-  nodemailer: require 'nodemailer'
-  os: require 'os'
   path: require 'path'
-  redis: require 'redis'
-  redisStore: require 'connect-redis'
+  jade: require 'jade'
+  async: require 'async'
+  crypto: require 'crypto'
+  moment: require 'moment-timezone'
   request: require 'request'
-  expressSession: require 'express-session'
+  express: require 'express'
+  child_process: require 'child_process'
+
+  csrf: require 'csrf'
+  mongoose: require 'mongoose'
   mongooseUniqueValidator: require 'mongoose-unique-validator'
   jsonStableStringify: require 'json-stable-stringify'
-
-  Insight: require 'insight'
   SSHConnection: require 'ssh2'
   Negotiator: require 'negotiator'
   ObjectID: (require 'mongoose').Types.ObjectId
-  EventEmitter: EventEmitter
-
   ObjectId: (require 'mongoose').Schema.Types.ObjectId
   Mixed: (require 'mongoose').Schema.Types.Mixed
 
-{bunyan, cookieParser, crypto, bodyParser, depd, express, fs, harp, mongoose} = app.libs
-{morgan, Insight, nodemailer, path, redis, _} = app.libs
+cookieParser = require 'cookie-parser'
+BunyanMongo = require 'bunyan-mongo'
+bodyParser = require 'body-parser'
+nodemailer = require 'nodemailer'
+Insight = require 'insight'
+morgan = require 'morgan'
+Mabolo = require 'mabolo'
+bunyan = require 'bunyan'
+redis = require 'redis'
+harp = require 'harp'
+
+{_, fs, path, express} = app.libs
 
 app.package = require './package'
-app.utils = require './core/utils'
+config = require './config'
+utils = require './core/utils'
 
-app.insight = new Insight
+fs.chmodSync path.join(__dirname, 'config.coffee'), 0o750
+
+if fs.existsSync config.web.listen
+  fs.unlinkSync config.web.listen
+
+insight = new Insight
   # 这个代码用于向 RootPanel 开发者提交匿名的统计信息
   # This code used to send anonymous usage metrics to RootPanel developers
   # 您不必修改这里 You do not have to modify it
@@ -55,53 +56,45 @@ app.insight = new Insight
   packageName: app.package.name
   packageVersion: app.package.version
 
-app.insight.track 'app.coffee'
+insight.track 'app.coffee'
 
-app.bunyanMongo = new app.utils.bunyanMongo()
+redis = redis.createClient 6379, '127.0.0.1',
+  auth_pass: config.redis.password
 
-app.logger = bunyan.createLogger
+mailer = nodemailer.createTransport config.email.account
+
+mabolo = new Mabolo utils.mongodbUri _.extend config.mongodb,
+  name: config.mongodb.test
+
+bunyanMongo = new BunyanMongo()
+
+mabolo.on 'connected', bunyanMongo.setDB.bind bunyanMongo
+
+logger = bunyan.createLogger
   name: app.package.name
   streams: [
     type: 'raw'
     level: 'info'
-    stream: app.bunyanMongo
+    stream: bunyanMongo
   ,
     level: process.env.LOG_LEVEL ? 'debug'
     stream: process.stdout
   ]
 
-do ->
-  config_path = path.join __dirname, 'config.coffee'
+_.extend app,
+  utils: utils
+  redis: redis
+  config: config
+  mabolo: mabolo
+  mailer: mailer
+  logger: logger
+  models: mabolo.models
+  insight: insight
+  express: express()
 
-  unless fs.existsSync config_path
-    fs.writeFileSync config_path, fs.readFileSync path.join __dirname, "./sample/core.config.coffee"
-
-  fs.chmodSync config_path, 0o750
-
-config = require './config'
-
-do  ->
-  if fs.existsSync config.web.listen
-    fs.unlinkSync config.web.listen
-
-  session_key_path = path.join __dirname, 'session.key'
-
-  unless fs.existsSync session_key_path
-    fs.writeFileSync session_key_path, crypto.randomBytes(48).toString('hex')
-    fs.chmodSync session_key_path, 0o750
-
-app.redis = redis.createClient 6379, '127.0.0.1',
-  auth_pass: config.redis.password
-
-app.mailer = nodemailer.createTransport config.email.account
-app.express = express()
-
-app.models = {}
-
-app.config = config
 app.db = require './core/db'
-app.cache = require './core/cache'
 app.i18n = require './core/i18n'
+app.cache = require './core/cache'
 app.pluggable = require './core/pluggable'
 
 require './core/model/Account'
@@ -133,7 +126,7 @@ app.express.use app.middleware.csrf()
 app.express.use app.middleware.authenticate
 app.express.use app.middleware.accountHelpers
 
-app.express.set 'views', path.join(__dirname, 'core/view')
+app.express.set 'views', path.join __dirname, 'core/view'
 app.express.set 'view engine', 'jade'
 
 app.express.use '/component', require './core/router/component'
@@ -149,12 +142,11 @@ app.billing.initPlans()
 app.pluggable.initPlugins()
 app.interfaces.Node.initNodes()
 
-app.express.get '/', (req, res) ->
-  unless res.headerSent
-    res.redirect '/panel/'
-
 app.express.use '/bower_components', express.static './bower_components'
 app.express.use harp.mount './core/static'
+
+app.express.get '/', (req, res) ->
+  res.redirect '/panel/'
 
 exports.start = _.once ->
   app.express.listen config.web.listen, ->

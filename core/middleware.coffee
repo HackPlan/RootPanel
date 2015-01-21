@@ -1,5 +1,9 @@
+expressBunyanLogger = require 'express-bunyan-logger'
+expressSession = require 'express-session'
+redisStore = require 'connect-redis'
+
 {config} = app
-{_, expressSession, redisStore, path, fs, moment, expressBunyanLogger} = app.libs
+{_, path, fs, moment, crypto} = app.libs
 {Account} = app.models
 
 exports.errorHandling = (req, res, next) ->
@@ -10,26 +14,32 @@ exports.errorHandling = (req, res, next) ->
     param ?= {}
 
     if req.method in ['GET', 'HEAD', 'OPTIONS']
-      res.status(status).send name
+      res.status(status).send name.toString()
     else
       res.status(status).json _.extend param,
-        error: name
+        error: name.toString()
 
   next()
 
 exports.logger = ->
   return expressBunyanLogger
-    logger: app.logger
+    genReqId: (req) -> req.sessionID
     parseUA: false
+    logger: app.logger
     excludes: [
       'req', 'res', 'body', 'short-body', 'http-version',
       'incoming', 'req-headers', 'res-headers'
     ]
-    genReqId: (req) -> req.sessionID
 
 exports.session = ->
+  session_key_path = path.join __dirname, '../session.key'
+
+  unless fs.existsSync session_key_path
+    fs.writeFileSync session_key_path, crypto.randomBytes(48).toString('hex')
+    fs.chmodSync session_key_path, 0o750
+
   RedisStore = redisStore expressSession
-  secret = fs.readFileSync(path.join __dirname, '../session.key').toString()
+  secret = fs.readFileSync(session_key_path).toString()
 
   return expressSession
     store: new RedisStore

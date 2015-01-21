@@ -72,6 +72,7 @@ module.exports =
     password: 'password'
     host: 'localhost'
     name: 'RootPanel'
+    test: 'RootPanel-test'
 
   redis:
     host: '127.0.0.1'

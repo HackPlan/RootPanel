@@ -61,3 +61,11 @@ exports.formatBillingTrigger = (name, plugin_name) ->
     return name
   else
     return "#{plugin_name}.#{part1}"
+
+exports.mongodbUri = (config) ->
+  {user, password, host, name} = config
+
+  if user and password
+    return "mongodb://#{user}:#{password}@#{host}/#{name}"
+  else
+    return "mongodb://#{host}/#{name}"
