@@ -156,3 +156,11 @@ exports.requireInService = (service_name) ->
         return res.error 'not_in_service'
 
       next()
+
+exports.TODO = (req, res) ->
+  res.status 501
+
+  if req.method in ['GET', 'HEAD', 'OPTIONS']
+    res.send 'TODO'
+  else
+    res.json error: 'TODO'

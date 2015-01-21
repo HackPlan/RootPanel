@@ -103,7 +103,7 @@ Account.path('username').validate (username) ->
 , 'invalid_username'
 
 Account.path('username').validate (username, callback) ->
-  async.each pluggable.selectHook('account.username_filter'), (hook, callback) ->
+  async.each pluggable.selectHooks('account.username_filter'), (hook, callback) ->
     hook.filter username, (is_allow) ->
       if is_allow
         callback()
@@ -137,7 +137,7 @@ Account.statics.register = (account, callback) ->
 
     pluggable: {}
 
-  async.each pluggable.selectHook('account.before_register'), (hook, callback) ->
+  async.each pluggable.selectHooks('account.before_register'), (hook, callback) ->
     hook.filter account, callback
   , ->
     account.save (err) ->
@@ -235,6 +235,9 @@ Account.methods.incBalance = (amount, type, payload, callback) ->
 
 Account.methods.inGroup = (group) ->
   return group in @groups
+
+Account.methods.isAdmin = ->
+  return @inGroup 'root'
 
 Account.methods.inPlan = (plan_name) ->
   return plan_name in _.keys @plans
