@@ -1,6 +1,10 @@
-{_, path, fs, jade, harp} = app.libs
+harp = require 'harp'
+
+{_, path, fs, jade} = app.libs
 {config, logger, i18n, utils} = app
 {available_plugins} = config.plugin
+
+ComponentTemplate = require './ComponentTemplate'
 
 pluggable = require '../pluggable'
 
@@ -18,7 +22,7 @@ module.exports = class Plugin
     if info.dependencies
       for dependence in plugin.dependencies
         unless dependence in available_plugins
-          err = new Error "Plugin:#{@name} is Dependent on Plugin:#{dependence} but not load"
+          err = new Error "Plugin:#{@name} is dependent on Plugin:#{dependence} but not load"
           logger.fatal err
           throw err
 
@@ -43,7 +47,7 @@ module.exports = class Plugin
       app.express.use harp.mount "/plugin/#{@name}", path.join(@path, 'static')
 
   registerComponent: (info) ->
-    component_meta = new ComponentMeta _.extend info,
+    template = new ComponentTemplate _.extend info,
       plugin: @
 
     for name, payload of info.register_hooks ? {}
@@ -51,10 +55,10 @@ module.exports = class Plugin
         unless payload.register_if.apply @
           continue
 
-      @registerComponentHook name, _.extend payload,
-        component_meta: component_meta
+      @registerHook name, _.extend payload,
+        component_template: template
 
-    pluggable.components[info.name] = component_meta
+    pluggable.components[info.name] = template
 
   registerHook: (name, payload) ->
     words = name.split '.'

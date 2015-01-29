@@ -13,7 +13,7 @@ exports.get '/financials', (req, res) ->
 
   async.parallel
     payment_methods: (callback) ->
-      async.map pluggable.selectHook('billing.payment_methods'), (hook, callback) ->
+      async.map pluggable.selectHooks('billing.payment_methods'), (hook, callback) ->
         hook.widgetGenerator req, (html) ->
           callback null, html
       , callback
@@ -30,7 +30,7 @@ exports.get '/financials', (req, res) ->
         async.map deposit_logs, (deposit_log, callback) ->
           deposit_log = deposit_log.toObject()
 
-          matched_hook = _.find pluggable.selectHook('billing.payment_methods'), (hook) ->
+          matched_hook = _.find pluggable.selectHooks('billing.payment_methods'), (hook) ->
             return hook.type == deposit_log.payload.type
 
           unless matched_hook

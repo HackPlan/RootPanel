@@ -1,20 +1,16 @@
 {_, async} = app.libs
-{logger} = app
+{logger, mabolo} = app
 {Account, Component} = app.models
+{ObjectID} = mabolo
+
+process.nextTick ->
+  {Component} = app.models
 
 Node = require './Node'
 
-module.exports = class ComponentType
-  @component_types = {}
-
-  @get: (name) ->
-    return @component_types[name]
-
+module.exports = class ComponentTemplate
   constructor: (info) ->
     _.extend @, info
-
-  pickPayload: (info) ->
-    return info
 
   # @param callback(err)
   initialize: (component, callback) ->
@@ -22,18 +18,19 @@ module.exports = class ComponentType
 
   # @param callback(err, component)
   createComponent: (account, info, callback) ->
-    {name, physical_node} = info
+    {name, node_name, payload} = info
 
     Component.create
-      account_id: account._id
-      component_type: @name
-      payload: @pickPayload info
+      account_id: ObjectID account._id.toString()
+      template: @name
+      payload: payload
       name: name
-      physical_node: physical_node
+      node_name: node_name
       dependencies: {}
     , (err, component) =>
-      component.populateComponent (populated_component) =>
-        @initialize populated_component, (err) =>
+      return callback err if err
+      component.populate =>
+        @initialize component, (err) =>
           return callback err if err
 
           component.markAsStatus 'running', callback
@@ -43,7 +40,7 @@ module.exports = class ComponentType
     component.markAsStatus 'destroying', (err) =>
       return callback err if err
 
-      component.populateComponent (component) =>
+      component.populate =>
         @destroy component, (err) =>
           return callback err if err
 
@@ -54,7 +51,3 @@ module.exports = class ComponentType
   transferOwner: ->
 
   movePhysicalNode: ->
-
-  packing: ->
-
-  unpacking: ->

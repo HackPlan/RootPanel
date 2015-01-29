@@ -2,7 +2,7 @@
 {pluggable, config} = app
 {requireAuthenticate} = app.middleware
 {wrapAsync} = app.utils
-{Plugin} = app.classes
+{Plugin} = app.interfaces
 
 linux = require './linux'
 monitor = require './monitor'
@@ -44,22 +44,17 @@ linuxPlugin.registerComponent
   initialize: linux.createUser
   destroy: linux.deleteUser
 
-  pickPayload: (info) ->
-    return {
-      username: info.username
-    }
-
   register_hooks:
     'account.resources_limit_changed':
-      repeating: 'every_node'
+      timing: 'every_node'
       filter: linux.setResourceLimit
 
     'view.panel.styles':
-      repeating: 'once'
+      timing: 'once'
       path: '/plugin/linux/style/panel.css'
 
     'view.panel.widgets':
-      repeating: 'every'
+      timing: 'every'
       generator: (req, callback) ->
         linux.getResourceUsageByAccount req.account, (resources_usage) ->
           resources_usage ?=

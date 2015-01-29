@@ -9,11 +9,11 @@ block main
     .form-group
       label.col-sm-2.col-md-offset-1.control-label= t('account.username')
       .col-sm-5
-        input.input-username.form-control(type='text', required)
+        input.form-control(name='username', type='text', required)
     .form-group
       label.col-sm-2.col-md-offset-1.control-label= t('account.password')
       .col-sm-5
-        input.input-password.form-control(type='password')
+        input.form-control(name='password', type='password')
     .form-group
       .col-sm-offset-3
         button.action-login.btn.btn-lg.btn-primary(type='button')= t('account.login')
@@ -24,4 +24,4 @@ prepend sidebar
     a.btn.btn-lg.btn-success(href='/account/register/')= t('account.register')
 
 append footer
-  script(src='/script/account/login.js')
+  script(src='/script/account.js')

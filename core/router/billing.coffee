@@ -22,9 +22,12 @@ exports.post '/join_plan', (req, res) ->
   if req.account.balance <= when_balance_below
     return res.error 'insufficient_balance'
 
-  req.account.joinPlan plan, (err) ->
-    res.error err if err
-    res.status(204).json {}
+  billing.joinPlan req.account, plan, (err) ->
+    console.log err
+    if err
+      res.error err
+    else
+      res.status(204).json {}
 
 exports.post '/leave_plan', (req, res) ->
   {plan} = req.body
@@ -32,6 +35,8 @@ exports.post '/leave_plan', (req, res) ->
   unless req.account.inPlan plan
     return res.error 'not_in_plan'
 
-  req.account.leavePlan plan, (err) ->
-    res.error err if err
-    res.status(204).json {}
+  billing.leavePlan req.account, plan, (err) ->
+    if err
+      res.error err
+    else
+      res.status(204).json {}

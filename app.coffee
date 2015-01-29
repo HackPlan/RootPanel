@@ -20,7 +20,6 @@ app.libs =
   mongoose: require 'mongoose'
   mongooseUniqueValidator: require 'mongoose-unique-validator'
   jsonStableStringify: require 'json-stable-stringify'
-  SSHConnection: require 'ssh2'
   Negotiator: require 'negotiator'
   ObjectID: (require 'mongoose').Types.ObjectId
   ObjectId: (require 'mongoose').Schema.Types.ObjectId
@@ -113,7 +112,7 @@ app.notification = require './core/notification'
 app.interfaces =
   Node: require './core/interface/Node'
   Plan: require './core/interface/Plan'
-  ComponentType: require './core/interface/ComponentType'
+  ComponentTemplate: require './core/interface/ComponentTemplate'
   Plugin: require './core/interface/Plugin'
 
 app.express.use bodyParser.json()
@@ -140,7 +139,12 @@ app.express.use '/panel', require './core/router/panel'
 app.i18n.init()
 app.billing.initPlans()
 app.pluggable.initPlugins()
-app.interfaces.Node.initNodes()
+
+app.nodes = {}
+
+for name, info of config.nodes
+  app.nodes[name] = new app.interfaces.Node _.extend info,
+    name: name
 
 app.express.use '/bower_components', express.static './bower_components'
 app.express.use harp.mount './core/static'

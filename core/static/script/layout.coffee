@@ -48,7 +48,7 @@ $ ->
       unless callback
         [options, callback] = [{}, options]
 
-      unless options.method.toUpperCase() == 'GET'
+      unless options.method?.toUpperCase() == 'GET'
         param.csrf_token = $('body').data 'csrf-token'
         param = JSON.stringify param
 

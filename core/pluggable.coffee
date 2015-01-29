@@ -1,10 +1,12 @@
 {async, path, harp, jade, tmp, fs, _, child_process} = app.libs
 {i18n, config, logger} = app
+{Componnet} = app.models
 
 Plugin = require './interface/Plugin'
 
 pluggable = _.extend exports,
   plugins: {}
+  components: {}
 
 pluggable.hooks =
   app:
@@ -68,8 +70,85 @@ pluggable.selectHookPath = (name) ->
 
   return ref
 
-pluggable.selectHooks = (name, options) ->
-  return _.filter pluggable.selectHookPath(name), (hook) ->
-    return !hook.component_meta
+pluggable.applyHooks = (name, account, options) ->
+  options = _.extend {
+    op: 'action'
+    execute: true
+  }, options
 
-pluggable.selectComponentHooks = (name, account, callback) ->
+  {op, execute} = options
+
+  result = []
+
+  pushResult = (hook, payload = {}) ->
+    if execute
+      result.push (callback) ->
+        params = []
+
+        {account, node, components, component} = payload
+
+        params.push account if account
+        params.push node if node
+        params.push components if components
+        params.push component if component
+        params.push callback
+
+        hook[op].apply null, params
+
+    else
+      result.push _.extend {}, hook, payload
+
+  for hook in pluggable.selectHookPath(name)
+    template = hook.component_template
+    timing = hook.timing
+
+    if !template or timing == 'always'
+      pushResult hook
+      continue
+
+    unless account
+      continue
+
+    if timing == 'available'
+      if template in account.getAvailableComponentsTemplates()
+        pushResult hook,
+          account: account
+
+      continue
+
+    components = _.filter account.components, (component) ->
+      return component.template == template
+
+    if timing == 'once'
+      unless _.isEmpty components
+        pushResult hook,
+          account: account
+          components: components
+
+      continue
+
+    if timing == 'every'
+      for component in components
+        pushResult hook,
+          account: account
+          component: component
+
+      continue
+
+    if timing == 'every_node'
+      components_by_node = _.groupBy components, (component) ->
+        return component.node_name
+
+      for node_name, components of components_by_node
+        pushResult hook,
+          account: account
+          node: app.nodes[node_name]
+          components: components
+
+      continue
+
+  if execute
+    return (callback) ->
+      async.series result, callback
+  else
+    return result

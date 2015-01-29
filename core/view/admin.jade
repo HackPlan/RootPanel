@@ -10,12 +10,30 @@ block main
   .row
     ul.nav.nav-tabs(role='tablist')
       li.active
+        a(href='#tab-system-info', data-toggle='tab') 系统状态
+      li
         a(href='#tab-account-list', data-toggle='tab')= t('view.admin.account_list')
       li
         a(href='#tab-coupon-code', data-toggle='tab')= t('view.admin.coupon_code')
+      li
+        a(href='#tab-system-log', data-toggle='tab') 系统日志
 
     .tab-content
-      #tab-account-list.tab-pane.active
+      #tab-system-info.tab-pane.active
+        .page-header
+          h1 
+            | RootPanel &nbsp;
+            small= app.package.version
+        
+        header 已加载的插件
+        
+        each plugin, name in app.pluggable.plugins
+          .panel.panel-default
+            .panel-heading
+              strong= name
+            .panel-body
+              
+      #tab-account-list.tab-pane
         table.table.table-hover
           thead
             tr
@@ -29,8 +47,8 @@ block main
               tr(data-id='#{account._id}')
                 td= account.username
                 td= account.email
-                td= account.billing.plans.join(', ')
-                td= account.billing.balance.toFixed(2)
+                td= _.keys(account.plans).join(', ')
+                td= account.balance.toFixed(2)
                 td
                   button.btn.btn-info.btn-sm.action-details(type='button')= t('common.details')
                   .btn-group
@@ -40,7 +58,7 @@ block main
                     ul.dropdown-menu
                       li
                         a.action-confirm-payment(href='#')= t('view.admin.confirm_payment')
-                      if account.billing.balance <= 0 && account.billing.plans.length == 0
+                      if account.balance <= 0 && account.plans.length == 0
                         li
                           a.action-delete-account(href='#')= t('view.admin.delete_account')
 

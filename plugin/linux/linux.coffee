@@ -5,33 +5,35 @@
 monitor = require './monitor'
 
 exports.createUser = (component, callback) ->
-  {account, physical_node} = component
+  {account, node_name} = component
 
   async.series [
     (callback) ->
-      physical_node.runCommand "sudo useradd -m -s /bin/bash #{account.username}", callback
+      node_name.runCommand "sudo useradd -m -s /bin/bash #{account.username}", (err) ->
+        logger.warn err if err
+        callback()
 
     (callback) ->
-      physical_node.runCommand "sudo usermod -G #{account.username} -a www-data", callback
+      node_name.runCommand "sudo usermod -G #{account.username} -a www-data", callback
 
   ], callback
 
 exports.deleteUser = (component, callback) ->
-  {account, physical_node} = component
+  {account, node_name} = component
 
   async.series [
     (callback) ->
-      physical_node.runCommand "sudo pkill -u #{account.username}", (err) ->
+      node_name.runCommand "sudo pkill -u #{account.username}", (err) ->
         logger.warn err if err
         callback()
 
     (callback) ->
-      physical_node.runCommand "sudo userdel -rf #{account.username}", (err) ->
+      node_name.runCommand "sudo userdel -rf #{account.username}", (err) ->
         logger.warn err if err
         callback()
 
     (callback) ->
-      physical_node.runCommand "sudo groupdel #{account.username}", (err) ->
+      node_name.runCommand "sudo groupdel #{account.username}", (err) ->
         logger.warn err if err
         callback()
 

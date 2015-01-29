@@ -1,6 +1,7 @@
-{pluggable, utils, config, models} = app
-{_, async, mongoose, mongooseUniqueValidator} = app.libs
+{pluggable, utils, config, models, mabolo} = app
+{_, async} = app.libs
 {Financial, SecurityLog, Component} = app.models
+{ObjectID} = mabolo
 
 Plan = require '../interface/Plan'
 billing = require '../billing'
@@ -8,50 +9,48 @@ billing = require '../billing'
 process.nextTick ->
   {Financial, SecurityLog, Component} = app.models
 
-Token = mongoose.Schema
+Token = mabolo.model 'Token',
   type:
     required: true
     type: String
-    enum: ['full_access']
 
   token:
     required: true
-    sparse: true
-    unique: true
     type: String
-
-  created_at:
-    type: Date
-    default: Date.now
-
-  update_at:
-    type: Date
-    default: Date.now
 
   payload:
     type: Object
 
-Token.methods.revoke = (callback) ->
-  @ownerDocument().update
+  created_at:
+    required: true
+    type: Date
+    default: -> new Date()
+
+  updated_at:
+    required: true
+    type: Date
+    default: -> new Date()
+
+Token::revoke = (callback) ->
+  @parent().update
     $pull:
       tokens:
         token: @token
   , callback
 
-_.extend app.models,
-  Token: mongoose.model 'Token', Token
-
-Account = mongoose.Schema
+Account = mabolo.model 'Account',
   username:
     required: true
-    unique: true
     type: String
+    regex: utils.rx.username
 
   email:
-    lowercase: true
     required: true
-    unique: true
     type: String
+    regex: utils.rx.email
+
+  groups: [String]
+  tokens: [Token]
 
   password:
     type: String
@@ -59,23 +58,11 @@ Account = mongoose.Schema
   password_salt:
     type: String
 
-  created_at:
-    type: Date
-    default: Date.now
-
-  groups:
-    type: Array
-
-  tokens: [
-    mongoose.modelSchemas.Token
-  ]
-
   preferences:
     type: Object
 
   plans:
     type: Object
-    default: {}
 
   balance:
     type: Number
@@ -86,40 +73,18 @@ Account = mongoose.Schema
 
   pluggable:
     type: Object
-    default: {}
 
   resources_limit:
     type: Object
 
-Account.plugin mongooseUniqueValidator,
-  message: 'unique_validation_error'
-
-Account.path('email').validate (email) ->
-  return utils.rx.email.test email
-, 'invalid_email'
-
-Account.path('username').validate (username) ->
-  return utils.rx.username.test username
-, 'invalid_username'
-
-Account.path('username').validate (username, callback) ->
-  async.each pluggable.selectHooks('account.username_filter'), (hook, callback) ->
-    hook.filter username, (is_allow) ->
-      if is_allow
-        callback()
-      else
-        callback true
-
-  , (not_allow) ->
-    if not_allow
-      callback()
-    else
-      callback true
-, 'username_exist'
+  created_at:
+    required: true
+    type: Date
+    default: -> new Date()
 
 # @param account: username, email, password
 # @param callback(err, account)
-Account.statics.register = (account, callback) ->
+Account.register = (account, callback) ->
   password_salt = utils.randomSalt()
 
   {username, email, password} = account
@@ -144,7 +109,7 @@ Account.statics.register = (account, callback) ->
       callback err, account
 
 # @param callback(account)
-Account.statics.search = (stuff, callback) ->
+Account.search = (stuff, callback) ->
   @findOne {username: stuff}, (err, account) =>
     if account
       return callback account
@@ -157,7 +122,7 @@ Account.statics.search = (stuff, callback) ->
         callback account
 
 # @param callback(token)
-Account.statics.generateToken = (callback) ->
+Account.generateToken = (callback) ->
   token = utils.randomSalt()
 
   @findOne
@@ -169,7 +134,7 @@ Account.statics.generateToken = (callback) ->
       callback token
 
 # @param callback(Token, Account)
-Account.statics.authenticate = (token, callback) ->
+Account.authenticate = (token, callback) ->
   unless token
     return callback()
 
@@ -185,7 +150,7 @@ Account.statics.authenticate = (token, callback) ->
     callback matched_token, account
 
 # @param callback(err, Token)
-Account.methods.createToken = (type, payload, callback) ->
+Account::createToken = (type, payload, callback) ->
   models.Account.generateToken (token) =>
     token = new models.Token
       type: type
@@ -202,16 +167,16 @@ Account.methods.createToken = (type, payload, callback) ->
 
         callback null, token
 
-Account.methods.matchPassword = (password) ->
+Account::matchPassword = (password) ->
   return @password == utils.hashPassword(password, @password_salt)
 
-Account.methods.updatePassword = (password, callback) ->
+Account::updatePassword = (password, callback) ->
   @password_salt = utils.randomSalt()
   @password = utils.hashPassword password, @password_salt
   @save callback
 
 # @param callback(err)
-Account.methods.incBalance = (amount, type, payload, callback) ->
+Account::incBalance = (amount, type, payload, callback) ->
   unless _.isNumber amount
     return callback 'invalid_amount'
 
@@ -233,16 +198,16 @@ Account.methods.incBalance = (amount, type, payload, callback) ->
       financials.save (err) ->
         callback err
 
-Account.methods.inGroup = (group) ->
+Account::inGroup = (group) ->
   return group in @groups
 
-Account.methods.isAdmin = ->
+Account::isAdmin = ->
   return @inGroup 'root'
 
-Account.methods.inPlan = (plan_name) ->
+Account::inPlan = (plan_name) ->
   return plan_name in _.keys @plans
 
-Account.methods.createSecurityLog = (type, token, payload, callback) ->
+Account::createSecurityLog = (type, token, payload, callback) ->
   SecurityLog.create
     account_id: @_id
     type: type
@@ -250,86 +215,14 @@ Account.methods.createSecurityLog = (type, token, payload, callback) ->
     payload: payload
   , callback
 
-Account.methods.getComponents = (type, callback) ->
-  if _.isArray type
-    query =
-      type:
-        $in: type
-  else if _.isString type
-    query =
-      type: type
-  else
-    query = {}
+Account::getAvailableComponentsTemplates = ->
+  return _.uniq _.compact _.map _.keys(@plans), (plan_name) ->
+    return _.keys billing.plans[plan_name].available_components
 
-  Component.find query, (err, components) ->
-    callback components
+Account::populate = (callback) ->
+  async.parallel
+    components: (callback) =>
+      Component.getComponents @, callback
 
-Account.methods.getAvailableComponentsTypes = ->
-  return _.compact _.map _.keys(@plans), (plan_name) ->
-    return _.keys Plan.get(plan_name).available_components
-
-# callback(err)
-Account.methods.joinPlan = (plan_name, callback) ->
-  plan = billing.plans[plan_name]
-
-  modifier =
-    $set: {}
-
-  modifier.$set["plans.#{plan.name}"] =
-    billing_state:
-      time:
-        expired_at: new Date()
-
-  plan.triggerBilling @, =>
-    app.models.Account.findByIdAndUpdate @_id, modifier, (err, account) ->
-      async.each _.keys(plan.available_components), (component_type, callback) =>
-        plan_component_info = plan.available_components[component_type]
-        component_type = pluggable.components[component_type]
-
-        unless plan_component_info.default
-          return callback()
-
-        async.each plan_component_info.default, (defaultInfo, callback) ->
-          default_info = defaultInfo account
-
-          component_type.createComponent account,
-            physical_node: default_info.physical_node
-            name: default_info.name ? ''
-            payload: default_info
-          , callback
-
-      , callback
-
-# callback(err)
-Account.methods.leavePlan = (plan_name, callback) ->
-  plan = billing.plans[plan_name]
-
-  modifier =
-    $unset: {}
-
-  modifier.$unset["plans.#{plan.name}"] = true
-
-  plan.triggerBilling @, =>
-    app.models.Account.findByIdAndUpdate @_id, modifier, (err, account) ->
-      available_component_types = account.getAvailableComponentsTypes()
-
-      account.getComponents null, (components) ->
-        async.each components, (component, callback) ->
-          if component.component_type in available_component_types
-            return callback()
-
-          component_type = ComponentType.get component.component_type
-          component_type.destroyComponent component, callback
-
-        , callback
-
-# @param callback(err, account)
-Account.methods.leaveAllPlans = (callback) ->
-  async.each @plans, (plan_name, callback) =>
-    @leavePlan plan_name, callback
-  , (err) =>
-    return callback err if err
-    Account.findById @_id, callback
-
-_.extend app.models,
-  Account: mongoose.model 'Account', Account
+  , (err, result) ->
+    callback _.extend @, result

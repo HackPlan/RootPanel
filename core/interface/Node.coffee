@@ -1,4 +1,6 @@
-{_, child_process, async, SSHConnection, fs} = app.libs
+SSHConnection = require 'ssh2'
+
+{_, child_process, async, fs} = app.libs
 {config, logger} = app
 {available_plugins} = config.plugin
 
@@ -8,18 +10,6 @@ module.exports = class Node
   name: ''
   master: false
   available_components: []
-
-  @nodes = {}
-
-  @initNodes: ->
-    for name, info of config.nodes
-      @nodes[name] = new Node _.extend info,
-        name: name
-
-    return @nodes
-
-  @get: (name) ->
-    return @nodes[name]
 
   constructor: (@info) ->
     _.extend @, info

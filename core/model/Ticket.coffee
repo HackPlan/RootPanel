@@ -163,6 +163,3 @@ Ticket::populateAccounts = (callback) ->
         callback err
 
   ], callback
-
-_.extend app.models,
-  Ticket: Ticket

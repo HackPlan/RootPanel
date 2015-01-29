@@ -8,17 +8,16 @@ $ ->
   Reply = Backbone.Model.extend
     idAttribute: '_id'
 
+  ReplyCollection = Backbone.Collection.extend
+    model: Reply
+
   Ticket = Backbone.Model.extend
     urlRoot: '/ticket/resource/'
     idAttribute: '_id'
 
     initialize: ->
-      ReplyCollection = Backbone.Collection.extend
+      @replies = new ReplyCollection
         url: @url() + '/replies'
-        model: Reply
-
-      @replies = new ReplyCollection()
-      @replies.url = @url() + '/replies'
 
       @once 'change', =>
         @replies.reset @get 'replies'
@@ -59,9 +58,6 @@ $ ->
     events:
       'click .action-reply': 'replyTicket'
       'click .action-status': 'setStatus'
-
-    id: null
-    model: null
 
     initialize: (options) ->
       @id = options.id

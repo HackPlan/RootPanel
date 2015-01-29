@@ -12,11 +12,11 @@ ticketParam = (req, res, next, id) ->
     logger.error err if err
 
     unless ticket
-      return res.error 404, 'ticket_not_exist'
+      return res.error 404, 'ticket_not_found'
 
     unless ticket.hasMember req.account
       unless req.account.isAdmin()
-        return res.error 403, 'forbidden'
+        return res.error 403, 'ticket_forbidden'
 
     _.extend req,
       ticket: ticket

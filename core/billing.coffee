@@ -3,9 +3,10 @@
 {Account, Financials, Component} = app.models
 
 process.nextTick ->
-  {Account} = app.models
+  {Account, Component} = app.models
 
 Plan = require './interface/Plan'
+ComponentTemplate = require './interface/ComponentTemplate'
 
 billing = _.extend exports,
   plans: {}
@@ -79,3 +80,67 @@ billing.isForceFreeze = (account) ->
       return true
 
   return false
+
+billing.joinPlan = (account, plan_name, callback) ->
+  plan = billing.plans[plan_name]
+
+  modifier =
+    $set: {}
+
+  modifier.$set["plans.#{plan.name}"] =
+    billing_state:
+      time:
+        expired_at: new Date()
+
+  plan.triggerBilling account, =>
+    Account.findByIdAndUpdate account._id, modifier, (err, account) ->
+      async.each _.keys(plan.available_components), (component_type, callback) =>
+        plan_component_info = plan.available_components[component_type]
+        component_type = pluggable.components[component_type]
+
+        unless plan_component_info.default
+          return callback()
+
+        async.each plan_component_info.default, (defaultInfo, callback) ->
+          default_info = defaultInfo account
+
+          component_type.createComponent account,
+            node_name: default_info.node_name ? 'master'
+            name: default_info.name ? ''
+            payload: default_info
+          , callback
+
+        , callback
+
+      , (err) ->
+        console.log 'async.each', arguments
+        callback(err)
+
+billing.leavePlan = (account, plan_name, callback) ->
+  plan = billing.plans[plan_name]
+
+  modifier =
+    $unset: {}
+
+  modifier.$unset["plans.#{plan.name}"] = true
+
+  plan.triggerBilling account, =>
+    Account.findByIdAndUpdate account._id, modifier, (err, account) ->
+      available_component_types = account.getAvailableComponentsTemplates()
+
+      Component.getComponents account, (err, components) ->
+        async.each components, (component, callback) ->
+          if component.template in available_component_types
+            return callback()
+
+          template = pluggable.components[component.template]
+          template.destroyComponent component, callback
+
+        , callback
+
+billing.leaveAllPlans = (account, callback) ->
+  async.each account.plans, (plan_name, callback) =>
+    billing.leavePlan account, plan_name, callback
+  , (err) =>
+    return callback err if err
+    Account.findById account._id, callback

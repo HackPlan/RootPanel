@@ -1,32 +1,35 @@
-{_, ObjectId, mongoose, async} = app.libs
-{Account} = app.models
+{_, async} = app.libs
+{mabolo, pluggable} = app
+{ObjectID} = mabolo
 
-Component = mongoose.Schema
-  component_type:
+Coworker = mabolo.model 'Coworker',
+  account_id:
+    required: true
+    type: ObjectID
+    ref: 'Account'
+
+  role:
     required: true
     type: String
-    enum: []
+    enum: ['readonly', 'readwrite']
+
+Component = mabolo.model 'Component',
+  account_id:
+    required: true
+    type: ObjectID
+    ref: 'Account'
 
   name:
     required: true
     type: String
 
-  account_id:
+  template:
     required: true
-    type: ObjectId
-    ref: 'Account'
+    type: String
 
-  coworkers: [
-    account_id:
-      required: true
-      type: ObjectId
-      ref: 'Account'
-
-    role:
-      required: true
-      type: String
-      enum: ['readonly', 'readwrite']
-  ]
+  node_name:
+    required: true
+    type: String
 
   status:
     type: String
@@ -39,37 +42,50 @@ Component = mongoose.Schema
   dependencies:
     type: Object
 
-  physical_node:
-    required: true
-    type: String
-    enum: []
+  coworkers: [Coworker]
 
-Component.methods.populateComponent = (callback) ->
-  component = @toObject()
+Component.getComponents = (account, callback) ->
+  @find
+    $or: [
+      account_id: account._id
+    ,
+      'coworkers.account_id': account._id
+    ]
+  , (err, components) ->
+    callback err, components
+
+Component::hasMember = (account) ->
+  if @account_id.equals account._id
+    return true
+
+  return _.some @coworkers, (coworker) ->
+    return coworker.account_id.equals account._id
+
+Component::markAsStatus = (status, callback) ->
+  @update
+    $set:
+      status: status
+  , callback
+
+Component::populate = (callback) ->
+  {Account} = app.models
 
   async.parallel
-    account: (callback) ->
-      Account.findById component.account_id, callback
+    account: (callback) =>
+      Account.findById @account_id, callback
 
-    coworkers: (callback) ->
-      async.each component.coworkers, (coworker, callback) ->
+    coworkers: (callback) =>
+      async.each @coworkers, (coworker, callback) ->
         Account.findById coworker.account_id, (err, account) ->
           callback _.extend coworker,
             account: account
       , callback
 
-  , (err, result) ->
+  , (err, result) =>
     {account, coworkers} = result
 
-    callback _.extend component,
+    callback _.extend @,
       account: account
       coworkers: coworkers
-      component_type: ComponentType.get component.component_type
-      physical_node: Node.get component.physical_node
-
-Component.methods.markAsStatus = (status, callback) ->
-  @status = status
-  @save callback
-
-_.extend app.models,
-  Component: mongoose.model 'Component', Component
+      component_type: pluggable.components[@template]
+      node: app.nodes[@node_name]
