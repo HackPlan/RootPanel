@@ -16,8 +16,8 @@ $ ->
     idAttribute: '_id'
 
     initialize: ->
-      @replies = new ReplyCollection
-        url: @url() + '/replies'
+      @replies = new ReplyCollection()
+      @replies.url = @url() + '/replies'
 
       @once 'change', =>
         @replies.reset @get 'replies'
@@ -45,7 +45,7 @@ $ ->
     className: 'list-group-item clearfix'
 
     initialize: ->
-      @template = _.template $('#reply-template').html()
+      @template = RP.tmpl '#reply-template'
       @model.on 'change', @render.bind @
 
     render: ->
@@ -70,10 +70,10 @@ $ ->
 
       @model.fetch()
 
-      @templateContent = _.template $('#content-template').html()
-      @templateActions = _.template $('#actions-template').html()
-      @templateAccountInfo = _.template $('#account-info-template').html()
-      @templateMembers = _.template $('#members-template').html()
+      @templateContent = RP.tmpl '#content-template'
+      @templateActions = RP.tmpl '#actions-template'
+      @templateAccountInfo = RP.tmpl '#account-info-template'
+      @templateMembers = RP.tmpl '#members-template'
 
     render: ->
       view_data = @model.toJSON()
@@ -108,7 +108,7 @@ $ ->
     tagName: 'tr'
 
     initialize: ->
-      @template = _.template $('#list-item-template').html()
+      @template = RP.tmpl '#list-item-template'
 
     render: ->
       view_data = @model.toJSON()

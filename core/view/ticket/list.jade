@@ -23,8 +23,8 @@ prepend sidebar
 
 append footer
   script(src='/script/ticket.js')
-  script(id='list-item-template', type='text/template')
+  script(id='list-item-template', type='text/x-jquery-tmpl')
     td
-      a(href='/ticket/view/{{_id}}') {{title}}
+      a(href='/ticket/view/${_id}') ${title}
     td
-      span(class='text-{{color}}') {{RP.t('ticket_status.' + status)}}
+      span(class='text-${color}') ${RP.t('ticket_status.' + status)}

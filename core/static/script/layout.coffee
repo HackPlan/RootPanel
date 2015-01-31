@@ -64,6 +64,12 @@ $ ->
           alert jqXHR.statusText
       .success callback
 
+    tmpl: (selector) ->
+      cache = $(selector).template()
+
+      return (view_data) ->
+        return $.tmpl cache, view_data
+
   RP.initLocale()
 
   $('nav a').each ->

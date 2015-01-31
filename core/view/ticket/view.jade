@@ -26,64 +26,64 @@ prepend sidebar
 append footer
   script(src='/bower_components/moment/moment.js')
   script(src='/script/ticket.js')
-  script(id='content-template', type='text/template')
+  script(id='content-template', type='text/x-jquery-tmpl')
     header
-      | {{title}} &nbsp;
-      span.small(class='text-{{color}}') {{RP.t('ticket_status.' + status)}}
+      | ${title} &nbsp;
+      span.small(class='text-${color}') ${RP.t('ticket_status.' + status)}
       
-    p {:content_html}}
-  script(id='reply-template', type='text/template')
+    p {{html content_html}}
+  script(id='reply-template', type='text/x-jquery-tmpl')
     a.pull-left
-      img.img-avatar(src='{{account.preferences.avatar_url}}')
+      img.img-avatar(src='${account.preferences.avatar_url}')
     .list-content
-      {% if (content_html) { %}
-      p {:content_html}}
-      {% } else { %}
-      p {{content}}
-      {% }; %}
+      {{if content_html}}
+      p {{html content_html}}
+      {{else}}
+      p ${content}
+      {{/if}}
       p
-        span.label.label-info {{account.username}}
-        {% if (created_at) { %}
-        span.label.label-default(title='{{created_at}}') {{moment(created_at).fromNow()}}
-        {% } else { %}
+        span.label.label-info ${account.username}
+        {{if created_at}}
+        span.label.label-default(title='${created_at}') ${moment(created_at).fromNow()}
+        {{else}}
         span.label.label-default ...
-        {% }; %}
-  script(id='actions-template', type='text/template')
-    {% if (status != 'closed') { %}
+        {{/if}}
+  script(id='actions-template', type='text/x-jquery-tmpl')
+    {{if status != 'closed'}}
     header= t('ticket.create_reply')
-    {% }; %}
+    {{/if}}
       
     form.form-horizontal
-      {% if (status != 'closed') { %}
+      {{if status != 'closed'}}
       .form-group.padding
         textarea.form-control(name='content', rows='5')
-      {% }; %}
+      {{/if}}
       .form-group.padding
-        {% if (status == 'closed') { %}
+        {{if status == 'closed'}}
         button(disabled).btn.btn-lg.btn-primary= t('ticket_status.closed')
-        {% } else { %}
+        {{else}}
         button.btn.btn-lg.btn-primary.action-reply(type='button')= t('ticket.create_reply')
         button(type='button', data-status='closed').btn.btn-lg.btn-danger.action-status= t('ticket.close_ticket')
-        {% }; %}
+        {{/if}}
         if account.isAdmin()
-          {% if (status == 'open' || status == 'pending') { %}
+          {{if status == 'open' || status == 'pending'}}
           button(type='button', data-status='finish').btn.btn-lg.btn-success.action-status= t('ticket.finish_ticket')
-          {% }; %}
-          {% if (status == 'closed') { %}
+          {{/if}}
+          {{if status == 'closed'}}
           button(type='button', data-status='open').btn.btn-lg.btn-success.action-status= t('ticket.reopen_ticket')
-          {% }; %}
-  script(id='account-info-template', type='text/template')
-    {% if (account) { %}
+          {{/if}}
+  script(id='account-info-template', type='text/x-jquery-tmpl')
+    {{if account}}
     a.pull-left
-      img.img-avatar(src='{{account.preferences.avatar_url}}')
+      img.img-avatar(src='${account.preferences.avatar_url}')
     p
-      span.label.label-info {{account.username}}
+      span.label.label-info ${account.username}
       br
-      span.label.label-default(title='{{created_at}}') {{moment(created_at).fromNow()}}
-    {% }; %}
-  script(id='members-template', type='text/template')
+      span.label.label-default(title='${created_at}') ${moment(created_at).fromNow()}
+    {{/if}}
+  script(id='members-template', type='text/x-jquery-tmpl')
     header= t('ticket.members')
-    {% members.forEach(function(member) { %}
+    {{each members}}
     a.pull-left
-      img.img-avatar(src='{{member.preferences.avatar_url}}', alt='{{member.username}}')
-    {% }); %}
+      img.img-avatar(src='${$value.preferences.avatar_url}', alt='${$value.username}')
+    {{/each}}
