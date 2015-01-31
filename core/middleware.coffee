@@ -53,7 +53,9 @@ exports.csrf = ->
   csrf = app.libs.csrf()
 
   return (req, res, next) ->
-    if req.path in _.pluck app.pluggable.selectHooks('app.ignore_csrf'), 'path'
+    paths = _.pluck app.pluggable.applyHooks('app.ignore_csrf'), 'path'
+
+    if req.path in paths
       return next()
 
     csrf_token = do ->
@@ -127,7 +129,10 @@ exports.accountHelpers = (req, res, next) ->
     t: res.t
     moment: res.moment
 
-    selectHooks: app.pluggable.selectHooks
+    applyHooks: (name, options) ->
+      app.pluggable.applyHooks name, req.account, _.extend {
+        execute: false
+      }, options
 
   next()
 

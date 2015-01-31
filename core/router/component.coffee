@@ -23,8 +23,6 @@ componentParam = (req, res, next, id) ->
 
     next()
 
-exports.param 'id', componentParam
-
 exports.use '/resource', do ->
   rest = new express.Router mergeParams: true
   rest.param 'id', componentParam

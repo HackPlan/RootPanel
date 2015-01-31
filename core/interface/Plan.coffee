@@ -8,6 +8,8 @@ process.nextTick ->
 {available_plugins} = config.plugin
 
 module.exports = class Plan
+  join_freely: true
+
   constructor: (info) ->
     _.extend @, info
 

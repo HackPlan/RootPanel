@@ -70,13 +70,8 @@ pluggable.selectHookPath = (name) ->
 
   return ref
 
-pluggable.applyHooks = (name, account, options) ->
-  options = _.extend {
-    op: 'action'
-    execute: true
-  }, options
-
-  {op, execute} = options
+pluggable.applyHooks = (name, account, options = {}) ->
+  {execute} = options
 
   result = []
 
@@ -93,7 +88,7 @@ pluggable.applyHooks = (name, account, options) ->
         params.push component if component
         params.push callback
 
-        hook[op].apply null, params
+        hook[execute].apply null, params
 
     else
       result.push _.extend {}, hook, payload

@@ -39,7 +39,7 @@ Account.find
           async.each _.difference(services, original_services), (service_name, callback) ->
             console.log "#{account.username} enabled #{service_name}"
 
-            async.each pluggable.selectHooks(account, "service.#{service_name}.enable"), (hook, callback) ->
+            async.each pluggable.applyHooks(account, "service.#{service_name}.enable"), (hook, callback) ->
               hook.filter account, callback
             , callback
           , callback
@@ -48,7 +48,7 @@ Account.find
           async.each _.difference(original_services, services), (service_name, callback) ->
             console.log "#{account.username} disabled #{service_name}"
 
-            async.each pluggable.selectHooks(account, "service.#{service_name}.disable"), (hook, callback) ->
+            async.each pluggable.applyHooks(account, "service.#{service_name}.disable"), (hook, callback) ->
               hook.filter account, callback
             , callback
           , callback

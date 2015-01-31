@@ -5,7 +5,7 @@ prepend header
 
 append header
   link(rel='stylesheet', href='/style/panel.css')
-  for hook in selectHooks('view.panel.styles')
+  for hook in applyHooks('view.panel.styles')
     link(rel='stylesheet', href=hook.path)
 
 block main
@@ -25,7 +25,7 @@ block main
               strong= t(plan.t_name)
             td= t(plan.t_description)
             td
-              if plan.is_enabled
+              if account.inPlan(plan.name)
                 button.action-leave-plan.btn.btn-danger.btn-sm= t('plan.leave')
               else
                 button.action-join-plan.btn.btn-success.btn-sm= t('plan.join')
@@ -36,11 +36,13 @@ block main
 prepend sidebar
   .row
     p
+      a.btn.btn-lg.btn-success(href='/panel/components') 元件详情
+    p
       a.btn.btn-lg.btn-success(href='/ticket/list/')= t('ticket.')
     p
       a.btn.btn-lg.btn-success(href='/account/preferences/')= t('account.preferences')
 
 append footer
   script(src='/script/panel.js')
-  for hook in selectHooks('view.panel.scripts')
+  for hook in applyHooks('view.panel.scripts')
     script(src=hook.path)

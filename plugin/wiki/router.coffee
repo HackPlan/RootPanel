@@ -11,7 +11,7 @@ module.exports = exports = express.Router()
 exports.get '/', (req, res) ->
   pages_by_category = {}
 
-  for page in pluggable.selectHooks 'plugins.wiki.pages'
+  for page in pluggable.applyHooks 'plugins.wiki.pages'
     pages_by_category[page.category] ?= []
     pages_by_category[page.category].push page
 
@@ -27,7 +27,7 @@ exports.get '/', (req, res) ->
     res.send html
 
 exports.get '/:category/:name', (req, res) ->
-  page = _.findWhere pluggable.selectHooks('plugins.wiki.pages'),
+  page = _.findWhere pluggable.applyHooks('plugins.wiki.pages'),
     category: req.params.category
     name: req.params.name
 

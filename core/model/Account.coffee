@@ -102,7 +102,7 @@ Account.register = (account, callback) ->
 
     pluggable: {}
 
-  async.each pluggable.selectHooks('account.before_register'), (hook, callback) ->
+  async.each pluggable.applyHooks('account.before_register'), (hook, callback) ->
     hook.filter account, callback
   , ->
     account.save (err) ->
