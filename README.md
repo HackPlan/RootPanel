@@ -17,7 +17,7 @@ RootPanel 的文档位于 [Github Wiki](https://github.com/jysperm/RootPanel/wik
 
     git clone https://github.com/jysperm/RootPanel.git
 
-试运行和开发推荐使用 [Vagrant box](https://vagrantcloud.com/jysperm/boxes/rootpanel)
+试运行和开发推荐使用 Vagrant: `vagrant up`
 
 详细安装步骤：[INSTALL.md](https://github.com/jysperm/RootPanel/blob/master/INSTALL.md)
 

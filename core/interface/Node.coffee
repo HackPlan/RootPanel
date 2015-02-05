@@ -4,7 +4,8 @@ SSHConnection = require 'ssh2'
 {config, logger} = app
 {available_plugins} = config.plugin
 
-id_key = fs.readFileSync config.ssh.id_key
+if fs.existsSync config.ssh.id_key
+  id_key = fs.readFileSync config.ssh.id_key
 
 module.exports = class Node
   name: ''
