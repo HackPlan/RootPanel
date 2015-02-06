@@ -1,4 +1,4 @@
-ifEnabled('linux') 'plugin/linux', ->
+describe.skip 'plugin/linux', ->
   linux = null
   cache = null
   redis = null

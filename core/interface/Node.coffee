@@ -12,7 +12,7 @@ module.exports = class Node
   master: false
   available_components: []
 
-  constructor: (@info) ->
+  constructor: (info) ->
     _.extend @, info
 
     for component_type in @available_components
@@ -108,7 +108,7 @@ module.exports = class Node
       callback connection
 
     connection.connect
-      host: @info.host
+      host: @host
       username: 'rpadmin'
       privateKey: id_key
 

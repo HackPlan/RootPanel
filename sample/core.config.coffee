@@ -2,7 +2,7 @@ module.exports =
   web:
     t_name: 'RootPanel'
     url: 'http://rp.rpvhost.net'
-    listen: '/home/rpadmin/rootpanel.sock'
+    listen: '/tmp/rootpanel.sock'
     repo: 'jysperm/RootPanel'
     google_analytics_id: ''
 
@@ -11,7 +11,6 @@ module.exports =
 
   i18n:
     available_language: ['zh_CN', 'en']
-    default_language: 'zh_CN'
     default_timezone: 'Asia/Shanghai'
 
   plugin:
@@ -24,15 +23,12 @@ module.exports =
       when_balance_below: 0
       when_arrears_above: 0
 
-    billing_cycle: 10 * 60 * 1000
-
   plans:
     sample:
       t_name: 'plans.sample.name'
       t_description: 'plans.sample.description'
 
       available_components: {}
-      resource_limit: {}
 
       billing_trigger:
         time:
@@ -47,10 +43,10 @@ module.exports =
       available_components: {}
       resource_limit: {}
 
-      billing: {}
+      billing_trigger: {}
 
   ssh:
-    id_key: '/home/rpadmin/.ssh/id_rsa'
+    id_key: './.ssh/id_rsa'
 
   nodes:
     master:

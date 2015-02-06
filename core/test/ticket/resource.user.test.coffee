@@ -28,13 +28,14 @@ describe 'ticket/user', ->
       res.body.should.be.a 'array'
       done err
 
-  it 'POST /:id/reply', (done) ->
-    agent.post "/ticket/resource/#{ticket_id}/reply"
+  it 'POST /:id/replies', (done) ->
+    agent.post "/ticket/resource/#{ticket_id}/replies"
     .send
       csrf_token: csrf_token
       content: 'Reply'
     .expect 201
     .end (err, res) ->
+      console.log res.text
       res.body._id.should.be.eixst
       res.body.content.should.be.equal 'Reply'
       done err
