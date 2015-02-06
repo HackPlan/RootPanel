@@ -92,13 +92,11 @@ module.exports = class Plugin
   render: (name, req, view_data, callback) ->
     template_path = path.join __dirname, '../../plugin', @name, 'view', "#{name}.jade"
 
-    locals = _.extend _.clone(req.res.locals), view_data,
+    locals = _.extend {}, req.res.locals, view_data,
       account: req.account
       t: @getTranslator req
 
-    jade.renderFile template_path, locals, (err, html) ->
-      logger.error err if err
-      callback html
+    jade.renderFile template_path, locals, callback
 
   renderTemplate: (name, view_data, callback) ->
     template_path = path.join __dirname, '../../plugin', @name, 'view', name

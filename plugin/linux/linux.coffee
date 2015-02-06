@@ -1,4 +1,6 @@
-{child_process, os, fs, async, _} = app.libs
+os = require 'os'
+
+{child_process, fs, async, _} = app.libs
 {cache, logger} = app
 {wrapAsync} = app.utils
 

@@ -92,10 +92,15 @@ exports.authenticate = (req, res, next) ->
 
   Account.authenticate token_code, (token, account) ->
     if token and token.type == 'full_access'
-      req.token = token
-      req.account = account
+      _.extend req,
+        token: token
+        account: account
 
-    next()
+      account.populate ->
+        next()
+
+    else
+      next()
 
 exports.accountHelpers = (req, res, next) ->
   _.extend res,

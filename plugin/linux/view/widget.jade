@@ -1,5 +1,3 @@
-- limit = account.resources_limit
-
 mixin displayProgressBar(now, limit, unit)
   - per = parseInt((now / limit * 100).toFixed())
   - color = per < 85 ? 'success' : 'danger'

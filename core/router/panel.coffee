@@ -68,7 +68,10 @@ exports.get '/', (req, res) ->
 
     async.parallel
       widgets_html: (callback) ->
-        pluggable.applyHooks('view.panel.widgets', account, execute: 'generator') callback
+        pluggable.applyHooks('view.panel.widgets', account,
+          execute: 'generator'
+          req: req
+        ) callback
 
     , (err, result) ->
       res.render 'panel', _.extend result,

@@ -100,6 +100,7 @@ Account.register = (account, callback) ->
       language: 'auto'
       timezone: config.i18n.default_timezone
 
+    plans: {}
     pluggable: {}
 
   async.each pluggable.applyHooks('account.before_register'), (hook, callback) ->
@@ -149,23 +150,21 @@ Account.authenticate = (token, callback) ->
 
     callback matched_token, account
 
-# @param callback(err, Token)
+# @param callback(err, token)
 Account::createToken = (type, payload, callback) ->
-  models.Account.generateToken (token) =>
+  models.Account.generateToken (code) =>
     token = new models.Token
       type: type
-      token: token
+      token: code
       payload: payload
+      created_at: new Date()
+      updated_at: new Date()
 
-    token.validate (err) =>
-      return callback err if err
-
-      @tokens.push token
-
-      @save (err) ->
-        return callback err if err
-
-        callback null, token
+    @update
+      $push:
+        tokens: token
+    , (err) ->
+      callback err, token
 
 Account::matchPassword = (password) ->
   return @password == utils.hashPassword(password, @password_salt)
@@ -224,5 +223,5 @@ Account::populate = (callback) ->
     components: (callback) =>
       Component.getComponents @, callback
 
-  , (err, result) ->
+  , (err, result) =>
     callback _.extend @, result

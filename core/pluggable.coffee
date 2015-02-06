@@ -71,31 +71,35 @@ pluggable.selectHookPath = (name) ->
   return ref
 
 pluggable.applyHooks = (name, account, options = {}) ->
-  {execute} = options
+  {execute, req} = options
 
   result = []
-
-  pushResult = (hook, payload = {}) ->
-    if execute
-      result.push (callback) ->
-        params = []
-
-        {account, node, components, component} = payload
-
-        params.push account if account
-        params.push node if node
-        params.push components if components
-        params.push component if component
-        params.push callback
-
-        hook[execute].apply null, params
-
-    else
-      result.push _.extend {}, hook, payload
 
   for hook in pluggable.selectHookPath(name)
     template = hook.component_template
     timing = hook.timing
+
+    pushResult = (hook, payload = {}) ->
+      if execute
+        result.push (callback) ->
+          params = []
+
+          {account, node, components, component} = payload
+
+          params.push account if account
+          params.push node if node
+          params.push components if components
+          params.push component if component
+          params.push callback
+
+          hook[execute].apply
+            req: req
+            template: template
+            plugin: hook.plugin
+          , params
+
+      else
+        result.push _.extend {}, hook, payload
 
     if !template or timing == 'always'
       pushResult hook
@@ -112,7 +116,7 @@ pluggable.applyHooks = (name, account, options = {}) ->
       continue
 
     components = _.filter account.components, (component) ->
-      return component.template == template
+      return component.template == template.name
 
     if timing == 'once'
       unless _.isEmpty components

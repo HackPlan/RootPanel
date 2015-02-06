@@ -45,4 +45,8 @@ Vagrant.configure(2) do |config|
 # config.vm.provision "shell", inline: $china_source
   config.vm.provision "shell", inline: $script
   config.vm.network "private_network", ip: "192.168.33.10"
+
+  config.vm.provider "virtualbox" do |v|
+    v.memory = 1024
+  end
 end

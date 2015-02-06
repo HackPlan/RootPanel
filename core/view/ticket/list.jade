@@ -16,9 +16,7 @@ block main
 
 prepend sidebar
   .row
-    if account.isAdmin()
-      a.btn.btn-lg.btn-success(href='/admin/ticket/')= t('ticket.ticket_list')
-    else
+    unless account.isAdmin()
       a.btn.btn-lg.btn-success(href='/ticket/create/')= t('ticket.create_ticket')
 
 append footer
