@@ -11,9 +11,9 @@ createAgent = (callback) ->
 
 createLoggedAgent = (callback) ->
   createAgent (err, {agent, csrf_token}) ->
-    username = 'test' + utils.randomString(10).toLowerCase()
-    email = utils.randomString(10) + '@gmail.com'
-    password = utils.randomString 10
+    username = 'test' + utils.randomString(8).toLowerCase()
+    email = utils.randomString(8) + '@gmail.com'
+    password = utils.randomString 8
 
     agent.post '/account/register'
     .send

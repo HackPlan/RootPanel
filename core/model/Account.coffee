@@ -3,7 +3,6 @@
 {Financial, SecurityLog, Component} = app.models
 {ObjectID} = mabolo
 
-Plan = require '../interface/Plan'
 billing = require '../billing'
 
 process.nextTick ->
@@ -103,7 +102,7 @@ Account.register = (account, callback) ->
     plans: {}
     pluggable: {}
 
-  async.each pluggable.applyHooks('account.before_register'), (hook, callback) ->
+  async.each app.applyHooks('account.before_register'), (hook, callback) ->
     hook.filter account, callback
   , ->
     account.save (err) ->
@@ -214,9 +213,9 @@ Account::createSecurityLog = (type, token, payload, callback) ->
     payload: payload
   , callback
 
-Account::getAvailableComponentsTemplates = ->
-  return _.uniq _.compact _.map _.keys(@plans), (plan_name) ->
-    return _.keys billing.plans[plan_name].available_components
+Account::availableComponentsTemplates = ->
+  return _.uniq _.flatten _.compact _.map _.keys(@plans), (plan_name) ->
+    return _.keys app.plans[plan_name].available_components
 
 Account::populate = (callback) ->
   async.parallel

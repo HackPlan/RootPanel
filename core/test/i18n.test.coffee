@@ -1,4 +1,4 @@
-describe.skip 'i18n', ->
+describe 'i18n', ->
   i18n = null
 
   before ->
@@ -101,7 +101,3 @@ describe.skip 'i18n', ->
 
     translator('test.account.username').should.be.equal '用户名'
     translator('test.test').should.be.equal 'Test'
-
-  it 'pickClientLocale'
-
-  it 'localeHash'

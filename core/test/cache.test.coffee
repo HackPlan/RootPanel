@@ -1,4 +1,4 @@
-describe.skip 'cache', ->
+describe 'cache', ->
   cache = null
   redis = null
 
@@ -53,17 +53,17 @@ describe.skip 'cache', ->
 
         redis.ttl 'RP:test_key3', (err, seconds) ->
           seconds.should.above 0
-          cache.delete 'test_key3', done
+          cache.refresh 'test_key3', done
 
-  describe 'delete', ->
+  describe 'refresh', ->
     it 'should success', (done) ->
-      cache.delete 'test_key', ->
+      cache.refresh 'test_key', ->
         redis.get 'RP:test_key', (err, value) ->
           expect(value).to.not.exist
           done()
 
     it 'should success with param', (done) ->
-      cache.delete
+      cache.refresh
         key: 'test2'
         object_id: 10
       , ->

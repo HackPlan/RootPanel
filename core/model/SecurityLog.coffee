@@ -1,9 +1,11 @@
-{_, ObjectId, mongoose} = app.libs
+{models, logger, mabolo} = app
+{_} = app.libs
+{ObjectID} = mabolo
 
-SecurityLog = mongoose.Schema
+SecurityLog = mabolo.model 'SecurityLog',
   account_id:
     required: true
-    type: ObjectId
+    type: ObjectID
     ref: 'Account'
 
   type:
@@ -13,13 +15,10 @@ SecurityLog = mongoose.Schema
 
   created_at:
     type: Date
-    default: Date.now
+    default: -> new Date()
 
   payload:
     type: Object
 
   token:
     type: Object
-
-_.extend app.models,
-  SecurityLog: mongoose.model 'SecurityLog', SecurityLog

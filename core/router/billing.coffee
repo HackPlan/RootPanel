@@ -1,7 +1,6 @@
 {express, _} = app.libs
 {config, billing} = app
 {requireAuthenticate} = app.middleware
-{Plan} = app.interfaces
 {Account} = app.models
 
 module.exports = exports = express.Router()

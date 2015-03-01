@@ -5,7 +5,7 @@ cookieParser = require 'cookie-parser'
 Account = null
 middleware = null
 
-describe.skip 'middleware', ->
+describe 'middleware', ->
   before ->
     require '../../app'
     {middleware} = app
@@ -33,7 +33,7 @@ describe.skip 'middleware', ->
       server.use middleware.errorHandling
 
       server.use (req, res) ->
-        res.error 'error_name', null, 403
+        res.error 403, 'error_name'
 
       supertest server
       .get '/'
@@ -96,18 +96,3 @@ describe.skip 'middleware', ->
         csrf_token: token
       .expect 200
       .end done
-
-  describe 'authenticate', ->
-    it 'pending'
-
-  describe 'accountHelpers', ->
-    it 'pending'
-
-  describe 'requireAuthenticate', ->
-    it 'pending'
-
-  describe 'requireAdminAuthenticate', ->
-    it 'pending'
-
-  describe 'requireInService', ->
-    it 'pending'

@@ -1,24 +1,28 @@
-{path, fs, _, Negotiator, jsonStableStringify} = app.libs
+Negotiator = require 'negotiator'
+jsonStableStringify = require 'json-stable-stringify'
+
+{path, fs, _} = app.libs
 {utils, cache, config} = app
 
-i18n = exports
+i18n =
+  i18n_data: {}
 
-i18n.i18n_data = i18n_data = {}
-
-i18n.init = ->
+module.exports = ->
   for filename in fs.readdirSync path.join(__dirname, 'locale')
     language = path.basename filename, '.json'
-    i18n_data[language] = require path.join(__dirname, 'locale', filename)
+    i18n.i18n_data[language] = require path.join(__dirname, 'locale', filename)
     config.i18n.available_language = _.union config.i18n.available_language, [language]
 
-i18n.initPlugin = (plugin) ->
-  for filename in fs.readdirSync path.join(__dirname, '../plugin', plugin.name, 'locale')
-    language = path.basename filename, '.json'
-    file_path = path.join __dirname, '../plugin', plugin.name, 'locale', filename
+  return i18n
 
-    i18n_data[language] ?= {}
-    i18n_data[language]['plugins'] ?= {}
-    i18n_data[language]['plugins'][plugin.name] = require file_path
+i18n.initPlugin = (plugin) ->
+  for filename in fs.readdirSync path.join(__dirname, '../plugins', plugin.name, 'locale')
+    language = path.basename filename, '.json'
+    file_path = path.join __dirname, '../plugins', plugin.name, 'locale', filename
+
+    i18n.i18n_data[language] ?= {}
+    i18n.i18n_data[language]['plugins'] ?= {}
+    i18n.i18n_data[language]['plugins'][plugin.name] = require file_path
 
     config.i18n.available_language = _.union config.i18n.available_language, [language]
 
@@ -44,7 +48,7 @@ i18n.translateByLanguage = (name, language) ->
   words = name.split '.'
   words.unshift language
 
-  result = i18n_data
+  result = i18n.i18n_data
 
   for item in words
     if result[item] == undefined
@@ -65,7 +69,7 @@ i18n.translate = (name, languages) ->
 
 i18n.getTranslator = (languages) ->
   return (name, payload) ->
-    result = exports.translate name, i18n.languagePriority languages
+    result = i18n.translate name, i18n.languagePriority languages
 
     if _.isObject payload
       for k, v of payload
@@ -80,7 +84,7 @@ i18n.pickClientLocale = _.memoize (languages) ->
   result = {}
 
   for language in languages
-    _.extend result, i18n_data[language]
+    _.extend result, i18n.i18n_data[language]
 
   return result
 
@@ -108,4 +112,4 @@ i18n.languagePriority = _.memoize (languages) ->
 , (languages) -> languages.join()
 
 i18n.localeHash = (req) ->
-  return utils.sha256 jsonStableStringify exports.pickClientLocale getLanguagesByReq req
+  return utils.sha256 jsonStableStringify i18n.pickClientLocale getLanguagesByReq req

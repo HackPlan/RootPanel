@@ -1,25 +1,27 @@
 process.env.NODE_ENV = 'test'
 process.env.LOG_LEVEL = 'error'
 
-global.config = require '../config'
-
 global._ = require 'underscore'
 global.fs = require 'fs'
-global.async = require 'async'
+
+if fs.existsSync "#{__dirname}/../config.coffee"
+  config = require '../config'
+else
+  config = require '../sample/core.config.coffee'
+
 global.chai = require 'chai'
+global.async = require 'async'
+global.config = config
 global.supertest = require 'supertest'
 
 if process.env.COV_TEST == 'true'
+  excludes = ['test', 'node_modules', '.git', 'sample', 'core/static']
+
   require('coffee-coverage').register
     path: 'relative'
     basePath: "#{__dirname}/../.."
-    exclude: do ->
-      excludes = ['test', 'node_modules', '.git', 'sample', 'core/static', 'migration']
-
-      for plugin_name in _.union config.plugin.available_extensions, config.plugin.available_services
-        excludes.push "plugin/#{plugin_name}/test"
-
-      return excludes
+    exclude: excludes.concat config.extends.available_plugins.map (name) ->
+      return "plugin/#{name}/test"
 
 global.expect = chai.expect
 
@@ -32,7 +34,7 @@ if process.env.TRAVIS == 'true'
   config.redis.password = undefined
 
 global.ifEnabled = (plugin_name) ->
-  if plugin_name in config.plugin.available_plugins
+  if plugin_name in config.extends.available_plugins
     return describe
   else
     describe.skip

@@ -9,7 +9,7 @@ exports.use requireAdminAuthenticate
 
 exports.get '/', (req, res) ->
   Account.find {}, (err, accounts) ->
-    async.map pluggable.applyHooks('view.admin.sidebars'), (hook, callback) ->
+    async.map app.applyHooks('view.admin.sidebars'), (hook, callback) ->
       hook.generator req, (html) ->
         callback null, html
 

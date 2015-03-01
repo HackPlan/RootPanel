@@ -1,6 +1,6 @@
 utils = require '../utils'
 
-describe.skip 'utils', ->
+describe 'utils', ->
   describe 'rx', ->
     it 'username', ->
       utils.rx.username.test('jysperm').should.be.ok

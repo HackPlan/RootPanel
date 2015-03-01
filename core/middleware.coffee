@@ -13,11 +13,8 @@ exports.errorHandling = (req, res, next) ->
 
     param ?= {}
 
-    if req.method in ['GET', 'HEAD', 'OPTIONS']
-      res.status(status).send name.toString()
-    else
-      res.status(status).json _.extend param,
-        error: name.toString()
+    res.status(status).json _.extend param,
+      error: name.toString()
 
   next()
 
@@ -50,14 +47,9 @@ exports.session = ->
     secret: secret
 
 exports.csrf = ->
-  csrf = app.libs.csrf()
+  csrf = (require 'csrf')()
 
   return (req, res, next) ->
-    paths = _.pluck app.pluggable.applyHooks('app.ignore_csrf'), 'path'
-
-    if req.path in paths
-      return next()
-
     csrf_token = do ->
       if req.headers['x-csrf-token']
         return req.headers['x-csrf-token']
@@ -65,9 +57,14 @@ exports.csrf = ->
         return req.body.csrf_token
 
     validator = ->
-      unless req.method in ['GET', 'HEAD', 'OPTIONS']
-        unless csrf.verify req.session.csrf_secret, csrf_token
-          return res.error 'invalid_csrf_token', null, 403
+      if req.path in _.pluck app.applyHooks('app.ignore_csrf'), 'path'
+        return next()
+
+      if req.method in ['GET', 'HEAD', 'OPTIONS']
+        return next()
+
+      unless csrf.verify req.session.csrf_secret, csrf_token
+        return res.error 403, 'invalid_csrf_token'
 
       next()
 
@@ -134,8 +131,10 @@ exports.accountHelpers = (req, res, next) ->
     t: res.t
     moment: res.moment
 
+    site_name: req.t(config.web.t_name)
+
     applyHooks: (name, options) ->
-      app.pluggable.applyHooks name, req.account, _.extend {
+      app.applyHooks name, req.account, _.extend {
         execute: false
       }, options
 
@@ -148,7 +147,7 @@ exports.requireAuthenticate = (req, res, next) ->
     if req.method == 'GET'
       res.redirect '/account/login/'
     else
-      res.error 'auth_failed', null, 403
+      res.error 403, 'auth_failed'
 
 exports.requireAdminAuthenticate = (req, res, next) ->
   unless 'root' in req.account?.groups

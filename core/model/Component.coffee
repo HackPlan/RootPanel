@@ -1,5 +1,5 @@
 {_, async} = app.libs
-{mabolo, pluggable} = app
+{mabolo} = app
 {ObjectID} = mabolo
 
 Coworker = mabolo.model 'Coworker',
@@ -87,5 +87,5 @@ Component::populate = (callback) ->
     callback _.extend @,
       account: account
       coworkers: coworkers
-      component_type: pluggable.components[@template]
+      component_type: app.components[@template]
       node: app.nodes[@node_name]

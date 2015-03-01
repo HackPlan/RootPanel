@@ -16,15 +16,6 @@ app.libs =
   express: require 'express'
   child_process: require 'child_process'
 
-  csrf: require 'csrf'
-  mongoose: require 'mongoose'
-  mongooseUniqueValidator: require 'mongoose-unique-validator'
-  jsonStableStringify: require 'json-stable-stringify'
-  Negotiator: require 'negotiator'
-  ObjectID: (require 'mongoose').Types.ObjectId
-  ObjectId: (require 'mongoose').Schema.Types.ObjectId
-  Mixed: (require 'mongoose').Schema.Types.Mixed
-
 cookieParser = require 'cookie-parser'
 BunyanMongo = require 'bunyan-mongo'
 bodyParser = require 'body-parser'
@@ -38,11 +29,13 @@ harp = require 'harp'
 
 {_, fs, path, express} = app.libs
 
-app.package = require './package'
-config = require './config'
-utils = require './core/utils'
+if fs.existsSync "#{__dirname}/config.coffee"
+  config = require './config'
+else
+  config = require './sample/core.config.coffee'
 
-fs.chmodSync path.join(__dirname, 'config.coffee'), 0o750
+app.package = require './package'
+utils = require './core/utils'
 
 if fs.existsSync config.web.listen
   fs.unlinkSync config.web.listen
@@ -81,6 +74,12 @@ logger = bunyan.createLogger
   ]
 
 _.extend app,
+  plans: {}
+  nodes: {}
+  hooks: {}
+  plugins: {}
+  components: {}
+
   utils: utils
   redis: redis
   config: config
@@ -91,10 +90,8 @@ _.extend app,
   insight: insight
   express: express()
 
-app.db = require './core/db'
-app.i18n = require './core/i18n'
+app.i18n = (require './core/i18n')()
 app.cache = require './core/cache'
-app.pluggable = require './core/pluggable'
 
 require './core/model/Account'
 require './core/model/Financials'
@@ -104,16 +101,15 @@ require './core/model/SecurityLog'
 require './core/model/Ticket'
 require './core/model/Component'
 
+app.extends = require './core/extends'
 app.templates = require './core/templates'
+app.clusters = require './core/clusters'
 app.billing = require './core/billing'
 app.middleware = require './core/middleware'
 app.notification = require './core/notification'
 
-app.interfaces =
-  Node: require './core/interface/Node'
-  Plan: require './core/interface/Plan'
-  ComponentTemplate: require './core/interface/ComponentTemplate'
-  Plugin: require './core/interface/Plugin'
+app.applyHooks = ->
+  app.extends.hook.applyHooks.apply null, arguments
 
 app.express.use bodyParser.json()
 app.express.use cookieParser()
@@ -136,15 +132,14 @@ app.express.use '/coupon', require './core/router/coupon'
 app.express.use '/admin', require './core/router/admin'
 app.express.use '/panel', require './core/router/panel'
 
-app.i18n.init()
-app.billing.initPlans()
-app.pluggable.initPlugins()
+for name in config.extends.available_plugins
+  require path.join __dirname, './plugins', name
 
-app.nodes = {}
+for plans, options of config.plans
+  app.billing.createPlan plans, options
 
-for name, info of config.nodes
-  app.nodes[name] = new app.interfaces.Node _.extend info,
-    name: name
+for name, options of config.nodes
+  app.clusters.createNode name, options
 
 app.express.use '/bower_components', express.static './bower_components'
 app.express.use harp.mount './core/static'

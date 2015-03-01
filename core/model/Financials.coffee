@@ -1,10 +1,13 @@
-{pluggable} = app
-{_, ObjectId, mongoose} = app.libs
+{mabolo} = app
+{_, ObjectID
+, mongoose} = app.libs
+{ObjectID} = mabolo
 
-Financials = mongoose.Schema
+Financials = mabolo.model 'Financials',
   account_id:
     required: true
-    type: ObjectId
+    type: ObjectID
+
     ref: 'Account'
 
   type:
@@ -18,10 +21,7 @@ Financials = mongoose.Schema
 
   created_at:
     type: Date
-    default: Date.now
+    default: -> new Date()
 
   payload:
     type: Object
-
-_.extend app.models,
-  Financials: mongoose.model 'Financials', Financials

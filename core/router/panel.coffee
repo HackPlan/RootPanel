@@ -2,7 +2,6 @@
 {requireAuthenticate} = app.middleware
 {Account, Financials} = app.models
 {pluggable, billing, config} = app
-{Plan} = app.interfaces
 
 module.exports = exports = express.Router()
 
@@ -13,7 +12,7 @@ exports.get '/financials', (req, res) ->
 
   async.parallel
     payment_methods: (callback) ->
-      async.map pluggable.applyHooks('billing.payment_methods'), (hook, callback) ->
+      async.map app.applyHooks('billing.payment_methods'), (hook, callback) ->
         hook.widgetGenerator req, (html) ->
           callback null, html
       , callback
@@ -30,7 +29,7 @@ exports.get '/financials', (req, res) ->
         async.map deposit_logs, (deposit_log, callback) ->
           deposit_log = deposit_log.toObject()
 
-          matched_hook = _.find pluggable.applyHooks('billing.payment_methods'), (hook) ->
+          matched_hook = _.find app.applyHooks('billing.payment_methods'), (hook) ->
             return hook.type == deposit_log.payload.type
 
           unless matched_hook
@@ -56,8 +55,8 @@ exports.get '/financials', (req, res) ->
     res.render 'panel/financials', result
 
 exports.get '/components', (req, res) ->
-  templates = _.map req.account.getAvailableComponentsTemplates(), (template_name) ->
-    return pluggable.components[template_name]
+  templates = _.compact _.map req.account.availableComponentsTemplates(), (template_name) ->
+    return app.components[template_name]
 
   res.render 'panel/components',
     templates: templates
@@ -66,9 +65,9 @@ exports.get '/', (req, res) ->
   billing.triggerBilling req.account, (err, account) ->
     return res.error err if err
 
-    async.parallel
+    async.auto
       widgets_html: (callback) ->
-        pluggable.applyHooks('view.panel.widgets', account,
+        app.applyHooks('view.panel.widgets', account,
           execute: 'generator'
           req: req
         ) callback

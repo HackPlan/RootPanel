@@ -1,8 +1,11 @@
-{_, ObjectId, mongoose} = app.libs
+{utils, config, models, mabolo} = app
+{_, async} = app.libs
+{ObjectID} = mabolo
 
-Notification = mongoose.Schema
+Notification = mabolo.model 'Notification',
   account_id:
-    type: ObjectId
+    type: ObjectID
+
     ref: 'Account'
 
   group_name:
@@ -20,10 +23,7 @@ Notification = mongoose.Schema
 
   created_at:
     type: Date
-    default: Date.now
+    default: -> new Date()
 
   payload:
     type: Object
-
-_.extend app.models,
-  Notification: mongoose.model 'Notification', Notification

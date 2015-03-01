@@ -45,7 +45,7 @@ exports.try = (key, setter, callback) ->
 
       , original_key
 
-exports.delete = (key, callback) ->
+exports.refresh = (key, callback) ->
   redis.del exports.hashKey(key), ->
     callback()
 

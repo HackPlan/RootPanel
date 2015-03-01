@@ -13,7 +13,7 @@ module.exports =
     available_language: ['zh_CN', 'en']
     default_timezone: 'Asia/Shanghai'
 
-  plugin:
+  extends:
     available_plugins: []
 
   billing:

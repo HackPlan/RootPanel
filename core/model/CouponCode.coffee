@@ -1,7 +1,19 @@
-{utils, config} = app
-{_, ObjectId, mongoose, mongooseUniqueValidator} = app.libs
+{utils, config, mabolo} = app
+{_, ObjectID
+, mongoose} = app.libs
 
-CouponCode = mongoose.Schema
+ApplyLog = mabolo.model 'ApplyLog',
+  account_id:
+    required: true
+    type: ObjectID
+
+    ref: 'Account'
+
+  created_at:
+    type: Date
+    default: -> new Date()
+
+CouponCode = mabolo.model 'CouponCode',
   code:
     required: true
     unique: true
@@ -21,19 +33,7 @@ CouponCode = mongoose.Schema
   meta:
     type: Object
 
-  apply_log: [
-    account_id:
-      required: true
-      type: ObjectId
-      ref: 'Account'
-
-    created_at:
-      type: Date
-      default: Date.now
-  ]
-
-CouponCode.plugin mongooseUniqueValidator,
-  message: 'unique_validation_error'
+  apply_log: [ApplyLog]
 
 config.coupons_meta = coupons_meta =
   amount:
@@ -64,7 +64,7 @@ config.coupons_meta = coupons_meta =
 
 # @param template: [expired], available_times, type, meta
 # @param callback(err, coupons)
-CouponCode.statics.createCodes = (template, count, callback) ->
+CouponCode.createCodes = (template, count, callback) ->
   coupons = _.map _.range(0, count), ->
     return {
       code: utils.randomString 16
@@ -77,17 +77,17 @@ CouponCode.statics.createCodes = (template, count, callback) ->
 
   @create coupons, callback
 
-CouponCode.methods.getMessage = (req, callback) ->
+CouponCode::getMessage = (req, callback) ->
   coupons_meta[@type].message req, @, callback
 
 # @param callback(is_available)
-CouponCode.methods.validateCode = (account, callback) ->
+CouponCode::validateCode = (account, callback) ->
   if @available_times <= 0
     return callback()
 
   coupons_meta[@type].validate account, @, callback
 
-CouponCode.methods.applyCode = (account, callback) ->
+CouponCode::applyCode = (account, callback) ->
   if @available_times <= 0
     return callback true
 
@@ -101,6 +101,3 @@ CouponCode.methods.applyCode = (account, callback) ->
   , (err) =>
     return callback err if err
     coupons_meta[@type].apply account, @, callback
-
-_.extend app.models,
-  CouponCode: mongoose.model 'CouponCode', CouponCode
