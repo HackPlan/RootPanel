@@ -1,6 +1,6 @@
-{_, async, express} = app.libs
+{_, express} = app.libs
 {requireAuthenticate} = app.middleware
-{Account, SecurityLog} = app.models
+{Account, SecurityLog, CouponCode} = app.models
 {config, utils, logger, i18n} = app
 
 module.exports = exports = express.Router()
@@ -33,68 +33,42 @@ exports.get '/session_info/', (req, res) ->
   res.json response
 
 exports.post '/register', (req, res) ->
-  Account.register req.body, (err, account) ->
-    return res.error utils.pickErrorName err if err
-
-    account.createToken 'full_access',
-      ip: req.headers['x-real-ip']
-      ua: req.headers['user-agent']
-    , (err, token) ->
-      logger.error err if err
-
-      res.cookie 'token', token.token,
-        expires: new Date(Date.now() + config.account.cookie_time)
-
-      res.json
-        id: account._id
+  Account.register(req.body).then (account) ->
+    res.createToken account
+  .catch res.error
 
 exports.post '/login', (req, res) ->
-  Account.search req.body.username, (account) ->
-    unless account
-      return res.error 'wrong_password'
+  Account.search(req.body.username).then (account) ->
+    if account?.matchPassword req.body.password
+      throw new Error 'wrong_password'
 
-    unless account.matchPassword req.body.password
-      return res.error 'wrong_password'
+    res.createCookie 'language', account.preferences.language
 
-    account.createToken 'full_access',
-      ip: req.headers['x-real-ip']
-      ua: req.headers['user-agent']
-    , (err, token) ->
-      logger.error err if err
-
-      res.cookie 'token', token.token,
-        expires: new Date Date.now() + config.account.cookie_time
-
-      res.cookie 'language', account.preferences.language,
-        expires: new Date Date.now() + config.account.cookie_time
-
-      res.json
-        id: account._id
+    res.createToken(account).then (token) ->
+      req.createSecurityLog 'login', {},
+        account: account
         token: token
 
-exports.post '/logout', requireAuthenticate, (req, res) ->
-  req.token.revoke ->
-    req.account.createSecurityLog 'revoke_token', req.token,
-      revoke_ip: req.headers['x-real-ip']
-      revoke_ua: req.headers['user-agent']
-    , (err) ->
-      logger.error err if err
+  .catch res.error
 
-      res.clearCookie 'token'
-      res.json {}
+exports.post '/logout', requireAuthenticate, (req, res) ->
+  req.token.revoke().then ->
+    req.createSecurityLog('revoke_token').then ->
+      res.clearCookie('token').sendStatus 204
+  .catch res.error
 
 exports.post '/update_password', requireAuthenticate, (req, res) ->
-  unless req.account.matchPassword req.body.original_password
-    return res.error 'wrong_password'
+  Q().then ->
+    unless req.account.matchPassword req.body.original_password
+      throw new Error 'wrong_password'
 
-  unless utils.rx.password.test req.body.password
-    return res.error 'invalid_password'
+    unless utils.rx.password.test req.body.password
+      throw new Error 'invalid_password'
 
-  req.account.updatePassword req.body.password, ->
-    req.account.createSecurityLog 'update_password', req.token, {}, (err) ->
-      logger.error err if err
+    req.account.setPassword(req.body.password).then ->
+      req.createSecurityLog 'update_password'
 
-      res.json {}
+  .catch res.error
 
 exports.post '/update_email', requireAuthenticate, (req, res) ->
   unless req.account.matchPassword req.body.password
@@ -136,3 +110,43 @@ exports.post '/update_preferences', requireAuthenticate, (req, res) ->
       logger.error err if err
 
       res.json {}
+
+exports.use do ->
+  router = new express.Router()
+
+  router.use requireAuthenticate
+
+  router.get '/info', (req, res) ->
+    CouponCode.findOne
+      code: req.query.code
+    , (err, coupon) ->
+      unless coupon
+        return res.error 'code_not_exist'
+
+      coupon.validateCode req.account, (is_available) ->
+        unless is_available
+          return res.error 'code_not_available'
+
+        coupon.getMessage req, (message) ->
+          res.json
+            message: message
+
+  router.post '/apply', (req, res) ->
+    CouponCode.findOne
+      code: req.body.code
+    , (err, coupon) ->
+      unless coupon
+        return res.error 'code_not_exist'
+
+      if coupon.expired and Date.now() > coupon.expired.getTime()
+        return res.error 'code_expired'
+
+      if coupon.available_times and coupon.available_times < 0
+        return res.error 'code_not_available'
+
+      coupon.validateCode req.account, (is_available) ->
+        unless is_available
+          return res.error 'code_not_available'
+
+        coupon.applyCode req.account, ->
+          res.json {}

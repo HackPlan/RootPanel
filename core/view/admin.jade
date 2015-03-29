@@ -1,7 +1,7 @@
 extends layout
 
 prepend header
-  title #{t('admin.admin_panel')} | #{t(config.web.t_name)}
+  title #{t('admin.admin_panel')} | #{site_name}
 
 append header
   link(rel='stylesheet', href='/style/admin.css')
@@ -31,7 +31,7 @@ block main
             
         header 付费方案
         
-        each plan, name in app.billing.plans
+        each plan, name in app.plans
           .panel.panel-success
             .panel-heading
               strong= name

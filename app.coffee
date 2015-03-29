@@ -6,6 +6,7 @@ global.app = module.exports = new EventEmitter()
 
 app.libs =
   _: require 'underscore'
+  Q: require 'q'
   fs: require 'fs'
   path: require 'path'
   jade: require 'jade'
@@ -29,10 +30,11 @@ harp = require 'harp'
 
 {_, fs, path, express} = app.libs
 
-if fs.existsSync "#{__dirname}/config.coffee"
-  config = require './config'
-else
-  config = require './sample/core.config.coffee'
+unless global.config
+  if fs.existsSync "#{__dirname}/config.coffee"
+    config = require './config'
+  else
+    config = require './sample/core.config.coffee'
 
 app.package = require './package'
 utils = require './core/utils'
@@ -60,7 +62,9 @@ mabolo = new Mabolo utils.mongodbUri _.extend config.mongodb,
 
 bunyanMongo = new BunyanMongo()
 
-mabolo.on 'connected', bunyanMongo.setDB.bind bunyanMongo
+mabolo.connect().then (db) ->
+  bunyanMongo.setDB db
+.catch console.error
 
 logger = bunyan.createLogger
   name: app.package.name
@@ -102,21 +106,19 @@ require './core/model/Ticket'
 require './core/model/Component'
 
 app.extends = require './core/extends'
-app.templates = require './core/templates'
 app.clusters = require './core/clusters'
 app.billing = require './core/billing'
 app.middleware = require './core/middleware'
-app.notification = require './core/notification'
 
-app.applyHooks = ->
-  app.extends.hook.applyHooks.apply null, arguments
+app.getHooks = app.extends.hook.getHooks
+app.applyHooks = app.extends.hook.applyHooks
 
 app.express.use bodyParser.json()
 app.express.use cookieParser()
 
+app.express.use app.middleware.reqHelpers
 app.express.use app.middleware.session()
 app.express.use app.middleware.logger()
-app.express.use app.middleware.errorHandling
 app.express.use app.middleware.csrf()
 app.express.use app.middleware.authenticate
 app.express.use app.middleware.accountHelpers
@@ -126,9 +128,7 @@ app.express.set 'view engine', 'jade'
 
 app.express.use '/component', require './core/router/component'
 app.express.use '/account', require './core/router/account'
-app.express.use '/billing', require './core/router/billing'
 app.express.use '/ticket', require './core/router/ticket'
-app.express.use '/coupon', require './core/router/coupon'
 app.express.use '/admin', require './core/router/admin'
 app.express.use '/panel', require './core/router/panel'
 
@@ -149,9 +149,6 @@ app.express.get '/', (req, res) ->
 
 exports.start = _.once ->
   app.express.listen config.web.listen, ->
-    if fs.existsSync config.web.listen
-      fs.chmodSync config.web.listen, 0o770
-
     app.started = true
     app.logger.info "RootPanel start at #{config.web.listen}"
     app.emit 'app.started'

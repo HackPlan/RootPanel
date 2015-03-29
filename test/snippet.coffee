@@ -1,4 +1,4 @@
-utils = require '../core/utils'
+global.utils = require '../core/utils'
 
 createAgent = (callback) ->
   agent = supertest.agent app.express
@@ -8,6 +8,9 @@ createAgent = (callback) ->
     callback err,
       agent: agent
       csrf_token: res.body.csrf_token
+
+cleanUpByAccount = ({account_id}, callback) ->
+  app.models.Account.findByIdAndRemove account_id, callback
 
 createLoggedAgent = (callback) ->
   createAgent (err, {agent, csrf_token}) ->
@@ -22,6 +25,9 @@ createLoggedAgent = (callback) ->
       email: email
       password: password
     .end (err, res) ->
+      after (done) ->
+        cleanUpByAccount res.body.account_id, done
+
       callback err,
         agent: agent
         username: username
@@ -32,4 +38,5 @@ createLoggedAgent = (callback) ->
 
 _.extend global,
   createAgent: createAgent
+  cleanUpByAccount: cleanUpByAccount
   createLoggedAgent: createLoggedAgent

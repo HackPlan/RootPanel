@@ -1,13 +1,10 @@
 {mabolo} = app
-{_, ObjectID
-, mongoose} = app.libs
 {ObjectID} = mabolo
 
 Financials = mabolo.model 'Financials',
   account_id:
     required: true
     type: ObjectID
-
     ref: 'Account'
 
   type:
@@ -25,3 +22,14 @@ Financials = mabolo.model 'Financials',
 
   payload:
     type: Object
+
+Financials.createLog = (account, type, amount, payload) ->
+  Q().then ->
+    unless isFinite amount
+      throw new Error 'invalid_amount'
+
+    @create
+      account_id: account._id
+      type: type
+      amount: amount
+      payload: payload

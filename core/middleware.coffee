@@ -1,20 +1,64 @@
 expressBunyanLogger = require 'express-bunyan-logger'
 expressSession = require 'express-session'
 redisStore = require 'connect-redis'
+csrf = require 'csrf'
 
 {config} = app
 {_, path, fs, moment, crypto} = app.libs
-{Account} = app.models
+{Account, SecurityLog} = app.models
 
-exports.errorHandling = (req, res, next) ->
+exports.reqHelpers = (req, res, next) ->
+  req.getCsrfToken = ->
+    if req.headers['x-csrf-token']
+      return req.headers['x-csrf-token']
+    else
+      return req.body.csrf_token
+
+  req.getTokenCode = ->
+    if req.headers['x-token']
+      return req.headers['x-token']
+    else
+      return req.cookies.token
+
+  req.getClientInfo = ->
+    return {
+      ip: req.headers['x-real-ip'] ? req.ip
+      ua: req.headers['user-agent']
+    }
+
+  req.createSecurityLog = (type, payload, options) ->
+    SecurityLog.createLog
+      account: options?.account ? req.account
+      token: token
+      type: type
+    , payload
+
   res.error = (status, name, param) ->
     unless _.isNumber status
       [status, name, param] = [400, status, name]
 
+    if name?.message
+      name = name.message
+
     param ?= {}
 
-    res.status(status).json _.extend param,
-      error: name.toString()
+    if req.method in ['GET', 'HEAD', 'OPTIONS']
+      res.status(status).send name.toString()
+    else
+      res.status(status).json _.extend param,
+        error: name.toString()
+
+  res.createCookie = (name, value) ->
+    res.cookie name, value,
+      expires: new Date(Date.now() + config.account.cookie_time)
+
+  res.createToken = (account = req.account) ->
+    account.createToken('full_access', req.getClientInfo()).then (token) ->
+      res.createCookie('token', token.code).json
+        account_id: account._id
+        token: token.code
+
+      return token
 
   next()
 
@@ -47,23 +91,17 @@ exports.session = ->
     secret: secret
 
 exports.csrf = ->
-  csrf = (require 'csrf')()
+  provider = csrf()
 
   return (req, res, next) ->
-    csrf_token = do ->
-      if req.headers['x-csrf-token']
-        return req.headers['x-csrf-token']
-      else
-        return req.body.csrf_token
-
     validator = ->
-      if req.path in _.pluck app.applyHooks('app.ignore_csrf'), 'path'
+      if req.path in app.getHooks('app.ignore_csrf', null, pluck: 'path')
         return next()
 
       if req.method in ['GET', 'HEAD', 'OPTIONS']
         return next()
 
-      unless csrf.verify req.session.csrf_secret, csrf_token
+      unless provider.verify req.session.csrf_secret, req.getCsrfToken()
         return res.error 403, 'invalid_csrf_token'
 
       next()
@@ -71,31 +109,23 @@ exports.csrf = ->
     if req.session.csrf_secret
       return validator()
     else
-      csrf.secret (err, secret) ->
+      provider.secret (err, secret) ->
         req.session.csrf_secret = secret
-        req.session.csrf_token = csrf.create secret
+        req.session.csrf_token = provider.create secret
 
         validator()
 
 exports.authenticate = (req, res, next) ->
-  token_code = do ->
-    if req.headers['x-token']
-      return req.headers['x-token']
-    else
-      return req.cookies.token
+  code = req.getTokenCode()
 
-  unless token_code
+  unless code
     return next()
 
-  Account.authenticate token_code, (token, account) ->
+  Account.authenticate(code).then ({token, account}) ->
     if token and token.type == 'full_access'
       _.extend req,
         token: token
         account: account
-
-      account.populate ->
-        next()
-
     else
       next()
 
@@ -133,10 +163,8 @@ exports.accountHelpers = (req, res, next) ->
 
     site_name: req.t(config.web.t_name)
 
-    applyHooks: (name, options) ->
-      app.applyHooks name, req.account, _.extend {
-        execute: false
-      }, options
+    getHooks: (name, options) ->
+      app.getHooks name, req.account, options
 
   next()
 

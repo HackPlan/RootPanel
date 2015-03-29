@@ -1,4 +1,4 @@
-describe 'ticket.test', ->
+describe 'ticket.user.test', ->
   agent = null
   csrf_token = null
 
@@ -10,7 +10,7 @@ describe 'ticket.test', ->
       done err
 
   it 'POST /', (done) ->
-    agent.post '/ticket/resource/'
+    agent.post '/ticket/rest/'
     .send
       csrf_token: csrf_token
       title: 'Title'
@@ -22,14 +22,14 @@ describe 'ticket.test', ->
       done err
 
   it 'GET /', (done) ->
-    agent.get '/ticket/resource/'
+    agent.get '/ticket/rest/'
     .expect 200
     .end (err, res) ->
       res.body.should.be.a 'array'
       done err
 
   it 'POST /:id/replies', (done) ->
-    agent.post "/ticket/resource/#{ticket_id}/replies"
+    agent.post "/ticket/rest/#{ticket_id}/replies"
     .send
       csrf_token: csrf_token
       content: 'Reply'
@@ -40,14 +40,14 @@ describe 'ticket.test', ->
       done err
 
   it 'GET /:id', (done) ->
-    agent.get "/ticket/resource/#{ticket_id}"
+    agent.get "/ticket/rest/#{ticket_id}"
     .expect 200
     .end (err, res) ->
       res.body.replies.length.should.be.equal 1
       done err
 
   it 'PUT /:id/status', (done) ->
-    agent.put "/ticket/resource/#{ticket_id}/status"
+    agent.put "/ticket/rest/#{ticket_id}/status"
     .send
       csrf_token: csrf_token
       status: 'closed'

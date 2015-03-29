@@ -1,4 +1,4 @@
-markdown = require('markdown').markdown
+{markdown} = require 'markdown'
 
 {models, logger, mabolo} = app
 {_, async} = app.libs
@@ -59,59 +59,55 @@ Ticket = mabolo.model 'Ticket',
     type: Date
     default: -> new Date()
 
-Ticket.create = (account, ticket, callback) ->
-  {title, content, status} = ticket
-
+Ticket.create = (account, {title, content, status}) ->
   unless title?.trim()
-    return callback 'empty_title'
+    throw new Error 'empty_title'
 
   if account.isAdmin()
     status ?= 'open'
   else
     status = 'pending'
 
-  # TODO: replace `ObjectID account._id.toString()` to `account._id`
-
   @__super__.constructor.create.call @,
-    account_id: ObjectID account._id.toString()
+    account_id: account._id
     title: title
     status: status
     content: content
     content_html: markdown.toHTML content
-    members: [ObjectID account._id.toString()]
+    members: [account._id]
     replies: []
-  , callback
 
 Ticket::hasMember = (account) ->
   return _.some @members, (member_id) ->
     return member_id.equals account._id
 
-Ticket::setStatusByAccount = (account, status, callback) ->
+Ticket::setStatusByAccount = (account, status) ->
   if account.isAdmin()
     unless status in ['open', 'pending', 'finish', 'closed']
-      return callback 'invalid_status'
+      throw new Error 'invalid_status'
   else
     unless status in ['closed']
-      return callback 'invalid_status'
+      throw new Error 'invalid_status'
 
-  @setStatus status, callback
+  @setStatus status
 
-Ticket::setStatus = (status, callback) ->
-  # TODO: validate status
+Ticket::setStatus = (status) ->
+  unless status in ['open', 'pending', 'finish', 'closed']
+    throw new Error 'invalid_status'
 
   @update
     $set:
       status: status
       updated_at: new Date()
-  , callback
 
-Ticket::createReply = (account, reply, callback) ->
+Ticket::createReply = (account, {content, status}, callback) ->
   {content, status} = reply
 
-  # TODO: cant reply after closed
+  if @status == 'closed'
+    throw new Error 'already_closed'
 
   unless content?.trim()
-    return callback 'empty_content'
+    throw new Error 'empty_content'
 
   if account.isAdmin()
     status ?= 'open'
@@ -119,47 +115,33 @@ Ticket::createReply = (account, reply, callback) ->
     status = 'pending'
 
   reply = new Reply
-    _parent: @
     account_id: account._id
     content: content
     content_html: markdown.toHTML content
     created_at: new Date()
 
-  @update
+  @update(
     $push:
       replies: reply
     $set:
       status: status
       updated_at: new Date()
-  , (err) ->
-    callback err, reply
+  ).thenResolve reply
 
-Ticket::populateAccounts = (callback) ->
-  {Account} = app.models
+Ticket::populateAccounts = ->
+  app.models.Account.find
+    _id:
+      $in: [
+        @account_id, @members..., _.pluck(@replies, 'account_id')...
+      ]
 
-  async.parallel [
-    (callback) =>
-      Account.findById @account_id, (err, account) =>
-        @account = account
-        callback err
+  .then (accounts) =>
+    @account = _.find accounts, (i) =>
+      return @account_id.equals i
 
-    (callback) =>
-      Account.find
-        _id:
-          $in: @members
-      , (err, accounts) =>
-        @members = accounts
-        callback err
+    @members = _.filter accounts, (i) =>
+      return @hasMember i
 
-    (callback) =>
-      Account.find
-        _id:
-          $in: _.pluck @replies, 'account_id'
-      , (err, accounts) =>
-        for reply in @replies
-          reply.account = _.find accounts, (account) ->
-            return reply.account_id.equals account._id
-
-        callback err
-
-  ], callback
+    for reply in @replies
+      reply.account = _.find accounts, (i) ->
+        return reply.account_id.equals account._id

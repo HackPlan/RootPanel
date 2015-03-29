@@ -1,7 +1,7 @@
 {express, async, _} = app.libs
 {requireAdminAuthenticate} = app.middleware
 {Account, Ticket, Financials, CouponCode} = app.models
-{config, pluggable} = app
+{config} = app
 
 module.exports = exports = express.Router()
 

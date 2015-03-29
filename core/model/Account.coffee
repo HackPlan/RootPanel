@@ -1,4 +1,4 @@
-{pluggable, utils, config, models, mabolo} = app
+{utils, config, models, mabolo} = app
 {_, async} = app.libs
 {Financial, SecurityLog, Component} = app.models
 {ObjectID} = mabolo
@@ -13,7 +13,7 @@ Token = mabolo.model 'Token',
     required: true
     type: String
 
-  token:
+  code:
     required: true
     type: String
 
@@ -29,13 +29,6 @@ Token = mabolo.model 'Token',
     required: true
     type: Date
     default: -> new Date()
-
-Token::revoke = (callback) ->
-  @parent().update
-    $pull:
-      tokens:
-        token: @token
-  , callback
 
 Account = mabolo.model 'Account',
   username:
@@ -81,120 +74,99 @@ Account = mabolo.model 'Account',
     type: Date
     default: -> new Date()
 
-# @param account: username, email, password
-# @param callback(err, account)
-Account.register = (account, callback) ->
+Token::revoke = ->
+  @parent().update
+    $pull:
+      tokens:
+        code: @code
+
+Account.ensureIndex
+
+Account.register = ({username, email, password}) ->
   password_salt = utils.randomSalt()
+  password = utils.hashPassword password, password_salt
 
-  {username, email, password} = account
+  avatar_url = '//cdn.v2ex.com/gravatar/' + utils.md5(email)
 
-  account = new @
-    username: username
+  account = new Account
     email: email
-    password: utils.hashPassword(password, password_salt)
+    username: username
+    password: password
     password_salt: password_salt
 
     preferences:
-      avatar_url: "//cdn.v2ex.com/gravatar/#{utils.md5(email)}"
+      avatar_url: avatar_url
       language: 'auto'
       timezone: config.i18n.default_timezone
 
     plans: {}
     pluggable: {}
 
-  async.each app.applyHooks('account.before_register'), (hook, callback) ->
-    hook.filter account, callback
-  , ->
-    account.save (err) ->
-      callback err, account
+  app.applyHooks('account.before_register',
+    execute: 'filter'
+  ).then ->
+    account.save()
 
-# @param callback(account)
-Account.search = (stuff, callback) ->
-  @findOne {username: stuff}, (err, account) =>
+Account.search = (identification) ->
+  @findOne(username: identification).then (account) =>
     if account
-      return callback account
-
-    @findOne {email: stuff}, (err, account) =>
-      if account
-        return callback account
-
-      @findById stuff, (err, account) ->
-        callback account
-
-# @param callback(token)
-Account.generateToken = (callback) ->
-  token = utils.randomSalt()
-
-  @findOne
-    'tokens.token': token
-  , (err, result) ->
-    if result
-      @generateToken callback
+      return account
     else
-      callback token
+      return @findOne(email: identification).then (account) =>
+        if account
+          return account
+        else
+          return @findById identification
 
-# @param callback(Token, Account)
-Account.authenticate = (token, callback) ->
-  unless token
-    return callback()
-
-  @findOneAndUpdate
-    'tokens.token': token
+Account.authenticate = (token_code) ->
+  @findOneAndUpdate(
+    'tokens.token': token_code
   ,
     $set:
       'tokens.$.updated_at': new Date()
-  , (err, account) ->
-    matched_token = _.findWhere account?.tokens,
-      token: token
 
-    callback matched_token, account
+  ).then (account) ->
+    return {
+      account: account
 
-# @param callback(err, token)
-Account::createToken = (type, payload, callback) ->
-  models.Account.generateToken (code) =>
-    token = new models.Token
-      type: type
-      token: code
-      payload: payload
-      created_at: new Date()
-      updated_at: new Date()
+      token: _.findWhere account?.tokens,
+        code: token_code
+    }
 
-    @update
-      $push:
-        tokens: token
-    , (err) ->
-      callback err, token
+Account::createToken = (type, payload) ->
+  token = new Token
+    type: type
+    code: utils.randomSalt()
+    payload: payload
+    created_at: new Date()
+    updated_at: new Date()
+
+  @update(
+    $push:
+      tokens: token
+  ).thenResolve token
 
 Account::matchPassword = (password) ->
   return @password == utils.hashPassword(password, @password_salt)
 
-Account::updatePassword = (password, callback) ->
-  @password_salt = utils.randomSalt()
-  @password = utils.hashPassword password, @password_salt
-  @save callback
+Account::setPassword = (password) ->
+  password_salt = utils.randomSalt()
+  password = utils.hashPassword password, password_salt
 
-# @param callback(err)
-Account::incBalance = (amount, type, payload, callback) ->
-  unless _.isNumber amount
-    return callback 'invalid_amount'
+  @update
+    $set:
+      password: password
+      password_salt: password_salt
 
-  financials = new models.Financials
-    account_id: @_id
-    type: type
-    amount: amount
-    payload: payload
+Account::setEmail = (email) ->
 
-  financials.validate (err) =>
-    return callback err if err
+Account::updatePreferences = (preferences) ->
 
+Account::increaseBalance = (amount, type, payload) ->
+  Financials.createLog(@, type, amount, payload).then =>
     @update
       $inc:
         balance: amount
-    , (err) ->
-      return callback err if err
-
-      financials.save (err) ->
-        callback err
 
 Account::inGroup = (group) ->
   return group in @groups
@@ -205,22 +177,11 @@ Account::isAdmin = ->
 Account::inPlan = (plan_name) ->
   return plan_name in _.keys @plans
 
-Account::createSecurityLog = (type, token, payload, callback) ->
-  SecurityLog.create
-    account_id: @_id
-    type: type
-    token: _.pick token, 'type', 'token', 'created_at', 'payload'
-    payload: payload
-  , callback
-
 Account::availableComponentsTemplates = ->
   return _.uniq _.flatten _.compact _.map _.keys(@plans), (plan_name) ->
     return _.keys app.plans[plan_name].available_components
 
-Account::populate = (callback) ->
-  async.parallel
-    components: (callback) =>
-      Component.getComponents @, callback
-
-  , (err, result) =>
-    callback _.extend @, result
+Account::populate = ->
+  Component.getComponents(@).then (components) =>
+    return _.extend @,
+      components: components

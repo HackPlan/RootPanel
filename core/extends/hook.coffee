@@ -1,4 +1,4 @@
-{_, async} = app.libs
+{_, async, Q} = app.libs
 
 app.hooks =
   app:
@@ -77,90 +77,51 @@ exports.selectHookPath = (name, options) ->
 
   return ref[last]
 
-exports.applyHooks = (name, account, options = {}) ->
-  {execute, pluck, req} = options
+exports.getHooks = (name, account, {execute, pluck, req} = {}) ->
+  return _.compact _.flatten exports.selectHookPath(name).map (hook) ->
+    {component, timing} = hook
 
-  result = []
-
-  for hook in exports.selectHookPath(name)
-    template = hook.component
-    timing = hook.timing
-
-    pushResult = (hook, payload = {}) ->
+    result = (params) ->
       if execute
-        result.push (callback) ->
-          params = []
-
-          {account, node, components, component} = payload
-
-          params.push account if account
-          params.push node if node
-          params.push components if components
-          params.push component if component
-          params.push callback
-
-          hook[execute].apply
-            req: req
-            template: template
-            plugin: hook.plugin
-          , params
+        return hook[execute].apply
+          req: req
+          component: component
+          plugin: hook.plugin
+        , params...
 
       else if pluck
-        result.push _.extend({}, hook, payload)[pluck]
+        return _.extend({}, hook, params)[pluck]
 
       else
-        result.push _.extend {}, hook, payload
+        return _.extend {}, hook, params
 
-    if !template or timing == 'always'
-      pushResult hook
-      continue
+    if !component or timing == 'always'
+      return result()
 
     unless account
-      continue
+      return
 
     if timing == 'available'
-      if template in account.getAvailableComponentsTemplates()
-        pushResult hook,
-          account: account
-
-      continue
+      if component in account.getAvailableComponentsTemplates()
+        return result account
 
     components = _.filter account.components, (component) ->
       return component.template == template.name
 
     if timing == 'once'
       unless _.isEmpty components
-        pushResult hook,
-          account: account
-          components: components
-
-      continue
+        return result account, components
 
     if timing == 'every'
-      for component in components
-        pushResult hook,
-          account: account
-          component: component
-
-      continue
+      return components.map (component) ->
+        return result account, component
 
     if timing == 'every_node'
-      components_by_node = _.groupBy components, (component) ->
-        return component.node_name
+      return _.each _.groupBy(components, 'node_name'), (node_name, components) ->
+        return result account, app.nodes[node_name], components
 
-      for node_name, components of components_by_node
-        pushResult hook,
-          account: account
-          node: app.nodes[node_name]
-          components: components
-
-      continue
-
-  if execute
-    return (callback) ->
-      async.series result, callback
-  else
-    return result
+exports.applyHooks = ->
+  return Q.all exports.getHooks arguments...
 
 error = (message) ->
   err = new Error 'core.extends.hook: ' + message

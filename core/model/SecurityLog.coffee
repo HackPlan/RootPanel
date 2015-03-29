@@ -11,7 +11,10 @@ SecurityLog = mabolo.model 'SecurityLog',
   type:
     required: true
     type: String
-    enum: ['revoke_token', 'update_password', 'update_email', 'update_preferences']
+    enum: [
+      'login', 'revoke_token'
+      'update_password', 'update_email', 'update_preferences'
+    ]
 
   created_at:
     type: Date
@@ -22,3 +25,10 @@ SecurityLog = mabolo.model 'SecurityLog',
 
   token:
     type: Object
+
+SecurityLog.createLog = ({account, token, type}, payload) ->
+  @create
+    account_id: account._id
+    payload: payload
+    token: _.pick token, 'type', 'token', 'created_at', 'payload'
+    type: type

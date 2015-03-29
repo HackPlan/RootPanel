@@ -1,6 +1,6 @@
 {utils, config, mabolo} = app
-{_, ObjectID
-, mongoose} = app.libs
+{_} = app.libs
+{ObjectID} = mabolo
 
 ApplyLog = mabolo.model 'ApplyLog',
   account_id:

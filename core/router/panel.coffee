@@ -1,11 +1,42 @@
 {express, async, _} = app.libs
 {requireAuthenticate} = app.middleware
 {Account, Financials} = app.models
-{pluggable, billing, config} = app
+{billing, config} = app
 
 module.exports = exports = express.Router()
 
 exports.use requireAuthenticate
+
+exports.post '/join_plan', (req, res) ->
+  {plan} = req.body
+
+  unless billing.plans[plan]
+    return res.error 'invalid_plan'
+
+  if req.account.inPlan plan
+    return res.error 'already_in_plan'
+
+  if req.account.balance <= when_balance_below
+    return res.error 'insufficient_balance'
+
+  billing.joinPlan req.account, plan, (err) ->
+    console.log err
+    if err
+      res.error err
+    else
+      res.status(204).json {}
+
+exports.post '/leave_plan', (req, res) ->
+  {plan} = req.body
+
+  unless req.account.inPlan plan
+    return res.error 'not_in_plan'
+
+  billing.leavePlan req.account, plan, (err) ->
+    if err
+      res.error err
+    else
+      res.status(204).json {}
 
 exports.get '/financials', (req, res) ->
   LIMIT = 10

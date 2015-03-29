@@ -1,7 +1,7 @@
 extends ../layout
 
 prepend header
-  title #{req.ticket.title} | #{t(config.web.t_name)}
+  title #{req.ticket.title} | #{site_name}
 
 append header
   link(rel='stylesheet', href='/style/ticket.css')

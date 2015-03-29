@@ -1,7 +1,7 @@
 {_, async, express} = app.libs
 {requireAuthenticate, TODO} = app.middleware
 {Account, Ticket} = app.models
-{config, notification, logger} = app
+{config, logger} = app
 
 module.exports = exports = express.Router()
 
@@ -25,7 +25,7 @@ ticketParam = (req, res, next, id) ->
 
 exports.param 'id', ticketParam
 
-exports.use '/resource', do ->
+exports.use '/rest', do ->
   rest = new express.Router mergeParams: true
   rest.param 'id', ticketParam
 

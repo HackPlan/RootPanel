@@ -44,15 +44,13 @@ Component = mabolo.model 'Component',
 
   coworkers: [Coworker]
 
-Component.getComponents = (account, callback) ->
+Component.getComponents = (account) ->
   @find
     $or: [
       account_id: account._id
     ,
       'coworkers.account_id': account._id
     ]
-  , (err, components) ->
-    callback err, components
 
 Component::hasMember = (account) ->
   if @account_id.equals account._id
@@ -61,11 +59,10 @@ Component::hasMember = (account) ->
   return _.some @coworkers, (coworker) ->
     return coworker.account_id.equals account._id
 
-Component::markAsStatus = (status, callback) ->
+Component::markAsStatus = (status) ->
   @update
     $set:
       status: status
-  , callback
 
 Component::populate = (callback) ->
   {Account} = app.models

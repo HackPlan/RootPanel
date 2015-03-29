@@ -5,13 +5,13 @@ global._ = require 'underscore'
 global.fs = require 'fs'
 
 if fs.existsSync "#{__dirname}/../config.coffee"
-  config = require '../config'
+  global.config = require '../config'
 else
-  config = require '../sample/core.config.coffee'
+  global.config = require '../sample/core.config.coffee'
 
+global.Q = require 'q'
 global.chai = require 'chai'
 global.async = require 'async'
-global.config = config
 global.supertest = require 'supertest'
 
 if process.env.COV_TEST == 'true'

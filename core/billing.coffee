@@ -5,8 +5,7 @@
 process.nextTick ->
   {Account, Financials, Component} = app.models
 
-billing = _.extend exports,
-  plans: {}
+billing = exports
 
 {available_plugins} = config.extends
 
@@ -132,7 +131,7 @@ billing.createPlan = (name, options) ->
 
 billing.triggerBilling = (account, callback) ->
   async.each account.plans, (plan, callback) ->
-    billing.plans[plan].triggerBilling account, callback
+    app.plans[plan].triggerBilling account, callback
   , (err) ->
     return callback err if err
 
@@ -142,15 +141,15 @@ billing.triggerBilling = (account, callback) ->
       callback err, account
 
 billing.acceptUsagesBilling = (account, trigger_name, volume, callback) ->
-  plan_names = _.filter billing.plans, (plan) ->
+  plan_names = _.filter app.plans, (plan) ->
     return plan.billing_trigger[trigger_name] and account.inPlan plan
 
   async.each plan_names, (plan_name, callback) ->
-    billing.plans[plan_name].acceptUsagesBilling account, trigger_name, volume, callback
+    app.plans[plan_name].acceptUsagesBilling account, trigger_name, volume, callback
   , callback
 
 billing.runTimeBilling = (callback = -> ) ->
-  plan_names = _.filter billing.plans, (plan) ->
+  plan_names = _.filter app.plans, (plan) ->
     return plan.billing_trigger.time
 
   Account.find
@@ -192,7 +191,7 @@ billing.isForceFreeze = (account) ->
   return false
 
 billing.joinPlan = (account, plan_name, callback) ->
-  plan = billing.plans[plan_name]
+  plan = app.plans[plan_name]
 
   modifier =
     $set: {}
@@ -222,12 +221,10 @@ billing.joinPlan = (account, plan_name, callback) ->
 
         , callback
 
-      , (err) ->
-        console.log 'async.each', arguments
-        callback(err)
+      , callback
 
 billing.leavePlan = (account, plan_name, callback) ->
-  plan = billing.plans[plan_name]
+  plan = app.plans[plan_name]
 
   modifier =
     $unset: {}

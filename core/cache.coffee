@@ -1,9 +1,9 @@
 stringify = require 'json-stable-stringify'
 getParameterNames = require 'get-parameter-names'
 CounterCache = require 'counter-cache'
-_ = require 'underscore'
 
 {redis, config} = app
+{_} = app.libs
 
 exports.counter = new CounterCache()
 
