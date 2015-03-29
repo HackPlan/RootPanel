@@ -29,7 +29,7 @@ exports.reqHelpers = (req, res, next) ->
   req.createSecurityLog = (type, payload, options) ->
     SecurityLog.createLog
       account: options?.account ? req.account
-      token: token
+      token: options?.token ? req.token
       type: type
     , payload
 
@@ -40,12 +40,10 @@ exports.reqHelpers = (req, res, next) ->
     if name?.message
       name = name.message
 
-    param ?= {}
-
     if req.method in ['GET', 'HEAD', 'OPTIONS']
       res.status(status).send name.toString()
     else
-      res.status(status).json _.extend param,
+      res.status(status).json _.extend {}, param,
         error: name.toString()
 
   res.createCookie = (name, value) ->
@@ -116,18 +114,13 @@ exports.csrf = ->
         validator()
 
 exports.authenticate = (req, res, next) ->
-  code = req.getTokenCode()
-
-  unless code
-    return next()
-
-  Account.authenticate(code).then ({token, account}) ->
-    if token and token.type == 'full_access'
+  Account.authenticate(req.getTokenCode()).then ({token, account}) ->
+    if token?.type == 'full_access'
       _.extend req,
         token: token
         account: account
-    else
-      next()
+
+  .finally next
 
 exports.accountHelpers = (req, res, next) ->
   _.extend res,

@@ -26,7 +26,7 @@ exports.get '/session_info/', (req, res) ->
 
   if req.account
     _.extend response,
-      id: req.account.id
+      account_id: req.account._id
       username: req.account.username
       preferences: req.account.preferences
 
@@ -35,11 +35,17 @@ exports.get '/session_info/', (req, res) ->
 exports.post '/register', (req, res) ->
   Account.register(req.body).then (account) ->
     res.createToken account
-  .catch res.error
+  .catch (err) ->
+    if err.message.match /duplicate.*username/
+      res.error 'username_exist'
+    else if err.message.match /Validating.*email/
+      res.error 'invalid_email'
+    else
+      res.error err
 
 exports.post '/login', (req, res) ->
   Account.search(req.body.username).then (account) ->
-    if account?.matchPassword req.body.password
+    unless account?.matchPassword req.body.password
       throw new Error 'wrong_password'
 
     res.createCookie 'language', account.preferences.language
@@ -49,7 +55,11 @@ exports.post '/login', (req, res) ->
         account: account
         token: token
 
-  .catch res.error
+  .catch (err) ->
+    if err.message.match /must be a/
+      res.error 'wrong_password'
+    else
+      res.error err
 
 exports.post '/logout', requireAuthenticate, (req, res) ->
   req.token.revoke().then ->

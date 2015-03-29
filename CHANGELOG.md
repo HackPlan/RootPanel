@@ -47,7 +47,7 @@
 * (新增) 帐号安全事件记录
 * (新增) 兑换代码
 * (新增) 管理员面板：删除账户
-* (改进) 在 Token 中记录 IP, UA, 和最后使用时间。
+* (改进) 在 Token 中记录 IP, UA, 和最后使用时间
 
 18 commits, 27 changed files with 366 additions and 29 deletions, by 1 contributors: jysperm.
 

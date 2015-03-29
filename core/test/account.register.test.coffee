@@ -1,4 +1,4 @@
-describe 'account.register.test', ->
+describe 'account.register', ->
   agent = null
   csrf_token = null
 
@@ -28,7 +28,7 @@ describe 'account.register.test', ->
     .expect 200
     .end (err, res) ->
       res.body.csrf_token.should.be.exist
-      csrf_token = res.body.csrf_token
+      {csrf_token} = res.body
       done err
 
   it 'POST register', (done) ->
@@ -45,8 +45,8 @@ describe 'account.register.test', ->
     .expect 200
     .expect 'set-cookie', /token=/
     .end (err, res) ->
-      res.body.id.should.have.length 24
-      account_id = res.body.id
+      res.body.account_id.should.have.length 24
+      {account_id} = res.body
       done err
 
   it 'POST register with existed username', (done) ->
@@ -82,7 +82,7 @@ describe 'account.register.test', ->
     .expect 200
     .expect 'set-cookie', /token=/
     .end (err, res) ->
-      res.body.id.should.be.equal account_id
+      res.body.account_id.should.be.equal account_id
       res.body.token.should.be.exist
       done err
 
@@ -99,7 +99,7 @@ describe 'account.register.test', ->
     agent.post '/account/logout'
     .send
       csrf_token: csrf_token
-    .expect 200
+    .expect 204
     .expect 'set-cookie', /token=;/
     .end done
 
@@ -112,7 +112,7 @@ describe 'account.register.test', ->
     .expect 200
     .expect 'set-cookie', /token=/
     .end (err, res) ->
-      res.body.id.should.be.equal account_id
+      res.body.account_id.should.be.equal account_id
       res.body.token.should.be.exist
       done err
 

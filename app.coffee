@@ -30,11 +30,10 @@ harp = require 'harp'
 
 {_, fs, path, express} = app.libs
 
-unless global.config
-  if fs.existsSync "#{__dirname}/config.coffee"
-    config = require './config'
-  else
-    config = require './sample/core.config.coffee'
+if fs.existsSync "#{__dirname}/config.coffee"
+  config = require './config'
+else
+  config = require './sample/core.config.coffee'
 
 app.package = require './package'
 utils = require './core/utils'

@@ -74,13 +74,26 @@ Account = mabolo.model 'Account',
     type: Date
     default: -> new Date()
 
+Account.ensureIndex
+  username: 1
+,
+  unique: true
+
+Account.ensureIndex
+  email: 1
+,
+  unique: true
+
+Account.ensureIndex
+  'tokens.code': 1
+,
+  unique: true
+
 Token::revoke = ->
   @parent().update
     $pull:
       tokens:
         code: @code
-
-Account.ensureIndex
 
 Account.register = ({username, email, password}) ->
   password_salt = utils.randomSalt()
@@ -89,7 +102,7 @@ Account.register = ({username, email, password}) ->
   avatar_url = '//cdn.v2ex.com/gravatar/' + utils.md5(email)
 
   account = new Account
-    email: email
+    email: email.toLowerCase()
     username: username
     password: password
     password_salt: password_salt
@@ -120,7 +133,7 @@ Account.search = (identification) ->
 
 Account.authenticate = (token_code) ->
   @findOneAndUpdate(
-    'tokens.token': token_code
+    'tokens.code': token_code
   ,
     $set:
       'tokens.$.updated_at': new Date()
