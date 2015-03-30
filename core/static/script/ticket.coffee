@@ -12,7 +12,7 @@ $ ->
     model: Reply
 
   Ticket = Backbone.Model.extend
-    urlRoot: '/ticket/resource/'
+    urlRoot: '/ticket/rest/'
     idAttribute: '_id'
 
     initialize: ->
@@ -24,7 +24,7 @@ $ ->
 
   TicketCollection = Backbone.Collection.extend
     model: Ticket
-    url: '/ticket/resource/'
+    url: '/ticket/rest/'
 
   CreateView = Backbone.View.extend
     el: '#create-view'

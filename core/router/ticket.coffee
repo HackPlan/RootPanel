@@ -1,5 +1,5 @@
-{_, async, express} = app.libs
-{requireAuthenticate, TODO} = app.middleware
+{_, express} = app.libs
+{requireAuthenticate} = app.middleware
 {Account, Ticket} = app.models
 {config, logger} = app
 
@@ -7,9 +7,10 @@ module.exports = exports = express.Router()
 
 exports.use requireAuthenticate
 
-ticketParam = (req, res, next, id) ->
-  Ticket.findById id, (err, ticket) ->
-    logger.error err if err
+loadTicket = (req, res, next, ticket_id) ->
+  Ticket.findById(ticket_id).then (ticket) ->
+    _.extend req,
+      ticket: ticket
 
     unless ticket
       return res.error 404, 'ticket_not_found'
@@ -18,66 +19,44 @@ ticketParam = (req, res, next, id) ->
       unless req.account.isAdmin()
         return res.error 403, 'ticket_forbidden'
 
-    _.extend req,
-      ticket: ticket
+  .done next, res.error
 
-    next()
-
-exports.param 'id', ticketParam
+exports.param 'id', loadTicket
 
 exports.use '/rest', do ->
   rest = new express.Router mergeParams: true
-  rest.param 'id', ticketParam
+  rest.param 'id', loadTicket
 
   rest.get '/', (req, res) ->
-    Ticket.find
-      $or: [
-        account_id: req.account._id
-      ,
-        members: req.account._id
-      ]
-    ,
-      sort:
-        updated_at: -1
-    , (err, tickets) ->
-      if err
-        res.error err
-      else
-        res.json tickets
+    Ticket.getTickets(req.account).done (tickets) ->
+      res.json tickets
+    , res.error
 
   rest.post '/', (req, res) ->
-    Ticket.create req.account, req.body, (err, ticket) ->
-      if err
-        res.error err
-      else
-        res.status(201).json ticket
+    Ticket.createTicket(req.account, req.body).done (ticket) ->
+      res.status(201).json ticket
+    , res.error
 
   rest.get '/:id', (req, res) ->
-    req.ticket.populateAccounts (err) ->
-      if err
-        res.error err
-      else
-        res.json req.ticket
+    req.ticket.populateAccounts().done (ticket) ->
+      res.json ticket
+    , res.error
 
-  rest.put '/:id', TODO
+  rest.put '/:id', (req, res) ->
 
-  rest.patch '/:id', TODO
+  rest.patch '/:id', (req, res) ->
 
-  rest.delete '/:id', TODO
+  rest.delete '/:id', (req, res) ->
 
   rest.post '/:id/replies', (req, res) ->
-    req.ticket.createReply req.account, req.body, (err, reply) ->
-      if err
-        res.error err
-      else
-        res.status(201).json reply
+    req.ticket.createReply(req.account, req.body).done (reply) ->
+      res.status(201).json reply
+    , res.error
 
   rest.put '/:id/status', (req, res) ->
-    req.ticket.setStatusByAccount req.account, req.body.status, (err) ->
-      if err
-        res.error err
-      else
-        res.status(204).json req.ticket
+    req.ticket.setStatusByAccount(req.account, req.body.status).done ->
+      res.sendStatus 204
+    , res.error
 
 exports.get '/list', (req, res) ->
   res.render 'ticket/list'

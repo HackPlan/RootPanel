@@ -59,7 +59,7 @@ Ticket = mabolo.model 'Ticket',
     type: Date
     default: -> new Date()
 
-Ticket.create = (account, {title, content, status}) ->
+Ticket.createTicket = (account, {title, content, status}) ->
   unless title?.trim()
     throw new Error 'empty_title'
 
@@ -68,7 +68,7 @@ Ticket.create = (account, {title, content, status}) ->
   else
     status = 'pending'
 
-  @__super__.constructor.create.call @,
+  @create
     account_id: account._id
     title: title
     status: status
@@ -76,6 +76,17 @@ Ticket.create = (account, {title, content, status}) ->
     content_html: markdown.toHTML content
     members: [account._id]
     replies: []
+
+Ticket.getTickets = (account) ->
+  @find
+    $or: [
+      account_id: account._id
+    ,
+      members: account._id
+    ]
+  ,
+    sort:
+      updated_at: -1
 
 Ticket::hasMember = (account) ->
   return _.some @members, (member_id) ->
@@ -100,9 +111,7 @@ Ticket::setStatus = (status) ->
       status: status
       updated_at: new Date()
 
-Ticket::createReply = (account, {content, status}, callback) ->
-  {content, status} = reply
-
+Ticket::createReply = (account, {content, status}) ->
   if @status == 'closed'
     throw new Error 'already_closed'
 
@@ -115,18 +124,20 @@ Ticket::createReply = (account, {content, status}, callback) ->
     status = 'pending'
 
   reply = new Reply
+    _id: new ObjectID()
     account_id: account._id
     content: content
     content_html: markdown.toHTML content
     created_at: new Date()
 
-  @update(
+  @update
     $push:
       replies: reply
     $set:
       status: status
       updated_at: new Date()
-  ).thenResolve reply
+
+  .thenResolve reply
 
 Ticket::populateAccounts = ->
   app.models.Account.find
@@ -136,12 +147,14 @@ Ticket::populateAccounts = ->
       ]
 
   .then (accounts) =>
-    @account = _.find accounts, (i) =>
-      return @account_id.equals i
+    @account = _.find accounts, ({_id}) =>
+      return @account_id.equals _id
 
-    @members = _.filter accounts, (i) =>
-      return @hasMember i
+    @members = _.filter accounts, ({_id}) =>
+      return @hasMember _id
 
     for reply in @replies
-      reply.account = _.find accounts, (i) ->
-        return reply.account_id.equals account._id
+      reply.account = _.find accounts, ({_id}) ->
+        return reply.account_id.equals _id
+
+    return @

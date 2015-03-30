@@ -1,4 +1,4 @@
-describe 'ticket.user.test', ->
+describe 'ticket.user', ->
   agent = null
   csrf_token = null
 
