@@ -3,15 +3,19 @@ harp = require 'harp'
 {config, logger, i18n} = app
 {_, fs, path, jade} = app.libs
 
-app.plugins ?= {}
-
 class Plugin
   isPlugin: true
+
+  defaults:
+    name: null
+    dependencies: []
+    initialize: ->
+    started: ->
 
   constructor: (options) ->
     {name} = options
 
-    _.extend @, options,
+    _.extend @, @defaults, options,
       config: config.plugins[name] ? {}
       path: path.join __dirname, '../../plugins', name
 
@@ -21,12 +25,10 @@ class Plugin
     if fs.existsSync path.join(@path, 'locale')
       i18n.initPlugin @
 
-    if @initialize
-      @initialize()
+    @initialize()
 
-    if @started
-      app.on 'app.started', =>
-        @started()
+    rp.on 'app.started', =>
+      @started()
 
   registerHook: (endpoint, options) ->
     app.extends.hook.register @, endpoint, options
@@ -72,25 +74,29 @@ class Plugin
     trigger_name = utils.formatBillingTrigger trigger_name
     app.billing.acceptUsagesBilling account,trigger_name, volume, callback
 
-# options: name, dependencies, initialize, started
-exports.register = (options) ->
-  {name, dependencies} = options
+module.exports = class PluginManager
+  constructor: ->
+    @plugins = {}
 
-  unless name
-    throw error 'plugin should have a name'
+  register: (options) ->
+    {name, dependencies} = options
 
-  if app.plugins[name]
-    throw error "plugin `#{name}` already exists"
+    unless name
+      throw new Error 'plugin should have a name'
 
-  if dependencies
-    app.on 'app.modules_loaded', ->
-      for dependence in dependencies
-        unless dependence in _.keys app.plugins
-          throw error "`#{name}` is dependent on `#{dependence}` but not load"
+    if @plugins[name]
+      throw new Error "plugin `#{name}` already exists"
 
-  app.plugins[name] = new Plugin options
+    if dependencies
+      app.on 'app.modules_loaded', ->
+        for dependence in dependencies
+          unless dependence in _.keys @plugins
+            throw new Error "`#{name}` is dependent on `#{dependence}` but not load"
 
-error = (message) ->
-  err = new Error 'core.extends.plugin: ' + message
-  logger.fatal err
-  return err
+    @plugins[name] = new Plugin options
+
+  all: ->
+    return _.values @plugins
+
+  byName: (name) ->
+    return @plugins[name]

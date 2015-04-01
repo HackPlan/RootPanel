@@ -3,17 +3,12 @@ SSHConnection = require 'ssh2'
 {_, child_process, async, fs} = app.libs
 {config, logger} = app
 
-app.nodes = {}
-
 if fs.existsSync config.ssh.id_key
   id_key = fs.readFileSync config.ssh.id_key
 
 class Node
   master: false
   available_components: []
-
-  constructor: (info) ->
-    _.extend @, info
 
   # @param callback(err, stdout, stderr)
   runCommand: (command, callback) ->
@@ -171,7 +166,3 @@ class Node
   readFileRemote: (filename, callback) ->
     @runCommandRemote "sudo cat #{filename}", (err, stdout) ->
       callback err, stdout
-
-exports.createNode = (name, options) ->
-  app.nodes[name] = new Node _.extend options,
-    name: name

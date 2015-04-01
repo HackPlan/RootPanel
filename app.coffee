@@ -2,7 +2,7 @@
 
 {EventEmitter} = require 'events'
 
-global.app = module.exports = new EventEmitter()
+global.rp = global.app = module.exports = new EventEmitter()
 
 app.libs =
   _: require 'underscore'
@@ -25,7 +25,7 @@ Insight = require 'insight'
 morgan = require 'morgan'
 Mabolo = require 'mabolo'
 bunyan = require 'bunyan'
-redis = require 'redis'
+
 harp = require 'harp'
 
 {_, fs, path, express} = app.libs
@@ -61,9 +61,8 @@ mabolo = new Mabolo utils.mongodbUri _.extend config.mongodb,
 
 bunyanMongo = new BunyanMongo()
 
-mabolo.connect().then (db) ->
+mabolo.connect().done (db) ->
   bunyanMongo.setDB db
-.catch console.error
 
 logger = bunyan.createLogger
   name: app.package.name
@@ -76,12 +75,18 @@ logger = bunyan.createLogger
     stream: process.stdout
   ]
 
+PlanManager = require './core/PlanManager'
+NodeManager = require './core/NodeManager'
+PluginManager = require './core/extends/PluginManager'
+HookManager = require './core/extends/HookManager'
+ComponentManager = require './core/extends/ComponentManager'
+
 _.extend app,
-  plans: {}
-  nodes: {}
-  hooks: {}
-  plugins: {}
-  components: {}
+  plans: new PlanManager config.plans
+  nodes: new NodeManager config.nodes
+  hooks: new HookManager()
+  plugins: new PluginManager()
+  components: new ComponentManager()
 
   utils: utils
   redis: redis
@@ -104,7 +109,15 @@ require './core/model/SecurityLog'
 require './core/model/Ticket'
 require './core/model/Component'
 
-app.extends = require './core/extends'
+PaymentProviderManager = require './core/extends/PaymentProviderManager'
+CouponProviderManager = require './core/extends/CouponProviderManager'
+NotificationManager = require './core/extends/NotificationManager'
+
+app.extends =
+  notification: new NotificationManager()
+  payments: new PaymentProviderManager()
+  coupons: new CouponProviderManager()
+
 app.clusters = require './core/clusters'
 app.billing = require './core/billing'
 app.middleware = require './core/middleware'
@@ -133,12 +146,6 @@ app.express.use '/panel', require './core/router/panel'
 
 for name in config.extends.available_plugins
   require path.join __dirname, './plugins', name
-
-for plans, options of config.plans
-  app.billing.createPlan plans, options
-
-for name, options of config.nodes
-  app.clusters.createNode name, options
 
 app.express.use '/bower_components', express.static './bower_components'
 app.express.use harp.mount './core/static'

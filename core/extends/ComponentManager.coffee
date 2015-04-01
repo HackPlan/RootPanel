@@ -1,9 +1,7 @@
 {config, logger} = app
 {_} = app.libs
 
-app.components ?= {}
-
-class ComponentTemplate
+class ComponentProvider
   isComponent: true
 
   constructor: (info) ->
@@ -32,9 +30,8 @@ class ComponentTemplate
     app.extends.hook.register @, endpoint, _.extend options,
       timing: 'every_node'
 
-  # @param callback(err)
-  initialize: (component, callback) ->
-    callback()
+  initialize: (component) ->
+    Q()
 
   # @param callback(err, component)
   createComponent: (account, info, callback) ->
@@ -72,20 +69,25 @@ class ComponentTemplate
 
   movePhysicalNode: ->
 
-exports.register = (plugin, options) ->
-  unless plugin
-    throw error 'must provide a plugin'
+module.exports = class ComponentManager
+  constructor: ->
+    @providers = {}
 
-  name = "#{plugin.name}.#{options.name}"
+  register: (plugin, options) ->
+    unless plugin
+      throw new Error 'must provide a plugin'
 
-  if app.components[name]
-    throw error "component `#{name}` already exists"
+    name = "#{plugin.name}.#{options.name}"
 
-  app.components[name] = new ComponentTemplate _.extend options,
-    name: name
-    plugin: plugin
+    if @providers[name]
+      throw new Error "component `#{name}` already exists"
 
-error = (message) ->
-  err = new Error 'core.extends.component: ' + message
-  logger.fatal err
-  return err
+    @providers[name] = new ComponentProvider _.extend options,
+      name: name
+      plugin: plugin
+
+  all: ->
+    return _.values @plugins
+
+  byName: (name) ->
+    return @plugins[name]

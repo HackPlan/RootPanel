@@ -1,14 +1,3 @@
-{config, logger} = app
-{async, _} = app.libs
-{Account, Financials, Component} = app.models
-
-process.nextTick ->
-  {Account, Financials, Component} = app.models
-
-billing = exports
-
-{available_plugins} = config.extends
-
 class Plan
   join_freely: true
 
@@ -120,14 +109,6 @@ class Plan
           amount_inc: -amount
       , (err) ->
         callback err, account
-
-billing.createPlan = (name, options) ->
-  app.plans[name] = new Plan _.extend options,
-    name: name
-
-  app.on 'app.started', ->
-    billing.runTimeBilling ->
-      setInterval billing.runTimeBilling, 3600 * 1000
 
 billing.triggerBilling = (account, callback) ->
   async.each account.plans, (plan, callback) ->
