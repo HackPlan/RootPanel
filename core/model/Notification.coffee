@@ -1,77 +1,66 @@
 {utils, config, models, mabolo} = app
-{_, async} = app.libs
 {ObjectID} = mabolo
 
 Notification = mabolo.model 'Notification',
-  account_id:
-    type: ObjectID
-    ref: 'Account'
-
-  group_name:
-    type: String
+  target:
+    required: true
+    type: Object
 
   type:
     required: true
     type: String
-    enum: ['payment_success', 'ticket_create', 'ticket_reply']
-
-  level:
-    required: true
-    type: String
-    enum: ['notice', 'event', 'log']
+    enum: []
 
   created_at:
     type: Date
     default: -> new Date()
 
-  payload:
+  read_at:
+    type: Date
+
+  title:
+    required: true
+    type: String
+
+  body:
+    required: true
+    type: String
+
+  body_html:
+    required: true
+    type: String
+
+  options:
     type: Object
 
-notices_level =
-  ticket_create: 'notice'
-  ticket_reply: 'notice'
-  ticket_update: 'event'
+Notification::isGroupNotice = ->
+  return @target instanceof ObjectID
 
-Notification.createNotice = (account, type, notice) ->
-  level = notices_level[type]
+Notification::sendMail = ->
+  sendMail = (to, subject, html) ->
+    Q.Promise (resolve, reject) ->
+      app.mailer.sendMail
+        from: config.email.from
+        replyTo: config.email.reply_to
+        to: to
+        subject: subject
+        html: html
+      , (err, result) ->
+        if err
+          reject err
+        else
+          resolve result
 
-  Notification.create
-    account_id: account._id
-    type: type
-    level: level
-    payload: notice
-  .then ->
-    app.mailer.sendMail
-      from: config.email.send_from
-      to: account.email
-      subject: notice.title
-      html: notice.body
-    , ->
-      callback notification
+  @populate().then =>
+    if @isGroupNotice()
+      Account.findByGroup(@target).then (accounts) =>
+        Q.all accounts.map (account) =>
+          sendMail account.email, @title, @body_html
 
-Notification.createGroupNotice = (group, type, notice) ->
-  level = exports.notices_level[type]
+    else
+      Account.findById(@target).then (account) =>
+        sendMail account.email, @title, @body_html
 
-  notification = new Notification
-    group_name: group
-    type: type
-    level: level
-    payload: notice
-
-  notification.save ->
-    unless level == NOTICE
-      callback notification
-
-    Account.find
-      groups: 'root'
-    , (err, accounts) ->
-      async.each accounts, (account, callback) ->
-        app.mailer.sendMail
-          from: config.email.send_from
-          to: account.email
-          subject: notice.title
-          html: notice.body
-        , callback
-      , (err) ->
-        logger.error err if err
-        callback notification
+Notification::populate = ->
+  @provider = rp.extends.notification.byName @type
+  @provider.populateNotification @

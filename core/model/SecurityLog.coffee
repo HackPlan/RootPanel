@@ -1,5 +1,6 @@
+_ = require 'underscore'
+
 {models, logger, mabolo} = app
-{_} = app.libs
 {ObjectID} = mabolo
 
 SecurityLog = mabolo.model 'SecurityLog',

@@ -131,6 +131,9 @@ Account.search = (identification) ->
         else
           return @findById identification
 
+Account.findByGroup = (group, options...) ->
+  @find groups: group, options...
+
 Account.authenticate = (token_code) ->
   @findOneAndUpdate(
     'tokens.code': token_code
@@ -145,6 +148,9 @@ Account.authenticate = (token_code) ->
       token: _.findWhere account?.tokens,
         code: token_code
     }
+
+Account::pick = ->
+  return _.omit @, 'password', 'password_salt', 'tokens'
 
 Account::createToken = (type, payload) ->
   token = new Token
@@ -175,11 +181,10 @@ Account::setEmail = (email) ->
 
 Account::updatePreferences = (preferences) ->
 
-Account::increaseBalance = (amount, type, payload) ->
-  Financials.createLog(@, type, amount, payload).then =>
-    @update
-      $inc:
-        balance: amount
+Account::increaseBalance = (amount) ->
+  @update
+    $inc:
+      balance: amount
 
 Account::inGroup = (group) ->
   return group in @groups

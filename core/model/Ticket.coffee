@@ -36,7 +36,7 @@ Ticket = mabolo.model 'Ticket',
   status:
     required: true
     type: String
-    enum: ['open', 'pending', 'finish', 'closed']
+    enum: ['opening', 'pending', 'finished', 'closed']
 
   content:
     required: true
@@ -87,6 +87,28 @@ Ticket.getTickets = (account) ->
   ,
     sort:
       updated_at: -1
+
+Ticket.getTicketsGroupByStatus = (account, options) ->
+  getTicketsOfStatus = (status) =>
+    @find
+      status: status
+    ,
+      sort:
+        updated_at: -1
+      limit: options?[status]?.limit
+
+  Q.all([
+    getTicketsOfStatus 'pending'
+    getTicketsOfStatus 'opening'
+    getTicketsOfStatus 'finished'
+    getTicketsOfStatus 'closed'
+  ]).then ([pending, opening, finished, closed]) ->
+    return {
+      pending: pending
+      opening: opening
+      finished: finished
+      closed: closed
+    }
 
 Ticket::hasMember = (account) ->
   return _.some @members, (member_id) ->
@@ -140,7 +162,7 @@ Ticket::createReply = (account, {content, status}) ->
   .thenResolve reply
 
 Ticket::populateAccounts = ->
-  app.models.Account.find
+  Account.find
     _id:
       $in: [
         @account_id, @members..., _.pluck(@replies, 'account_id')...

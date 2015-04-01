@@ -1,6 +1,8 @@
-{_, async} = app.libs
 {mabolo} = app
 {ObjectID} = mabolo
+
+_ = require 'underscore'
+Q = require 'q'
 
 Coworker = mabolo.model 'Coworker',
   account_id:
@@ -23,11 +25,11 @@ Component = mabolo.model 'Component',
     required: true
     type: String
 
-  template:
+  provider:
     required: true
     type: String
 
-  node_name:
+  node:
     required: true
     type: String
 
@@ -64,25 +66,21 @@ Component::markAsStatus = (status) ->
     $set:
       status: status
 
-Component::populate = (callback) ->
-  {Account} = app.models
+Component::populate = ->
+  Account.find
+    _id:
+      $in: [
+        @account_id, _.pluck(@coworkers, 'account_id')...
+      ]
 
-  async.parallel
-    account: (callback) =>
-      Account.findById @account_id, callback
+  .then (accounts) =>
+    @account = _.find accounts, ({_id}) =>
+      return @account_id.equals _id
 
-    coworkers: (callback) =>
-      async.each @coworkers, (coworker, callback) ->
-        Account.findById coworker.account_id, (err, account) ->
-          callback _.extend coworker,
-            account: account
-      , callback
+    for coworker in @coworkers
+      coworker.account = _.find accounts, ({_id}) ->
+        return coworker.account_id.equals _id
 
-  , (err, result) =>
-    {account, coworkers} = result
-
-    callback _.extend @,
-      account: account
-      coworkers: coworkers
-      component_type: app.components[@template]
-      node: app.nodes[@node_name]
+    return _.extend @,
+      provider: rp.components.byName @provider
+      node: rp.nodes.byName @node
