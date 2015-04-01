@@ -1,4 +1,7 @@
-{express, async, _} = app.libs
+_ = require 'underscore'
+Q = require 'q'
+
+{express} = app.libs
 {requireAdminAuthenticate} = app.middleware
 {Account, Ticket, Financials, CouponCode} = app.models
 {config} = app
@@ -8,94 +11,86 @@ module.exports = exports = express.Router()
 exports.use requireAdminAuthenticate
 
 exports.get '/', (req, res) ->
-  Account.find {}, (err, accounts) ->
-    async.map app.applyHooks('view.admin.sidebars'), (hook, callback) ->
-      hook.generator req, (html) ->
-        callback null, html
+  Q.all([
+    Account.find()
+    rp.applyHooks 'view.admin.sidebars', req.account, req: req, execute: 'generator'
+  ]).done ([accounts, sidebars_html]) ->
+    res.render 'admin',
+      accounts: accounts
+      sidebars_html: sidebars_html
+  , res.error
 
-    , (err, sidebars_html) ->
-      res.render 'admin',
-        accounts: accounts
-        sidebars_html: sidebars_html
-        coupon_code_types: _.keys config.coupons_meta
+exports.get '/tickets', (req, res) ->
+  Ticket.getTicketsGroupByStatus(
+    opening:
+      limit: 10
+    finished:
+      limit: 10
+    closed:
+      limit: 10
+  ).done (tickets) ->
+    res.render 'ticket/list', tickets
+  , res.error
 
-exports.get '/account_details', (req, res) ->
-  Account.findById req.query.account_id, (err, account) ->
-    res.json _.omit account.toObject(), 'password', 'password_salt', 'tokens', '__v'
+exports.post '/coupons/generate', (req, res) ->
+  CouponCode.createCodes(req.body, req.body.count).done (coupons) ->
+    res.json coupons
+  , res.error
 
-exports.get '/ticket', (req, res) ->
-  LIMIT = 10
+exports.use '/user', do ->
+  router = express.Router()
 
-  async.parallel
-    pending: (callback) ->
-      Ticket.find
-        status: 'pending'
-      , null,
-        sort:
-          updated_at: -1
-      , callback
+  router.param 'id', (req, res, next, user_id) ->
+    Account.findById(user_id).then (user) ->
+      _.extend req,
+        user: user
 
-    open: (callback) ->
-      Ticket.find
-        status: 'open'
-      , null,
-        sort:
-          updated_at: -1
-        limit: LIMIT
-      , callback
+      unless user
+        return res.error 404, 'user_not_found'
 
-    finish: (callback) ->
-      Ticket.find
-        status: 'finish'
-      , null,
-        sort:
-          updated_at: -1
-        limit: LIMIT
-      , callback
+      next()
 
-    closed: (callback) ->
-      Ticket.find
-        status: 'closed'
-      , null,
-        sort:
-          updated_at: -1
-        limit: LIMIT
-      , callback
+    .catch res.error
 
-  , (err, result) ->
-    res.render 'ticket/list', result
+  router.param 'plan', (req, res, next, plan_name) ->
+    req.plan = plan = app.plans.byName plan_name
 
-exports.post '/confirm_payment', (req, res) ->
-  Account.findById req.body.account_id, (err, account) ->
-    unless account
-      return res.error 'account_not_exist'
+    if plan
+      next()
+    else
+      res.error 'plan_not_found'
 
-    unless _.isFinite req.body.amount
-      return res.error 'invalid_amount'
+  router.get '/:id', (req, res) ->
+    res.json req.user.pick()
 
-    account.incBalance req.body.amount, 'deposit',
-      type: req.body.type
+  router.post '/:id/plan/:plan/join', (req, res) ->
+    req.plan.addMember(req.account).done ->
+      res.sendStatus 204
+    , res.erro
+
+  router.post '/:id/plan/:plan/leave', (req, res) ->
+    req.plan.removeMember(req.account).done ->
+      res.sendStatus 204
+    , res.error
+
+  router.post '/:id/deposits/create', (req, res) ->
+    Financials.createDepositRequest(req.user, req.body.amount,
+      provider: req.body.provider
       order_id: req.body.order_id
-    , (err) ->
-      return res.error err if err
-      res.json {}
+    ).then (financial) ->
+      if req.body.status
+        financial.updateStatus req.body.status
+    .done ->
+      res.sendStatus 204
+    , res.error
 
-exports.post '/delete_account', (req, res) ->
-  Account.findById req.body.account_id, (err, account) ->
-    unless account
-      return res.error 'account_not_exist'
-
-    unless _.isEmpty account.billing.plans
+  router.delete '/:id', (req, res) ->
+    unless _.isEmpty account.plans
       return res.error 'already_in_plan'
 
-    unless account.billing.balance <= 0
+    unless account.balance <= 0
       return res.error 'balance_not_empty'
 
-    Account.findByIdAndRemove account._id, ->
-      res.json {}
-
-exports.post '/generate_coupon_code', (req, res) ->
-  coupon_code = _.pick req.body, 'expired', 'available_times', 'type', 'meta'
-
-  CouponCode.createCodes coupon_code, req.body.count, (err, coupon_codes...) ->
-    res.json coupon_codes
+    req.user.remove().done ->
+      res.sendStatus 204
+    , res.error

@@ -1,110 +1,61 @@
-{express, async, _} = app.libs
+_ = require 'underscore'
+
+{express} = app.libs
 {requireAuthenticate} = app.middleware
 {Account, Financials} = app.models
-{billing, config} = app
+{config} = app
 
 module.exports = exports = express.Router()
 
 exports.use requireAuthenticate
 
-exports.post '/join_plan', (req, res) ->
-  {plan} = req.body
+exports.use '/plan' do ->
+  router = express.Router()
 
-  unless billing.plans[plan]
-    return res.error 'invalid_plan'
+  router.param 'plan', (req, res, next, plan_name) ->
+    req.plan = plan = app.plans.byName plan_name
 
-  if req.account.inPlan plan
-    return res.error 'already_in_plan'
-
-  if req.account.balance <= when_balance_below
-    return res.error 'insufficient_balance'
-
-  billing.joinPlan req.account, plan, (err) ->
-    console.log err
-    if err
-      res.error err
+    if plan
+      next()
     else
-      res.status(204).json {}
+      res.error 'plan_not_found'
 
-exports.post '/leave_plan', (req, res) ->
-  {plan} = req.body
+  router.post '/:plan/join', (req, res) ->
+    if req.account.balance <= config.billing.force_freeze.when_balance_below
+      return res.error 'insufficient_balance'
 
-  unless req.account.inPlan plan
-    return res.error 'not_in_plan'
+    unless req.plan.join_freely
+      return res.error 'cant_join_plan'
 
-  billing.leavePlan req.account, plan, (err) ->
-    if err
-      res.error err
-    else
-      res.status(204).json {}
+    req.plan.addMember(req.account).done ->
+      res.sendStatus 204
+    , res.error
+
+  router.post '/:plan/leave', (req, res) ->
+    req.plan.removeMember(req.account).done ->
+      res.sendStatus 204
+    , res.error
 
 exports.get '/financials', (req, res) ->
-  LIMIT = 10
-
-  async.parallel
-    payment_methods: (callback) ->
-      async.map app.applyHooks('billing.payment_methods'), (hook, callback) ->
-        hook.widgetGenerator req, (html) ->
-          callback null, html
-      , callback
-
-    deposit_log: (callback) ->
-      Financials.find
-        account_id: req.account._id
-        type: 'deposit'
-      , null,
-        sort:
-          created_at: -1
-        limit: LIMIT
-      , (err, deposit_logs) ->
-        async.map deposit_logs, (deposit_log, callback) ->
-          deposit_log = deposit_log.toObject()
-
-          matched_hook = _.find app.applyHooks('billing.payment_methods'), (hook) ->
-            return hook.type == deposit_log.payload.type
-
-          unless matched_hook
-            return callback null, deposit_log
-
-          matched_hook.detailsMessage req, deposit_log, (payment_details) ->
-            deposit_log.payment_details = payment_details
-            callback null, deposit_log
-
-        , callback
-
-    billing_log: (callback) ->
-      Financials.find
-        account_id: req.account._id
-        type: 'billing'
-      , null,
-        sort:
-          created_at: -1
-        limit: LIMIT
-      , callback
-
-  , (err, result) ->
-    res.render 'panel/financials', result
+  Q.all([
+    rp.extends.payments.generateWidgets req
+    Financials.getDepositLogs req.account, req: req, limit: 10
+    Financials.getBillingLogs req.account, limit: 10
+  ]).done ([payment_providers, deposit_logs, billing_logs]) ->
+    res.render 'panel/financials',
+      payment_providers: payment_providers
+      deposit_logs: deposit_logs
+      billing_logs: billing_logs
+  , res.error
 
 exports.get '/components', (req, res) ->
-  templates = _.compact _.map req.account.availableComponentsTemplates(), (template_name) ->
-    return app.components[template_name]
-
   res.render 'panel/components',
-    templates: templates
+    component_providers: rp.extend.components.all()
 
 exports.get '/', (req, res) ->
-  billing.triggerBilling req.account, (err, account) ->
-    return res.error err if err
-
-    async.auto
-      widgets_html: (callback) ->
-        app.applyHooks('view.panel.widgets', account,
-          execute: 'generator'
-          req: req
-        ) callback
-
-    , (err, result) ->
-      res.render 'panel', _.extend result,
-        account: account
-        plans: _.filter billing.plans, (plan) ->
-          return plan.join_freely
+  app.applyHooks('view.panel.widgets', req.account,
+    execute: 'generator'
+  ).done (widgets_html) ->
+    res.render 'panel',
+      widgets_html: widgets_html
+  , res.error

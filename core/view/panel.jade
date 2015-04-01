@@ -5,8 +5,8 @@ prepend header
 
 append header
   link(rel='stylesheet', href='/style/panel.css')
-  for hook in applyHooks('view.panel.styles')
-    link(rel='stylesheet', href=hook.path)
+  for path in getHooks('view.panel.styles', {pluck: 'path'})
+    link(rel='stylesheet', href=path)
 
 block main
   .row
@@ -19,7 +19,7 @@ block main
     header= t('plan.')
     table.table.table-hover.plan-list
       tbody
-        for plan in plans
+        for plan in app.plans
           tr(data-name='#{plan.name}')
             td
               strong= t(plan.t_name)
@@ -44,5 +44,5 @@ prepend sidebar
 
 append footer
   script(src='/script/panel.js')
-  for hook in applyHooks('view.panel.scripts')
-    script(src=hook.path)
+  for path in getHooks('view.panel.scripts', {pluck: 'path'})
+    script(src=path)

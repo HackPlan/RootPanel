@@ -171,13 +171,10 @@ exports.requireAuthenticate = (req, res, next) ->
       res.error 403, 'auth_failed'
 
 exports.requireAdminAuthenticate = (req, res, next) ->
-  unless 'root' in req.account?.groups
-    if req.method == 'GET'
-      return res.status(403).end()
-    else
-      return res.error 'forbidden'
-
-  next()
+  if 'root' in req.account?.groups
+    next()
+  else
+    res.error 403, 'forbidden'
 
 exports.requireInService = (service_name) ->
   return (req, res, next) ->

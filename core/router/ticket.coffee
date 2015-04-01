@@ -19,7 +19,9 @@ loadTicket = (req, res, next, ticket_id) ->
       unless req.account.isAdmin()
         return res.error 403, 'ticket_forbidden'
 
-  .done next, res.error
+    next()
+
+  .catch res.error
 
 exports.param 'id', loadTicket
 

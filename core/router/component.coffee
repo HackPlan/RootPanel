@@ -1,4 +1,4 @@
-{_, express} = app.libs
+{express} = app.libs
 {logger} = app
 {requireAuthenticate} = app.middleware
 {Component} = app.models
@@ -7,32 +7,27 @@ module.exports = exports = express.Router()
 
 exports.use requireAuthenticate
 
-componentParam = (req, res, next, id) ->
-  Component.findById id, (err, component) ->
-    logger.error err if err
+exports.use '/rest', do ->
+  rest.param 'id', (req, res, next, component_id) ->
+    Component.findById(component_id).then (component) ->
+      _.extend req,
+        component: component
 
-    unless component
-      return res.error 404, 'component_not_found'
+      unless component
+        return res.error 404, 'component_not_found'
 
-    unless component.hasMember req.account
-      unless req.account.isAdmin()
-        return res.error 403, 'component_forbidden'
+      unless component.hasMember req.account
+        unless req.account.isAdmin()
+          return res.error 403, 'component_forbidden'
 
-    _.extend req,
-      component: component
+      next()
 
-    next()
-
-exports.use '/resource', do ->
-  rest = new express.Router mergeParams: true
-  rest.param 'id', componentParam
+    .catch res.error
 
   rest.get '/', (req, res) ->
-    Component.getComponents req.account, (err, components) ->
-      if err
-        res.error err
-      else
-        res.json components
+    Component.getComponents(req.account).done (components) ->
+      res.json components
+    , res.error
 
   rest.post '/', (req, res) ->
 
