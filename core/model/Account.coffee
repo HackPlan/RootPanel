@@ -134,6 +134,15 @@ Account.search = (identification) ->
 Account.findByGroup = (group, options...) ->
   @find groups: group, options...
 
+Account.findByPlans = (plans_name, options...) ->
+  query = {}
+
+  for plan_name in plans_name
+    query["plans.#{plan_name}"] =
+      $exists: true
+
+  @find query, options...
+
 Account.authenticate = (token_code) ->
   @findOneAndUpdate(
     'tokens.code': token_code
@@ -191,13 +200,6 @@ Account::inGroup = (group) ->
 
 Account::isAdmin = ->
   return @inGroup 'root'
-
-Account::inPlan = (plan_name) ->
-  return plan_name in _.keys @plans
-
-Account::availableComponentsTemplates = ->
-  return _.uniq _.flatten _.compact _.map _.keys(@plans), (plan_name) ->
-    return _.keys app.plans[plan_name].available_components
 
 Account::populate = ->
   Component.getComponents(@).then (components) =>

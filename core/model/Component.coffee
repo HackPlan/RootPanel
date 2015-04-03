@@ -25,7 +25,7 @@ Component = mabolo.model 'Component',
     required: true
     type: String
 
-  provider:
+  type:
     required: true
     type: String
 
@@ -38,7 +38,7 @@ Component = mabolo.model 'Component',
     enum: ['running', 'initializing', 'destroying']
     default: 'initializing'
 
-  payload:
+  options:
     type: Object
 
   dependencies:
@@ -61,10 +61,14 @@ Component::hasMember = (account) ->
   return _.some @coworkers, (coworker) ->
     return coworker.account_id.equals account._id
 
-Component::markAsStatus = (status) ->
+Component::setStatus = (status) ->
   @update
     $set:
       status: status
+
+Component::destroy = ->
+  @populate().then =>
+    @provider.destroyComponent @
 
 Component::populate = ->
   Account.find
@@ -82,5 +86,5 @@ Component::populate = ->
         return coworker.account_id.equals _id
 
     return _.extend @,
-      provider: rp.components.byName @provider
+      provider: rp.components.byName @type
       node: rp.nodes.byName @node
