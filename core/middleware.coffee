@@ -26,6 +26,21 @@ exports.reqHelpers = (req, res, next) ->
       ua: req.headers['user-agent']
     }
 
+  req.getLanguage = ->
+    if req.cookies?.language and req.cookies.language != 'auto'
+      return req.cookies.language
+    else
+      return config.i18n.default_language
+
+  req.getTimezone = ->
+    return req.cookies?.timezone ? config.i18n.default_timezone
+
+  req.getTranslator = ->
+    return rp.translatorByReq req
+
+  req.getMoment = ->
+    return moment.apply(@, arguments).locale(req.getLanguage()).tz(req.getTimezone())
+
   req.createSecurityLog = (type, payload, options) ->
     SecurityLog.createLog
       account: options?.account ? req.account
@@ -57,6 +72,18 @@ exports.reqHelpers = (req, res, next) ->
         token: token.code
 
       return token
+
+  next()
+
+exports.renderHelpers = (req, res, next) ->
+  _.extend res.locals,
+    _: _
+    rp: rp
+    req: req
+    res: res
+
+    account: req.account
+    site_name: req.getTranslator config.web.name
 
   next()
 
@@ -122,45 +149,6 @@ exports.authenticate = (req, res, next) ->
 
   .finally next
 
-exports.accountHelpers = (req, res, next) ->
-  _.extend res,
-    language: req.cookies.language ? config.i18n.default_language
-    timezone: req.cookies.timezone ? config.i18n.default_timezone
-
-    t: app.i18n.getTranslatorByReq req
-
-    moment: ->
-      if res.language and res.language != 'auto'
-        return moment.apply(@, arguments).locale(res.language).tz(res.timezone)
-      else if res.timezone
-        return moment.apply(@, arguments).tz(res.timezone)
-      else
-        return moment.apply(@, arguments)
-
-  _.extend req,
-    res: res
-    t: res.t
-
-  _.extend res.locals,
-    _: _
-
-    app: app
-    req: req
-    res: res
-    config: config
-
-    account: req.account
-
-    t: res.t
-    moment: res.moment
-
-    site_name: req.t(config.web.t_name)
-
-    getHooks: (name, options) ->
-      app.getHooks name, req.account, options
-
-  next()
-
 exports.requireAuthenticate = (req, res, next) ->
   if req.account
     next()
@@ -171,15 +159,7 @@ exports.requireAuthenticate = (req, res, next) ->
       res.error 403, 'auth_failed'
 
 exports.requireAdminAuthenticate = (req, res, next) ->
-  if 'root' in req.account?.groups
+  if req.account?.isAdmin()
     next()
   else
     res.error 403, 'forbidden'
-
-exports.requireInService = (service_name) ->
-  return (req, res, next) ->
-    exports.requireAuthenticate req, res, ->
-      unless service_name in req.account.billing.services
-        return res.error 'not_in_service'
-
-      next()

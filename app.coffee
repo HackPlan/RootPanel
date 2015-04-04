@@ -51,9 +51,6 @@ insight = new Insight
 
 insight.track 'app.coffee'
 
-redis = redis.createClient 6379, '127.0.0.1',
-  auth_pass: config.redis.password
-
 mailer = nodemailer.createTransport config.email.account
 
 mabolo = new Mabolo utils.mongodbUri _.extend config.mongodb,
@@ -77,6 +74,8 @@ logger = bunyan.createLogger
 
 PlanManager = require './core/PlanManager'
 NodeManager = require './core/NodeManager'
+CacheManager = require './core/CacheManager'
+TranslationManager = require './core/TranslationManager'
 PluginManager = require './core/extends/PluginManager'
 HookManager = require './core/extends/HookManager'
 ComponentManager = require './core/extends/ComponentManager'
@@ -84,12 +83,13 @@ ComponentManager = require './core/extends/ComponentManager'
 _.extend app,
   plans: new PlanManager config.plans
   nodes: new NodeManager config.nodes
+  cache: new CacheManager()
   hooks: new HookManager()
-  plugins: new PluginManager()
+
   components: new ComponentManager()
+  translations: new TranslationManager config.i18n
 
   utils: utils
-  redis: redis
   config: config
   mabolo: mabolo
   mailer: mailer
@@ -97,9 +97,6 @@ _.extend app,
   models: mabolo.models
   insight: insight
   express: express()
-
-app.i18n = (require './core/i18n')()
-app.cache = require './core/cache'
 
 require './core/model/Account'
 require './core/model/Financials'
@@ -114,12 +111,10 @@ CouponProviderManager = require './core/extends/CouponProviderManager'
 NotificationManager = require './core/extends/NotificationManager'
 
 app.extends =
-  notification: new NotificationManager()
+  notifications: new NotificationManager()
   payments: new PaymentProviderManager()
   coupons: new CouponProviderManager()
 
-app.clusters = require './core/clusters'
-app.billing = require './core/billing'
 app.middleware = require './core/middleware'
 
 app.getHooks = app.extends.hook.getHooks
@@ -133,7 +128,7 @@ app.express.use app.middleware.session()
 app.express.use app.middleware.logger()
 app.express.use app.middleware.csrf()
 app.express.use app.middleware.authenticate
-app.express.use app.middleware.accountHelpers
+app.express.use app.middleware.renderHelpers
 
 app.express.set 'views', path.join __dirname, 'core/view'
 app.express.set 'view engine', 'jade'
@@ -144,8 +139,7 @@ app.express.use '/ticket', require './core/router/ticket'
 app.express.use '/admin', require './core/router/admin'
 app.express.use '/panel', require './core/router/panel'
 
-for name in config.extends.available_plugins
-  require path.join __dirname, './plugins', name
+app.plugins = new PluginManager()
 
 app.express.use '/bower_components', express.static './bower_components'
 app.express.use harp.mount './core/static'
