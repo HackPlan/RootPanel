@@ -35,10 +35,10 @@ class CacheManager
   tryHelper: (key, setter, operator) ->
     hashed_key = @hashKey key
 
-    @get(hashed_key).then (value) =>
-      Q().then =>
+    @get(hashed_key).then (value) ->
+      Q().then ->
         if value in [undefined, null]
-          Q(setter()).then (value) =>
+          Q(setter()).then (value) ->
             command(hashed_key, value).thenReject value
         else
           return value
