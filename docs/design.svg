@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="1096px" height="527px" viewBox="0 0 1096 527" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch Beta 3.3 (11970) - http://www.bohemiancoding.com/sketch -->
+    <title>RootPanel</title>
+    <desc>Created with Sketch Beta.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="RootPanel" sketch:type="MSArtboardGroup">
+            <g id="Layout" sketch:type="MSLayerGroup" transform="translate(18.000000, 12.000000)">
+                <rect id="Rectangle-2" stroke="#979797" fill="#D8D8D8" sketch:type="MSShapeGroup" x="48.7048748" y="0" width="716.534914" height="84"></rect>
+                <rect id="Rectangle-2" stroke="#979797" fill="#D8D8D8" sketch:type="MSShapeGroup" x="48.7048748" y="96" width="716.534914" height="84"></rect>
+                <rect id="Rectangle-2" stroke="#979797" fill="#D8D8D8" sketch:type="MSShapeGroup" x="48.7048748" y="192" width="716.534914" height="84"></rect>
+                <rect id="Rectangle-2" stroke="#979797" fill="#D8D8D8" sketch:type="MSShapeGroup" x="47.7233202" y="288" width="716.534914" height="84"></rect>
+                <rect id="Rectangle-2" stroke="#979797" fill="#D8D8D8" sketch:type="MSShapeGroup" x="48.7048748" y="384" width="716.534914" height="84"></rect>
+                <text id="Managers" sketch:type="MSTextLayer" font-family="Helvetica" font-size="12" font-weight="bold" fill="#000000">
+                    <tspan x="54" y="205">Managers</tspan>
+                </text>
+                <g id="Depend-on" transform="translate(0.000000, 3.000000)">
+                    <path d="M-186.367823,224.25 L-197.25,236.25 L262.25,236.25" id="Path-1" stroke="#000000" stroke-width="3" sketch:type="MSShapeGroup" transform="translate(32.500000, 230.250000) scale(-1, 1) rotate(-270.000000) translate(-32.500000, -230.250000) "></path>
+                    <text sketch:type="MSTextLayer" transform="translate(15.000000, 213.500000) rotate(-90.000000) translate(-15.000000, -213.500000) " font-family="Heiti SC" font-size="28.1299992" font-weight="260" fill="#000000">
+                        <tspan x="-63" y="223">Depend on</tspan>
+                    </text>
+                </g>
+            </g>
+            <g id="Registries" sketch:type="MSLayerGroup" transform="translate(771.000000, 133.000000)">
+                <g transform="translate(112.000000, 0.000000)">
+                    <rect id="Rectangle-13" stroke="#979797" fill="#D8D8D8" sketch:type="MSShapeGroup" x="0" y="0" width="201" height="377"></rect>
+                    <text sketch:type="MSTextLayer" font-family="Helvetica" font-size="12" font-weight="bold" fill="#000000">
+                        <tspan x="3" y="12">Registries</tspan>
+                    </text>
+                    <g id="View" transform="translate(33.000000, 197.000000)">
+                        <rect id="Rectangle-7" stroke="#979797" fill="#FFFFFF" sketch:type="MSShapeGroup" x="0" y="0" width="128.898305" height="53" rx="8"></rect>
+                        <text sketch:type="MSTextLayer" font-family="Helvetica" font-size="28.5357143" font-weight="normal" sketch:alignment="middle" fill="#000000">
+                            <tspan x="33.774653" y="37">View</tspan>
+                        </text>
+                    </g>
+                    <g id="Hook" transform="translate(33.000000, 140.000000)">
+                        <rect id="Rectangle-7" stroke="#979797" fill="#FFFFFF" sketch:type="MSShapeGroup" x="0" y="0" width="128.898305" height="53" rx="8"></rect>
+                        <text sketch:type="MSTextLayer" font-family="Helvetica" font-size="28.5357143" font-weight="normal" sketch:alignment="middle" fill="#000000">
+                            <tspan x="31.1412302" y="37">Hook</tspan>
+                        </text>
+                    </g>
+                    <g id="Widget" transform="translate(33.000000, 83.000000)">
+                        <rect id="Rectangle-7" stroke="#979797" fill="#FFFFFF" sketch:type="MSShapeGroup" x="0" y="0" width="128.898305" height="53" rx="8"></rect>
+                        <text sketch:type="MSTextLayer" font-family="Helvetica" font-size="28.5357143" font-weight="normal" sketch:alignment="middle" fill="#000000">
+                            <tspan x="20.0432339" y="37">Widget</tspan>
+                        </text>
+                    </g>
+                    <g id="Component" transform="translate(10.000000, 26.000000)">
+                        <rect id="Rectangle-7" stroke="#979797" fill="#FFFFFF" sketch:type="MSShapeGroup" x="0" y="0" width="175" height="53" rx="8"></rect>
+                        <text sketch:type="MSTextLayer" font-family="Helvetica" font-size="28.5357143" font-weight="normal" sketch:alignment="middle" fill="#000000">
+                            <tspan x="13.7362932" y="37">Component</tspan>
+                        </text>
+                    </g>
+                    <g id="Coupon" transform="translate(22.000000, 254.000000)">
+                        <rect id="Rectangle-7" stroke="#979797" fill="#FFFFFF" sketch:type="MSShapeGroup" x="0" y="0" width="150.880962" height="53" rx="8"></rect>
+                        <text sketch:type="MSTextLayer" font-family="Helvetica" font-size="28.5357143" font-weight="normal" sketch:alignment="middle" fill="#000000">
+                            <tspan x="25.4611805" y="37">Coupon</tspan>
+                        </text>
+                    </g>
+                    <g id="Payment" transform="translate(22.000000, 314.000000)">
+                        <rect id="Rectangle-7" stroke="#979797" fill="#FFFFFF" sketch:type="MSShapeGroup" x="0" y="0" width="150.880962" height="53" rx="8"></rect>
+                        <text sketch:type="MSTextLayer" font-family="Helvetica" font-size="28.5357143" font-weight="normal" sketch:alignment="middle" fill="#000000">
+                            <tspan x="19.1353923" y="37">Payment</tspan>
+                        </text>
+                    </g>
+                </g>
+                <path d="M10.8821769,0 L0,12 L95,12" id="Path-1-Copy" stroke="#000000" stroke-width="3" sketch:type="MSShapeGroup" transform="translate(47.500000, 6.000000) scale(-1, 1) translate(-47.500000, -6.000000) "></path>
+            </g>
+            <g id="Layer5" sketch:type="MSLayerGroup" transform="translate(261.972332, 410.000000)">
+                <g id="Tests" transform="translate(197.000000, 0.000000)">
+                    <rect id="Rectangle-7" stroke="#979797" fill="#FFFFFF" sketch:type="MSShapeGroup" x="0" y="0" width="129" height="53" rx="8"></rect>
+                    <text sketch:type="MSTextLayer" font-family="Helvetica" font-size="28.5357143" font-weight="normal" sketch:alignment="middle" fill="#000000">
+                        <tspan x="30.6477623" y="37">Tests</tspan>
+                    </text>
+                </g>
+                <g id="App-Entry">
+                    <rect id="Rectangle-7" stroke="#979797" fill="#FFFFFF" sketch:type="MSShapeGroup" x="0.5" y="0" width="160" height="53" rx="8"></rect>
+                    <text sketch:type="MSTextLayer" font-family="Helvetica" font-size="28.5357143" font-weight="normal" sketch:alignment="middle" fill="#000000">
+                        <tspan x="17.848223" y="37">App Entry</tspan>
+                    </text>
+                </g>
+            </g>
+            <g id="Layer4" sketch:type="MSLayerGroup" transform="translate(180.000000, 152.000000)">
+                <g id="Routers" transform="translate(0.972332, 162.000000)">
+                    <rect id="Rectangle-7" stroke="#979797" fill="#FFFFFF" sketch:type="MSShapeGroup" x="0.5" y="0" width="160" height="53" rx="8"></rect>
+                    <text sketch:type="MSTextLayer" font-family="Helvetica" font-size="28.5357143" font-weight="normal" sketch:alignment="middle" fill="#000000">
+                        <tspan x="30.5415998" y="37">Routers</tspan>
+                    </text>
+                </g>
+                <g id="Plugins" transform="translate(205.972332, 0.250000)">
+                    <rect id="Rectangle-7" stroke="#979797" fill="#E5E5E5" sketch:type="MSShapeGroup" x="0.885179093" y="154" width="283.25731" height="71.5" rx="8"></rect>
+                    <text sketch:type="MSTextLayer" font-family="Helvetica" font-size="28.5499992" font-weight="normal" sketch:alignment="middle" fill="#000000">
+                        <tspan x="11.6028883" y="197.211365">Plugins</tspan>
+                    </text>
+                    <g id="Injector" transform="translate(132.027668, 0.750000)">
+                        <rect id="Rectangle-7-Copy" stroke="#979797" fill="#FFFFFF" sketch:type="MSShapeGroup" x="0.222332016" y="162.75" width="139.5" height="53" rx="8"></rect>
+                        <text sketch:type="MSTextLayer" font-family="Helvetica" font-size="28.5357143" font-weight="normal" sketch:alignment="middle" fill="#000000">
+                            <tspan x="23.1837927" y="196.711365">Injector</tspan>
+                        </text>
+                        <path d="M124,187 L322.494332,187 L322.494339,10.0000001 L254.996094,10.0000001 L270,0" id="Path-5" stroke="#000000" stroke-width="3" sketch:type="MSShapeGroup"></path>
+                        <text id="Control" sketch:type="MSTextLayer" font-family="Heiti SC" font-size="21.8999996" font-weight="260" sketch:alignment="middle" fill="#000000">
+                            <tspan x="204.875651" y="182">Control</tspan>
+                        </text>
+                    </g>
+                </g>
+            </g>
+            <g id="Layer3" sketch:type="MSLayerGroup" transform="translate(89.000000, 225.000000)">
+                <g id="ServerManager">
+                    <rect id="Rectangle-7" stroke="#979797" fill="#FFFFFF" sketch:type="MSShapeGroup" x="0" y="0" width="117" height="53" rx="8"></rect>
+                    <text id="Server" sketch:type="MSTextLayer" font-family="Helvetica" font-size="28.5357143" font-weight="normal" sketch:alignment="middle" fill="#000000">
+                        <tspan x="15.976702" y="37">Server</tspan>
+                    </text>
+                </g>
+                <g id="BillingManager" transform="translate(128.000000, 0.000000)">
+                    <rect id="Rectangle-7" stroke="#979797" fill="#FFFFFF" sketch:type="MSShapeGroup" x="0" y="0" width="117" height="53" rx="8"></rect>
+                    <text id="Billing" sketch:type="MSTextLayer" font-family="Helvetica" font-size="28.5357143" font-weight="normal" sketch:alignment="middle" fill="#000000">
+                        <tspan x="19.933803" y="37">Billing</tspan>
+                    </text>
+                </g>
+                <g id="NotificationManager" transform="translate(256.000000, 0.000000)">
+                    <rect id="Rectangle-7" stroke="#979797" fill="#FFFFFF" sketch:type="MSShapeGroup" x="0.5" y="0" width="155" height="53" rx="8"></rect>
+                    <text id="Notification" sketch:type="MSTextLayer" font-family="Helvetica" font-size="28.5357143" font-weight="normal" sketch:alignment="middle" fill="#000000">
+                        <tspan x="7.42008754" y="37">Notification</tspan>
+                    </text>
+                </g>
+                <g id="I18nManager" transform="translate(423.000000, 0.000000)">
+                    <rect id="Rectangle-7" stroke="#979797" fill="#FFFFFF" sketch:type="MSShapeGroup" x="0" y="0" width="117" height="53" rx="8"></rect>
+                    <text id="I18n" sketch:type="MSTextLayer" font-family="Helvetica" font-size="28.5357143" font-weight="normal" sketch:alignment="middle" fill="#000000">
+                        <tspan x="30.2306257" y="37">I18n</tspan>
+                    </text>
+                </g>
+                <g id="PluginManager" transform="translate(553.000000, 0.000000)">
+                    <rect id="Rectangle-7" stroke="#979797" fill="#FFFFFF" sketch:type="MSShapeGroup" x="0" y="0" width="117" height="53" rx="8"></rect>
+                    <text id="Plugin" sketch:type="MSTextLayer" font-family="Helvetica" font-size="28.5357143" font-weight="normal" sketch:alignment="middle" fill="#000000">
+                        <tspan x="18.3384225" y="37">Plugin</tspan>
+                    </text>
+                </g>
+            </g>
+            <g id="Layer2" sketch:type="MSLayerGroup" transform="translate(89.000000, 123.000000)">
+                <g id="Middlewares">
+                    <rect id="Rectangle-7" stroke="#979797" fill="#FFFFFF" sketch:type="MSShapeGroup" x="0" y="0" width="183" height="53" rx="8"></rect>
+                    <text sketch:type="MSTextLayer" font-family="Helvetica" font-size="28.5357143" font-weight="normal" sketch:alignment="middle" fill="#000000">
+                        <tspan x="11.410505" y="37">Middlewares</tspan>
+                    </text>
+                    <path d="M211.882177,21 L201,33 L268,33" id="Path-1" stroke="#000000" stroke-width="3" sketch:type="MSShapeGroup" transform="translate(234.500000, 27.000000) scale(-1, 1) translate(-234.500000, -27.000000) "></path>
+                </g>
+                <g id="Registries" transform="translate(433.000000, 0.000000)">
+                    <rect id="Rectangle-7" stroke="#979797" fill="#FFFFFF" sketch:type="MSShapeGroup" x="86" y="0" width="150.880962" height="53" rx="8"></rect>
+                    <text sketch:type="MSTextLayer" font-family="Helvetica" font-size="28.5357143" font-weight="normal" sketch:alignment="middle" fill="#000000">
+                        <tspan x="98.0084305" y="37">Registries</tspan>
+                    </text>
+                    <path d="M10.8821769,21 L0,33 L67,33" id="Path-1" stroke="#000000" stroke-width="3" sketch:type="MSShapeGroup"></path>
+                </g>
+                <g id="Models" transform="translate(286.000000, 0.000000)">
+                    <rect id="Rectangle-7" stroke="#979797" fill="#FFFFFF" sketch:type="MSShapeGroup" x="0" y="0" width="128.898305" height="53" rx="8"></rect>
+                    <text sketch:type="MSTextLayer" font-family="Helvetica" font-size="28.5357143" font-weight="normal" sketch:alignment="middle" fill="#000000">
+                        <tspan x="18.4548201" y="37">Models</tspan>
+                    </text>
+                </g>
+            </g>
+            <g id="Layer1" sketch:type="MSLayerGroup" transform="translate(89.000000, 28.000000)">
+                <g id="Cache" transform="translate(541.000000, 0.000000)">
+                    <rect id="Rectangle-7" stroke="#979797" fill="#FFFFFF" sketch:type="MSShapeGroup" x="0" y="0" width="128.898305" height="53" rx="8"></rect>
+                    <text sketch:type="MSTextLayer" font-family="Helvetica" font-size="28.5357143" font-weight="normal" sketch:alignment="middle" fill="#000000">
+                        <tspan x="23.206128" y="37">Cache</tspan>
+                    </text>
+                </g>
+                <g id="Config" transform="translate(390.000000, 0.000000)">
+                    <rect id="Rectangle-7" stroke="#979797" fill="#FFFFFF" sketch:type="MSShapeGroup" x="0" y="0" width="128.898305" height="53" rx="8"></rect>
+                    <text sketch:type="MSTextLayer" font-family="Helvetica" font-size="28.5357143" font-weight="normal" sketch:alignment="middle" fill="#000000">
+                        <tspan x="23.206128" y="37">Config</tspan>
+                    </text>
+                </g>
+                <g id="Utils">
+                    <rect id="Rectangle-7" stroke="#979797" fill="#FFFFFF" sketch:type="MSShapeGroup" x="0" y="0" width="117" height="53" rx="8"></rect>
+                    <text sketch:type="MSTextLayer" font-family="Helvetica" font-size="28.5357143" font-weight="normal" sketch:alignment="middle" fill="#000000">
+                        <tspan x="30.2584926" y="37">Utils</tspan>
+                    </text>
+                </g>
+                <g id="Dependencies" transform="translate(139.000000, 0.000000)">
+                    <rect id="Rectangle-7" stroke="#979797" fill="#FFFFFF" sketch:type="MSShapeGroup" x="0" y="0" width="230" height="53" rx="8"></rect>
+                    <text sketch:type="MSTextLayer" font-family="Helvetica" font-size="28.5357143" font-weight="normal" sketch:alignment="middle" fill="#000000">
+                        <tspan x="24.2776751" y="37">Dependencies</tspan>
+                    </text>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
