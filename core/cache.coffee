@@ -4,7 +4,11 @@ redis = require 'redis'
 _ = require 'underscore'
 Q = require 'q'
 
-class CacheManager
+###
+  Public: Cache utils
+  You can access a global instance via `root.cache`.
+###
+class Cache
   constructor: ({host, port, password}) ->
     @redis = redis.createClient port, host,
       auth_pass: password

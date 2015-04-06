@@ -1,13 +1,17 @@
+validator = require 'validator'
 crypto = require 'crypto'
-_ = require 'underscore'
+_ = require 'lodash'
 
 exports.rx =
-  username: /^[a-z][0-9a-z_]{2,23}$/
-  email: /^\w+([-+.]\w+)*@\w+([-+.]\w+)*$/
-  password: /^.+$/
   domain: /^(\*\.)?[A-Za-z0-9]+(\-[A-Za-z0-9]+)*(\.[A-Za-z0-9]+(\-[A-Za-z0-9]+)*)*$/
   filename: /^[A-Za-z0-9_\-\.]+$/
   url: /^https?:\/\/[^\s;]*$/
+
+validator.extend 'isUsername', (username) ->
+  return /^[a-z][0-9a-z_]{2,23}$/.test username
+
+validator.extend 'isPassword', (password) ->
+  return /^.+$/.test password
 
 exports.sha256 = (data) ->
   if data
@@ -48,19 +52,3 @@ exports.pickErrorName = (error) ->
     return "#{err.path}_exist"
 
   return err.message
-
-exports.formatBillingTrigger = (name, plugin_name) ->
-  [part1, part2] = name.split '.'
-
-  if part2
-    return name
-  else
-    return "#{plugin_name}.#{part1}"
-
-exports.mongodbUri = (config) ->
-  {user, password, host, name} = config
-
-  if user and password
-    return "mongodb://#{user}:#{password}@#{host}/#{name}"
-  else
-    return "mongodb://#{host}/#{name}"

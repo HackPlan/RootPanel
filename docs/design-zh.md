@@ -54,5 +54,6 @@ RootPanel 使用 Mabolo 管理数据模型。
 ## 应用入口
 
 * Routers `/core/router`: 路由
-* App Entry `/app`: RootPanel 主程序的入口
+* Root `/core/root` 全局对象 `root`
+* App Entry `/app`: 入口点
 * Tests `/core/test`: 自动测试

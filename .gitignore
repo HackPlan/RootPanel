@@ -1,14 +1,14 @@
-/node_modules
-/bower_components
-/coverage-reporter.html
-/npm-debug.log
-
-/.vagrant
-/package.box
-
-/.idea
 *~
 .DS_Store
 
-/config.coffee
+.idea/
+.vagrant/
+node_modules/
+bower_components/
+
+/package.box
+/npm-debug.log
+
 /session.key
+/config.coffee
+/coverage-reporter.html

@@ -63,7 +63,7 @@ exports.reqHelpers = (req, res, next) ->
 
   res.createCookie = (name, value) ->
     res.cookie name, value,
-      expires: new Date(Date.now() + config.account.cookie_time)
+      expires: new Date(Date.now() + config.web.cookie_time)
 
   res.createToken = (account = req.account) ->
     account.createToken('full_access', req.getClientInfo()).then (token) ->
