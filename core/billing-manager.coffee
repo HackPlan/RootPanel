@@ -144,7 +144,7 @@ class Plan
         @updatePlan modifier
     }
 
-module.exports = class PlanManager
+module.exports = class BillingManager
   constructor: (plans) ->
     @plans = {}
 

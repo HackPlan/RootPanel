@@ -1,4 +1,4 @@
-_ = require 'underscore'
+_ = require 'lodash'
 Q = require 'q'
 
 class PaymentProvider
@@ -10,7 +10,11 @@ class PaymentProvider
   constructor: (options) ->
     _.extend @, @defaults, options
 
-module.exports = class PaymentProviderManager
+###
+  Public: Extend payment providers.
+  You can access a global instance via `root.paymentProviders`.
+###
+module.exports = class PaymentProviderRegistry
   constructor: ->
     @providers = {}
 

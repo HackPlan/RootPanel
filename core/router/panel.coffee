@@ -9,7 +9,7 @@ module.exports = exports = express.Router()
 
 exports.use requireAuthenticate
 
-exports.use '/plan' do ->
+exports.use '/plan', do ->
   router = express.Router()
 
   router.param 'plan', (req, res, next, plan_name) ->

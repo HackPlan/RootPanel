@@ -6,14 +6,14 @@ _ = require 'lodash'
 
 utils = require './utils'
 
-module.exports = class TranslationManager
+module.exports = class I18nManager
   constructor: (@config) ->
     @translations = {}
 
     for filename in fs.readdirSync(path.join __dirname, 'locale')
-      @register path.basename(filename, '.json'), require path.join(__dirname, 'locale', filename)
+      @addTranslations path.basename(filename, '.json'), require path.join(__dirname, 'locale', filename)
 
-  register: (language, translations) ->
+  addTranslations: (language, translations) ->
     language = formatLanguage language
     @translations[language] ?= {}
     _.merge @translations[language], translations

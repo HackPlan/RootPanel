@@ -81,45 +81,23 @@ exports.post '/update_password', requireAuthenticate, (req, res) ->
   .catch res.error
 
 exports.post '/update_email', requireAuthenticate, (req, res) ->
-  unless req.account.matchPassword req.body.password
-    return res.error 'wrong_password'
+  Q().done ->
+    unless req.account.matchPassword req.body.password
+      throw new Error 'wrong_password'
 
-  unless utils.rx.email.test req.body.email
-    return res.error 'invalid_email'
+    unless utils.rx.email.test req.body.email
+      throw new Error 'invalid_email'
 
-  req.account.email = req.body.email
+    original_email = req.account.email
 
-  req.account.save (err) ->
-    logger.error err if err
+    req.account.setEmail(req.body.email).then ->
+      req.createSecurityLog 'update_email',
+        original_email: original_email
+        current_email: req.account.email
 
-    req.account.createSecurityLog 'update_email', req.token,
-      original_email: req.account.email
-      email: req.body.email
-    , (err) ->
-      logger.error err if err
-
-      res.json {}
+  , req.error
 
 exports.post '/update_preferences', requireAuthenticate, (req, res) ->
-  req.body = _.omit req.body, 'csrf_token'
-
-  for k, v of req.body
-    if k in ['qq', 'language', 'timezone']
-      req.account.preferences[k] = v
-      req.account.markModified "preferences.#{k}"
-    else
-      return res.error 'invalid_field'
-
-  req.account.save (err) ->
-    logger.error err if err
-
-    req.account.createSecurityLog 'update_preferences', req.token,
-      original_preferences: _.pick.apply @, [req.account.preferences].concat _.keys(req.body)
-      preferences: req.body
-    , (err) ->
-      logger.error err if err
-
-      res.json {}
 
 exports.use do ->
   router = new express.Router()

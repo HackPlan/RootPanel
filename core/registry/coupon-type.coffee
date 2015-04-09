@@ -1,4 +1,6 @@
-class CouponProvider
+_ = require 'lodash'
+
+class CouponType
   defaults:
     name: null
     validate: (account, coupon) ->
@@ -8,7 +10,11 @@ class CouponProvider
   constructor: (options) ->
     _.extend @, @defaults, options
 
-module.exports = class CouponProviderManager
+###
+  Public: Extend type of coupons.
+  You can access a global instance via `root.couponTypes`.
+###
+module.exports = class CouponTypeRegistry
   constructor: ->
     @providers = {}
 
@@ -21,7 +27,7 @@ module.exports = class CouponProviderManager
     if @providers[name]
       throw new Error "coupon provider `#{name}` already exists"
 
-    @providers[name] = new CouponType options
+    @providers[name] = new CouponType _.extend options
 
   all: ->
     return _.values @providers

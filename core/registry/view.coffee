@@ -5,12 +5,13 @@ os = require 'os'
 Q = require 'q'
 
 ###
-  Public: View registry
+  Public: Use jade syntax to inject html to web views.
+  You can access a global instance via `root.views`.
 ###
-class ViewRegistry
+module.exports = class ViewRegistry
   constructor: ->
-    @view_extends = {}
-    @view_cache = {}
+    @viewExtends = {}
+    @viewCache = {}
 
   ###
     Public: Register extends of view
@@ -23,14 +24,14 @@ class ViewRegistry
 
   ###
   register: (view, options) ->
-    @view_extends[view] ?= []
-    @view_extends[view].push options
+    @viewExtends[view] ?= []
+    @viewExtends[view].push options
 
   ###
     Public: Flush view cache
   ###
   flushCache: ->
-    @view_cache = {}
+    @viewCache = {}
 
   ###
     Public: Render View
@@ -42,18 +43,18 @@ class ViewRegistry
   ###
   render: (view, locals) ->
     Q.then =>
-      if @view_cache[view]
-        return @view_cache[view]
+      if @viewCache[view]
+        return @viewCache[view]
       else
-        @resolve(view).tap (render) =>
-          @view_cache[view] = render
-    .then (render) ->
-      return render locals
+        @resolve(view).tap (renderer) =>
+          @viewCache[view] = renderer
+    .then (renderer) ->
+      return renderer locals
 
-  # return {Promise} resolve with render of `view`.
+  # return {Promise} resolve with renderer of `view`.
   resolve: (view) ->
     extendSource = (source) =>
-      return [source, _.pluck(@view_extends[view], 'source')...].join os.EOL
+      return [source, _.pluck(@viewExtends[view], 'source')...].join os.EOL
 
     async.detect([
       view

@@ -1,11 +1,4 @@
-harp = require 'harp'
-
-{config, logger, i18n} = app
-{_, fs, path, jade} = app.libs
-
 class Plugin
-  isPlugin: true
-
   defaults:
     name: null
     dependencies: []
@@ -14,10 +7,6 @@ class Plugin
 
   constructor: (options) ->
     {name} = options
-
-    _.extend @, @defaults, options,
-      config: config.plugins[name] ? {}
-      path: path.join __dirname, '../../plugins', name
 
     if fs.existsSync path.join(@path, 'static')
       app.express.use harp.mount "/plugins/#{name}", path.join(@path, 'static')
@@ -74,26 +63,58 @@ class Plugin
     trigger_name = utils.formatBillingTrigger trigger_name
     app.billing.acceptUsagesBilling account,trigger_name, volume, callback
 
+class Plugin
+
+class Injector
+  constructor: ({Plugin, name, path, config, extend}) ->
+    @extend = extend
+    @plugin = new Plugin @, config
+
+    _.extend @plugin,
+      name: name
+      path: path
+
+  plugin: ->
+    return @plugin
+
+  hook: (path, options) ->
+    return @extend.hooks.register path _.extend options,
+      plugin: @plugin
+
+  component: (options) ->
+    return @extend.components.register _.extend options,
+      plugin: @plugin
+
+  coupon: (options) ->
+    return @extend.coupons.register _.extend options,
+      plugin: @plugin
+
+  payment: (options) ->
+    return @extend.payments.register _.extend options,
+      plugin: @plugin
+
 module.exports = class PluginManager
-  constructor: ->
+  constructor: (@config) ->
     @plugins = {}
 
-  register: (options) ->
-    {name, dependencies} = options
+    for name, config of @config
+      if config.enable
+        @add name, config
 
-    unless name
-      throw new Error 'plugin should have a name'
-
+  add: (name, config) ->
     if @plugins[name]
       throw new Error "plugin `#{name}` already exists"
 
-    if dependencies
-      app.on 'app.modules_loaded', ->
-        for dependence in dependencies
-          unless dependence in _.keys @plugins
-            throw new Error "`#{name}` is dependent on `#{dependence}` but not load"
+    plugin_path = path.join __dirname, '../plugins', name
 
-    @plugins[name] = new Plugin options
+    injector = new Injector
+      Plugin: require plugin_path
+      name: name
+      path: plugin_path
+      config: config
+      extend: rp.extends
+
+    @plugins[name] = injector.plugin()
 
   all: ->
     return _.values @plugins

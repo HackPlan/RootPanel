@@ -3,7 +3,7 @@ child_process = require 'child_process'
 _ = require 'underscore'
 Q = require 'q'
 
-class Node
+class ServerNode
   defaults:
     name: null
     host: '127.0.0.1'
@@ -109,12 +109,12 @@ class Node
     @connected = ->
       return connected
 
-module.exports = class NodeManager
-  constructor: (nodes) ->
+module.exports = class ServerManager
+  constructor: (@config) ->
     @nodes = {}
 
-    for name, options of nodes
-      @nodes[name] = new Node _.extend options,
+    for name, options of @config
+      @nodes[name] = new ServerNode _.extend options,
         name: name
 
   all: ->
