@@ -20,10 +20,8 @@ html
               span.icon-bar
             a.navbar-brand(href='/')= t(config.web.t_name)
           #navbar-collapse.collapse.navbar-collapse
-            ul.nav.navbar-nav
-              for hook in getHooks('view.layout.menu_bar')
-                li
-                  a(href=hook.href, target=hook.target)= hook.plugin.getTranslator(req)(hook.t_body)
+            block menu-bar
+              ul.nav.navbar-nav
             ul.nav.navbar-nav.navbar-right
               if account
                 li

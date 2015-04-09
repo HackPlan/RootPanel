@@ -1,0 +1,6 @@
+div|= ticket.content_html
+div
+  p Created by #{account.username} as #{ticket.created_at}.
+  p 
+    a(href="#{config.web.url}/ticket/view/#{ticket._id}") View ticket #{ticket._id}
+  p Notice from RootPanel
