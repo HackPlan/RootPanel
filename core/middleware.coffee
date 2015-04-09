@@ -41,12 +41,11 @@ exports.reqHelpers = (req, res, next) ->
   req.getMoment = ->
     return moment.apply(@, arguments).locale(req.getLanguage()).tz(req.getTimezone())
 
-  req.createSecurityLog = (type, payload, options) ->
-    SecurityLog.createLog
-      account: options?.account ? req.account
-      token: options?.token ? req.token
+  req.createSecurityLog = (type, options, {account, token} = {}) ->
+    SecurityLog.createLog (account ? req.account),
+      token: token ? req.token
+      options: options
       type: type
-    , payload
 
   res.error = (status, name, param) ->
     unless _.isNumber status

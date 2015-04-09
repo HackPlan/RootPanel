@@ -5,7 +5,7 @@ Q = require 'q'
 {ObjectID} = mabolo
 
 ###
-  Model: Component Coworker Model,
+  Model: Component coworker,
   Embedded as a array at `coworkers` of {Component}.
 ###
 Coworker = mabolo.model 'Coworker',

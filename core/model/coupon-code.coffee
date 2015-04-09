@@ -7,7 +7,7 @@ utils = require '../utils'
 {ObjectID} = mabolo
 
 ###
-  Model: Apply Log of CouponCode,
+  Model: Apply log of CouponCode,
   Embedded as a array at `apply_log` of {CouponCode}.
 ###
 ApplyLog = mabolo.model 'ApplyLog',
@@ -34,6 +34,7 @@ CouponCode = mabolo.model 'CouponCode',
   # Public: Current available times
   available_times:
     type: Number
+    default: 1
 
   # Public: Expired Date
   expired_at:
@@ -57,20 +58,20 @@ CouponCode = mabolo.model 'CouponCode',
 
   * `coupon` {Object}
 
-    * `expired_at` {Date}
-    * `available_times` {Number}
     * `type` {String}
-    * `options` {Object}
+    * `options` (optional) {Object}
+    * `expired_at` (optional) {Date}
+    * `available_times` (optional) {Number}
 
   * `count` {Number}
 
   Return {Promise} resolve with array of {CouponCode}.
 ###
-CouponCode.createCoupons = ({expired_at, available_times, type, options}, count) ->
+CouponCode.createCoupons = ({type, options, expired_at, available_times}, count) ->
   Q.all [1 .. count].map ->
     @create
-      type: type
       code: utils.randomString 16
+      type: type
       options: options
       expired_at: expired_at
       available_times: available_times
