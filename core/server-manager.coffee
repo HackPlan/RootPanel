@@ -3,6 +3,9 @@ child_process = require 'child_process'
 _ = require 'underscore'
 Q = require 'q'
 
+###
+  Class: Server node, managed by {ServerManager}.
+###
 class ServerNode
   defaults:
     name: null
@@ -17,6 +20,13 @@ class ServerNode
     unless @master
       @setupRemote()
 
+  ###
+    Public: Run shell command on this server.
+
+    * `command` {String}
+
+    Return {Promise} resolve with `{stdout, stderr}`.
+  ###
   command: (command) ->
     if @master
       return Q.Promise (resolve, reject) ->
@@ -30,13 +40,24 @@ class ServerNode
     else
       @exec command
 
-  exec: (command, {args, stdin}) ->
+  ###
+    Public: Execute program on this server.
+
+    * `command` {String}
+    * `options` {Object}
+
+      * `params` {Array} of {String}
+      * `stdin` {String}
+
+    Return {Promise} resolve with `{stdout, stderr}`.
+  ###
+  exec: (command, {params, stdin}) ->
     stdout = ''
     stderr = ''
 
     if @master
       return Q.Promise (resolve, reject) ->
-        proc = child_process.spawn command, args
+        proc = child_process.spawn command, params
 
         if stdin
           proc.stdin.end stdin
@@ -57,7 +78,7 @@ class ServerNode
     else
       @connected().then (client) ->
         return Q.Promise (resolve, reject) ->
-          client.exec "#{command} #{args.join(' ')}", (err, stream) ->
+          client.exec "#{command} #{params.join(' ')}", (err, stream) ->
             if err
               return reject err
 
@@ -72,6 +93,13 @@ class ServerNode
                 stdout: stdout
                 stderr: stderr
 
+  ###
+    Public: Read file from this server.
+
+    * `filename` {String}
+
+    Return {Promise}.
+  ###
   readFile: (filename) ->
     @command("sudo cat #{filename}").then ({stdout, stderr}) ->
       if stderr
@@ -79,6 +107,18 @@ class ServerNode
       else
         return stdout
 
+  ###
+    Public: Write file to this server.
+
+    * `filename` {String}
+    * `body` {String}
+    * `options` {Object}
+
+      * `mode` (optional) {String} e.g. `644`
+      * `owner` (optional) {String}
+
+    Return {Promise}.
+  ###
   writeFile: (filename, body, {mode, owner}) ->
     @command("sudo touch #{filename}").then =>
       Q.all([
@@ -86,7 +126,7 @@ class ServerNode
         if owner then @command("sudo chown #{owner}:#{owner} #{filename}")
       ]).then =>
         @exec 'sudo',
-          args: ['tee', filename]
+          params: ['tee', filename]
           stdin: body
 
   setupRemote: ->
@@ -109,16 +149,30 @@ class ServerNode
     @connected = ->
       return connected
 
+###
+  Manager: Server node manager,
+  You can access a global instance via `root.servers`.
+###
 module.exports = class ServerManager
   constructor: (@config) ->
-    @nodes = {}
+    @servers = {}
 
     for name, options of @config
-      @nodes[name] = new ServerNode _.extend options,
+      @servers[name] = new ServerNode _.extend options,
         name: name
 
-  all: ->
-    return _.values @nodes
+  ###
+    Public: Get all server nodes.
 
+    Return {Array} of {ServerNode}.
+  ###
+  all: ->
+    return _.values @servers
+
+  ###
+    Public: Get specified server.
+
+    Return {ServerNode}.
+  ###
   byName: (name) ->
-    return @nodes[name]
+    return @servers[name]

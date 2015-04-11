@@ -1,7 +1,10 @@
 _ = require 'lodash'
 Q = require 'q'
 
-class Plan
+###
+  Class: Billing Plan, Managed by {BillingManager}.
+###
+class BillingPlan
   defaults:
     name: null
     join_freely: true
@@ -23,18 +26,39 @@ class Plan
         type: type
         defaults: defaults
 
+  ###
+    Public: Check has specified member.
+
+    * `account` {Account}
+
+    Return {Boolean}.
+  ###
   hasMember: (account) ->
     return @name in _.keys account.plans
 
+  ###
+    Public: Add a member to plan.
+
+    * `account` {Account}
+
+    Return {Promise}.
+  ###
   addMember: (account) ->
-    @updatePlanState(account,
+    @state(account).updatePlan
       $set:
         billing_state: {}
-    ).then =>
+    .then =>
       @setupDefaultComponents()
 
+  ###
+    Public: Remove a member from plan.
+
+    * `account` {Account}
+
+    Return {Promise}.
+  ###
   removeMember: (account) ->
-    removePlanState(account).then =>
+    @state(account).removePlan().then =>
       @manager.destroyOverflowedComponents account
 
   setupDefaultComponents: (account) ->
@@ -105,6 +129,20 @@ class Plan
     else
       return Q()
 
+  ###
+    Public: Get state wrapper object.
+
+    * `account` {Account}
+
+    Return {Object} with following method:
+
+    * `plan` {Function} `-> Object`, Get plan state.
+    * `updatePlan` {Function} `(updates) -> Promise`, Update plan state.
+    * `removePlan` {Function} `-> Promise`, Remove plan state.
+    * `trigger` {Function} `(trigger) -> Object`, Get trigger state.
+    * `updateTrigger` {Function} `(trigger, updates) -> Promise`, Update trigger state.
+
+  ###
   state: (account) ->
     {name} = @
 
@@ -144,21 +182,42 @@ class Plan
         @updatePlan modifier
     }
 
+###
+  Manager: Billing manager,
+  You can access a global instance via `root.billing`.
+###
 module.exports = class BillingManager
   constructor: (plans) ->
     @plans = {}
 
     for name, options of plans
-      @plans[name] = new Plan _.extend options,
+      @plans[name] = new BillingPlan _.extend options,
         manager: @
         name: name
 
+  ###
+    Public: Get all billing plans.
+
+    Return {Array} of {BillingPlan}.
+  ###
   all: ->
     return _.values @plans
 
+  ###
+    Public: Get specified plan.
+
+    Return {BillingPlan}.
+  ###
   byName: (name) ->
     return @plans[name]
 
+  ###
+    Public: Trigger billing for specified account.
+
+    * `account` {Account}
+
+    Return {Promise}.
+  ###
   triggerBilling: (account) ->
     Q.all @all().map (plan) ->
       if plan.billing.time
@@ -176,11 +235,27 @@ module.exports = class BillingManager
       if @isFrozen account
         @leaveAllPlans account
 
+  ###
+    Public: Invoke a usages billing.
+
+    * `account` {Account}
+    * `trigger` {String} e.g. `storage`, `cpu`
+    * `volume` {Number}
+
+    TODO: Should select the cheapest plan only.
+
+    Return {Promise}.
+  ###
   usagesBilling: (account, trigger, volume) ->
     Q.all @all().map (plan) ->
       if plan.hasMember(account) and plan.billing[trigger]
         plan.usagesBilling account, trigger, volume
 
+  ###
+    Public: Run time billing for all accounts.
+
+    Return {Promise}.
+  ###
   runTimeBilling: ->
     plans = @all().filter (plan) ->
       return plan.billing.time
@@ -189,20 +264,48 @@ module.exports = class BillingManager
       Q.all accounts.map (account) =>
         @triggerBilling account
 
+  ###
+    Public: Destroy all overflowed components for specified account.
+
+    * `account` {Account}
+
+    Return {Promise}.
+  ###
   destroyOverflowedComponents: (account) ->
     Component.getComponents(account).then (components) =>
       Q.all components.map (component) =>
         unless component.type in @availableComponents(account)
           component.destroy()
 
+  ###
+    Public: Remove specified account from all plans.
+
+    * `account` {Account}
+
+    Return {Promise}.
+  ###
   leaveAllPlans: (account) ->
     Q.all _.keys(account.plans).map (name) =>
       @byName(name).removeMember account
 
+  ###
+    Public: Get current available component names of specified account.
+
+    * `account` {Account}
+
+    Return {Array} of {String}.
+  ###
   availableComponents: (account) ->
     return _.uniq _.flatten _.keys(account.plans).map (name) =>
       return _.keys @byName(name).components
 
+  ###
+    Public: Check if account should be frozen.
+
+    * `account` {Account}
+
+    Return {Boolean}.
+  ###
   isFrozen: ({balance, arrears_at}) ->
     {balance_below, arrears_above} = config.billing.freeze_conditions
 
