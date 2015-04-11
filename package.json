@@ -15,10 +15,11 @@
       "url": "https://jysperm.me"
     }
   ],
+  "main": "core/index",
   "scripts": {
     "install": "./node_modules/.bin/bower install",
     "start": "./node_modules/.bin/coffee app.coffee | ./node_modules/.bin/bunyan -o short",
-    "test": "COV_TEST=true ./node_modules/.bin/mocha --compilers coffee:coffee-script/register --require test/env --reporter node_modules/mocha-reporter-cov-summary -- core/test/*.test.coffee plugins/*/test"
+    "test": "COV_TEST=true ./node_modules/.bin/mocha --compilers coffee:coffee-script/register --require test/env --reporter node_modules/mocha-reporter-cov-summary -- core/test/*.test.coffee"
   },
   "dependencies": {
     "async": "^0.9.0",
