@@ -1,43 +1,34 @@
 _ = require 'lodash'
 
+###
+  Class: Component provider, Managed by {ComponentRegistry}.
+###
 class ComponentProvider
   defaults:
     initialize: (component) ->
     destroy: (component) ->
 
   constructor: (options) ->
-    _.extend @, options
+    _.extend @, @defaults, options
 
-  registerHook: (endpoint, options) ->
-    app.extends.hook.register @, endpoint, options
+  ###
+    Public: Create component.
 
-  registerHookAlways: (endpoint, options) ->
-    app.extends.hook.register @, endpoint, _.extend options,
-      timing: 'always'
+    * `account` {Account}
+    * `server` {ServerNode}
+    * `component` {Object}
 
-  registerHookAvailable: (endpoint, options) ->
-    app.extends.hook.register @, endpoint, _.extend options,
-      timing: 'available'
+      * `name` {String}
+      * `options` (optional) {Object}
 
-  registerHookOnce: (endpoint, options) ->
-    app.extends.hook.register @, endpoint, _.extend options,
-      timing: 'once'
-
-  registerHookEvery: (endpoint, options) ->
-    app.extends.hook.register @, endpoint, _.extend options,
-      timing: 'every'
-
-  registerHookEveryNode: (endpoint, options) ->
-    app.extends.hook.register @, endpoint, _.extend options,
-      timing: 'every_node'
-
-  createComponent: (account, {name, node, options}) ->
-    Component.create
-      account_id: account._id
+    Return {Promise} resolve with created {Component}.
+  ###
+  create: (account, server, {name, options}) ->
+    Component.createComponent account,
       type: @name
       options: options
       name: name
-      node: node
+      node: server.name
       dependencies: {}
     .then (component) =>
       component.populate().then =>
@@ -45,6 +36,13 @@ class ComponentProvider
       .then ->
         component.setStatus 'running'
 
+  ###
+    Public: Destroy component.
+
+    * `component` {Component}
+
+    Return {Promise}.
+  ###
   destroyComponent: (component) ->
     component.setStatus('destroying').then =>
       component.populate().then =>
@@ -52,27 +50,55 @@ class ComponentProvider
       .then ->
         component.remove()
 
-  setCoworkers: (component, updates) ->
+  # TODO: Update coworkers.
+  updateCoworkers: (component, updates) ->
 
-  transferOwner: ->
-
-  movePhysicalNode: ->
-
+###
+  Registry: Component registry,
+  You can access a global instance via `root.components`.
+###
 module.exports = class ComponentRegistry
   constructor: ->
     @providers = {}
 
-  register: (options) ->
-    name = "#{options.plugin.name}.#{options.name}"
+  ###
+    Public: Register a component provider.
+
+    * `name` {String} e.g. `linux` or `vpn.pptp`.
+    * `options` {Object}
+
+      * `plugin` {Plugin}
+      * `initialize` {Function} Received {Component}, return {Promise}.
+      * `destroy` {Function} Received {Component}, return {Promise}.
+
+    Return {ComponentProvider}.
+  ###
+  register: (name, options) ->
+    unless '.' in name
+      name = "#{options.plugin.name}.#{name}"
 
     if @providers[name]
-      throw new Error "component `#{name}` already exists"
+      throw new Error "Component `#{name}` already exists"
 
     @providers[name] = new ComponentProvider _.extend options,
       name: name
 
+  ###
+    Public: Get all component providers.
+
+    Return {Array} of {ComponentProvider}.
+  ###
   all: ->
     return _.values @providers
 
+  ###
+    Public: Get specified provider.
+
+    * `name` {String}
+
+    Return {ComponentProvider}.
+  ###
   byName: (name) ->
     return @providers[name]
+
+Component = require '../model/component'

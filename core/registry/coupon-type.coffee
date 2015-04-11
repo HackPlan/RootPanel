@@ -1,5 +1,8 @@
 _ = require 'lodash'
 
+###
+  Class: Coupon type, Managed by {CouponTypeRegistry}
+###
 class CouponType
   defaults:
     name: null
@@ -11,26 +14,50 @@ class CouponType
     _.extend @, @defaults, options
 
 ###
-  Public: Extend type of coupons.
+  Registry: Extend type of coupons.
   You can access a global instance via `root.couponTypes`.
 ###
 module.exports = class CouponTypeRegistry
   constructor: ->
     @providers = {}
 
-  register: (options) ->
-    {name} = options
+  ###
+    Public: Register a coupon type.
 
+    * `name` {String}
+    * `options` {Object}
+
+      * `plugin` {Plugin}
+      * `validate` {Function} Received {Account} and {CouponCode}, return {Promise}.
+      * `apply` {Function} Received {Account} and {CouponCode}, return {Promise}.
+      * `populateCoupon` {Function} Received {CouponCode} and `{req}`, return {Promise}.
+
+    Return {CouponType}.
+  ###
+  register: (name, options) ->
     unless name
-      throw new Error 'coupon provider should have a name'
+      throw new Error 'Coupon type should have a name'
 
     if @providers[name]
-      throw new Error "coupon provider `#{name}` already exists"
+      throw new Error "Coupon type `#{name}` already exists"
 
-    @providers[name] = new CouponType _.extend options
+    @providers[name] = new CouponType _.extend options,
+      name: name
 
+  ###
+    Public: Get all coupon type.
+
+    Return {Array} of {CouponType}.
+  ###
   all: ->
     return _.values @providers
 
+  ###
+    Public: Get specified type.
+
+    * `name` {String}
+
+    Return {CouponType}.
+  ###
   byName: (name) ->
     return @providers[name]

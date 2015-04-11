@@ -20,7 +20,7 @@ module.exports = class Root extends EventEmitter
 
     * `rootPath` {String} e.g. `/home/rpadmin/RootPanel`
 
-    Return {String}.
+    Return {Object}.
   ###
   @findConfig: (rootPath) ->
     configPath = path.resolve rootPath, '../config.coffee'

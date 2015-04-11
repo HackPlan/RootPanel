@@ -1,6 +1,9 @@
 _ = require 'lodash'
 Q = require 'q'
 
+###
+  Class: Payment provider, Managed by {PaymentProviderRegistry}.
+###
 class PaymentProvider
   defaults:
     name: null
@@ -11,30 +14,60 @@ class PaymentProvider
     _.extend @, @defaults, options
 
 ###
-  Public: Extend payment providers.
+  Public: Payment provider registry,
   You can access a global instance via `root.paymentProviders`.
 ###
 module.exports = class PaymentProviderRegistry
   constructor: ->
     @providers = {}
 
-  register: (options) ->
-    {name} = options
+  ###
+    Public: Register a payment provider.
 
+    * `name` {String}
+    * `options` {Object}
+
+      * `plugin` {Plugin}
+      * `widget` {Function} Received {ClientRequest}, return {Promise} resolve with html.
+      * `populateFinancials` {Function} Received {ClientRequest} and {Financials}, Return {Promise}.
+
+    Return {PaymentProvider}.
+  ###
+  register: (name, options) ->
     unless name
-      throw new Error 'payment provider should have a name'
+      throw new Error 'Payment provider should have a name'
 
     if @providers[name]
-      throw new Error "payment provider `#{name}` already exists"
+      throw new Error "Payment provider `#{name}` already exists"
 
-    @providers[name] = new PaymentProvider options
+    @providers[name] = new PaymentProvider _.extend options,
+      name: name
 
+  ###
+    Public: Get all payment providers.
+
+    Return {Array} of {PaymentProvider}.
+  ###
   all: ->
     return _.values @providers
 
+  ###
+    Public: Get specified provider.
+
+    * `name` {String}
+
+    Return {PaymentProvider}.
+  ###
   byName: (name) ->
     return @providers[name]
 
+  ###
+    Public: Generate widgets.
+
+    * `req` {ClientRequest}
+
+    Return {Promise} resolve with {Array} of html.
+  ###
   generateWidgets: (req) ->
     Q.all @providers.map (provider) ->
       provider.widget req

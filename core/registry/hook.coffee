@@ -1,23 +1,71 @@
 _ = require 'lodash'
 
 ###
-  Public: Collection of simple extend point.
+  Registry: Collection of simple extend point,
   You can access a global instance via root.hooks.
 ###
 module.exports = class HookRegistry
   constructor: ->
     @hooks =
       middleware:
+        # path
         ignore_csrf: []
 
       account:
-        # filter: (account) ->
+        # filter: (account) -> Promise
         before_register: []
 
+  ###
+    Public: Register a hook.
+
+    * `path` {String} e.g. `account.before_register`
+    * `options` {Object}
+
+      * `plugin` {Plugin}
+      * Other options, depend on specific hook.
+
+  ###
   register: (path, options) ->
     @getHooks(path, array: true).push options
 
-  getHooks: (path, options) ->
+  ###
+    Public: Apply hooks.
+
+    * `path` {String}
+    * `options` {Object}
+
+      * `execute` {String} Execute specific path.
+      * `pluck` {String} Pluck specific path.
+      * `req` {Object} Passed as `@req` when execute.
+      * `param` Passed as parameter when execute.
+
+    Return {Array}.
+  ###
+  applyHooks: (path, {execute, pluck, req, payload} = {}) ->
+    return _.compact @getHooks(path).map (hook) ->
+      if execute
+        return hook[execute].call
+          req: req
+          plugin: hook.plugin
+        , payload
+
+      else if pluck
+        return hook[pluck]
+
+      else
+        return hook
+
+  ###
+    Public: Execute hooks.
+
+    Parameter same as {HookRegistry::applyHooks}.
+
+    Return {Promise}.
+  ###
+  executeHooks: ->
+    Q.all @dispatch arguments...
+
+  getHooks: (path, {array, object} = {}) ->
     words = path.split '.'
     last = words.pop()
 
@@ -27,26 +75,9 @@ module.exports = class HookRegistry
       ref[word] ?= {}
       ref = ref[word]
 
-    if options?.array
+    if array
       ref[last] ?= []
-    else if options?.object
+    else if object
       ref[last] ?= {}
 
     return ref[last]
-
-  applyHooks: (path, {execute, pluck, req, params} = {}) ->
-    return _.compact @getHooks(path).map (hook) ->
-      if execute
-        return hook[execute].apply
-          req: req
-          plugin: hook.plugin
-        , params...
-
-      else if pluck
-        return hook[pluck]
-
-      else
-        return hook
-
-  executeHooks: ->
-    Q.all @dispatch arguments...

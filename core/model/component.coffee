@@ -65,6 +65,15 @@ Component = mabolo.model 'Component',
     type: Object
     default: -> {}
 
+Component.createComponent = (account, {name, type, node, dependencies, options}) ->
+  @create
+    account_id: account._id
+    name: name
+    type: type
+    node: node
+    options: options
+    dependencies: dependencies
+
 ###
   Public: Find components belongs to account.
 
