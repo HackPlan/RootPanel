@@ -1,123 +1,153 @@
+###
+  Class: Abstract plugin, managed by {PluginManager}.
+###
 class Plugin
-  defaults:
-    name: null
-    dependencies: []
-    initialize: ->
-    started: ->
+  # Public: {String}
+  name: null
+  # Public: {String}
+  path: null
+  # Public: {Array} or {String}
+  dependencies: []
 
-  constructor: (options) ->
-    {name} = options
+  ###
+    Public: Constructor.
 
-    if fs.existsSync path.join(@path, 'static')
-      app.express.use harp.mount "/plugins/#{name}", path.join(@path, 'static')
+    * `injector` {Injector}
 
-    if fs.existsSync path.join(@path, 'locale')
-      i18n.initPlugin @
+  ###
+  constructor: (@injector) ->
 
-    @initialize()
-
-    rp.on 'app.started', =>
-      @started()
-
-  registerHook: (endpoint, options) ->
-    app.extends.hook.register @, endpoint, options
-
-  registerComponent: (options) ->
-    app.extends.component.register @, options
-
-  getTranslator: (languages) ->
-    return (name) =>
-      if _.isArray languages
-        t = i18n.getTranslator languages
-      else
-        t = i18n.getTranslatorByReq languages
-
-      full_name = "plugins.#{@name}.#{name}"
-
-      args = _.toArray arguments
-      args[0] = full_name
-
-      full_result = t.apply @, args
-
-      unless full_result == full_name
-        return full_result
-
-      return t.apply @, _.toArray(arguments)
-
-  render: (name, req, view_data, callback) ->
-    template_path = path.join __dirname, '../../plugins', @name, 'view', "#{name}.jade"
-
-    locals = _.extend {}, req.res.locals, view_data,
-      account: req.account
-      t: @getTranslator req
-
-    jade.renderFile template_path, locals, callback
-
-  renderTemplate: (name, view_data, callback) ->
-    template_path = path.join __dirname, '../../plugins', @name, 'view', name
-
-    fs.readFile template_path, (err, template_file) ->
-      callback _.template(template_file.toString()) view_data
-
-  triggerUsages: (account, trigger_name, volume, callback) ->
-    trigger_name = utils.formatBillingTrigger trigger_name
-    app.billing.acceptUsagesBilling account,trigger_name, volume, callback
-
-class Plugin
-
+###
+  Class: Private injector of {Plugin}.
+###
 class Injector
-  constructor: ({Plugin, name, path, config, extend}) ->
-    @extend = extend
+  ###
+    Public: Constructor.
+
+    * `Plugin` Constructor {Function} of {Plugin}.
+    * `plugin` {Object}
+
+      * `name` {String}
+      * `path` {String}
+      * `config` {Object}
+      * `package` {Object}
+      * `registries` {Root}
+
+  ###
+  constructor: (Plugin, {name, path, config, package: pkg, @registries}) ->
     @plugin = new Plugin @, config
 
     _.extend @plugin,
       name: name
       path: path
 
+  ###
+    Public: Get owner plugin.
+
+    Return {Plugin}.
+  ###
   plugin: ->
     return @plugin
 
+  ###
+    Public: Get translator of plugin.
+
+    * `language` {String} or {ClientRequest}
+
+    Return {Function} `(name, params) -> String`.
+  ###
+  getTranslator: (language) ->
+
+  ###
+    Public: Register a hook, proxy of {HookRegistry::register}.
+  ###
   hook: (path, options) ->
-    return @extend.hooks.register path _.extend options,
+    return @registries.hooks.register path, _.extend options,
       plugin: @plugin
 
-  component: (options) ->
-    return @extend.components.register _.extend options,
+  ###
+    Public: Register a view, proxy of {ViewRegistry::register}.
+  ###
+  view: (view, options) ->
+    return @registries.views.register view, _.extend options,
       plugin: @plugin
 
-  coupon: (options) ->
-    return @extend.coupons.register _.extend options,
+  ###
+    Public: Register a widget, proxy of {WidgetRegistry::register}.
+  ###
+  widget: (view, options) ->
+    return @registries.widgets.register view, _.extend options,
       plugin: @plugin
 
-  payment: (options) ->
-    return @extend.payments.register _.extend options,
+  ###
+    Public: Register a component, proxy of {ComponentRegistry::register}.
+  ###
+  component: (name, options) ->
+    return @extend.components.register name, _.extend options,
       plugin: @plugin
 
+  ###
+    Public: Register a coupon type, proxy of {CouponTypeRegistry::register}.
+  ###
+  couponType: (name, options) ->
+    return @extend.couponTypes.register name, _.extend options,
+      plugin: @plugin
+
+  ###
+    Public: Register a payment provider, proxy of {PaymentProviderRegistry::register}.
+  ###
+  paymentProvider: (name, options) ->
+    return @extend.paymentProviders.register name, _.extend options,
+      plugin: @plugin
+
+###
+  Manager: Plugin manager,
+  You can access a global instance via `root.plugins`.
+###
 module.exports = class PluginManager
   constructor: (@config) ->
     @plugins = {}
 
     for name, config of @config
       if config.enable
-        @add name, config
+        @add name, path.join(__dirname, '../plugins', name), config
 
-  add: (name, config) ->
+  ###
+    Public: Add a plugin.
+
+    * `name` {String}
+    * `path` {String}
+    * `config` {Object} `plugins.$name` of config object.
+
+    Return {Plugin}.
+  ###
+  add: (name, path, config) ->
     if @plugins[name]
-      throw new Error "plugin `#{name}` already exists"
+      throw new Error "Plugin `#{name}` already exists"
 
-    plugin_path = path.join __dirname, '../plugins', name
-
-    injector = new Injector
-      Plugin: require plugin_path
+    injector = new Injector require(path),
       name: name
-      path: plugin_path
+      path: path
       config: config
-      extend: rp.extends
+      package: require "#{path}/package.json"
+      registries: root
 
     @plugins[name] = injector.plugin()
 
+  ###
+    Public: Get all plugins.
+
+    Return {Array} of {Plugin}.
+  ###
   all: ->
     return _.values @plugins
 
+  ###
+    Public: Get specified plugin.
+
+    * `name` {String}
+
+    Return {Plugin}.
+  ###
   byName: (name) ->
     return @plugins[name]

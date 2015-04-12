@@ -44,31 +44,38 @@ module.exports = class I18nManager
     return _.keys @translations
 
   ###
-    Public: Get translator by language.
+    Public: Create translator by language or request.
 
-    * `language` {String}
+    * `language` {String} or {ClientRequest}
+    * `prefixes` {Array} or {String}
 
     Return {Function} `(name, params) -> String`.
   ###
-  translator: (language) ->
-    return (name, params) ->
+  translator: (language, prefixes) ->
+    translator = (name, params) =>
       return insert @translate(name, @alternativeLanguages language), params
 
+    insert = (string, params) ->
+      if _.isObject params
+        for name, value of params
+          string = string.replace new RegExp("{#{name}}", 'g'), value
+
+      return string
+
+    return (name) ->
+      for prefix in [prefixes..., name]
+        fullName = "#{prefix}.#{name}"
+        result = translator fullName, arguments[1 ..]...
+
+        if result != fullName
+          return result
+
+      return name
+
   ###
-    Public: Get translator by request.
+    Public: Get packaged translations by language or request.
 
-    * `req` {ClientRequest}
-
-    Return {Function} `(name, params) -> String`.
-  ###
-  translatorByReq: (req) ->
-    return (name, params) ->
-      return insert @translate(name, @alternativeLanguagesByReq req), params
-
-  ###
-    Public: Get packaged translations by language.
-
-    * `language` {String}
+    * `language` {String} or {ClientRequest}
 
     Return {Object}.
   ###
@@ -76,34 +83,14 @@ module.exports = class I18nManager
     return @packLocale @alternativeLanguages language
 
   ###
-    Public: Get packaged translations by request.
+    Public: Get hash of packaged translations by language or request.
 
-    * `req` {ClientRequest}
-
-    Return {Object}.
-  ###
-  packClientLocaleByReq: (req) ->
-    return @packLocale @alternativeLanguagesByReq req
-
-  ###
-    Public: Get hash of packaged translations by language.
-
-    * `language` {String}
+    * `language` {String} or {ClientRequest}
 
     Return {Object}.
   ###
   localeHash: (language) ->
     utils.sha256 jsonStableStringify @pickClientLocale language
-
-  ###
-    Public: Get hash of packaged translations by request.
-
-    * `req` {ClientRequest}
-
-    Return {Object}.
-  ###
-  localeHashByReq: (req) ->
-    utils.sha256 jsonStableStringify @pickClientLocaleByReq req
 
   ###
     Public: Translate name by languages.
@@ -159,36 +146,23 @@ module.exports = class I18nManager
     return result
 
   ###
-    Private: Get alternative languages of specified language.
+    Private: Get alternative languages of specified language or request.
 
-    * `language` {String}
+    * `language` {String} or {ClientRequest}
 
     Return {Array} of {String}.
   ###
   alternativeLanguages: (language) ->
-    {lang} = parseLanguage language
+    if _.isString language
+      {lang} = parseLanguage language
 
-    alternatives = @languages().filter (language) ->
-      return parseLanguage(language).lang == lang
+      alternatives = @languages().filter (language) ->
+        return parseLanguage(language).lang == lang
 
-    return _.uniq [language, alternatives..., @config.default_language]
+      return _.uniq [language, alternatives..., @config.default_language]
 
-  ###
-    Private: Get alternative languages of request.
-
-    * `req` {ClientRequest}
-
-    Return {Array} of {String}.
-  ###
-  alternativeLanguagesByReq: (req) ->
-    return _.uniq _.compact [req.cookies?.language, (new Negotiator req).languages()...]
-
-insert = (string, params) ->
-  if _.isObject params
-    for name, value of params
-      string = string.replace new RegExp("{#{name}}", 'g'), value
-
-  return string
+    else
+      return _.uniq _.compact [req.cookies?.language, (new Negotiator language).languages()...]
 
 parseLanguage = (language) ->
   [lang, country] = language.replace('_', '-').split '-'

@@ -172,6 +172,8 @@ module.exports = class ServerManager
   ###
     Public: Get specified server.
 
+    * `name` {String}
+
     Return {ServerNode}.
   ###
   byName: (name) ->
