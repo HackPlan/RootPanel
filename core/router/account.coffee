@@ -1,38 +1,69 @@
-{_, express} = app.libs
-{requireAuthenticate} = app.middleware
-{Account, SecurityLog, CouponCode} = app.models
-{config, utils, logger, i18n} = app
+express = require 'express'
+_ = require 'lodash'
 
-module.exports = exports = express.Router()
+utils = require '../utils'
 
-exports.get '/register', (req, res) ->
+{i18n, Account, CouponCode} = root
+{requireAuthenticate} = root.middleware
+
+module.router = router = express.Router()
+
+###
+  Router: GET /account/register
+
+  Response HTML.
+###
+router.get '/register', (req, res) ->
   res.render 'account/register'
 
-exports.get '/login', (req, res) ->
+###
+  Router: GET /account/login
+
+  Response HTML.
+###
+router.get '/login', (req, res) ->
   res.render 'account/login'
 
-exports.get '/locale/:language?', (req, res) ->
-  if req.params['language']
-    req.cookies['language'] = req.params['language']
+###
+  Router: GET /account/translations/:language?
 
-  res.json i18n.pickClientLocale i18n.getLanguagesByReq req
+  Response {Object}.
+###
+router.get '/translations/:language?', (req, res) ->
+  if req.params.language
+    res.json i18n.packTranslations req.params.language
+  else
+    res.json i18n.packTranslations req
 
-exports.get '/preferences', requireAuthenticate, (req, res) ->
+###
+  Router: GET /account/preferences/edit
+
+  Response HTML.
+###
+router.get '/preferences/edit', requireAuthenticate, (req, res) ->
   res.render 'account/preferences'
 
-exports.get '/session_info/', (req, res) ->
-  response =
-    csrf_token: req.session.csrf_token
+###
+  Router: GET /account/self
 
-  if req.account
-    _.extend response,
-      account_id: req.account._id
-      username: req.account.username
-      preferences: req.account.preferences
+  Response {Account} from {Account::pick}
+###
+router.get '/self', requireAuthenticate, (req, res) ->
+  res.json req.account.pick 'self'
 
-  res.json response
+###
+  Router: POST /account/register
 
-exports.post '/register', (req, res) ->
+  Request {Object}
+
+    * `username` {String}
+    * `email` {String}
+    * `password` {String}
+
+  Response {Token}.
+  Set-Cookie: token.
+###
+router.post '/register', (req, res) ->
   Account.register(req.body).then (account) ->
     res.createToken account
   .catch (err) ->
@@ -43,7 +74,18 @@ exports.post '/register', (req, res) ->
     else
       res.error err
 
-exports.post '/login', (req, res) ->
+###
+  Router: POST /account/login
+
+  Request {Object}
+
+    * `username` {String} Username, email or account_id.
+    * `password` {String}
+
+  Response {Token}.
+  Set-Cookie: token, language.
+###
+router.post '/login', (req, res) ->
   Account.search(req.body.username).then (account) ->
     unless account?.matchPassword req.body.password
       throw new Error 'wrong_password'
@@ -61,14 +103,28 @@ exports.post '/login', (req, res) ->
     else
       res.error err
 
-exports.post '/logout', requireAuthenticate, (req, res) ->
-  req.token.revoke().then ->
+###
+  Router: POST /account/logout
+
+  Set-Cookie: token.
+###
+router.post '/logout', requireAuthenticate, (req, res) ->
+  req.token.revoke().done ->
     req.createSecurityLog('revoke_token').then ->
       res.clearCookie('token').sendStatus 204
-  .catch res.error
+  , res.error
 
-exports.post '/update_password', requireAuthenticate, (req, res) ->
-  Q().then ->
+###
+  Router: PUT /account/password
+
+  Request {Object}
+
+    * `original_password` {String}
+    * `password` {String}
+
+###
+router.put '/password', requireAuthenticate, (req, res) ->
+  Q().done ->
     unless req.account.matchPassword req.body.original_password
       throw new Error 'wrong_password'
 
@@ -77,10 +133,20 @@ exports.post '/update_password', requireAuthenticate, (req, res) ->
 
     req.account.setPassword(req.body.password).then ->
       req.createSecurityLog 'update_password'
+      res.sendStatus 204
 
-  .catch res.error
+  , res.error
 
-exports.post '/update_email', requireAuthenticate, (req, res) ->
+###
+  Router: PUT /email
+
+  Request {Object}
+
+    * `email` {String}
+    * `password` {String}
+
+###
+router.post '/update_email', requireAuthenticate, (req, res) ->
   Q().done ->
     unless req.account.matchPassword req.body.password
       throw new Error 'wrong_password'
@@ -95,46 +161,47 @@ exports.post '/update_email', requireAuthenticate, (req, res) ->
         original_email: original_email
         current_email: req.account.email
 
+      res.sendStatus 204
+
   , req.error
 
-exports.post '/update_preferences', requireAuthenticate, (req, res) ->
+###
+  Router: PATCH /account/preferences
 
-exports.use do ->
-  router = new express.Router()
+  Request {Preferences}.
 
-  router.use requireAuthenticate
+  Response {Preferences}.
+###
+router.patch '/preferences', requireAuthenticate, (req, res) ->
+  req.account.updatePreferences(req.body).done (preferences) ->
+    res.json preferences
+  , res.error
 
-  router.get '/info', (req, res) ->
-    CouponCode.findOne
-      code: req.query.code
-    , (err, coupon) ->
-      unless coupon
-        return res.error 'code_not_exist'
+router.use '/coupons', do (router = express.Router()) ->
+  ###
+    Router: GET /account/coupons/:code
 
-      coupon.validateCode req.account, (is_available) ->
-        unless is_available
-          return res.error 'code_not_available'
+    Response {CouponCode}.
+  ###
+  router.get '/:code', (req, res) ->
+    CouponCode.findByCode(req.params.code).done (coupon) ->
+      if coupon
+        coupon.populate(req: req).then ->
+          coupon.validate(req.account).then (available) ->
+            res.json _.extend coupon.pick(),
+              available: available
+      else
+        throw new Error 'coupon_not_found'
+    , res.error
 
-        coupon.getMessage req, (message) ->
-          res.json
-            message: message
-
-  router.post '/apply', (req, res) ->
-    CouponCode.findOne
-      code: req.body.code
-    , (err, coupon) ->
-      unless coupon
-        return res.error 'code_not_exist'
-
-      if coupon.expired and Date.now() > coupon.expired.getTime()
-        return res.error 'code_expired'
-
-      if coupon.available_times and coupon.available_times < 0
-        return res.error 'code_not_available'
-
-      coupon.validateCode req.account, (is_available) ->
-        unless is_available
-          return res.error 'code_not_available'
-
-        coupon.applyCode req.account, ->
-          res.json {}
+  ###
+    Router: POST /account/coupons/:code/apply
+  ###
+  router.post '/:code/apply', requireAuthenticate, (req, res) ->
+    CouponCode.findByCode(req.params.code).done (coupon) ->
+      if coupon
+        coupon.apply(account).then ->
+          res.sendStatus 204
+      else
+        throw new Error 'coupon_not_found'
+    , res.error

@@ -38,10 +38,6 @@
     "level": "error",
     "limitComments": true
   },
-  "missing_fat_arrows": {
-    "name": "missing_fat_arrows",
-    "level": "warn"
-  },
   "newlines_after_classes": {
     "name": "newlines_after_classes",
     "value": 1,

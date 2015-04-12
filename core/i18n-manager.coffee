@@ -79,8 +79,8 @@ module.exports = class I18nManager
 
     Return {Object}.
   ###
-  packClientLocale: (language) ->
-    return @packLocale @alternativeLanguages language
+  packTranslations: (language) ->
+    return @packTranslationsByLanguages @alternativeLanguages language
 
   ###
     Public: Get hash of packaged translations by language or request.
@@ -89,8 +89,8 @@ module.exports = class I18nManager
 
     Return {Object}.
   ###
-  localeHash: (language) ->
-    utils.sha256 jsonStableStringify @pickClientLocale language
+  translationsHash: (language) ->
+    utils.sha256 jsonStableStringify @packTranslations language
 
   ###
     Public: Translate name by languages.
@@ -135,9 +135,11 @@ module.exports = class I18nManager
 
     * `languages` {Array} of {String}
 
+    TODO: Cache.
+
     Return {Object}.
   ###
-  packLocale: (languages) ->
+  packTranslationsByLanguages: (languages) ->
     result = {}
 
     for language in languages

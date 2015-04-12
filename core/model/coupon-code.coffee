@@ -53,6 +53,14 @@ CouponCode = mabolo.model 'CouponCode',
   # Public: Apply log of coupon
   apply_log: [ApplyLog]
 
+CouponCode.ensureIndex
+  code: 1
+,
+  unique: true
+
+CouponCode.findByCode = (code, options...) ->
+  @findOne code: code, options...
+
 ###
   Public: Create coupons.
 
@@ -76,6 +84,9 @@ CouponCode.createCoupons = ({type, options, expired_at, available_times}, count)
       expired_at: expired_at
       available_times: available_times
 
+CouponCode::pick = ->
+  return _.omit @, 'apply_log'
+
 ###
   Public: Check availability for specified account.
 
@@ -84,10 +95,13 @@ CouponCode.createCoupons = ({type, options, expired_at, available_times}, count)
   Return {Promise} resolve with {Boolean}.
 ###
 CouponCode::validate = (account) ->
-  if @available_times <= 0
-    return Q false
-
   @populate().then ->
+    if @available_times != undefined and @available_times <= 0
+      return false
+
+    if @expired and new Date() > @expired
+      return false
+
     @provider.validate account, @
 
 ###
@@ -98,18 +112,19 @@ CouponCode::validate = (account) ->
   Return {Promise}.
 ###
 CouponCode::apply = (account) ->
-  if @available_times <= 0
-    throw new Error 'coupon_unavailable'
-
-  @populate().then ->
-    @provider.apply(account, @).then =>
-      @update
-        $inc:
-          available_times: -1
-        $push:
-          apply_log:
-            account_id: account._id
-            created_at: new Date()
+  @validate(account).then (available) ->
+    unless available
+      throw new Error 'coupon_unavailable'
+  .then =>
+    @provider.apply account, @
+  .then =>
+    @update
+      $inc:
+        available_times: -1
+      $push:
+        apply_log:
+          account_id: account._id
+          created_at: new Date()
 
 ###
   Public: Populate.

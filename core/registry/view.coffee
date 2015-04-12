@@ -58,9 +58,9 @@ module.exports = class ViewRegistry
 
     async.detect([
       view
-      rp.resolve view
-      rp.resolve 'core', view
-      rp.resolve 'core/view', view
+      root.resolve view
+      root.resolve 'core', view
+      root.resolve 'core/view', view
     ], fs.exists).then (filename) ->
       fs.read(filename).then (source) ->
         return jade.compile extendSource(source),

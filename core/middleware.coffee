@@ -1,11 +1,14 @@
 expressBunyanLogger = require 'express-bunyan-logger'
 expressSession = require 'express-session'
 redisStore = require 'connect-redis'
+moment = require 'moment-timezone'
+crypto = require 'crypto'
 csrf = require 'csrf'
+path = require 'path'
+fs = require 'fs'
+_ = require 'lodash'
 
-{config} = app
-{_, path, fs, moment, crypto} = app.libs
-{Account, SecurityLog} = app.models
+{Account, SecurityLog, config} = root
 
 exports.reqHelpers = (req, res, next) ->
   req.getCsrfToken = ->
@@ -36,10 +39,10 @@ exports.reqHelpers = (req, res, next) ->
     return req.cookies?.timezone ? config.i18n.default_timezone
 
   req.getTranslator = ->
-    return rp.translatorByReq req
+    return root.i18n.translator req
 
   req.getMoment = ->
-    return moment.apply(@, arguments).locale(req.getLanguage()).tz(req.getTimezone())
+    return moment.apply(arguments...).locale(req.getLanguage()).tz(req.getTimezone())
 
   req.createSecurityLog = (type, options, {account, token} = {}) ->
     SecurityLog.createLog (account ? req.account),
@@ -87,6 +90,7 @@ exports.renderHelpers = (req, res, next) ->
   next()
 
 exports.logger = ->
+  # TODO: refactor
   return expressBunyanLogger
     genReqId: (req) -> req.sessionID
     parseUA: false
@@ -122,7 +126,7 @@ exports.csrf = ->
       if req.path in app.getHooks('app.ignore_csrf', null, pluck: 'path')
         return next()
 
-      if req.method in ['GET', 'HEAD', 'OPTIONS']
+      if req.method in ['HEAD', 'OPTIONS']
         return next()
 
       unless provider.verify req.session.csrf_secret, req.getCsrfToken()
@@ -145,17 +149,15 @@ exports.authenticate = (req, res, next) ->
       _.extend req,
         token: token
         account: account
-
   .finally next
 
 exports.requireAuthenticate = (req, res, next) ->
   if req.account
     next()
+  else if req.method == 'GET'
+    res.redirect '/account/login/'
   else
-    if req.method == 'GET'
-      res.redirect '/account/login/'
-    else
-      res.error 403, 'auth_failed'
+    res.error 403, 'auth_failed'
 
 exports.requireAdminAuthenticate = (req, res, next) ->
   if req.account?.isAdmin()
