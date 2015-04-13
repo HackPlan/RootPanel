@@ -7,7 +7,6 @@ Q = require 'q'
 class PaymentProvider
   defaults:
     name: null
-    widget: (req) ->
     populateFinancials: (req, financial) -> financial
 
   constructor: (options) ->
@@ -60,14 +59,3 @@ module.exports = class PaymentProviderRegistry
   ###
   byName: (name) ->
     return @providers[name]
-
-  ###
-    Public: Generate widgets.
-
-    * `req` {ClientRequest}
-
-    Return {Promise} resolve with {Array} of html.
-  ###
-  generateWidgets: (req) ->
-    Q.all @providers.map (provider) ->
-      provider.widget req

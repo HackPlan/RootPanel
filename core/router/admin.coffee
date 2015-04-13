@@ -1,94 +1,123 @@
-_ = require 'underscore'
+{Router} = require 'express'
+_ = require 'lodash'
 Q = require 'q'
 
-{express} = app.libs
-{requireAdminAuthenticate} = app.middleware
-{Account, Ticket, Financials, CouponCode} = app.models
-{config} = app
+{Account, Ticket, Financials, CouponCode} = root
 
-module.exports = exports = express.Router()
+module.exports = router = new Router()
 
-exports.use requireAdminAuthenticate
+router.use root.middleware.requireAdminAuthenticate
 
-exports.get '/', (req, res) ->
+###
+  Router: GET /admin/dashboard
+
+  Response HTML.
+###
+router.get '/dashboard', (req, res) ->
   Q.all([
     Account.find()
-    rp.applyHooks 'view.admin.sidebars', req.account, req: req, execute: 'generator'
-  ]).done ([accounts, sidebars_html]) ->
+  ]).done ([accounts]) ->
     res.render 'admin',
       accounts: accounts
-      sidebars_html: sidebars_html
   , res.error
 
-exports.get '/tickets', (req, res) ->
-  Ticket.getTicketsGroupByStatus(
+###
+  Router: GET /admin/tickets/list
+
+  Response HTML.
+###
+router.get '/tickets/list', (req, res) ->
+  Ticket.getTicketsGroupByStatus
     opening:
       limit: 10
     finished:
       limit: 10
     closed:
       limit: 10
-  ).done (tickets) ->
+  .done (tickets) ->
     res.render 'ticket/list', tickets
   , res.error
 
-exports.post '/coupons/generate', (req, res) ->
+###
+  Router: POST /admin/coupons/generate
+
+  Response {Array} of {CouponCode}.
+###
+router.post '/coupons/generate', (req, res) ->
   CouponCode.createCodes(req.body, req.body.count).done (coupons) ->
     res.json coupons
   , res.error
 
-exports.use '/user', do ->
-  router = express.Router()
-
+router.use '/users', do (router = new Router) ->
   router.param 'id', (req, res, next, user_id) ->
     Account.findById(user_id).then (user) ->
-      _.extend req,
-        user: user
-
-      unless user
-        return res.error 404, 'user_not_found'
-
-      next()
-
+      if req.user = user
+        next
+      else
+        res.error 404, 'user_not_found'
     .catch res.error
 
   router.param 'plan', (req, res, next, plan_name) ->
-    req.plan = plan = app.plans.byName plan_name
-
-    if plan
+    if req.plan = root.billing.byName plan_name
       next()
     else
       res.error 'plan_not_found'
 
-  router.get '/:id', (req, res) ->
-    res.json req.user.pick()
+  ###
+    Router: GET /admin/users/:id
 
-  router.post '/:id/plan/:plan/join', (req, res) ->
+    Response {Account}.
+  ###
+  router.get '/:id', (req, res) ->
+    res.json req.user.pick 'admin'
+
+  ###
+    Router: GET /admin/users/:id/plans/join
+  ###
+  router.post '/:id/plans/join', (req, res) ->
     req.plan.addMember(req.account).done ->
       res.sendStatus 204
     , res.erro
 
-  router.post '/:id/plan/:plan/leave', (req, res) ->
+  ###
+    Router: GET /admin/users/:id/plans/leave
+  ###
+  router.post '/:id/plans/leave', (req, res) ->
     req.plan.removeMember(req.account).done ->
       res.sendStatus 204
-    , res.error
+    , res.erro
 
+  ###
+    Router: POST /admin/users/:id/deposits/create
+
+    Request {Object}
+
+      * `amount` {Number}
+      * `provider` {String}
+      * `orderId` {String}
+      * `status` (optional) {String}
+
+    Response {Financials}.
+  ###
   router.post '/:id/deposits/create', (req, res) ->
     Financials.createDepositRequest(req.user, req.body.amount,
       provider: req.body.provider
-      order_id: req.body.order_id
-    ).then (financial) ->
+      order_id: req.body.orderId
+    ).tap (financial) ->
       if req.body.status
         financial.updateStatus req.body.status
-    .done ->
-      res.sendStatus 204
+    .done (financial) ->
+      res.json financial
     , res.error
 
+  ###
+    Router: DELETE /admin/users/:id
+  ###
   router.delete '/:id', (req, res) ->
-    unless _.isEmpty account.plans
+    unless _.isEmpty req.user.plans
       return res.error 'already_in_plan'
 
-    unless account.balance <= 0
+    unless req.user.balance <= 0
       return res.error 'balance_not_empty'
 
     req.user.remove().done ->

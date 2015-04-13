@@ -100,4 +100,12 @@ module.exports = class WidgetRegistry
     @widgets[view] ?= []
     @widgets[view].push options
 
-  dispatch: (view) ->
+  ###
+    Public: Dispatch.
+
+    * `view` {String}
+    * `account` {Account}
+
+    Return {Promise} resolve with {Array} of html.
+  ###
+  dispatch: (view, account) ->

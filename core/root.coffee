@@ -154,9 +154,9 @@ module.exports = class Root extends EventEmitter
 
     @express.use '/admin', require './router/admin'
     @express.use '/panel', require './router/panel'
-    @express.use '/ticket', require './router/ticket'
+    @express.use '/tickets', require './router/ticket'
     @express.use '/account', require './router/account'
-    @express.use '/component', require './router/component'
+    @express.use '/components', require './router/component'
 
     @express.use '/bower_components', express.static @resolve '../bower_components'
     @express.use harp.mount @resolve 'static'
@@ -181,6 +181,18 @@ module.exports = class Root extends EventEmitter
 
           @emit 'started'
           resolve()
+
+  ###
+    Public: Create a router.
+
+    * `path` {String}
+
+    Return {Router}.
+  ###
+  createRouter = (path) ->
+    router = express.Router()
+    @express.use path, router
+    return router
 
   ###
     Public: Resolve path based on core directory.

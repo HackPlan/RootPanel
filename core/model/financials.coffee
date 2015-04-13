@@ -24,7 +24,7 @@ Financials = mabolo.model 'Financials',
     type: String
     enum: ['pending', 'rejected', 'canceled', 'success', 'processing']
 
-  # Public: Amount, already positive value
+  # Public: Amount, always positive value
   amount:
     required: true
     type: Number
@@ -109,7 +109,7 @@ Financials.getBillingLogs = ({_id}, {limit}) ->
   * `financial` {Object}
 
     * `amount` {Number}
-    * `provider` {PaymentProvider}
+    * `provider` {PaymentProvider} TODO: Verify provider
     * `order_id` (optional) {String}
 
   Return {Promise} resolve with created {Financials}.

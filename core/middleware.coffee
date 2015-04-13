@@ -57,11 +57,14 @@ exports.reqHelpers = (req, res, next) ->
     if name?.message
       name = name.message
 
-    if req.method in ['GET', 'HEAD', 'OPTIONS']
+    if req.method in ['HEAD', 'OPTIONS']
       res.status(status).send name.toString()
     else
       res.status(status).json _.extend {}, param,
         error: name.toString()
+
+  res.render = (view, locals) ->
+    root.views.render(view, locals).done res.send, res.error
 
   res.createCookie = (name, value) ->
     res.cookie name, value,

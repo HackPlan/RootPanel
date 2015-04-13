@@ -1,38 +1,29 @@
-{express} = app.libs
-{logger} = app
-{requireAuthenticate} = app.middleware
-{Component} = app.models
+{Router} = require 'express'
 
-module.exports = exports = express.Router()
+{Component} = root
 
-exports.use requireAuthenticate
+module.router = router = new Router()
 
-exports.use '/rest', do ->
-  rest.param 'id', (req, res, next, component_id) ->
-    Component.findById(component_id).then (component) ->
-      _.extend req,
-        component: component
+router.use root.middleware.requireAuthenticate
 
-      unless component
-        return res.error 404, 'component_not_found'
+router.param 'id', (req, res, next, componentId) ->
+  Component.findById(componentId).done (component) ->
+    unless req.component = component
+      return res.error 404, 'component_not_found'
 
-      unless component.hasMember req.account
-        unless req.account.isAdmin()
-          return res.error 403, 'component_forbidden'
+    unless component.hasMember req.account
+      unless req.account.isAdmin()
+        return res.error 403, 'component_forbidden'
 
-      next()
+    next()
+  , res.error
 
-    .catch res.error
+###
+  Router: GET /components
 
-  rest.get '/', (req, res) ->
-    Component.getComponents(req.account).done (components) ->
-      res.json components
-    , res.error
-
-  rest.post '/', (req, res) ->
-
-  rest.get '/:id', (req, res) ->
-
-  rest.patch '/:id', (req, res) ->
-
-  rest.delete '/:id', (req, res) ->
+  Response {Array} of {Component}.
+###
+router.get '/', (req, res) ->
+  Component.getComponents(req.account).done (components) ->
+    res.json components
+  , res.error

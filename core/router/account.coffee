@@ -1,4 +1,4 @@
-express = require 'express'
+{Router} = require 'express'
 _ = require 'lodash'
 
 utils = require '../utils'
@@ -6,7 +6,7 @@ utils = require '../utils'
 {i18n, Account, CouponCode} = root
 {requireAuthenticate} = root.middleware
 
-module.router = router = express.Router()
+module.exports = router = new Router()
 
 ###
   Router: GET /account/register
@@ -177,7 +177,36 @@ router.patch '/preferences', requireAuthenticate, (req, res) ->
     res.json preferences
   , res.error
 
-router.use '/coupons', do (router = express.Router()) ->
+router.use '/plans', do (router = new Router) ->
+  router.param 'plan', (req, res, next, plan_name) ->
+    if req.plan = root.billing.byName plan_name
+      next()
+    else
+      res.error 'plan_not_found'
+
+  ###
+    Router: POST /account/plans/:plan/join
+  ###
+  router.post '/:plan/join', (req, res) ->
+    if root.billing.isFrozen req.account
+      return res.error 'insufficient_balance'
+
+    unless req.plan.join_freely
+      return res.error 'cant_join_plan'
+
+    req.plan.addMember(req.account).done ->
+      res.sendStatus 204
+    , res.error
+
+  ###
+    Router: POST /account/plans/:plan/leave
+  ###
+  router.post '/:plan/leave', (req, res) ->
+    req.plan.removeMember(req.account).done ->
+      res.sendStatus 204
+    , res.error
+
+router.use '/coupons', do (router = new Router) ->
   ###
     Router: GET /account/coupons/:code
 

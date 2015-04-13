@@ -1,18 +1,16 @@
-{_, express} = app.libs
-{requireAuthenticate} = app.middleware
-{Account, Ticket} = app.models
-{config, logger} = app
+{Router} = require 'express'
+_ = require 'lodash'
+Q = require 'q'
 
-module.exports = exports = express.Router()
+{Account, Ticket} = root
 
-exports.use requireAuthenticate
+module.exports = router = new Router()
 
-loadTicket = (req, res, next, ticket_id) ->
-  Ticket.findById(ticket_id).then (ticket) ->
-    _.extend req,
-      ticket: ticket
+router.use root.middleware.requireAuthenticate
 
-    unless ticket
+router.param 'id', (req, res, next, ticket_id) ->
+  Ticket.findById(ticket_id).done (ticket) ->
+    unless req.ticket = ticket
       return res.error 404, 'ticket_not_found'
 
     unless ticket.hasMember req.account
@@ -20,51 +18,76 @@ loadTicket = (req, res, next, ticket_id) ->
         return res.error 403, 'ticket_forbidden'
 
     next()
+  , res.error
 
-  .catch res.error
+###
+  Router: GET /tickets/list
 
-exports.param 'id', loadTicket
-
-exports.use '/rest', do ->
-  rest = new express.Router mergeParams: true
-  rest.param 'id', loadTicket
-
-  rest.get '/', (req, res) ->
-    Ticket.getTickets(req.account).done (tickets) ->
-      res.json tickets
-    , res.error
-
-  rest.post '/', (req, res) ->
-    Ticket.createTicket(req.account, req.body).done (ticket) ->
-      res.status(201).json ticket
-    , res.error
-
-  rest.get '/:id', (req, res) ->
-    req.ticket.populateAccounts().done (ticket) ->
-      res.json ticket
-    , res.error
-
-  rest.put '/:id', (req, res) ->
-
-  rest.patch '/:id', (req, res) ->
-
-  rest.delete '/:id', (req, res) ->
-
-  rest.post '/:id/replies', (req, res) ->
-    req.ticket.createReply(req.account, req.body).done (reply) ->
-      res.status(201).json reply
-    , res.error
-
-  rest.put '/:id/status', (req, res) ->
-    req.ticket.setStatusByAccount(req.account, req.body.status).done ->
-      res.sendStatus 204
-    , res.error
-
-exports.get '/list', (req, res) ->
+  Response HTML.
+###
+router.get '/list', (req, res) ->
   res.render 'ticket/list'
 
-exports.get '/create', (req, res) ->
+###
+  Router: GET /tickets/create
+
+  Response HTML.
+###
+router.get '/create', (req, res) ->
   res.render 'ticket/create'
 
-exports.get '/view/:id', (req, res) ->
+###
+  Router: GET /tickets/:id/view
+
+  Response HTML.
+###
+router.get '/:id/view', (req, res) ->
   res.render 'ticket/view'
+
+###
+  Router: GET /tickets
+
+  Response {Array} of {Ticket}.
+###
+router.get '/', (req, res) ->
+  Ticket.getTickets(req.account).done (tickets) ->
+    res.json tickets
+  , res.error
+
+###
+  Router: POST /tickets
+
+  Response {Ticket}.
+###
+router.post '/', (req, res) ->
+  Ticket.createTicket(req.account, req.body).done (ticket) ->
+    res.status(201).json ticket
+  , res.error
+
+###
+  Router: GET /tickets/:id
+
+  Response {Ticket}.
+###
+router.get '/:id', (req, res) ->
+  req.ticket.populateAccounts().done (ticket) ->
+    res.json ticket
+  , res.error
+
+###
+  Router: POST /tickets/:id/replies
+
+  Response {Reply}.
+###
+router.post '/:id/replies', (req, res) ->
+  req.ticket.createReply(req.account, req.body).done (reply) ->
+    res.status(201).json reply
+  , res.error
+
+###
+  Router: PUT /tickets/:id/status
+###
+router.put '/:id/status', (req, res) ->
+  req.ticket.setStatusByAccount(req.account, req.body.status).done ->
+    res.sendStatus 204
+  , res.error

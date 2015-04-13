@@ -51,7 +51,13 @@ module.exports = class ViewRegistry
     .then (renderer) ->
       return renderer locals
 
-  # return {Promise} resolve with renderer of `view`.
+  ###
+    Private: Resolve renderer.
+
+    * `view` {String}
+
+    return {Promise} resolve with {Function} `(locals) -> String`.
+  ###
   resolve: (view) ->
     extendSource = (source) =>
       return [source, _.pluck(@viewExtends[view], 'source')...].join os.EOL
