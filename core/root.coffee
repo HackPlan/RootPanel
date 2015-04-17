@@ -41,7 +41,7 @@ module.exports = class Root extends EventEmitter
   mabolo: null
   # Public: {Insight} instance
   insight: null
-  # Public: global {Cache} instance
+  # Public: global {CacheFactory} instance
   cache: null
 
   # Public: {Account} Model
@@ -93,7 +93,7 @@ module.exports = class Root extends EventEmitter
   constructor: (@config, @package) ->
     @package ?= require '../package'
 
-    Cache = require './cache'
+    CacheFactory = require './cache'
 
     HookRegistry = require './registry/hook'
     ViewRegistry = require './registry/view'
@@ -117,7 +117,7 @@ module.exports = class Root extends EventEmitter
         trackingCode: TRACKING_CODE
         pkg: @package
 
-      cache: new Cache()
+      cache: new CacheFactory()
 
       Account: require './model/account'
       Financials: require './model/financials'
@@ -126,6 +126,8 @@ module.exports = class Root extends EventEmitter
       SecurityLog: require './model/security-log'
       Ticket: require './model/ticket'
       Component: require './model/component'
+
+      routers: []
 
       hooks: new HookRegistry()
       views: new ViewRegistry()
@@ -147,8 +149,7 @@ module.exports = class Root extends EventEmitter
     middleware = require './middleware'
 
     @express.use middleware.reqHelpers
-    @express.use middleware.session()
-    @express.use middleware.csrf()
+    @express.use middleware.session @cache
     @express.use middleware.authenticate
     @express.use middleware.renderHelpers
 
@@ -181,18 +182,6 @@ module.exports = class Root extends EventEmitter
 
           @emit 'started'
           resolve()
-
-  ###
-    Public: Create a router.
-
-    * `path` {String}
-
-    Return {Router}.
-  ###
-  createRouter = (path) ->
-    router = express.Router()
-    @express.use path, router
-    return router
 
   ###
     Public: Resolve path based on core directory.

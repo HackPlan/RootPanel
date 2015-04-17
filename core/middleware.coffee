@@ -10,18 +10,16 @@ _ = require 'lodash'
 
 {Account, SecurityLog, config} = root
 
-exports.reqHelpers = (req, res, next) ->
-  req.getCsrfToken = ->
-    if req.headers['x-csrf-token']
-      return req.headers['x-csrf-token']
-    else
-      return req.body.csrf_token
+errors =
+  authFailed: 403
+  forbidden: 403
+  usernameExist: 400
+  invalidEmail: 400
+  wrongPassword: 400
 
+exports.reqHelpers = (req, res, next) ->
   req.getTokenCode = ->
-    if req.headers['x-token']
-      return req.headers['x-token']
-    else
-      return req.cookies.token
+    return req.headers?['x-token']
 
   req.getClientInfo = ->
     return {
@@ -63,8 +61,9 @@ exports.reqHelpers = (req, res, next) ->
       res.status(status).json _.extend {}, param,
         error: name.toString()
 
-  res.render = (view, locals) ->
-    root.views.render(view, locals).done res.send, res.error
+  for name, status of errors
+    res.error[name] = ->
+      res.error status, name, arguments...
 
   res.createCookie = (name, value) ->
     res.cookie name, value,
@@ -83,12 +82,19 @@ exports.reqHelpers = (req, res, next) ->
 exports.renderHelpers = (req, res, next) ->
   _.extend res.locals,
     _: _
-    rp: rp
     req: req
     res: res
+    root: root
+
+    plugin: (name) ->
+      return root.plugins.byName name
 
     account: req.account
     site_name: req.getTranslator config.web.name
+
+  res.render = (view, locals) ->
+    # TODO: Merge res.locals
+    root.views.render(view, locals).done res.send, res.error
 
   next()
 
@@ -103,7 +109,7 @@ exports.logger = ->
       'incoming', 'req-headers', 'res-headers'
     ]
 
-exports.session = ->
+exports.session = ({redis}) ->
   session_key_path = path.join __dirname, '../session.key'
 
   unless fs.existsSync session_key_path
@@ -115,36 +121,11 @@ exports.session = ->
 
   return expressSession
     store: new RedisStore
-      client: app.redis
+      client: redis
 
     resave: false
     saveUninitialized: false
     secret: secret
-
-exports.csrf = ->
-  provider = csrf()
-
-  return (req, res, next) ->
-    validator = ->
-      if req.path in app.getHooks('app.ignore_csrf', null, pluck: 'path')
-        return next()
-
-      if req.method in ['HEAD', 'OPTIONS']
-        return next()
-
-      unless provider.verify req.session.csrf_secret, req.getCsrfToken()
-        return res.error 403, 'invalid_csrf_token'
-
-      next()
-
-    if req.session.csrf_secret
-      return validator()
-    else
-      provider.secret (err, secret) ->
-        req.session.csrf_secret = secret
-        req.session.csrf_token = provider.create secret
-
-        validator()
 
 exports.authenticate = (req, res, next) ->
   Account.authenticate(req.getTokenCode()).then ({token, account}) ->
@@ -158,12 +139,12 @@ exports.requireAuthenticate = (req, res, next) ->
   if req.account
     next()
   else if req.method == 'GET'
-    res.redirect '/account/login/'
+    res.redirect '/account/login'
   else
-    res.error 403, 'auth_failed'
+    res.error.authFailed()
 
 exports.requireAdminAuthenticate = (req, res, next) ->
   if req.account?.isAdmin()
     next()
   else
-    res.error 403, 'forbidden'
+    res.error.forbidden()

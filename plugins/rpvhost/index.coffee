@@ -1,27 +1,20 @@
-plugin = app.extends.plugin.register
-  name: 'rpvhost'
+module.exports = class RPVHost
+  constructor: (@injector, {@green_style, @index_page}) ->
+    @injector.paymentProvider 'taobao', new TaobaoPayment()
 
-  initialize: ->
-    unless @config.index_page == false
-      app.express.get '/', (req, res) =>
-        @render 'index', req, {}, (err, html) ->
-          res.send html
+    @injector.view 'layout',
+      filename: __dirname + '/view/layout'
+      locals: rpvhost: @
 
-if plugin.config.green_style
-  plugin.registerHook 'view.layout.styles',
-    path: '/plugin/rpvhost/style/green.css'
+    @injector.view 'panel/financials',
+      filename: __dirname + '/view/taobao'
+      locals: rpvhost: @
 
-plugin.registerHook 'view.layout.menu_bar',
-  href: 'http://blog.rpvhost.net'
-  target: '_blank'
-  t_body: 'official_blog'
+    if @index_page
+      @injector.router('/').get '/', (req, res) ->
+        res.render __dirname + '/view/index'
 
-plugin.registerHook 'billing.payment_methods',
-  type: 'taobao'
-
-  widgetGenerator: (req, callback) ->
-    plugin.render 'payment_method', req, {}, callback
-
-  detailsMessage: (req, deposit_log, callback) ->
+class TaobaoPayment
+  populateFinancials: (req, financial) ->
     callback plugin.getTranslator(req) 'view.payment_details',
       order_id: deposit_log.payload.order_id

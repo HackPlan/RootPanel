@@ -6,9 +6,8 @@ prepend header
 block main
   .row
     header= t('account.financials')
-
-    for payment_method in payment_methods
-      != payment_method
+    
+    block payment-provider
 
   .row
     header= t('view.financials.payment_log')

@@ -1,3 +1,5 @@
+{Router} = require 'express'
+
 ###
   Class: Abstract plugin, managed by {PluginManager}.
 ###
@@ -16,6 +18,15 @@ class Plugin
 
   ###
   constructor: (@injector) ->
+
+  ###
+    Public: Get translator of plugin.
+
+    * `language` {String} or {ClientRequest}
+
+    Return {Function} `(name, params) -> String`.
+  ###
+  getTranslator: (language) ->
 
 ###
   Class: Private injector of {Plugin}.
@@ -49,14 +60,16 @@ class Injector
   plugin: ->
     return @plugin
 
-  ###
-    Public: Get translator of plugin.
+  router: (path) ->
+    router = express.Router()
+    root.express.use path, router
 
-    * `language` {String} or {ClientRequest}
+    @registries.routers.push
+      path: path
+      router: router
+      plugin: @plugin
 
-    Return {Function} `(name, params) -> String`.
-  ###
-  getTranslator: (language) ->
+    return router
 
   ###
     Public: Register a hook, proxy of {HookRegistry::register}.

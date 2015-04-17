@@ -28,6 +28,7 @@ module.exports = class I18nManager
     Public: Add translations.
 
     * `language` {String}
+    * `translations` {Object}
 
   ###
   addTranslations: (language, translations) ->
@@ -58,16 +59,20 @@ module.exports = class I18nManager
     insert = (string, params) ->
       if _.isObject params
         for name, value of params
-          string = string.replace new RegExp("{#{name}}", 'g'), value
+          string = string.replace new RegExp("\\{#{name}\\}", 'g'), value
 
       return string
 
     return (name) ->
-      for prefix in [prefixes..., name]
-        fullName = "#{prefix}.#{name}"
-        result = translator fullName, arguments[1 ..]...
+      for prefix in [prefixes..., null]
+        if prefix
+          full_name = "#{prefix}.#{name}"
+        else
+          full_name = name
 
-        if result != fullName
+        result = translator full_name, [arguments...][1 ..]...
+
+        if result != full_name
           return result
 
       return name
@@ -118,7 +123,7 @@ module.exports = class I18nManager
     Return {String}.
   ###
   translateByLanguage: (name, language) ->
-    return '' unless name
+    return undefined unless name
 
     ref = @translations
 
@@ -176,4 +181,8 @@ parseLanguage = (language) ->
 
 formatLanguage = (language) ->
   {lang, country} = parseLanguage language
-  return "#{lang}-#{country}"
+
+  if country
+    return "#{lang}-#{country}"
+  else
+    return lang

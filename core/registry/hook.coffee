@@ -7,10 +7,6 @@ _ = require 'lodash'
 module.exports = class HookRegistry
   constructor: ->
     @hooks =
-      middleware:
-        # path
-        ignore_csrf: []
-
       account:
         # filter: (account) -> Promise
         before_register: []

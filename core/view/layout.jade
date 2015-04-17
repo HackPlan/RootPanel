@@ -5,8 +5,6 @@ html
     block header
       link(rel='stylesheet', href='/bower_components/bootstrap/dist/css/bootstrap.min.css')
       link(rel='stylesheet', href='/style/layout.css')
-      for path in getHooks('view.layout.styles', {pluck: 'path'})
-        link(rel='stylesheet', href=path)
 
   body(data-username="#{account ? account.username : ''}", data-locale-version=app.i18n.localeHash(req), data-csrf-token=req.session.csrf_token)
     header.navbar-fixed-top
@@ -20,8 +18,8 @@ html
               span.icon-bar
             a.navbar-brand(href='/')= t(config.web.t_name)
           #navbar-collapse.collapse.navbar-collapse
-            block menu-bar
-              ul.nav.navbar-nav
+            ul.nav.navbar-nav
+              block menu-bar
             ul.nav.navbar-nav.navbar-right
               if account
                 li
@@ -68,21 +66,19 @@ html
                       a(href='https://github.com/#{config.web.repo}', target='_blank') Source on Github
 
     #footer
-      if config.web.google_analytics_id
-        script.
-          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-          ga('create', '#{config.web.google_analytics_id}', 'auto');
-          ga('send', 'pageview');
-      script(src='/bower_components/jquery/dist/jquery.min.js')
-      script(src='/bower_components/jquery-tmpl/jquery.tmpl.min.js')
-      script(src='/bower_components/jquery-cookie/jquery.cookie.js')
-      script(src='/bower_components/underscore/underscore-min.js')
-      script(src='/bower_components/backbone/backbone.js')
-      script(src='/bower_components/bootstrap/dist/js/bootstrap.min.js')
-      script(src='/script/layout.js')
-      for path in getHooks('view.layout.scripts', {pluck: 'path'})
-        script(src=path)
       block footer
+        if config.web.google_analytics_id
+          script.
+            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+            })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+            ga('create', '#{config.web.google_analytics_id}', 'auto');
+            ga('send', 'pageview');
+        script(src='/bower_components/jquery/dist/jquery.min.js')
+        script(src='/bower_components/jquery-tmpl/jquery.tmpl.min.js')
+        script(src='/bower_components/jquery-cookie/jquery.cookie.js')
+        script(src='/bower_components/underscore/underscore-min.js')
+        script(src='/bower_components/backbone/backbone.js')
+        script(src='/bower_components/bootstrap/dist/js/bootstrap.min.js')
+        script(src='/script/layout.js')

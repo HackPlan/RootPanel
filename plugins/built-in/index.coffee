@@ -1,6 +1,8 @@
-rp.extends.coupons.register
-  name: 'cash'
+module.exports = class Builtin
+  constructor: (@injector) ->
+    @injector.couponType 'cash', new CashCoupon()
 
+class CashCoupon
   validate: (account, coupon) ->
     apply_log = _.find coupon.apply_log, (log) ->
       return log.account_id.equals account._id

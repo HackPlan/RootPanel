@@ -68,9 +68,9 @@ router.post '/register', (req, res) ->
     res.createToken account
   .catch (err) ->
     if err.message.match /duplicate.*username/
-      res.error 'username_exist'
+      res.error.usernameExist()
     else if err.message.match /Validating.*email/
-      res.error 'invalid_email'
+      res.error.invalidEmail()
     else
       res.error err
 
@@ -99,7 +99,7 @@ router.post '/login', (req, res) ->
 
   .catch (err) ->
     if err.message.match /must be a/
-      res.error 'wrong_password'
+      res.error.wrongPassword()
     else
       res.error err
 
