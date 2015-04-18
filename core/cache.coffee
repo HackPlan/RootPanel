@@ -25,6 +25,13 @@ class CacheFactory
     else
       return jsonStableStringify key
 
+  getJSON: (key) ->
+    @get(@hashKey key).then (result) ->
+      try
+        return JSON.parse result
+      catch
+        return null
+
   try: (key, setter) ->
     @tryHelper key, setter, =>
       @set arguments...

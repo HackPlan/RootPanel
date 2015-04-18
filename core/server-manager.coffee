@@ -178,3 +178,7 @@ module.exports = class ServerManager
   ###
   byName: (name) ->
     return @servers[name]
+
+  master: ->
+    return _.findWhere @servers,
+      master: true

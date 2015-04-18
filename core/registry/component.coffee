@@ -6,6 +6,7 @@ _ = require 'lodash'
 class ComponentProvider
   defaults:
     initialize: (component) ->
+    reconfigure: (component) ->
     destroy: (component) ->
 
   constructor: (options) ->
