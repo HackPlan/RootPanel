@@ -33,12 +33,20 @@ class LinuxServer
       @server.command "sudo usermod -G #{user} -a www-data"
     ]
 
+  setPassword: (user, password) ->
+    @server.exec 'sudo',
+      params: ['chpasswd']
+      stdin: "#{user}:#{password}"
+
   deleteUser: (user) ->
     Q.all [
       @server.command "sudo pkill -u #{user}"
       @server.command "sudo userdel -rf #{user}"
       @server.command "sudo groupdel #{user}"
     ]
+
+  killProcess: (user, pid) ->
+    @server.command "sudo su #{user} -c 'kill #{pid}'"
 
   killProcesses: (user) ->
     @server.command "sudo pkill -SIGKILL -u #{user}"

@@ -1,40 +1,72 @@
-{_} = app.libs
-{pluggable} = app
+module.exports = class Supervisor
+  constructor: (@injector) ->
+    @injector.component 'program', new SupervisorComponent @
 
-exports = module.exports = class SupervisorPlugin extends pluggable.Plugin
-  @NAME: 'supervisor'
-  @type: 'service'
-  @dependencies: ['linux']
+    @injector.widget 'panel',
+      repeating:
+        components:
+          'supervisor.program': createable: true
+      generator: (account, component) ->
+        root.views.render __dirname + '/view/widget'
 
-supervisor = require './supervisor'
+  getSupervisor: (node) ->
+    if node
+      return new Supervisor root.servers.byName node
+    else
+      return new Supervisor root.servers.master()
 
-exports.registerHook 'view.panel.scripts',
-  path: '/plugin/supervisor/script/panel.js'
+class SupervisorComponent
+  constructor: ({@getSupervisor}) ->
 
-exports.registerHook 'view.panel.styles',
-  path: '/plugin/supervisor/style/panel.css'
+  preSave: ({options}) ->
+    (new Program options).validate()
 
-exports.registerHook 'view.panel.widgets',
-  generator: (req, callback) ->
-    supervisor.programsStatus (programs_status) ->
-      exports.render 'widget', req,
-        programs_status: _.indexBy programs_status, 'name'
-      , callback
+  initialize: (component) ->
+    (new Program component.options).populate(component).then ({configuration}) =>
+      @getSupervisor(node).writeConfig configuration, [component.options]
 
-exports.registerServiceHook 'enable',
-  filter: (account, callback) ->
-    account.update
-      $set:
-        'pluggable.supervisor.programs': []
-    , callback
+  update: (component) ->
+    (new Program component.options).populate(component).then ({configuration}) =>
+      @getSupervisor(node).writeConfig configuration, [component.options]
 
-exports.registerServiceHook 'disable',
-  filter: (account, callback) ->
-    supervisor.removePrograms account, ->
-      supervisor.updateProgram account, null, ->
-        account.update
-          $unset:
-            'pluggable.supervisor': true
-        , callback
+  destroy: (component) ->
+    (new Program component.options).populate(component).then ({configuration}) =>
+      @getSupervisor(node).removeConfig configuration
 
-app.express.use '/plugin/supervisor', require './router'
+  actions: [
+    control:
+      handler: ({node, account: {username}, options: {name}}, {action}) =>
+        @getSupervisor(node).controlProgram
+          user: username
+          name: name
+        , action
+  ]
+
+Program = mabolo.model 'Program',
+  command:
+    type: String
+    required: true
+    validator: (command) ->
+      unless /^.*$/.test command
+        throw new Error 'invalid_command'
+
+  autostart:
+    type: Boolean
+    required: true
+    default: true
+
+  autorestart:
+    type: String
+    enum: ['true', 'false', 'unexpected']
+
+  directory:
+    type: String
+    validator: (directory) ->
+      unless /^.*$/.test directory
+        throw new Error 'invalid_directory'
+
+Program::populate = ({account, name}) ->
+  return Q _.extend @,
+    user: account.username
+    name: "#{account.username}-#{name}"
+    configuration: "user.#{account.username}.#{name}"

@@ -1,70 +1,66 @@
-{async, child_process, fs, _} = app.libs
-{logger} = app
+validator = require 'validator'
 
-SupervisorPlugin = require './index'
+{mabolo} = root
 
-exports.removePrograms = (account, callback) ->
-  async.each account.pluggable.supervisor.programs, (program, callback) ->
-    exports.removeConfig account, program, ->
-      callback()
-  , ->
-    exports.updateProgram account, null, ->
-      callback()
+status_mapping =
+  STOPPED: 'stopped'
+  STARTING: 'running'
+  RUNNING: 'running'
+  BACKOFF: 'stopped'
+  STOPPING: 'running'
+  EXITED: 'stopped'
+  FATAL: 'stopped'
+  UNKNOWN: 'stopped'
 
-exports.updateProgram = (account, program, callback) ->
-  child_process.exec 'sudo supervisorctl update', (err) ->
-    logger.error err if err
+module.exports = class Supervisor
+  constructor: (@server) ->
 
-    if program and program.autostart
-      child_process.exec "sudo supervisorctl start #{program.program_name}", (err) ->
-        logger.error err if err
-        callback()
-    else
-      callback()
+  writeConfig: (name, programs) ->
+    @server.writeFile configPath(name), renderConfig(programs), mode: 640
 
-exports.writeConfig = (account, program, callback) ->
-  SupervisorPlugin.renderTemplate 'program.conf',
-    account: account
-    program: program
-  , (configure) ->
-    SupervisorPlugin.writeConfigFile "/etc/supervisor/conf.d/#{program.program_name}.conf", configure, ->
-      callback()
+  removeConfig: (name) ->
+    @server.command "sudo rm #{configPath name}"
 
-exports.removeConfig = (account, program, callback) ->
-  child_process.exec "sudo rm /etc/supervisor/conf.d/#{program.program_name}.conf", (err) ->
-    logger.error err if err
-    callback()
+  updateProgram: ({autostart, user, name}) ->
+    @server.command('sudo supervisorctl update').then =>
+      if autostart
+        @server.command "sudo supervisorctl start #{user}-#{name}"
 
-# @param action: start|stop|restart
-exports.programControl = (account, program, action, callback) ->
-  child_process.exec "sudo supervisorctl #{action} #{program.program_name}", (err) ->
-    logger.error err if err
-    callback()
+  controlProgram: ({user, name}, action) ->
+    @server.command "sudo supervisorctl #{action} #{user}-#{name}"
 
-exports.programsStatus = (callback) ->
-  child_process.exec 'sudo supervisorctl status', (err, stdout) ->
-    lines = stdout.split '\n'
-    lines = lines[... lines.length - 1]
+  programsStatus: ->
+    @server.command('sudo supervisorctl status').then ({stdout}) ->
+      return stdout.split('\n')[... -1].map (line) ->
+        [$, name, status, pid, uptime] = line.match /^(\S+)\s+(\S+)\s+pid (\d+), uptime (.*)/
 
-    callback _.map lines, (line) ->
-      [__, name, status, info] = line.match /^(\S+)\s+(\S+)\s+(.*)/
+        return {
+          pid: pid
+          name: name
+          uptime: uptime
+          status: status_mapping[status]
+        }
 
-      if name.match /^([^:]+):/
-        [__, name] = name.match /^([^:]+):/
+configPath = (name) ->
+  return "/etc/supervisor/conf.d/#{name}.conf"
 
-      status_mapping =
-        STOPPED: 'stopped'
-        STARTING: 'running'
-        RUNNING: 'running'
-        BACKOFF: 'stopped'
-        STOPPING: 'running'
-        EXITED: 'stopped'
-        FATAL: 'stopped'
-        UNKNOWN: 'stopped'
+renderConfig = (programs) ->
+  renderProgram = (program) ->
+    configuration = """
+      [program:#{user}-#{program.name}]
+      user = #{program.user}
+      command = #{program.command}
+      autostart = #{program.autostart}
+      autorestart = #{program.autorestart}
+      redirect_stderr = #{program.redirect_stderr}\n
+    """
 
-      return {
-        name: name
-        original_status: status
-        status: status_mapping[status]
-        info: info
-      }
+    if program.directory
+      configuration += "directory = #{program.directory}\n"
+
+    if program.stdout_logfile != false
+      configuration += "stdout_logfile = /home/#{user}/supervisor-#{name}.log\n"
+
+    return configuration
+
+  return programs.map(renderProgram).join '\n'

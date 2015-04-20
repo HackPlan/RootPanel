@@ -122,7 +122,7 @@ class ServerNode
   writeFile: (filename, body, {mode, owner}) ->
     @command("sudo touch #{filename}").then =>
       Q.all([
-        if mode then @command("sudo chmod #{mode} #{filename}")
+        if mode then @command("sudo chmod #{mode.toString()} #{filename}")
         if owner then @command("sudo chown #{owner}:#{owner} #{filename}")
       ]).then =>
         @exec 'sudo',

@@ -1,3 +1,5 @@
+validator = require 'validator'
+
 module.exports = class Linux
   constructor: (@injector, {@monitor_cycle}) ->
     {requireAuthenticate} = root.middleware
@@ -29,6 +31,20 @@ module.exports = class Linux
         @getLinuxServer(node).deleteUser user
 
       reconfigure: (component) ->
+
+      actions: [
+        setPassword:
+          handler: ({node, options: {user}}, {passowrd}) =>
+            unless validator.isPassword passowrd
+              throw new Error 'invalid_password'
+
+            @getLinuxServer(node).setPassword user, password
+
+        killProcess:
+          handler: ({node, options: {user}}, {pid}) =>
+            @getLinuxServer(node).killProcess user, parseInt(pid)
+
+      ]
 
     @injector.widget 'panel',
       repeating:

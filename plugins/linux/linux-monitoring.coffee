@@ -1,5 +1,5 @@
 module.exports = class LinuxMonitoring
-  constructor: (@linux_server, {@monitor_cycle}) ->
+  constructor: (@server, {@monitor_cycle}) ->
     @cache = root.cache
 
   start: ->
@@ -15,13 +15,13 @@ module.exports = class LinuxMonitoring
     return @current_usages
 
   monitoring: ->
-    @linux_server.getProcessList().then (process_list) =>
+    @server.getProcessList().then (process_list) =>
       process_list = process_list.filter (process) ->
         return item.rss != 0
 
       Q.all [
         @cache.getJSON 'linux:recent_resources_usage'
-        @linux_server.getMemoryUsages()
+        @server.getMemoryUsages()
         @monitoringCpu process_list
         @monitoringMemory process_list
       ]
