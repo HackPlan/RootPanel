@@ -11,9 +11,9 @@ module.exports = class Supervisor
 
   getSupervisor: (node) ->
     if node
-      return new Supervisor root.servers.byName node
+      return new SupervisorManager root.servers.byName node
     else
-      return new Supervisor root.servers.master()
+      return new SupervisorManager root.servers.master()
 
 class SupervisorComponent
   constructor: ({@getSupervisor}) ->

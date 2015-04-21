@@ -53,8 +53,8 @@ module.exports = class LinuxMonitoring
         usage.memory = usage.memory / recent_usages.length / (@monitor_cycle / 1000)
 
       Q.all [
-        @redis.setex 'linux:last_process_list', 3600, JSON.stringify process_list
-        @redis.setex 'linux:recent_resources_usage', 60, JSON.stringify recent_usages
+        @cache.setex 'linux:last_process_list', 3600, JSON.stringify process_list
+        @cache.setex 'linux:recent_resources_usage', 60, JSON.stringify recent_usages
       ]
 
   monitoringCpu: (process_list) ->

@@ -19,3 +19,10 @@ script: npm test
 services:
   - mongodb
   - redis-server
+
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/b718f15367b0c6a71f7c
+    on_success: always
+    on_failure: always

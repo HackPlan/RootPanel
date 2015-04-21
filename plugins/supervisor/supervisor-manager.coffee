@@ -1,7 +1,5 @@
 validator = require 'validator'
 
-{mabolo} = root
-
 status_mapping =
   STOPPED: 'stopped'
   STARTING: 'running'
@@ -12,7 +10,7 @@ status_mapping =
   FATAL: 'stopped'
   UNKNOWN: 'stopped'
 
-module.exports = class Supervisor
+module.exports = class SupervisorManager
   constructor: (@server) ->
 
   writeConfig: (name, programs) ->
@@ -47,12 +45,12 @@ configPath = (name) ->
 renderConfig = (programs) ->
   renderProgram = (program) ->
     configuration = """
-      [program:#{user}-#{program.name}]
+      [program:#{program.user}-#{program.name}]
       user = #{program.user}
       command = #{program.command}
       autostart = #{program.autostart}
       autorestart = #{program.autorestart}
-      redirect_stderr = #{program.redirect_stderr}\n
+      redirect_stderr = true\n
     """
 
     if program.directory
