@@ -3,10 +3,11 @@ _ = require 'lodash'
 Q = require 'q'
 
 {Account, Ticket} = root
+{requireAuthenticate} = require '../middleware'
 
 module.exports = router = new Router()
 
-router.use root.middleware.requireAuthenticate
+router.use requireAuthenticate
 
 router.param 'id', (req, res, next, ticket_id) ->
   Ticket.findById(ticket_id).done (ticket) ->

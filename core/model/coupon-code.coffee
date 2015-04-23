@@ -24,7 +24,7 @@ ApplyLog = mabolo.model 'ApplyLog',
 ###
   Model: CouponCode.
 ###
-CouponCode = mabolo.model 'CouponCode',
+module.exports = CouponCode = mabolo.model 'CouponCode',
   # Public: Code of coupon
   code:
     required: true

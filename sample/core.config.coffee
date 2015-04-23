@@ -5,75 +5,66 @@ module.exports =
     listen: '/tmp/rootpanel.sock'
     repo: 'jysperm/RootPanel'
     google_analytics_id: ''
-
-  account:
     cookie_time: 30 * 24 * 3600 * 1000
 
   i18n:
-    available_language: ['zh_CN', 'en']
+    default_language: 'zh-CN'
     default_timezone: 'Asia/Shanghai'
 
-  extends:
-    available_plugins: []
+  plugins:
+    'built-in':
+      enable: true
+
+  server:
+    ssh:
+      id_key: './.ssh/id_rsa'
+
+    servers:
+      master:
+        host: 'localhost'
+        master: true
+        available_components: []
 
   billing:
     currency: 'CNY'
 
-    force_freeze:
-      when_balance_below: 0
-      when_arrears_above: 0
+    freeze_conditions:
+      balance_below: 0
+      arrears_above: 0
 
-  plans:
-    sample:
-      t_name: 'plans.sample.name'
-      t_description: 'plans.sample.description'
+    plans:
+      all:
+        name: 'plans.sample.name'
+        description: 'plans.sample.description'
 
-      available_components: {}
+        available_components:
+          linux:
+            defaults: (account) ->
+              return {
+                payload:
+                  username: account.username
+              }
 
-      billing_trigger:
-        time:
-          interval: 24 * 3600 * 1000
-          price: 10 / 30
-          prepaid: true
-
-    test:
-      t_name: 'plans.test.name'
-      t_description: 'plans.test.description'
-
-      available_components: {}
-      resource_limit: {}
-
-      billing_trigger: {}
-
-  ssh:
-    id_key: './.ssh/id_rsa'
-
-  nodes:
-    master:
-      host: 'localhost'
-      master: true
-      available_components: []
+        billing:
+          time:
+            interval: 24 * 3600 * 1000
+            price: 10 / 30
+            prepaid: true
 
   mongodb:
-    user: 'rpadmin'
-    password: 'password'
     host: 'localhost'
     name: 'RootPanel'
-    test: 'RootPanel-test'
 
   redis:
     host: '127.0.0.1'
     port: 6379
-    password: 'password'
-    prefix: 'RP'
 
   email:
-    send_from: 'robot@rpvhost.net'
+    from: 'robot@rpvhost.net'
+    reply_to: 'admins@rpvhost.net'
 
     account:
       service: 'Postmark'
       auth:
         user: 'postmark-api-token'
         pass: 'postmark-api-token'
-
-  plugins: {}

@@ -10,6 +10,7 @@ path = require 'path'
 harp = require 'harp'
 fs = require 'q-io/fs'
 _ = require 'lodash'
+Q = require 'q'
 
 ###
   Class: Root object for control RootPanel, An instance is always available as the `root` global.
@@ -18,16 +19,18 @@ module.exports = class Root extends EventEmitter
   ###
     Public: Find and load configure file.
 
-    * `rootPath` {String} e.g. `/home/rpadmin/RootPanel`
+    * `root_path` {String} e.g. `/home/rpadmin/RootPanel`
 
     Return {Object}.
   ###
-  @findConfig: (rootPath) ->
-    configPath = path.resolve rootPath, '../config.coffee'
-    defaultPath = path.resolve rootPath, '../sample/config.coffee'
+  @findConfig: (root_path) ->
+    configPath = path.resolve root_path, 'config.coffee'
+    defaultPath = path.resolve root_path, 'sample/core.config.coffee'
 
     fs.exists(configPath).then (exists) ->
-      fs.read if exists then configPath else defaultPath
+      return require if exists then configPath else defaultPath
+
+  log: console.log
 
   # Public: Config object
   config: null
@@ -92,33 +95,29 @@ module.exports = class Root extends EventEmitter
   ###
   constructor: (@config, @package) ->
     @package ?= require '../package'
+    @log "new Root #{@package.name} #{@package.version}"
 
+  ###
+    Public: Run RootPanel and start web service.
+
+    Return a {Promise}.
+  ###
+  start: ->
     CacheFactory = require './cache'
-
-    HookRegistry = require './registry/hook'
-    ViewRegistry = require './registry/view'
-    WidgetRegistry = require './registry/widget'
-    ComponentRegistry = require './registry/component'
-    CouponTypeRegistry = require './registry/coupon-type'
-    PaymentProviderRegistry = require './registry/payment-provider'
-
-    I18nManager = require './i18n-manager'
-    PluginManager = require './plugin-manager'
-    ServerManager = require './server-manager'
-    BillingManager = require './billing-manager'
-    NotificationManager = require './notification-manager'
 
     _.extend @,
       express: express()
-      mailer: nodemailer.createTransport @config.email.account
       mabolo: new Mabolo mongodbUri @config.mongodb
+      mailer: nodemailer.createTransport @config.email.account
 
       insight: new Insight
         trackingCode: TRACKING_CODE
+        packageName: 'RootPanel'
         pkg: @package
 
-      cache: new CacheFactory()
+      cache: new CacheFactory @config.redis
 
+    _.extend @,
       Account: require './model/account'
       Financials: require './model/financials'
       CouponCode: require './model/coupon-code'
@@ -127,6 +126,14 @@ module.exports = class Root extends EventEmitter
       Ticket: require './model/ticket'
       Component: require './model/component'
 
+    HookRegistry = require './registry/hook'
+    ViewRegistry = require './registry/view'
+    WidgetRegistry = require './registry/widget'
+    ComponentRegistry = require './registry/component'
+    CouponTypeRegistry = require './registry/coupon-type'
+    PaymentProviderRegistry = require './registry/payment-provider'
+
+    _.extend @,
       routers: []
 
       hooks: new HookRegistry()
@@ -136,6 +143,13 @@ module.exports = class Root extends EventEmitter
       couponTypes: new CouponTypeRegistry()
       paymentProviders: new PaymentProviderRegistry()
 
+    I18nManager = require './i18n-manager'
+    PluginManager = require './plugin-manager'
+    ServerManager = require './server-manager'
+    BillingManager = require './billing-manager'
+    NotificationManager = require './notification-manager'
+
+    _.extend @,
       i18n: new I18nManager @config.i18n
       plugins: new PluginManager @config.plugins
       servers: new ServerManager @config.server
@@ -144,7 +158,9 @@ module.exports = class Root extends EventEmitter
 
     @express.use bodyParser.json()
     @express.use cookieParser()
-    @express.use morgan 'combined'
+
+    unless @testing()
+      @express.use morgan 'combined'
 
     middleware = require './middleware'
 
@@ -159,39 +175,44 @@ module.exports = class Root extends EventEmitter
     @express.use '/account', require './router/account'
     @express.use '/components', require './router/component'
 
-    @express.use '/bower_components', express.static @resolve '../bower_components'
-    @express.use harp.mount @resolve 'static'
-
     @express.get '/', (req, res) ->
       res.redirect '/panel/'
 
-  ###
-    Public: Run RootPanel and start web service.
+    @express.use '/bower_components', express.static @resolve '../bower_components'
+    @express.use harp.mount @resolve 'static'
 
-    Return a {Promise}.
-  ###
-  start: ->
     @trackUsage 'root.start'
+    @listen()
 
-    fs.exists(@config.web.listen).then (exists) ->
-      fs.unlink(@config.web.listen) if exists
-    .then ->
+  listen: ->
+    {listen} = @config.web
+    @log "Root.listen on #{listen}"
+
+    Q().then ->
+      if _.isString listen
+        fs.exists(listen).then (exists) ->
+          fs.remove(listen) if exists
+    .then =>
       Q.Promise (resolve, reject) =>
-        @express.listen @config.web.listen, (err) =>
-          return reject err if err
+        @express.listen listen, (err) =>
+          if err
+            reject err
+          else
+            @emit 'started'
+            resolve()
 
-          @emit 'started'
-          resolve()
+  testing: ->
+    return process.env.NODE_ENV == 'test'
 
   ###
-    Public: Resolve path based on core directory.
+    Public: Resolve path based on root directory.
 
     * `arguments...` {String} paths
 
     return {String}.
   ###
   resolve: ->
-    return path.resolve __dirname, arguments...
+    return path.resolve __dirname, '..', arguments...
 
   ###
     Public: Send usage metrics to Google Analytics.
@@ -200,6 +221,7 @@ module.exports = class Root extends EventEmitter
 
   ###
   trackUsage: (path) ->
+    @log "Root.trackUsage #{path}"
     @insight.track path.split('.')...
 
 # Private: This code used to send anonymous usage metrics to RootPanel developers.

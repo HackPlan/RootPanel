@@ -1,6 +1,4 @@
 module.exports =
-  skip: true
-
   web:
     t_name: 'plugins.rpvhost.greenshadow'
     url: 'http://greenshadow.net'

@@ -8,7 +8,7 @@ Q = require 'q'
   Public: Cache factory,
   You can access a global instance via `root.cache`.
 ###
-class CacheFactory
+module.exports = class CacheFactory
   constructor: ({host, port, password}) ->
     @redis = redis.createClient port, host,
       auth_pass: password

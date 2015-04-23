@@ -2,6 +2,7 @@ async = require 'async-q'
 jade = require 'jade'
 fs = require 'q-io/fs'
 os = require 'os'
+_ = require 'lodash'
 Q = require 'q'
 
 ###
@@ -50,13 +51,13 @@ module.exports = class ViewRegistry
     return {Promise} resolve with html.
   ###
   render: (view, locals) ->
-    Q.then =>
+    Q().then =>
       if @viewCache[view]
         return @viewCache[view]
       else
         @resolve(view).tap (renderer) =>
           @viewCache[view] = renderer
-    .then (renderer) ->
+    .then (renderer) =>
       locals = _.extend {}, _.pluck(@viewExtends[view], 'locals')..., locals
       return renderer locals
 
@@ -74,12 +75,12 @@ module.exports = class ViewRegistry
     extendSource = (source) =>
       return [source, _.pluck(@viewExtends[view], 'source')...].join os.EOL
 
-    async.detect([
+    Q async.detect([
       view
       root.resolve view
-      root.resolve 'view', view
-      root.resolve '..', view
-    ], fs.exists).then (filename) ->
+      root.resolve 'core', view
+      root.resolve 'core/view', view
+    ], fs.exists.bind fs).then (filename) ->
       fs.read(filename).then (source) ->
         return jade.compile extendSource(source.toString()),
           filename: filename

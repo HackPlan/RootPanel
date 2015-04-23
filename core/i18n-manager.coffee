@@ -48,11 +48,11 @@ module.exports = class I18nManager
     Public: Create translator by language or request.
 
     * `language` {String} or {ClientRequest}
-    * `prefixes` {Array} or {String}
+    * `prefixes` (optional) {Array} or {String}
 
     Return {Function} `(name, params) -> String`.
   ###
-  translator: (language, prefixes) ->
+  translator: (language, prefixes = []) ->
     translator = (name, params) =>
       return insert @translate(name, @alternativeLanguages language), params
 
@@ -169,7 +169,8 @@ module.exports = class I18nManager
       return _.uniq [language, alternatives..., @config.default_language]
 
     else
-      return _.uniq _.compact [req.cookies?.language, (new Negotiator language).languages()...]
+      req = language
+      return _.uniq _.compact [req.cookies?.language, (new Negotiator req).languages()...]
 
 parseLanguage = (language) ->
   [lang, country] = language.replace('_', '-').split '-'

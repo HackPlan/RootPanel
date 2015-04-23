@@ -1,5 +1,6 @@
 child_process = require 'child_process'
 {Client} = require 'ssh2'
+fs = require 'q-io/fs'
 _ = require 'underscore'
 Q = require 'q'
 
@@ -130,21 +131,20 @@ class ServerNode
           stdin: body
 
   setupRemote: ->
-    id_key = fs.readFileSync @id_key
-
     connected = Q.Promise (resolve, reject) =>
-      client = new Client()
+      fs.read(@id_key).then (id_key) =>
+        client = new Client()
 
-      client.connect
-        host: @host
-        username: @username
-        privateKey: id_key
+        client.connect
+          host: @host
+          username: @username
+          privateKey: id_key
 
-      client.on 'ready', ->
-        resolve connection
+        client.on 'ready', ->
+          resolve connection
 
-      client.on 'error', (err) ->
-        reject err
+        client.on 'error', (err) ->
+          reject err
 
     @connected = ->
       return connected

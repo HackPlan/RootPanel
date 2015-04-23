@@ -4,7 +4,7 @@ _ = require 'lodash'
 utils = require '../utils'
 
 {i18n, Account, CouponCode} = root
-{requireAuthenticate} = root.middleware
+{requireAuthenticate} = require '../middleware'
 
 module.exports = router = new Router()
 

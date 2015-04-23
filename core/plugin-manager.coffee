@@ -1,4 +1,6 @@
 {Router} = require 'express'
+path = require 'path'
+_ = require 'lodash'
 
 ###
   Class: Abstract plugin, managed by {PluginManager}.
@@ -42,13 +44,12 @@ class Injector
       * `path` {String}
       * `config` {Object}
       * `package` {Object}
-      * `registries` {Root}
 
   ###
-  constructor: (Plugin, {name, path, config, package: pkg, @registries}) ->
-    @plugin = new Plugin @, config
+  constructor: (Plugin, {name, path, config, package: pkg}) ->
+    @owner = new Plugin @, config
 
-    _.extend @plugin,
+    _.extend @owner,
       name: name
       path: path
 
@@ -58,16 +59,16 @@ class Injector
     Return {Plugin}.
   ###
   plugin: ->
-    return @plugin
+    return @owner
 
   router: (path) ->
     router = express.Router()
     root.express.use path, router
 
-    @registries.routers.push
+    root.routers.push
       path: path
       router: router
-      plugin: @plugin
+      plugin: @owner
 
     return router
 
@@ -75,43 +76,43 @@ class Injector
     Public: Register a hook, proxy of {HookRegistry::register}.
   ###
   hook: (path, options) ->
-    return @registries.hooks.register path, _.extend options,
-      plugin: @plugin
+    return root.hooks.register path, _.extend options,
+      plugin: @owner
 
   ###
     Public: Register a view, proxy of {ViewRegistry::register}.
   ###
   view: (view, options) ->
-    return @registries.views.register view, _.extend options,
-      plugin: @plugin
+    return root.views.register view, _.extend options,
+      plugin: @owner
 
   ###
     Public: Register a widget, proxy of {WidgetRegistry::register}.
   ###
   widget: (view, options) ->
-    return @registries.widgets.register view, _.extend options,
-      plugin: @plugin
+    return root.widgets.register view, _.extend options,
+      plugin: @owner
 
   ###
     Public: Register a component, proxy of {ComponentRegistry::register}.
   ###
   component: (name, options) ->
-    return @extend.components.register name, _.extend options,
-      plugin: @plugin
+    return root.components.register name, _.extend options,
+      plugin: @owner
 
   ###
     Public: Register a coupon type, proxy of {CouponTypeRegistry::register}.
   ###
   couponType: (name, options) ->
-    return @extend.couponTypes.register name, _.extend options,
-      plugin: @plugin
+    return root.couponTypes.register name, _.extend options,
+      plugin: @owner
 
   ###
     Public: Register a payment provider, proxy of {PaymentProviderRegistry::register}.
   ###
   paymentProvider: (name, options) ->
-    return @extend.paymentProviders.register name, _.extend options,
-      plugin: @plugin
+    return root.paymentProviders.register name, _.extend options,
+      plugin: @owner
 
 ###
   Manager: Plugin manager,
@@ -143,7 +144,6 @@ module.exports = class PluginManager
       path: path
       config: config
       package: require "#{path}/package.json"
-      registries: root
 
     @plugins[name] = injector.plugin()
 

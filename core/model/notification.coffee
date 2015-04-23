@@ -7,7 +7,7 @@ Q = require 'q'
 ###
   Model: Notification.
 ###
-Notification = mabolo.model 'Notification',
+module.exports = Notification = mabolo.model 'Notification',
   # Public: Plugin that created this notification
   source:
     required: true

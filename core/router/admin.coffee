@@ -3,10 +3,11 @@ _ = require 'lodash'
 Q = require 'q'
 
 {Account, Ticket, Financials, CouponCode} = root
+{requireAdminAuthenticate} = require '../middleware'
 
 module.exports = router = new Router()
 
-router.use root.middleware.requireAdminAuthenticate
+router.use requireAdminAuthenticate
 
 ###
   Router: GET /admin/dashboard

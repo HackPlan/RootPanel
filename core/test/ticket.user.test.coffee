@@ -1,4 +1,4 @@
-describe 'ticket.user', ->
+describe.skip 'ticket.user', ->
   agent = null
   csrf_token = null
 

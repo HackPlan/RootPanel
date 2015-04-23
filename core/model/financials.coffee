@@ -6,7 +6,7 @@ Q = require 'q'
 ###
   Model: Financials.
 ###
-Financials = mabolo.model 'Financials',
+module.exports = Financials = mabolo.model 'Financials',
   # Public: Related account
   account_id:
     required: true

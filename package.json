@@ -18,15 +18,14 @@
   "main": "core/index",
   "scripts": {
     "install": "./node_modules/.bin/bower install",
-    "start": "./node_modules/.bin/coffee app.coffee | ./node_modules/.bin/bunyan -o short",
-    "test": "COV_TEST=true ./node_modules/.bin/mocha --compilers coffee:coffee-script/register --require test/env --reporter node_modules/mocha-reporter-cov-summary -- core/test/*.test.coffee"
+    "start": "./node_modules/.bin/coffee app.coffee",
+    "test": "./node_modules/.bin/mocha --compilers coffee:coffee-script/register --require test/env -- core/test/*.test.coffee"
   },
   "dependencies": {
     "async": "^0.9.0",
     "async-q": "^0.2.2",
     "body-parser": "^1.9.3",
     "bower": "^1.3.12",
-    "bunyan": "^1.2.3",
     "bunyan-mongo": "^0.1.0",
     "coffee-script": "^1.8.0",
     "connect-redis": "^2.1.0",
@@ -54,7 +53,7 @@
     "q": "^1.2.0",
     "q-io": "^1.12.0",
     "redis": "^0.12.1",
-    "request": "^2.48.0",
+    "request": "^2.55.0",
     "semver": "^4.1.0",
     "ssh2": "^0.3.6",
     "underscore": "^1.7.0",

@@ -3,10 +3,11 @@ _ = require 'lodash'
 Q = require 'q'
 
 {Account, Financials} = root
+{requireAuthenticate} = require '../middleware'
 
-module.router = router = new Router()
+module.exports = router = new Router()
 
-router.use root.middleware.requireAuthenticate
+router.use requireAuthenticate
 
 ###
   Router: GET /panel/financials

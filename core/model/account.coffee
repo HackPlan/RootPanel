@@ -55,7 +55,7 @@ Preferences = mabolo.model 'Preferences',
 ###
   Model: Account Model.
 ###
-Account = mabolo.model 'Account',
+module.exports = Account = mabolo.model 'Account',
   # Public: User name
   username:
     required: true

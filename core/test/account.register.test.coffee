@@ -1,22 +1,14 @@
 describe 'account.register', ->
-  agent = null
-  csrf_token = null
+  agent = createAgent
+    baseUrl: '/account'
 
   account_id = null
   username = null
   password = null
   email = null
 
-  before ->
-    agent = supertest.agent app.express
-
-  after (done) ->
-    cleanUpByAccount account_id, done
-
-  it 'GET login', (done) ->
-    agent.get '/account/login'
-    .expect 200
-    .end done
+  it.only 'GET login', ->
+    agent.get '/login'
 
   it 'GET register', (done) ->
     agent.get '/account/register'
@@ -27,8 +19,6 @@ describe 'account.register', ->
     agent.get '/account/session_info'
     .expect 200
     .end (err, res) ->
-      res.body.csrf_token.should.be.exist
-      {csrf_token} = res.body
       done err
 
   it 'POST register', (done) ->
@@ -38,7 +28,6 @@ describe 'account.register', ->
 
     agent.post '/account/register'
     .send
-      csrf_token: csrf_token
       username: username
       email: email
       password: password
@@ -52,7 +41,6 @@ describe 'account.register', ->
   it 'POST register with existed username', (done) ->
     agent.post '/account/register'
     .send
-      csrf_token: csrf_token
       username: username
       email: "#{utils.randomString 8}@gmail.com"
       password: password
@@ -64,7 +52,6 @@ describe 'account.register', ->
   it 'POST register with invalid email', (done) ->
     agent.post '/account/register'
     .send
-      csrf_token: csrf_token
       username: "test#{utils.randomString(8).toLowerCase()}"
       email: "@gmail.com"
       password: password
@@ -76,7 +63,6 @@ describe 'account.register', ->
   it 'POST login', (done) ->
     agent.post '/account/login'
     .send
-      csrf_token: csrf_token
       username: username
       password: password
     .expect 200
@@ -97,16 +83,12 @@ describe 'account.register', ->
 
   it 'POST logout', (done) ->
     agent.post '/account/logout'
-    .send
-      csrf_token: csrf_token
     .expect 204
     .expect 'set-cookie', /token=;/
     .end done
 
   it 'POST login with email', (done) ->
-    agent.post '/account/login'
-    .send
-      csrf_token: csrf_token
+    agent.post '/account/login',
       username: email.toLowerCase()
       password: password
     .expect 200
@@ -119,7 +101,6 @@ describe 'account.register', ->
   it 'POST login with username does not exist', (done) ->
     agent.post '/account/login'
     .send
-      csrf_token: csrf_token
       username: 'username_not_exist'
       password: password
     .expect 400
@@ -131,7 +112,6 @@ describe 'account.register', ->
   it 'POST login with invalid password', (done) ->
     agent.post '/account/login'
     .send
-      csrf_token: csrf_token
       username: username
       password: 'invalid password'
     .expect 400

@@ -6,7 +6,7 @@ html
       link(rel='stylesheet', href='/bower_components/bootstrap/dist/css/bootstrap.min.css')
       link(rel='stylesheet', href='/style/layout.css')
 
-  body(data-username="#{account ? account.username : ''}", data-locale-version=app.i18n.localeHash(req), data-csrf-token=req.session.csrf_token)
+  body(data-username="#{account ? account.username : ''}")
     header.navbar-fixed-top
       .container
         nav.navbar.navbar-default.navbar-inverse(role='navigation')
@@ -44,7 +44,7 @@ html
                 ul.dropdown-menu
                   li
                     a.action-switch-language(href='#', data-language='auto') #{t('languages.auto')} (auto)
-                    for language in config.i18n.available_language
+                    for language in root.i18n.languages()
                       a.action-switch-language(href='#', data-language=language) #{t('languages.' + language)} (#{language})
 
     block content
@@ -56,9 +56,9 @@ html
           #sidebar.col-md-3
             block sidebar
               .row
-                header= t(config.web.t_name)
+                header= site.name
                 ul
-                  li v#{app.package.version}
+                  li v#{root.package.version}
                   li
                     if config.web.repo.match(/^http/)
                       a(href=config.web.repo, target='_blank') Source Code

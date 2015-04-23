@@ -24,7 +24,7 @@ Coworker = mabolo.model 'Coworker',
 ###
   Model: Component.
 ###
-Component = mabolo.model 'Component',
+module.exports = Component = mabolo.model 'Component',
   # Public: Owner account
   account_id:
     required: true

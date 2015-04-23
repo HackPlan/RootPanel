@@ -34,7 +34,7 @@ Reply = mabolo.model 'Reply',
 ###
   Model: Ticket.
 ###
-Ticket = mabolo.model 'Ticket',
+module.exports = Ticket = mabolo.model 'Ticket',
   # Public: Related account
   account_id:
     required: true

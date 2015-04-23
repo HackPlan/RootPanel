@@ -53,6 +53,7 @@ exports.reqHelpers = (req, res, next) ->
       [status, name, param] = [400, status, name]
 
     if name?.message
+      console.log name.stack
       name = name.message
 
     if req.method in ['HEAD', 'OPTIONS']
@@ -86,28 +87,23 @@ exports.renderHelpers = (req, res, next) ->
     res: res
     root: root
 
+    t: root.i18n.translator req
+
     plugin: (name) ->
       return root.plugins.byName name
 
     account: req.account
-    site_name: req.getTranslator config.web.name
 
-  res.render = (view, locals) ->
-    # TODO: Merge res.locals
-    root.views.render(view, locals).done res.send, res.error
+    site:
+      name: req.getTranslator config.web.name
+
+  res.render = (view, locals = {}) ->
+    root.views.render view, _.defaults(locals, res.locals)
+    .done (html) ->
+      res.send html
+    , res.error
 
   next()
-
-exports.logger = ->
-  # TODO: refactor
-  return expressBunyanLogger
-    genReqId: (req) -> req.sessionID
-    parseUA: false
-    logger: app.logger
-    excludes: [
-      'req', 'res', 'body', 'short-body', 'http-version',
-      'incoming', 'req-headers', 'res-headers'
-    ]
 
 exports.session = ({redis}) ->
   session_key_path = path.join __dirname, '../session.key'
