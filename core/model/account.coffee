@@ -3,7 +3,7 @@ _ = require 'lodash'
 
 utils = require '../utils'
 
-{mabolo, hooks} = root
+{mabolo} = root
 
 ###
   Model: Account Session Token Model,
@@ -70,7 +70,7 @@ module.exports = Account = mabolo.model 'Account',
     type: String
     validator: (email) ->
       unless validator.isEmail email
-        throw new Error 'invalid_email'
+        throw new Error 'invalid email'
 
   # Public: Password
   password:
@@ -241,7 +241,7 @@ Account.register = ({username, email, password}) ->
     preferences:
       avatar_url: avatar_url
 
-  hooks.executeHooks('account.before_register',
+  root.hooks.executeHooks('account.before_register',
     execute: 'filter'
     params: [account]
   ).then ->

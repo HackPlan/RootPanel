@@ -9,6 +9,14 @@ utils = require '../utils'
 module.exports = router = new Router()
 
 ###
+  Router: GET /account
+
+  Response {Account} from {Account::pick}
+###
+router.get '/', requireAuthenticate, (req, res) ->
+  res.json req.account.pick 'self'
+
+###
   Router: GET /account/register
 
   Response HTML.
@@ -44,14 +52,6 @@ router.get '/preferences/edit', requireAuthenticate, (req, res) ->
   res.render 'account/preferences'
 
 ###
-  Router: GET /account/self
-
-  Response {Account} from {Account::pick}
-###
-router.get '/self', requireAuthenticate, (req, res) ->
-  res.json req.account.pick 'self'
-
-###
   Router: POST /account/register
 
   Request {Object}
@@ -63,16 +63,14 @@ router.get '/self', requireAuthenticate, (req, res) ->
   Response {Token}.
   Set-Cookie: token.
 ###
-router.post '/register', (req, res) ->
+router.post '/register', (req, res, next) ->
   Account.register(req.body).then (account) ->
     res.createToken account
   .catch (err) ->
     if err.message.match /duplicate.*username/
-      res.error.usernameExist()
-    else if err.message.match /Validating.*email/
-      res.error.invalidEmail()
+      next new Error 'username exist'
     else
-      res.error err
+      next err
 
 ###
   Router: POST /account/login
@@ -85,10 +83,10 @@ router.post '/register', (req, res) ->
   Response {Token}.
   Set-Cookie: token, language.
 ###
-router.post '/login', (req, res) ->
+router.post '/login', (req, res, next) ->
   Account.search(req.body.username).then (account) ->
     unless account?.matchPassword req.body.password
-      throw new Error 'wrong_password'
+      throw new Error 'wrong password'
 
     res.createCookie 'language', account.preferences.language
 
@@ -99,9 +97,9 @@ router.post '/login', (req, res) ->
 
   .catch (err) ->
     if err.message.match /must be a/
-      res.error.wrongPassword()
+      next new Error 'wrong password'
     else
-      res.error err
+      next err
 
 ###
   Router: POST /account/logout

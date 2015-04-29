@@ -6,116 +6,102 @@ describe 'account.register', ->
   username = null
   password = null
   email = null
+  token = null
 
-  it.only 'GET login', ->
+  it 'GET login', ->
     agent.get '/login'
 
-  it 'GET register', (done) ->
-    agent.get '/account/register'
-    .expect 200
-    .end done
+  it 'GET register', ->
+    agent.get '/register'
 
-  it 'GET session_info', (done) ->
-    agent.get '/account/session_info'
-    .expect 200
-    .end (err, res) ->
-      done err
+  it 'POST register', ->
+    {username, password, email} = randomAccount()
 
-  it 'POST register', (done) ->
-    username = 'test' + utils.randomString(8).toLowerCase()
-    password = utils.randomString 8
-    email = utils.randomString(8) + '@gmail.com'
+    agent.post '/register',
+      json:
+        username: username
+        email: email
+        password: password
+    ,
+      headers:
+        'set-cookie': /token=/
+      body:
+        account_id: /\w{24}/
+        token: /\w{64}/
+    .then (res) ->
+      {account_id, token} = res.body
 
-    agent.post '/account/register'
-    .send
-      username: username
-      email: email
-      password: password
-    .expect 200
-    .expect 'set-cookie', /token=/
-    .end (err, res) ->
-      res.body.account_id.should.have.length 24
-      {account_id} = res.body
-      done err
+  it 'POST register with existed username', ->
+    agent.post '/register',
+      json:
+        username: username
+        email: randomAccount().email
+        password: password
+    ,
+      error: 'username exist'
 
-  it 'POST register with existed username', (done) ->
-    agent.post '/account/register'
-    .send
-      username: username
-      email: "#{utils.randomString 8}@gmail.com"
-      password: password
-    .expect 400
-    .end (err, res) ->
-      res.body.error.should.be.equal 'username_exist'
-      done err
+  it 'POST register with invalid email', ->
+    agent.post '/register',
+      json:
+        username: randomAccount().username
+        email: 'gmail.com'
+        password: password
+    ,
+      error: 'invalid email'
 
-  it 'POST register with invalid email', (done) ->
-    agent.post '/account/register'
-    .send
-      username: "test#{utils.randomString(8).toLowerCase()}"
-      email: "@gmail.com"
-      password: password
-    .expect 400
-    .end (err, res) ->
-      res.body.error.should.be.equal 'invalid_email'
-      done err
+  it 'POST login', ->
+    agent.post '/login',
+      json:
+        username: username
+        password: password
+    ,
+      headers:
+        'set-cookie': /token=/
+      body:
+        account_id: /\w{24}/
+        token: /\w{64}/
 
-  it 'POST login', (done) ->
-    agent.post '/account/login'
-    .send
-      username: username
-      password: password
-    .expect 200
-    .expect 'set-cookie', /token=/
-    .end (err, res) ->
-      res.body.account_id.should.be.equal account_id
-      res.body.token.should.be.exist
-      done err
+  it 'GET account', ->
+    agent.get '/',
+      headers:
+        token: token
+    ,
+      body:
+        _id: /\w{24}/
+        username: username
 
-  it 'GET session_info when logged', (done) ->
-    agent.get '/account/session_info'
-    .expect 200
-    .end (err, res) ->
-      res.body.csrf_token.should.be.exist
-      res.body.username.should.be.equal username
-      res.body.preferences.should.be.a 'object'
-      done err
+  it 'POST logout', ->
+    agent.post '/logout',
+      headers:
+        token: token
+    ,
+      headers:
+        'set-cookie': /token=;/
 
-  it 'POST logout', (done) ->
-    agent.post '/account/logout'
-    .expect 204
-    .expect 'set-cookie', /token=;/
-    .end done
+  it 'POST login with email', ->
+    agent.post '/login',
+      json:
+        username: email
+        password: password
+    ,
+      headers:
+        'set-cookie': /token=/
+      body:
+        account_id: /\w{24}/
+        token: /\w{64}/
 
-  it 'POST login with email', (done) ->
-    agent.post '/account/login',
-      username: email.toLowerCase()
-      password: password
-    .expect 200
-    .expect 'set-cookie', /token=/
-    .end (err, res) ->
-      res.body.account_id.should.be.equal account_id
-      res.body.token.should.be.exist
-      done err
+  it 'POST login with username does not exist', ->
+    agent.post '/login',
+      json:
+        username: randomAccount().username
+        password: password
+    ,
+      error: 'wrong password'
 
-  it 'POST login with username does not exist', (done) ->
-    agent.post '/account/login'
-    .send
-      username: 'username_not_exist'
-      password: password
-    .expect 400
-    .end (err, res) ->
-      res.body.error.should.be.equal 'wrong_password'
-      expect(res.body.token).to.not.exist
-      done err
-
-  it 'POST login with invalid password', (done) ->
-    agent.post '/account/login'
-    .send
-      username: username
-      password: 'invalid password'
-    .expect 400
-    .end (err, res) ->
-      res.body.error.should.be.equal 'wrong_password'
-      expect(res.body.token).to.not.exist
-      done err
+  it 'POST login with invalid password', ->
+    agent.post '/login',
+      json:
+        username: username
+        password: 'invalid password'
+    ,
+      error: 'wrong password'

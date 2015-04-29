@@ -1,4 +1,5 @@
 _ = require 'lodash'
+Q = require 'q'
 
 ###
   Registry: Collection of simple extend point,
@@ -59,7 +60,7 @@ module.exports = class HookRegistry
     Return {Promise}.
   ###
   executeHooks: ->
-    Q.all @dispatch arguments...
+    Q.all @applyHooks arguments...
 
   getHooks: (path, {array, object} = {}) ->
     words = path.split '.'

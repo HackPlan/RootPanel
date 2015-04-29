@@ -19,7 +19,7 @@ errors =
 
 exports.reqHelpers = (req, res, next) ->
   req.getTokenCode = ->
-    return req.headers?['x-token']
+    return req.headers?['x-token'] ? req.headers?.token
 
   req.getClientInfo = ->
     return {
@@ -53,7 +53,6 @@ exports.reqHelpers = (req, res, next) ->
       [status, name, param] = [400, status, name]
 
     if name?.message
-      console.log name.stack
       name = name.message
 
     if req.method in ['HEAD', 'OPTIONS']
@@ -104,6 +103,10 @@ exports.renderHelpers = (req, res, next) ->
     , res.error
 
   next()
+
+exports.errorhandling = (err, req, res, next) ->
+  res.json
+    error: err.message
 
 exports.session = ({redis}) ->
   session_key_path = path.join __dirname, '../session.key'
