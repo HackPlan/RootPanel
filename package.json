@@ -15,7 +15,7 @@
       "url": "https://jysperm.me"
     }
   ],
-  "main": "core/index",
+  "main": "core",
   "scripts": {
     "install": "./node_modules/.bin/bower install",
     "start": "./node_modules/.bin/coffee app.coffee",
@@ -37,7 +37,6 @@
     "express-bunyan-logger": "^1.1.0",
     "express-session": "^1.9.2",
     "get-parameter-names": "^0.2.0",
-    "harp": "^0.14.0",
     "insight": "^0.5.3",
     "jade": "^1.9.2",
     "json-stable-stringify": "^1.0.0",
@@ -62,6 +61,16 @@
   "devDependencies": {
     "chai": "^1.10.0",
     "coffee-coverage": "0.4.2",
+    "del": "^1.1.1",
+    "gulp": "^3.8.11",
+    "gulp-coffee": "^2.3.1",
+    "gulp-concat": "^2.5.2",
+    "gulp-filter": "^2.0.2",
+    "gulp-less": "^3.0.3",
+    "gulp-minify-css": "^1.1.0",
+    "gulp-order": "^1.1.1",
+    "gulp-uglify": "^1.2.0",
+    "main-bower-files": "^2.7.0",
     "mocha": "^2.0.1",
     "mocha-reporter-cov-summary": "^0.1.0",
     "supertest": "^0.15.0"

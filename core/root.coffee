@@ -7,7 +7,6 @@ express = require 'express'
 Mabolo = require 'mabolo'
 morgan = require 'morgan'
 path = require 'path'
-harp = require 'harp'
 fs = require 'q-io/fs'
 _ = require 'lodash'
 Q = require 'q'
@@ -178,8 +177,7 @@ module.exports = class Root extends EventEmitter
     @express.get '/', (req, res) ->
       res.redirect '/panel/'
 
-    @express.use '/bower_components', express.static @resolve '../bower_components'
-    @express.use harp.mount @resolve 'static'
+    @express.use '/public', express.static @resolve 'public'
 
     @trackUsage 'root.start'
     @listen()

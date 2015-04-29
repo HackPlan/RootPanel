@@ -5,6 +5,7 @@
 .vagrant/
 node_modules/
 bower_components/
+/public/
 
 /package.box
 /npm-debug.log
