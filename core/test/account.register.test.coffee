@@ -28,8 +28,8 @@ describe 'account.register', ->
       body:
         account_id: /\w{24}/
         token: /\w{64}/
-    .then (res) ->
-      {account_id, token} = res.body
+    .then ({body}) ->
+      {account_id, token} = body
 
   it 'POST register with existed username', ->
     agent.post '/register',

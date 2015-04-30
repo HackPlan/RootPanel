@@ -255,7 +255,7 @@ Ticket::populateAccounts = ->
   Account.find
     _id:
       $in: [
-        @account_id, @members..., _.pluck(@replies, 'account_id')...
+        @account_id, @members_id..., _.pluck(@replies, 'account_id')...
       ]
 
   .then (accounts) =>
@@ -265,8 +265,10 @@ Ticket::populateAccounts = ->
     @members = _.filter accounts, ({_id}) =>
       return @hasMember _id
 
-    @replies.each (reply) ->
+    @replies.forEach (reply) ->
       reply.account = _.find accounts, ({_id}) ->
         return reply.account_id.equals _id
 
     return @
+
+Account = require './account'

@@ -174,7 +174,7 @@ module.exports = class Root extends EventEmitter
     @express.use '/account', require './router/account'
     @express.use '/components', require './router/component'
 
-    @express.use middleware.errorhandling
+    @express.use middleware.errorHandling
 
     @express.get '/', (req, res) ->
       res.redirect '/panel/'

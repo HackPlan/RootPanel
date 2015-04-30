@@ -10,6 +10,11 @@ _ = require 'lodash'
 
 {Account, SecurityLog, config} = root
 
+builtInErrors = [
+  EvalError, RangeError, ReferenceError
+  SyntaxError, TypeError, URIError
+]
+
 errors =
   authFailed: 403
   forbidden: 403
@@ -104,7 +109,10 @@ exports.renderHelpers = (req, res, next) ->
 
   next()
 
-exports.errorhandling = (err, req, res, next) ->
+exports.errorHandling = (err, req, res, next) ->
+  if err.constructor in builtInErrors
+    root.log err.stack
+
   res.json
     error: err.message
 

@@ -1,16 +1,17 @@
-supertest = require 'supertest'
 request = require 'request'
 chai = require 'chai'
 url = require 'url'
 _ = require 'lodash'
 Q = require 'q'
 
+utils = require '../core/utils'
+
 expect = chai.expect
 
 chai.should()
 chai.config.includeStack = true
 
-utils = require '../core/utils'
+methods = ['get', 'post', 'delete', 'put', 'patch', 'head', 'options']
 
 ifEnabled = (name) ->
   if name in _.keys config.plugins
@@ -34,9 +35,7 @@ randomAccount = ->
     email: 'test' + randomLowerCase(6) + '@gmail.com'
   }
 
-createAgent = (agent_options = {}) ->
-  methods = ['get', 'post', 'delete', 'put', 'patch', 'head', 'options']
-
+createAgent = (agent_options) ->
   if _.isNumber config.web.listen
     prefix = "http://127.0.0.1:#{config.web.listen}"
   else
@@ -45,8 +44,8 @@ createAgent = (agent_options = {}) ->
   agent = {}
 
   methods.map (method) ->
-    agent[method] = (url, options = {}, asserts = {}) ->
-      options = _.extend
+    agent[method] = (url, options, asserts) ->
+      options = _.merge
         url: url
         json: true
         method: method
@@ -55,15 +54,13 @@ createAgent = (agent_options = {}) ->
 
       if options.baseUrl
         options.baseUrl = prefix + options.baseUrl
+      else
+        options.baseUrl = prefix + '/'
 
-      Q.Promise (resolve, reject) ->
-        request options, (err, res, body) ->
-          if err
-            reject err
-          else
-            resolve res
+      Q.nfcall(request, options).then ([res]) ->
+        return res
       .tap (res) ->
-        {status, headers, body, error} = asserts
+        {status, headers, body, error} = asserts ? {}
 
         message = printHttpResponse res
 
@@ -78,41 +75,31 @@ createAgent = (agent_options = {}) ->
         assertObjectFields = (data, asserts) ->
           for field, pattern of asserts ? {}
             if pattern instanceof RegExp
-              expect(data[field]).to.match pattern
+              expect(data[field]).to.match pattern, message
             else
-              expect(data[field]).to.equal pattern
+              expect(data[field]).to.equal pattern, message
 
         assertObjectFields res.headers, headers
         assertObjectFields res.body, body
 
   return agent
 
-cleanUpByAccount = ({account_id}, callback) ->
-  app.models.Account.findByIdAndRemove account_id, callback
+createLoggedAgent = (options) ->
+  ready = null
+  agent = {}
 
-createLoggedAgent = (callback) ->
-  createAgent (err, {agent, csrf_token}) ->
-    username = 'test' + utils.randomString(8).toLowerCase()
-    email = utils.randomString(8) + '@gmail.com'
-    password = utils.randomString 8
+  methods.map (method) ->
+    agent[method] = (args...) ->
+      ready ?= createAgent().post '/account/register',
+        json: randomAccount()
 
-    agent.post '/account/register'
-    .send
-      csrf_token: csrf_token
-      username: username
-      email: email
-      password: password
-    .end (err, res) ->
-      after (done) ->
-        cleanUpByAccount res.body.account_id, done
+      ready.then ({body}) ->
+        options ?= {}
+        options.headers ?= {}
+        options.headers.token = body.token
+        createAgent(options)[method] args...
 
-      callback err,
-        agent: agent
-        username: username
-        email: email
-        password: password
-        csrf_token: csrf_token
-        account_id: res.body.account_id
+  return agent
 
 printHttpResponse = ({httpVersion, statusCode, statusMessage, headers, body}) ->
   message = """
@@ -126,13 +113,14 @@ printHttpResponse = ({httpVersion, statusCode, statusMessage, headers, body}) ->
   if headers['content-type']?.match /text\/html/
     body = body.replace /&nbsp;/g, ' '
     body = body.replace /<br>/g, '\n'
+  else if headers['content-type']?.match /application\/json/
+    body = JSON.stringify body, null, '  '
 
   message += "\n#{body}"
 
   return message
 
 _.extend global, {
-  supertest
   utils
 
   ifEnabled
@@ -140,6 +128,5 @@ _.extend global, {
   randomAccount
 
   createAgent
-  cleanUpByAccount
   createLoggedAgent
 }
