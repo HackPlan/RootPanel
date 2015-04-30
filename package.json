@@ -17,9 +17,11 @@
   ],
   "main": "core",
   "scripts": {
-    "install": "./node_modules/.bin/bower install",
     "start": "./node_modules/.bin/coffee app.coffee",
-    "test": "./node_modules/.bin/mocha --compilers coffee:coffee-script/register --require test/env -- core/test/*.test.coffee"
+    "test": "./node_modules/.bin/mocha --compilers coffee:coffee-script/register --require test/env -- core/test/*.test.coffee",
+    "docker-build": "docker build -t=jysperm/rootpanel .",
+    "docker-create": "docker run --name rootpanel -P -v `pwd`:/rootpanel -i -t jysperm/rootpanel",
+    "docker-start": "docker start -i -a rootpanel"
   },
   "dependencies": {
     "async": "^0.9.0",
@@ -69,10 +71,12 @@
     "gulp-less": "^3.0.3",
     "gulp-minify-css": "^1.1.0",
     "gulp-order": "^1.1.1",
+    "gulp-shell": "^0.4.1",
     "gulp-uglify": "^1.2.0",
     "main-bower-files": "^2.7.0",
     "mocha": "^2.0.1",
     "mocha-reporter-cov-summary": "^0.1.0",
+    "run-sequence": "^1.1.0",
     "supertest": "^0.15.0"
   }
 }

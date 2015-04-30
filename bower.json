@@ -7,6 +7,7 @@
     "jquery": "~2.1.2",
     "backbone": "~1.1.2",
     "moment": "~2.9.0",
-    "jquery-tmpl": "~1.0.0"
+    "jquery-tmpl": "vBeta1.0.0",
+    "q": "~1.2.0"
   }
 }
