@@ -1,0 +1,24 @@
+extends ../layout
+
+prepend header
+  title #{t('account.reset')} | #{site_name}
+
+block main
+  header= t('account.reset')
+  form.form-horizontal
+    input(type='hidden', name='token', value=#{token})
+    input(type='hidden', name='email', value=#{email})
+    .form-group
+      label.col-sm-2.col-md-offset-1.control-label= t('account.password')
+      .col-sm-5
+        input.form-control(name='password', type='password')
+    .form-group
+      label.col-sm-2.col-md-offset-1.control-label= t('view.account.password2')
+      .col-sm-5
+        input.form-control(name='password2', type='password')
+    .form-group
+      .col-sm-offset-3
+        button.action-login.btn.btn-lg.btn-primary(type='button')= t('account.reset')
+
+append footer
+  script(src='/script/account.js')
