@@ -123,7 +123,7 @@ module.exports = class I18nManager
     Return {String}.
   ###
   translateByLanguage: (name, language) ->
-    return undefined unless name
+    return name unless name
 
     ref = @translations
 

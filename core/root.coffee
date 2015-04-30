@@ -173,13 +173,9 @@ module.exports = class Root extends EventEmitter
     @express.use '/tickets', require './router/ticket'
     @express.use '/account', require './router/account'
     @express.use '/components', require './router/component'
+    @express.use '/public', express.static @resolve 'public'
 
     @express.use middleware.errorHandling
-
-    @express.get '/', (req, res) ->
-      res.redirect '/panel/'
-
-    @express.use '/public', express.static @resolve 'public'
 
     @trackUsage 'root.start'
     @listen()
@@ -203,6 +199,9 @@ module.exports = class Root extends EventEmitter
 
   testing: ->
     return process.env.NODE_ENV == 'test'
+
+  error: (message, options) ->
+    return _.extend new Error message, options
 
   ###
     Public: Resolve path based on root directory.

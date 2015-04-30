@@ -2,6 +2,9 @@ module.exports = class Builtin
   constructor: (@injector) ->
     @injector.couponType 'cash', new CashCoupon()
 
+    @injector.router('/').get '/', (req, res) ->
+      res.redirect '/panel/'
+
 class CashCoupon
   validate: (account, coupon) ->
     apply_log = _.find coupon.apply_log, (log) ->

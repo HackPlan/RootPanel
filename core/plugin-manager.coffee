@@ -62,7 +62,7 @@ class Injector
     return @owner
 
   router: (path) ->
-    router = express.Router()
+    router = new Router()
     root.express.use path, router
 
     root.routers.push

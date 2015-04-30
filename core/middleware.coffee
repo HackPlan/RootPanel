@@ -24,7 +24,10 @@ errors =
 
 exports.reqHelpers = (req, res, next) ->
   req.getTokenCode = ->
-    return req.headers?['x-token'] ? req.headers?.token
+    if req.method == 'GET'
+      return req.cookies?.token ? req.headers?['x-token'] ? req.headers?.token
+    else
+      return req.headers?['x-token'] ? req.headers?.token
 
   req.getClientInfo = ->
     return {
@@ -90,6 +93,7 @@ exports.renderHelpers = (req, res, next) ->
     req: req
     res: res
     root: root
+    config: config
 
     t: root.i18n.translator req
 
@@ -99,13 +103,14 @@ exports.renderHelpers = (req, res, next) ->
     account: req.account
 
     site:
-      name: req.getTranslator config.web.name
+      name: req.getTranslator() config.web.name
 
   res.render = (view, locals = {}) ->
     root.views.render view, _.defaults(locals, res.locals)
     .done (html) ->
       res.send html
-    , res.error
+    , (err) ->
+      exports.errorHandling err, req, res, ->
 
   next()
 

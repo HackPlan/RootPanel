@@ -3,8 +3,8 @@ html
   head
     meta(charset='utf-8')
     block header
-      link(rel='stylesheet', href='/bower_components/bootstrap/dist/css/bootstrap.min.css')
-      link(rel='stylesheet', href='/style/layout.css')
+      link(rel='stylesheet', href='/public/vendor/vendor.css')
+      link(rel='stylesheet', href='/public/core.css')
 
   body(data-username="#{account ? account.username : ''}")
     header.navbar-fixed-top
@@ -16,7 +16,7 @@ html
               span.icon-bar
               span.icon-bar
               span.icon-bar
-            a.navbar-brand(href='/')= t(config.web.t_name)
+            a.navbar-brand(href='/')= site.name
           #navbar-collapse.collapse.navbar-collapse
             ul.nav.navbar-nav
               block menu-bar
@@ -75,10 +75,5 @@ html
             })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
             ga('create', '#{config.web.google_analytics_id}', 'auto');
             ga('send', 'pageview');
-        script(src='/bower_components/jquery/dist/jquery.min.js')
-        script(src='/bower_components/jquery-tmpl/jquery.tmpl.min.js')
-        script(src='/bower_components/jquery-cookie/jquery.cookie.js')
-        script(src='/bower_components/underscore/underscore-min.js')
-        script(src='/bower_components/backbone/backbone.js')
-        script(src='/bower_components/bootstrap/dist/js/bootstrap.min.js')
-        script(src='/script/layout.js')
+        script(src='/public/vendor/vendor.js')
+        script(src='/public/core.js')

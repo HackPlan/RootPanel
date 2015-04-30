@@ -1,10 +1,4 @@
 $ ->
-  window.RP ?= {}
-
-  $.ajaxSetup
-    headers:
-      'X-Csrf-Token': $('body').data 'csrf-token'
-
   _.templateSettings =
     evaluate: /\{%([\s\S]+?)%\}/g,
     interpolate: /\{:([\s\S]+?)\}\}/g
@@ -44,33 +38,11 @@ $ ->
     tErr: (name) ->
       return RP.t "error_code.#{name}"
 
-    request: (url, param, options, callback) ->
-      unless callback
-        [options, callback] = [{}, options]
-
-      unless options.method?.toUpperCase() == 'GET'
-        param.csrf_token = $('body').data 'csrf-token'
-        param = JSON.stringify param
-
-      $.ajax
-        type: (options.method ? 'POST').toUpperCase()
-        contentType: 'application/json; charset=UTF-8'
-        url: url
-        data: param
-      .fail (jqXHR) ->
-        if jqXHR.responseJSON?.error
-          alert RP.tErr jqXHR.responseJSON.error
-        else
-          alert jqXHR.statusText
-      .success callback
-
     tmpl: (selector) ->
       cache = $(selector).template()
 
       return (view_data) ->
         return $.tmpl cache, view_data
-
-  RP.initLocale()
 
   $('nav a').each ->
     if $(@).attr('href') == location.pathname

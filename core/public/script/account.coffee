@@ -1,5 +1,16 @@
 $ ->
-  {request, t} = RP
+  {agent} = root
+
+  $('[name=password]').keypress (e) ->
+    if e.keyCode == 13
+      $('.action-login').click()
+
+  $('.action-login').click ->
+    agent.post '/account/login',
+      username: $('[name=username]').val()
+      password: $('[name=password]').val()
+    .then ->
+      location.href = '/panel/'
 
   $('.action-register').click ->
     username = $('[name=username]').val()
@@ -10,23 +21,14 @@ $ ->
     unless password == password2
       return alert t 'view.account.password_inconsistent'
 
-    request '/account/register',
+    agent.post '/account/register',
       username: username
       password: password
       email: email
-    , ->
+    .then ->
       location.href = '/panel/'
 
-  $('.action-login').click ->
-    request '/account/login',
-      username: $('[name=username]').val()
-      password: $('[name=password]').val()
-    , ->
-      location.href = '/panel/'
-
-  $('[name=password]').keypress (e) ->
-    if e.keyCode == 13
-      $('.action-login').click()
+  #
 
   $('.action-save').click ->
     request '/account/update_preferences',
