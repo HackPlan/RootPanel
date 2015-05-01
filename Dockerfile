@@ -8,13 +8,10 @@ RUN apt-get update &&\
 
 RUN npm install -g coffee-script gulp bower
 
-RUN useradd -m rpadmin &&\
-    usermod -G rpadmin -a www-data
-
 ADD sample/nginx.conf /etc/nginx/sites-enabled/rpadmin
 
 EXPOSE 80
-USER rpadmin
+WORKDIR /rootpanel
 
 CMD service nginx start &&\
     service mongodb start &&\
