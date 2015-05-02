@@ -14,7 +14,7 @@ Token = mabolo.model 'Token',
   type:
     required: true
     type: String
-    enum: ['full_access']
+    enum: ['full_access', 'reset_access']
 
   # Public: Code of token, a sha256 string
   code:
@@ -266,6 +266,27 @@ Account::createToken = (type, options) ->
   @update(
     $push:
       tokens: token
+  ).then ->
+    return token
+
+###
+  Public: Remove all token and create a new one just for reset password.
+  
+  * `options` {Object} Options of {Token}
+
+  Return {Promise} resolve with the new token.
+###
+Account::forgetPassword = (options) ->
+  token = new Token
+    type: 'reset_access'
+    code: utils.randomSalt()
+    options: options
+    created_at: new Date()
+    updated_at: new Date()
+
+  @update(
+    $set:
+      tokens: [token]
   ).then ->
     return token
 
