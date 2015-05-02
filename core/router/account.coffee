@@ -171,11 +171,11 @@ router.post '/login', (req, res, next) ->
 
   Set-Cookie: token.
 ###
-router.post '/logout', requireAuthenticate, (req, res) ->
+router.post '/logout', requireAuthenticate, (req, res, next) ->
   req.token.revoke().done ->
     req.createSecurityLog('revoke_token').then ->
       res.clearCookie('token').sendStatus 204
-  , res.error
+  , next
 
 ###
   Router: PUT /account/password
@@ -186,7 +186,7 @@ router.post '/logout', requireAuthenticate, (req, res) ->
     * `password` {String}
 
 ###
-router.put '/password', requireAuthenticate, (req, res) ->
+router.put '/password', requireAuthenticate, (req, res, next) ->
   Q().done ->
     unless req.account.matchPassword req.body.original_password
       throw new Error 'wrong_password'
@@ -198,7 +198,7 @@ router.put '/password', requireAuthenticate, (req, res) ->
       req.createSecurityLog 'update_password'
       res.sendStatus 204
 
-  , res.error
+  , next
 
 ###
   Router: PUT /email
@@ -209,7 +209,7 @@ router.put '/password', requireAuthenticate, (req, res) ->
     * `password` {String}
 
 ###
-router.post '/update_email', requireAuthenticate, (req, res) ->
+router.post '/update_email', requireAuthenticate, (req, res, next) ->
   Q().done ->
     unless req.account.matchPassword req.body.password
       throw new Error 'wrong_password'
@@ -226,7 +226,7 @@ router.post '/update_email', requireAuthenticate, (req, res) ->
 
       res.sendStatus 204
 
-  , req.error
+  , next
 
 ###
   Router: PATCH /account/preferences
@@ -235,39 +235,39 @@ router.post '/update_email', requireAuthenticate, (req, res) ->
 
   Response {Preferences}.
 ###
-router.patch '/preferences', requireAuthenticate, (req, res) ->
+router.patch '/preferences', requireAuthenticate, (req, res, next) ->
   req.account.updatePreferences(req.body).done (preferences) ->
     res.json preferences
-  , res.error
+  , next
 
 router.use '/plans', do (router = new Router) ->
   router.param 'plan', (req, res, next, plan_name) ->
     if req.plan = root.billing.byName plan_name
       next()
     else
-      res.error 'plan_not_found'
+      next new Error 'plan not found'
 
   ###
     Router: POST /account/plans/:plan/join
   ###
-  router.post '/:plan/join', (req, res) ->
+  router.post '/:plan/join', (req, res, next) ->
     if root.billing.isFrozen req.account
-      return res.error 'insufficient_balance'
+      return next new Error 'insufficient_balance'
 
     unless req.plan.join_freely
-      return res.error 'cant_join_plan'
+      return next new Error 'cant_join_plan'
 
     req.plan.addMember(req.account).done ->
       res.sendStatus 204
-    , res.error
+    , next
 
   ###
     Router: POST /account/plans/:plan/leave
   ###
-  router.post '/:plan/leave', (req, res) ->
+  router.post '/:plan/leave', (req, res, next) ->
     req.plan.removeMember(req.account).done ->
       res.sendStatus 204
-    , res.error
+    , next
 
 router.use '/coupons', do (router = new Router) ->
   ###
@@ -275,7 +275,7 @@ router.use '/coupons', do (router = new Router) ->
 
     Response {CouponCode}.
   ###
-  router.get '/:code', (req, res) ->
+  router.get '/:code', (req, res, next) ->
     CouponCode.findByCode(req.params.code).done (coupon) ->
       if coupon
         coupon.populate(req: req).then ->
@@ -284,16 +284,16 @@ router.use '/coupons', do (router = new Router) ->
               available: available
       else
         throw new Error 'coupon_not_found'
-    , res.error
+    , next
 
   ###
     Router: POST /account/coupons/:code/apply
   ###
-  router.post '/:code/apply', requireAuthenticate, (req, res) ->
+  router.post '/:code/apply', requireAuthenticate, (req, res, next) ->
     CouponCode.findByCode(req.params.code).done (coupon) ->
       if coupon
         coupon.apply(account).then ->
           res.sendStatus 204
       else
         throw new Error 'coupon_not_found'
-    , res.error
+    , next

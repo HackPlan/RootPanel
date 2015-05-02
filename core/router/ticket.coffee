@@ -12,14 +12,14 @@ router.use requireAuthenticate
 router.param 'id', (req, res, next, ticket_id) ->
   Ticket.findById(ticket_id).done (ticket) ->
     unless req.ticket = ticket
-      return res.error 404, 'ticket_not_found'
+      return next new Error 'ticket not found'
 
     unless ticket.hasMember req.account
       unless req.account.isAdmin()
-        return res.error 403, 'ticket_forbidden'
+        return next new Error 'ticket forbidden'
 
     next()
-  , res.error
+  , next
 
 ###
   Router: GET /tickets/list
@@ -50,45 +50,45 @@ router.get '/:id/view', (req, res) ->
 
   Response {Array} of {Ticket}.
 ###
-router.get '/', (req, res) ->
+router.get '/', (req, res, next) ->
   Ticket.getTickets(req.account).done (tickets) ->
     res.json tickets
-  , res.error
+  , next
 
 ###
   Router: POST /tickets
 
   Response {Ticket}.
 ###
-router.post '/', (req, res) ->
+router.post '/', (req, res, next) ->
   Ticket.createTicket(req.account, req.body).done (ticket) ->
     res.status(201).json ticket
-  , res.error
+  , next
 
 ###
   Router: GET /tickets/:id
 
   Response {Ticket}.
 ###
-router.get '/:id', (req, res) ->
+router.get '/:id', (req, res, next) ->
   req.ticket.populateAccounts().done (ticket) ->
     res.json ticket
-  , res.error
+  , next
 
 ###
   Router: POST /tickets/:id/replies
 
   Response {Reply}.
 ###
-router.post '/:id/replies', (req, res) ->
+router.post '/:id/replies', (req, res, next) ->
   req.ticket.createReply(req.account, req.body).done (reply) ->
     res.status(201).json reply
-  , res.error
+  , next
 
 ###
   Router: PUT /tickets/:id/status
 ###
-router.put '/:id/status', (req, res) ->
+router.put '/:id/status', (req, res, next) ->
   req.ticket.setStatusByAccount(req.account, req.body.status).done ->
     res.sendStatus 204
-  , res.error
+  , next

@@ -10,24 +10,24 @@ router.use requireAuthenticate
 router.param 'id', (req, res, next, component_id) ->
   Component.findById(component_id).done (component) ->
     unless req.component = component
-      return res.error 404, 'component_not_found'
+      return next new Error 'component not found'
 
     unless component.hasMember req.account
       unless req.account.isAdmin()
-        return res.error 403, 'component_forbidden'
+        return next new Error 'component forbidden'
 
     next()
-  , res.error
+  , next
 
 ###
   Router: GET /components
 
   Response {Array} of {Component}.
 ###
-router.get '/', (req, res) ->
+router.get '/', (req, res, next) ->
   Component.getComponents(req.account).done (components) ->
     res.json components
-  , res.error
+  , next
 
 ###
   Router: POST /components/:type

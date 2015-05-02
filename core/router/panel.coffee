@@ -14,7 +14,7 @@ router.use requireAuthenticate
 
   Response HTML.
 ###
-router.get '/financials', (req, res) ->
+router.get '/financials', (req, res, next) ->
   Q.all([
     Financials.getDepositLogs req.account, req: req, limit: 10
     Financials.getBillingLogs req.account, limit: 10
@@ -22,7 +22,7 @@ router.get '/financials', (req, res) ->
     res.render 'panel/financials',
       deposit_logs: deposit_logs
       billing_logs: billing_logs
-  , res.error
+  , next
 
 ###
   Router: GET /panel/components

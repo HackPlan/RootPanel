@@ -15,13 +15,6 @@ builtInErrors = [
   SyntaxError, TypeError, URIError
 ]
 
-errors =
-  authFailed: 403
-  forbidden: 403
-  usernameExist: 400
-  invalidEmail: 400
-  wrongPassword: 400
-
 exports.reqHelpers = (req, res, next) ->
   req.getTokenCode = ->
     if req.method == 'GET'
@@ -55,24 +48,6 @@ exports.reqHelpers = (req, res, next) ->
       token: token ? req.token
       options: options
       type: type
-
-  # Deprecated
-  res.error = (status, name, param) ->
-    unless _.isNumber status
-      [status, name, param] = [400, status, name]
-
-    if name?.message
-      name = name.message
-
-    if req.method in ['HEAD', 'OPTIONS']
-      res.status(status).send name.toString()
-    else
-      res.status(status).json _.extend {}, param,
-        error: name.toString()
-
-  for name, status of errors
-    res.error[name] = ->
-      res.error status, name, arguments...
 
   res.createCookie = (name, value) ->
     res.cookie name, value,
@@ -154,10 +129,10 @@ exports.requireAuthenticate = (req, res, next) ->
   else if req.method == 'GET'
     res.redirect '/account/login'
   else
-    res.error.authFailed()
+    next new Error 'auth failed'
 
 exports.requireAdminAuthenticate = (req, res, next) ->
   if req.account?.isAdmin()
     next()
   else
-    res.error.forbidden()
+    next new Error 'forbidden'

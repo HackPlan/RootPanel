@@ -14,20 +14,20 @@ router.use requireAdminAuthenticate
 
   Response HTML.
 ###
-router.get '/dashboard', (req, res) ->
+router.get '/dashboard', (req, res, next) ->
   Q.all([
     Account.find()
   ]).done ([accounts]) ->
     res.render 'admin',
       accounts: accounts
-  , res.error
+  , next
 
 ###
   Router: GET /admin/tickets/list
 
   Response HTML.
 ###
-router.get '/tickets/list', (req, res) ->
+router.get '/tickets/list', (req, res, next) ->
   Ticket.getTicketsGroupByStatus
     opening:
       limit: 10
@@ -37,17 +37,17 @@ router.get '/tickets/list', (req, res) ->
       limit: 10
   .done (tickets) ->
     res.render 'ticket/list', tickets
-  , res.error
+  , next
 
 ###
   Router: POST /admin/coupons/generate
 
   Response {Array} of {CouponCode}.
 ###
-router.post '/coupons/generate', (req, res) ->
+router.post '/coupons/generate', (req, res, next) ->
   CouponCode.createCodes(req.body, req.body.count).done (coupons) ->
     res.json coupons
-  , res.error
+  , next
 
 router.use '/users', do (router = new Router) ->
   router.param 'id', (req, res, next, user_id) ->
@@ -55,14 +55,14 @@ router.use '/users', do (router = new Router) ->
       if req.user = user
         next
       else
-        res.error 404, 'user_not_found'
-    .catch res.error
+        next new Error 'user not found'
+    .catch next
 
   router.param 'plan', (req, res, next, plan_name) ->
     if req.plan = root.billing.byName plan_name
       next()
     else
-      res.error 'plan_not_found'
+      next new Error 'plan not found'
 
   ###
     Router: GET /admin/users/:id
@@ -75,18 +75,18 @@ router.use '/users', do (router = new Router) ->
   ###
     Router: GET /admin/users/:id/plans/join
   ###
-  router.post '/:id/plans/join', (req, res) ->
+  router.post '/:id/plans/join', (req, res, next) ->
     req.plan.addMember(req.account).done ->
       res.sendStatus 204
-    , res.erro
+    , next
 
   ###
     Router: GET /admin/users/:id/plans/leave
   ###
-  router.post '/:id/plans/leave', (req, res) ->
+  router.post '/:id/plans/leave', (req, res, next) ->
     req.plan.removeMember(req.account).done ->
       res.sendStatus 204
-    , res.erro
+    , next
 
   ###
     Router: POST /admin/users/:id/deposits/create
@@ -100,7 +100,7 @@ router.use '/users', do (router = new Router) ->
 
     Response {Financials}.
   ###
-  router.post '/:id/deposits/create', (req, res) ->
+  router.post '/:id/deposits/create', (req, res, next) ->
     Financials.createDepositRequest(req.user, req.body.amount,
       provider: req.body.provider
       order_id: req.body.orderId
@@ -109,18 +109,18 @@ router.use '/users', do (router = new Router) ->
         financial.updateStatus req.body.status
     .done (financial) ->
       res.json financial
-    , res.error
+    , next
 
   ###
     Router: DELETE /admin/users/:id
   ###
-  router.delete '/:id', (req, res) ->
+  router.delete '/:id', (req, res, next) ->
     unless _.isEmpty req.user.plans
-      return res.error 'already_in_plan'
+      return next new Error 'already in plan'
 
     unless req.user.balance <= 0
-      return res.error 'balance_not_empty'
+      return next new Error 'balance not empty'
 
     req.user.remove().done ->
       res.sendStatus 204
-    , res.error
+    , next
