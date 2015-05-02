@@ -50,12 +50,14 @@
     "": "Account",
     "register": "Register",
     "login": "Login",
+    "forget": "Forget",
     "username": "Username",
     "email": "Email",
     "password": "Password",
     "logout": "Logout",
     "preferences": "Preferences",
-    "financials": "Financials"
+    "financials": "Financials",
+    "send": "Send"
   },
   "panel": {
     "": "Panel",

@@ -1,0 +1,15 @@
+extends ../layout
+
+prepend header
+  title #{t('account.forget')} | #{site.name}
+
+block main
+  header= t('account.forget')
+  form.form-horizontal
+    .form-group
+      label.col-sm-2.col-md-offset-1.control-label= t('account.email')
+      .col-sm-5
+        input.form-control(name='email', type='text', required)
+    .form-group
+      .col-sm-offset-3
+        button.action-login.btn.btn-lg.btn-primary(type='button')= t('account.send')

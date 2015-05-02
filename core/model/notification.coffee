@@ -65,7 +65,7 @@ Notification::isGroupNotice = ->
 Notification::sendMail = ->
   sendMail = (to, subject, html) ->
     Q.Promise (resolve, reject) ->
-      app.mailer.sendMail
+      root.mailer.sendMail
         from: config.email.from
         replyTo: config.email.reply_to
         to: to

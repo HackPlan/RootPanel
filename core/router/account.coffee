@@ -33,6 +33,30 @@ router.get '/login', (req, res) ->
   res.render 'account/login'
 
 ###
+  Router: GET /account/forget
+
+  Response HTML
+###
+router.get '/forget',  (req, res) ->
+  res.render 'account/forget'
+
+###
+  Router: GET /account/reset/:email/:token
+
+  Response HTML
+###
+router.get '/reset/:email/:token', (req, res) ->
+  Account.search(req.params.email).done (account) ->
+    unless account
+      throw new Error 'no account'
+
+    if account.token.length != 1 or account.token[0] != token
+      throw new Error 'illegal action'
+
+    res.render 'account/reset', req.params
+  , next
+
+###
   Router: GET /account/translations/:language?
 
   Response {Object}.
@@ -71,6 +95,47 @@ router.post '/register', (req, res, next) ->
       next new Error 'username exist'
     else
       next err
+
+###
+  Router: POST /account/forget
+
+  Request {Object}
+
+    * `email` {String}
+
+  Response HTML send mail result page (success or failed)
+###
+router.post '/forget', (req, res) ->
+  Account.search(req.body.email).then (account) ->
+    account.forgetPassword(req.getClientInfo()).then (token) ->
+      # the send mail module can't work
+      # todo: send email with a url like: /account/reset/:email/:token
+      # return the success or ...
+      res.sendStatus 200
+
+###
+  Router: POST /account/forget
+
+  Request {Object}
+
+    * `email` {String}
+
+  Response HTML send mail result page (success or failed)
+###
+router.post '/reset', (req, res) ->
+  Account.search(req.body.email).done (account) ->
+    # TODO: check token type
+    if account and account.token.length is 1 and account.token[0] is req.body.token
+      account.setPassword(req.body.password).then ->
+        account.update
+          $set:
+            token: []
+        .then ->
+          res.json account
+    else
+      throw new Error 'illegal action'
+
+  , next
 
 ###
   Router: POST /account/login
