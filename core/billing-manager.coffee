@@ -187,10 +187,10 @@ class BillingPlan
   You can access a global instance via `root.billing`.
 ###
 module.exports = class BillingManager
-  constructor: (plans) ->
+  constructor: (@config) ->
     @plans = {}
 
-    for name, options of plans
+    for name, options of @config.plans
       @plans[name] = new BillingPlan _.extend options,
         manager: @
         name: name

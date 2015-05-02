@@ -1,3 +1,8 @@
+_ = require 'lodash'
+Q = require 'q'
+
+{Component} = root
+
 ###
   Public: Add widgets to panel page.
   You can access a global instance via `root.widgets`.
@@ -115,8 +120,8 @@ module.exports = class WidgetRegistry
       else
         return [value]
 
-    account.getComponents().then (components) ->
-      Q.all @widgets[view].map (widget) ->
+    Component.getComponents(account).then (components) =>
+      Q.all (@widgets[view] ? []).map (widget) ->
         {required, repeating, generator} = widget
 
         Q().then ->

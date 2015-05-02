@@ -23,7 +23,7 @@ html
             ul.nav.navbar-nav.navbar-right
               if account
                 li
-                  a(href='/account/preferences/')= account.username
+                  a(href='/account/preferences/edit')= account.username
                 li
                   a(href='/panel/')= t('panel.')
                 if account.inGroup('root')

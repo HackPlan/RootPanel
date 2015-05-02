@@ -38,8 +38,8 @@ router.get '/components', (req, res) ->
 
   Response HTML.
 ###
-router.get '/', (req, res) ->
+router.get '/', (req, res, next) ->
   root.widgets.dispatch('panel', req.account).done (widgets_html) ->
     res.render 'panel',
       widgets_html: widgets_html
-  , res.error
+  , next

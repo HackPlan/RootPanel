@@ -3,9 +3,6 @@ extends ../layout
 prepend header
   title #{req.ticket.title} | #{site.name}
 
-append header
-  link(rel='stylesheet', href='/style/ticket.css')
-
 block main
   .row.content
 
@@ -17,15 +14,13 @@ block main
       
 prepend sidebar
   .row
-    a.btn.btn-lg.btn-success(href='/ticket/list/')= t('ticket.ticket_list')
+    a.btn.btn-lg.btn-success(href='/tickets/list/')= t('ticket.ticket_list')
 
   .row.account-info
 
   .row.members
 
 append footer
-  script(src='/bower_components/moment/moment.js')
-  script(src='/script/ticket.js')
   script(id='content-template', type='text/x-jquery-tmpl')
     header
       | ${title} &nbsp;

@@ -3,11 +3,6 @@ extends layout
 prepend header
   title #{t('panel.')} | #{site.name}
 
-append header
-  link(rel='stylesheet', href='/style/panel.css')
-  for path in getHooks('view.panel.styles', {pluck: 'path'})
-    link(rel='stylesheet', href=path)
-
 block main
   .row
     header= t('account.financials')
@@ -19,13 +14,13 @@ block main
     header= t('plan.')
     table.table.table-hover.plan-list
       tbody
-        for plan in app.plans
+        for plan in root.billing.all()
           tr(data-name='#{plan.name}')
             td
-              strong= t(plan.t_name)
-            td= t(plan.t_description)
+              strong= t(plan.name)
+            td= t(plan.description)
             td
-              if account.inPlan(plan.name)
+              if plan.hasMember(account)
                 button.action-leave-plan.btn.btn-danger.btn-sm= t('plan.leave')
               else
                 button.action-join-plan.btn.btn-success.btn-sm= t('plan.join')
@@ -38,11 +33,6 @@ prepend sidebar
     p
       a.btn.btn-lg.btn-success(href='/panel/components') 元件详情
     p
-      a.btn.btn-lg.btn-success(href='/ticket/list/')= t('ticket.')
+      a.btn.btn-lg.btn-success(href='/tickets/list/')= t('ticket.')
     p
       a.btn.btn-lg.btn-success(href='/account/preferences/')= t('account.preferences')
-
-append footer
-  script(src='/script/panel.js')
-  for path in getHooks('view.panel.scripts', {pluck: 'path'})
-    script(src=path)

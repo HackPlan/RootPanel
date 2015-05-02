@@ -3,9 +3,6 @@ extends ../layout
 prepend header
   title #{t('ticket.create_ticket')} | #{site.name}
 
-append header
-  link(rel='stylesheet', href='/style/ticket.css')
-
 block main
   #create-view.row
     header= t('ticket.create_ticket')
@@ -16,6 +13,3 @@ block main
         textarea.form-control(name='content', rows='15')
       .form-group.padding
         button.btn.btn-lg.btn-primary.action-create(type='button')= t('ticket.create')
-
-append footer
-  script(src='/script/ticket.js')

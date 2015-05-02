@@ -17,12 +17,11 @@ block main
 prepend sidebar
   .row
     unless account.isAdmin()
-      a.btn.btn-lg.btn-success(href='/ticket/create/')= t('ticket.create_ticket')
+      a.btn.btn-lg.btn-success(href='/tickets/create/')= t('ticket.create_ticket')
 
 append footer
-  script(src='/script/ticket.js')
   script(id='list-item-template', type='text/x-jquery-tmpl')
     td
-      a(href='/ticket/view/${_id}') ${title}
+      a(href='/tickets/view/${_id}') ${title}
     td
       span(class='text-${color}') ${RP.t('ticket_status.' + status)}

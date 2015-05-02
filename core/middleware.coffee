@@ -56,6 +56,7 @@ exports.reqHelpers = (req, res, next) ->
       options: options
       type: type
 
+  # Deprecated
   res.error = (status, name, param) ->
     unless _.isNumber status
       [status, name, param] = [400, status, name]

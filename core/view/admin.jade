@@ -3,9 +3,6 @@ extends layout
 prepend header
   title #{t('admin.admin_panel')} | #{site.name}
 
-append header
-  link(rel='stylesheet', href='/style/admin.css')
-
 block main
   .row
     ul.nav.nav-tabs(role='tablist')
@@ -157,6 +154,3 @@ prepend sidebar
 
   .row
     a.btn.btn-lg.btn-success(href='/admin/ticket/')= t('ticket.ticket_list')
-
-append footer
-  script(src='/script/admin.js')

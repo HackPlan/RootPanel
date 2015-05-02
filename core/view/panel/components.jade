@@ -14,9 +14,9 @@ block main
           th 限制
           th 操作
       tbody
-        for template in templates
+        for provider in root.components.all()
           tr
-            td= template.name
+            td= provider.name
             td
             td
     
@@ -32,7 +32,6 @@ block main
       tbody
 
 append footer
-  script(src='/script/components.js')
   script(id='list-item-template', type='text/x-jquery-tmpl')
     td ${template}
     td ${name}
