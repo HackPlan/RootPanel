@@ -4,8 +4,7 @@ module.exports = class Shadowsocks
 
     @injector.widget 'panel',
       repeating:
-        components:
-          shadowsocks: every: true
+        every: 'shadowsocks'
       generator: (account, component) ->
         root.views.render __dirname + '/view/widget'
 

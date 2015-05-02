@@ -48,8 +48,7 @@ module.exports = class Linux
 
     @injector.widget 'panel',
       repeating:
-        components:
-          linux: every: true
+        every: 'linux'
       generator: (account, component) ->
         root.views.render __dirname + '/view/widget'
 

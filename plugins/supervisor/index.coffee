@@ -3,9 +3,8 @@ module.exports = class Supervisor
     @injector.component 'program', new SupervisorComponent @
 
     @injector.widget 'panel',
-      repeating:
-        components:
-          'supervisor.program': createable: true
+      required:
+        createable: 'supervisor.program'
       generator: (account, component) ->
         root.views.render __dirname + '/view/widget'
 
