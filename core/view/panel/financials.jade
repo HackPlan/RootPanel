@@ -1,14 +1,13 @@
 extends ../layout
 
 prepend header
-  title #{t('account.financials')} | #{t(config.web.t_name)}
+  title #{t('account.financials')} | #{site.name}
 
 block main
   .row
     header= t('account.financials')
-
-    for payment_method in payment_methods
-      != payment_method
+    
+    block payment-provider
 
   .row
     header= t('view.financials.payment_log')

@@ -1,8 +1,7 @@
 language: node_js
 
 node_js:
-  - 0.11
-  - 0.10
+  - 0.12
 
 before_install:
   - sudo apt-get update -qq
@@ -10,9 +9,20 @@ before_install:
   - sudo apt-get install -y python-pip python-m2crypto
   - sudo pip install shadowsocks
   - sudo mkdir /etc/shadowsocks
+  - ssh-keygen -b 2048 -t rsa -f ~/.ssh/id_rsa -q -N ''
+  - cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+  - chmod -R 700 ~/.ssh
+  - cp sample/core.config.coffee config.coffee
 
-script: npm run test-full
+script: npm test
 
 services:
   - mongodb
   - redis-server
+
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/b718f15367b0c6a71f7c
+    on_success: always
+    on_failure: always

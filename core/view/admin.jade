@@ -1,21 +1,48 @@
 extends layout
 
 prepend header
-  title #{t('admin.admin_panel')} | #{t(config.web.t_name)}
-
-append header
-  link(rel='stylesheet', href='/style/admin.css')
+  title #{t('admin.admin_panel')} | #{site.name}
 
 block main
   .row
     ul.nav.nav-tabs(role='tablist')
       li.active
+        a(href='#tab-system-info', data-toggle='tab') 系统状态
+      li
         a(href='#tab-account-list', data-toggle='tab')= t('view.admin.account_list')
       li
+        a(href='#tab-tickets', data-toggle='tab') 工单
+      li
         a(href='#tab-coupon-code', data-toggle='tab')= t('view.admin.coupon_code')
+      li
+        a(href='#tab-compontents', data-toggle='tab') 元件
+      li
+        a(href='#tab-system-log', data-toggle='tab') 系统日志
 
     .tab-content
-      #tab-account-list.tab-pane.active
+      #tab-system-info.tab-pane.active
+        .page-header
+          h1 
+            | RootPanel &nbsp;
+            small= app.package.version
+            
+        header 付费方案
+        
+        each plan, name in app.plans
+          .panel.panel-success
+            .panel-heading
+              strong= name
+            .panel-body
+        
+        header 已加载的插件
+        
+        each plugin, name in app.plugins
+          .panel.panel-default
+            .panel-heading
+              strong= name
+            .panel-body
+              
+      #tab-account-list.tab-pane
         table.table.table-hover
           thead
             tr
@@ -29,10 +56,19 @@ block main
               tr(data-id='#{account._id}')
                 td= account.username
                 td= account.email
-                td= account.billing.plans.join(', ')
-                td= account.billing.balance.toFixed(2)
+                td= _.keys(account.plans).join(', ')
+                td= account.balance.toFixed(2)
                 td
                   button.btn.btn-info.btn-sm.action-details(type='button')= t('common.details')
+                  .btn-group
+                    button(type='button', data-toggle='dropdown').btn.btn-warning.btn-sm.dropdown-toggle
+                      | 计划 &nbsp;
+                      span.caret
+                    ul.dropdown-menu
+                      li
+                        a(href='#') 加入套餐 A
+                      li
+                        a(href='#') 离开套餐 B
                   .btn-group
                     button(type='button', data-toggle='dropdown').btn.btn-primary.btn-sm.dropdown-toggle
                       | #{t('common.actions')} &nbsp;
@@ -40,9 +76,11 @@ block main
                     ul.dropdown-menu
                       li
                         a.action-confirm-payment(href='#')= t('view.admin.confirm_payment')
-                      if account.billing.balance <= 0 && account.billing.plans.length == 0
+                      if account.balance <= 0 && !_.isEmpty(account.plans)
                         li
                           a.action-delete-account(href='#')= t('view.admin.delete_account')
+
+      #tab-tickets.tab-pane
 
       #tab-coupon-code.tab-pane
         form.form-horizontal
@@ -116,6 +154,3 @@ prepend sidebar
 
   .row
     a.btn.btn-lg.btn-success(href='/admin/ticket/')= t('ticket.ticket_list')
-
-append footer
-  script(src='/script/admin.js')

@@ -1,0 +1,13 @@
+{
+  "name": "rootpanel",
+  "dependencies": {
+    "bootstrap": "~3.3.1",
+    "jquery-cookie": "~1.4.1",
+    "underscore": "~1.7.0",
+    "jquery": "~2.1.2",
+    "backbone": "~1.1.2",
+    "moment": "~2.9.0",
+    "jquery-tmpl": "vBeta1.0.0",
+    "q": "~1.2.0"
+  }
+}

@@ -1,77 +1,45 @@
-{express, async, _} = app.libs
-{requireAuthenticate} = app.middleware
-{Account, Financials} = app.models
-{pluggable, billing, config} = app
+{Router} = require 'express'
+_ = require 'lodash'
+Q = require 'q'
 
-module.exports = exports = express.Router()
+{Account, Financials} = root
+{requireAuthenticate} = require '../middleware'
 
-exports.use requireAuthenticate
+module.exports = router = new Router()
 
-exports.get '/financials', (req, res) ->
-  LIMIT = 10
+router.use requireAuthenticate
 
-  async.parallel
-    payment_methods: (callback) ->
-      async.map pluggable.selectHook(req.account, 'billing.payment_methods'), (hook, callback) ->
-        hook.widget_generator req, (html) ->
-          callback null, html
-      , callback
+###
+  Router: GET /panel/financials
 
-    deposit_log: (callback) ->
-      Financials.find
-        account_id: req.account._id
-        type: 'deposit'
-      , null,
-        sort:
-          created_at: -1
-        limit: LIMIT
-      , (err, deposit_logs) ->
-        async.map deposit_logs, (deposit_log, callback) ->
-          deposit_log = deposit_log.toObject()
+  Response HTML.
+###
+router.get '/financials', (req, res, next) ->
+  Q.all([
+    Financials.getDepositLogs req.account, req: req, limit: 10
+    Financials.getBillingLogs req.account, limit: 10
+  ]).done ([payment_providers, deposit_logs, billing_logs]) ->
+    res.render 'panel/financials',
+      deposit_logs: deposit_logs
+      billing_logs: billing_logs
+  , next
 
-          matched_hook = _.find pluggable.selectHook(req.account, 'view.pay.display_payment_details'), (hook) ->
-            return hook?.type == deposit_log.payload.type
+###
+  Router: GET /panel/components
 
-          unless matched_hook
-            return callback null, deposit_log
+  Response HTML.
+###
+router.get '/components', (req, res) ->
+  res.render 'panel/components',
+    component_providers: root.components.all()
 
-          matched_hook.filter req, deposit_log, (payment_details) ->
-            deposit_log.payment_details = payment_details
-            callback null, deposit_log
+###
+  Router: GET /panel
 
-        , callback
-
-    billing_log: (callback) ->
-      Financials.find
-        account_id: req.account._id
-        type:
-          $in: ['billing', 'usage_billing']
-      , null,
-        sort:
-          created_at: -1
-        limit: LIMIT
-      , callback
-
-  , (err, result) ->
-    res.render 'panel/financials', result
-
-exports.get '/', (req, res) ->
-  billing.triggerBilling req.account, (account) ->
-    view_data =
-      account: account
-      plans: []
-      widgets_html: []
-
-    for name, info of config.plans
-      view_data.plans.push _.extend _.clone(info),
-        name: name
-        is_enable: name in req.account.billing.plans
-
-    async.map pluggable.selectHook(account, 'view.panel.widgets'), (hook, callback) ->
-      hook.generator req, (html) ->
-        callback null, html
-
-    , (err, widgets_html) ->
-      view_data.widgets_html = widgets_html
-
-      res.render 'panel', view_data
+  Response HTML.
+###
+router.get '/', (req, res, next) ->
+  root.widgets.dispatch('panel', req.account).done (widgets_html) ->
+    res.render 'panel',
+      widgets_html: widgets_html
+  , next

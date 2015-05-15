@@ -1,7 +1,7 @@
 extends ../layout
 
 prepend header
-  title #{t('account.preferences')} | #{t(config.web.t_name)}
+  title #{t('account.preferences')} | #{site.name}
 
 block main
   .row
@@ -10,7 +10,7 @@ block main
       .form-group
         label.col-sm-2.col-md-offset-1.control-label= t('view.preferences.qq')
         .col-sm-5
-          input.input-qq.form-control(type='text', value=account.preferences.qq)
+          input.form-control(name='qq', type='text', value=account.preferences.qq)
       .form-group
         .col-sm-offset-3
           button.action-save.btn.btn-lg.btn-success(type='button')= t('common.save')
@@ -21,7 +21,7 @@ block main
       .form-group
         label.col-sm-2.col-md-offset-1.control-label= t('view.preferences.code')
         .col-sm-5
-          input.input-coupon_code.form-control(type='text')
+          input.form-control(name='coupon_code', type='text')
       .form-group
         .col-sm-offset-3
           button.action-use.btn.btn-lg.btn-success(type='button')= t('common.apply')
@@ -63,7 +63,3 @@ block main
       .form-group
         .col-sm-offset-3
           button.action-update-email.btn.btn-lg.btn-info(type='button')= t('common.change')
-
-
-append footer
-  script(src='/script/account/preferences.js')

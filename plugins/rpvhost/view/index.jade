@@ -1,0 +1,80 @@
+extends ../../../core/view/layout
+
+prepend header
+  title RP 主机：Linux 虚拟主机 | #{site.name}
+
+append header
+  link(rel='stylesheet', href='/plugins/rpvhost/style/index.css')
+
+block content
+  #page-title
+    .container
+      h1 RP 主机
+      p Linux 虚拟主机
+
+  #content.container
+    .row
+      .col-md-6.col-md-offset-6
+        header 支持多种运行环境
+        ul
+          li
+            code console.log('Node.js');
+          li
+            code print('Python')
+          li
+            code fmt.Println('Golang')
+          li
+            code echo 'PHP';
+
+    .row
+      .col-md-6
+        header 灵活地编写 Nginx 配置
+        pre.
+          {
+            "listen": 80,
+            "server_name": ["myapp.net"],
+            "auto_index": false,
+            "index": ["index.html"],
+            "root": "/home/user/web",
+            "location": {
+              "/": {
+                "fastcgi_pass": "unix:///home/user/phpfpm.sock",
+                "fastcgi_index": ["index.php"]
+              }
+            }
+          }
+
+    .row
+      .col-md-6.col-md-offset-6
+        header 各种类型的数据库
+        ul
+          li
+            code db.update {name: 'MongoDB'}
+          li
+            code SELECT FROM `MySQL`
+          li
+            code FLUSH Redis
+          li
+            code GET Memcache
+
+  #page-footer
+    .container
+      p
+        a(href='https://github.com/jysperm/RootPanel') RootPanel
+        | &nbsp; v#{app.package.version}
+      p
+        for author in app.package.contributors
+          | by &nbsp;
+          a(href=author.url)= author.name
+
+  #site-not-exist.modal
+    .modal-dialog
+      .modal-content
+        .modal-header
+          button.close(type='button', data-dismiss='modal', aria-hidden='true') &times;
+          h4.modal-title 您访问的站点不存在
+        .modal-body
+          p 因为您要访问的站点不存在，所以我们将页面重定向到了 RP 主机首页。
+          p 很可能是由于这个站点的所有者删除或修改了这个站点。
+        .modal-footer
+          button.btn.btn-danger(type='button', data-dismiss='modal') 关闭

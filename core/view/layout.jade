@@ -3,12 +3,10 @@ html
   head
     meta(charset='utf-8')
     block header
-      link(rel='stylesheet', href='http://cdn.staticfile.org/twitter-bootstrap/3.2.0/css/bootstrap.min.css')
-      link(rel='stylesheet', href='/style/layout.css')
-      for hook in selectHook('view.layout.styles')
-        link(rel='stylesheet', href=hook.path)
+      link(rel='stylesheet', href='/public/vendor/vendor.css')
+      link(rel='stylesheet', href='/public/core.css')
 
-  body(data-username="#{account ? account.username : ''}", data-locale-version=app.i18n.clientLocaleHash(req), data-csrf-token=req.session.csrf_token)
+  body(data-username="#{account ? account.username : ''}")
     header.navbar-fixed-top
       .container
         nav.navbar.navbar-default.navbar-inverse(role='navigation')
@@ -18,20 +16,14 @@ html
               span.icon-bar
               span.icon-bar
               span.icon-bar
-            a.navbar-brand(href='/')= t(config.web.t_name)
+            a.navbar-brand(href='/')= site.name
           #navbar-collapse.collapse.navbar-collapse
             ul.nav.navbar-nav
-              for hook in selectHook('view.layout.menu_bar')
-                if hook.target
-                  li
-                    a(href=hook.href, target=hook.target)= t(hook.t_body)
-                else
-                  li
-                    a(href=hook.href)= t(hook.t_body)
+              block menu-bar
             ul.nav.navbar-nav.navbar-right
               if account
                 li
-                  a(href='/account/preferences/')= account.username
+                  a(href='/account/preferences/edit')= account.username
                 li
                   a(href='/panel/')= t('panel.')
                 if account.inGroup('root')
@@ -52,7 +44,7 @@ html
                 ul.dropdown-menu
                   li
                     a.action-switch-language(href='#', data-language='auto') #{t('languages.auto')} (auto)
-                    for language in config.i18n.available_language
+                    for language in root.i18n.languages()
                       a.action-switch-language(href='#', data-language=language) #{t('languages.' + language)} (#{language})
 
     block content
@@ -64,9 +56,9 @@ html
           #sidebar.col-md-3
             block sidebar
               .row
-                header= t(config.web.t_name)
+                header= site.name
                 ul
-                  li v#{app.package.version}
+                  li v#{root.package.version}
                   li
                     if config.web.repo.match(/^http/)
                       a(href=config.web.repo, target='_blank') Source Code
@@ -74,19 +66,14 @@ html
                       a(href='https://github.com/#{config.web.repo}', target='_blank') Source on Github
 
     #footer
-      if config.web.google_analytics_id
-        script.
-          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-          ga('create', '#{config.web.google_analytics_id}', 'auto');
-          ga('send', 'pageview');
-      script(src='http://cdn.staticfile.org/jquery/2.0.3/jquery.min.js')
-      script(src='http://cdn.staticfile.org/jquery-cookie/1.4.1/jquery.cookie.min.js')
-      script(src='http://cdn.staticfile.org/underscore.js/1.7.0/underscore-min.js')
-      script(src='http://cdn.staticfile.org/twitter-bootstrap/3.2.0/js/bootstrap.min.js')
-      script(src='/script/layout.js')
-      for hook in selectHook('view.layout.scripts')
-        script(src=hook.path)
       block footer
+        if config.web.google_analytics_id
+          script.
+            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+            })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+            ga('create', '#{config.web.google_analytics_id}', 'auto');
+            ga('send', 'pageview');
+        script(src='/public/vendor/vendor.js')
+        script(src='/public/core.js')

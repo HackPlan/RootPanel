@@ -1,125 +1,94 @@
-{_, async, express} = app.libs
+{Router} = require 'express'
+_ = require 'lodash'
+Q = require 'q'
 
-{requireAuthenticate} = app.middleware
-{Account, Ticket} = app.models
-{config, notification, logger} = app
+{Account, Ticket} = root
+{requireAuthenticate} = require '../middleware'
 
-module.exports = exports = express.Router()
+module.exports = router = new Router()
 
-exports.use requireAuthenticate
+router.use requireAuthenticate
 
-exports.param 'id', (req, res, next, id) ->
-  Ticket.findById id, (err, ticket) ->
-    logger.error err if err
-
-    unless ticket
-      return res.error 'ticket_not_exist', null, 404
+router.param 'id', (req, res, next, ticket_id) ->
+  Ticket.findById(ticket_id).done (ticket) ->
+    unless req.ticket = ticket
+      return next new Error 'ticket not found'
 
     unless ticket.hasMember req.account
-      unless req.account.inGroup 'root'
-        return res.error 'forbidden', null, 403
-
-    req.ticket = ticket
+      unless req.account.isAdmin()
+        return next new Error 'ticket forbidden'
 
     next()
+  , next
 
-exports.get '/list', (req, res) ->
-  Ticket.find
-    $or: [
-      account_id: req.account._id
-    ,
-      members: req.account._id
-    ]
-  , null,
-    sort:
-      updated_at: -1
-  , (err, tickets) ->
-    logger.error err if err
-    res.render 'ticket/list',
-      tickets: tickets
+###
+  Router: GET /tickets/list
 
-exports.get '/create', (req, res) ->
+  Response HTML.
+###
+router.get '/list', (req, res) ->
+  res.render 'ticket/list'
+
+###
+  Router: GET /tickets/create
+
+  Response HTML.
+###
+router.get '/create', (req, res) ->
   res.render 'ticket/create'
 
-exports.get '/view/:id', (req, res) ->
-  req.ticket.populateAccounts (ticket) ->
-    res.render 'ticket/view',
-      ticket: ticket
+###
+  Router: GET /tickets/:id/view
 
-exports.post '/create', (req, res) ->
-  unless /^.+$/.test req.body.title
-    return res.error 'invalid_title'
+  Response HTML.
+###
+router.get '/:id/view', (req, res) ->
+  res.render 'ticket/view'
 
-  Ticket.create
-    account_id: req.account._id
-    title: req.body.title
-    content: req.body.content
-    status: if req.account.inGroup 'root' then 'open' else 'pending'
-    members: [req.account._id]
-  , (err, ticket) ->
-    logger.error err if err
+###
+  Router: GET /tickets
 
-    res.json
-      id: ticket._id
+  Response {Array} of {Ticket}.
+###
+router.get '/', (req, res, next) ->
+  Ticket.getTickets(req.account).done (tickets) ->
+    res.json tickets
+  , next
 
-    notification.createGroupNotice 'root', 'ticket_create',
-      title: res.t 'notification_title.ticket', ticket
-      body: _.template(app.templates['ticket_create_email'])
-        t: res.t
-        ticket: ticket
-        account: req.account
-        config: config
-    , ->
+###
+  Router: POST /tickets
 
-exports.post '/reply/:id', (req, res) ->
-  {ticket} = req
+  Response {Ticket}.
+###
+router.post '/', (req, res, next) ->
+  Ticket.createTicket(req.account, req.body).done (ticket) ->
+    res.status(201).json ticket
+  , next
 
-  unless req.body.content
-    return res.error 'invalid_content'
+###
+  Router: GET /tickets/:id
 
-  status = if 'root' in req.account.groups then 'open' else 'pending'
+  Response {Ticket}.
+###
+router.get '/:id', (req, res, next) ->
+  req.ticket.populateAccounts().done (ticket) ->
+    res.json ticket
+  , next
 
-  ticket.createReply req.account, req.body.content, status, {}, (err, reply) ->
-    logger.error err if err
+###
+  Router: POST /tickets/:id/replies
 
-    res.json
-      id: reply._id
+  Response {Reply}.
+###
+router.post '/:id/replies', (req, res, next) ->
+  req.ticket.createReply(req.account, req.body).done (reply) ->
+    res.status(201).json reply
+  , next
 
-    async.each ticket.members, (member_id, callback) ->
-      if member_id.toString() == req.account._id.toString()
-        return callback()
-
-      Account.findOne
-        _id: member_id
-      , (err, account) ->
-        notification.createNotice account, 'ticket_reply',
-          title: res.t 'notification_title.ticket', ticket
-          body: _.template(app.templates['ticket_reply_email'])
-            t: res.t
-            ticket: ticket
-            reply: reply
-            account: req.account
-            config: config
-        , ->
-          callback()
-    , ->
-
-exports.post '/update_status/:id', (req, res) ->
-  {ticket} = req
-
-  if req.account.inGroup 'root'
-    allow_status = ['open', 'pending', 'finish', 'closed']
-  else
-    allow_status = ['closed']
-
-  if req.body.status in allow_status
-    if ticket.status == req.body.status
-      return res.error 'already_in_status'
-  else
-    return res.error 'invalid_status'
-
-  ticket.update
-    $set:
-      status: req.body.status
-  , ->
-    res.json {}
+###
+  Router: PUT /tickets/:id/status
+###
+router.put '/:id/status', (req, res, next) ->
+  req.ticket.setStatusByAccount(req.account, req.body.status).done ->
+    res.sendStatus 204
+  , next

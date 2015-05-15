@@ -1,17 +1,12 @@
 extends layout
 
 prepend header
-  title #{t('panel.')} | #{t(config.web.t_name)}
-
-append header
-  link(rel='stylesheet', href='/style/panel.css')
-  for hook in selectHook('view.panel.styles')
-    link(rel='stylesheet', href=hook.path)
+  title #{t('panel.')} | #{site.name}
 
 block main
   .row
     header= t('account.financials')
-    p #{t('plan.balance')}: #{account.billing.balance.toFixed(2)} #{t('plan.currency.' + config.billing.currency)}
+    p #{t('plan.balance')}: #{account.balance.toFixed(2)} #{t('plan.currency.' + config.billing.currency)}
     p
       a(href= '/panel/financials/').btn.btn-success= t('common.charge')
 
@@ -19,13 +14,13 @@ block main
     header= t('plan.')
     table.table.table-hover.plan-list
       tbody
-        for plan in plans
+        for plan in root.billing.all()
           tr(data-name='#{plan.name}')
             td
-              strong= t(plan.t_name)
-            td= t(plan.t_description)
+              strong= t(plan.name)
+            td= t(plan.description)
             td
-              if plan.is_enable
+              if plan.hasMember(account)
                 button.action-leave-plan.btn.btn-danger.btn-sm= t('plan.leave')
               else
                 button.action-join-plan.btn.btn-success.btn-sm= t('plan.join')
@@ -36,11 +31,8 @@ block main
 prepend sidebar
   .row
     p
-      a.btn.btn-lg.btn-success(href='/ticket/list/')= t('ticket.')
+      a.btn.btn-lg.btn-success(href='/panel/components') 元件详情
+    p
+      a.btn.btn-lg.btn-success(href='/tickets/list/')= t('ticket.')
     p
       a.btn.btn-lg.btn-success(href='/account/preferences/')= t('account.preferences')
-
-append footer
-  script(src='/script/panel.js')
-  for hook in selectHook('view.panel.scripts')
-    script(src=hook.path)

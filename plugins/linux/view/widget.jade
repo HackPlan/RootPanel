@@ -1,0 +1,25 @@
+mixin displayProgressBar(now, limit, unit)
+  - per = parseInt((now / limit * 100).toFixed())
+  - color = per < 85 ? 'success' : 'danger'
+
+  .progress
+    .progress-bar(class="progress-bar-#{color}", role='progressbar', aria-valuenow='#{per}',
+                  aria-valuemin='0', aria-valuemax='100', style='width: #{per}%;')
+      span #{now} / #{limit} #{unit}
+
+.row
+  header= t('')
+  table.table.table-hover.linux-widget-table
+    tbody
+      tr
+        td= t('widget.hour_cpu')
+        td
+          mixin displayProgressBar(usage.cpu, limit.cpu, 's')
+      tr
+        td= t('widget.hour_memory')
+        td
+          mixin displayProgressBar(usage.memory, limit.memory, 'M')
+      tr
+        td= t('widget.storage')
+        td
+          mixin displayProgressBar(usage.storage, limit.storage, 'M')

@@ -1,132 +1,299 @@
-{_, async, express} = app.libs
-{requireAuthenticate} = app.middleware
-{Account, SecurityLog} = app.models
-{config, utils, logger} = app
+{Router} = require 'express'
+_ = require 'lodash'
 
-module.exports = exports = express.Router()
+utils = require '../utils'
 
-exports.get '/register', (req, res) ->
+{i18n, Account, CouponCode} = root
+{requireAuthenticate} = require '../middleware'
+
+module.exports = router = new Router()
+
+###
+  Router: GET /account
+
+  Response {Account} from {Account::pick}
+###
+router.get '/', requireAuthenticate, (req, res) ->
+  res.json req.account.pick 'self'
+
+###
+  Router: GET /account/register
+
+  Response HTML.
+###
+router.get '/register', (req, res) ->
   res.render 'account/register'
 
-exports.get '/login', (req, res) ->
+###
+  Router: GET /account/login
+
+  Response HTML.
+###
+router.get '/login', (req, res) ->
   res.render 'account/login'
 
-exports.get '/preferences', requireAuthenticate, (req, res) ->
+###
+  Router: GET /account/forget
+
+  Response HTML
+###
+router.get '/forget',  (req, res) ->
+  res.render 'account/forget'
+
+###
+  Router: GET /account/reset/:email/:token
+
+  Response HTML
+###
+router.get '/reset/:email/:token', (req, res) ->
+  Account.search(req.params.email).done (account) ->
+    unless account
+      throw new Error 'no account'
+
+    if account.token.length != 1 or account.token[0] != token
+      throw new Error 'illegal action'
+
+    res.render 'account/reset', req.params
+  , next
+
+###
+  Router: GET /account/translations/:language?
+
+  Response {Object}.
+###
+router.get '/translations/:language?', (req, res) ->
+  if req.params.language
+    res.json i18n.packTranslations req.params.language
+  else
+    res.json i18n.packTranslations req
+
+###
+  Router: GET /account/preferences/edit
+
+  Response HTML.
+###
+router.get '/preferences/edit', requireAuthenticate, (req, res) ->
   res.render 'account/preferences'
 
-exports.get '/session_info/', (req, res) ->
-  response =
-    csrf_token: req.session.csrf_token
+###
+  Router: POST /account/register
 
-  if req.account
-    _.extend response,
-      id: req.account.id
-      username: req.account.username
-      preferences: req.account.preferences
+  Request {Object}
 
-  res.json response
+    * `username` {String}
+    * `email` {String}
+    * `password` {String}
 
-exports.post '/register', (req, res) ->
-  Account.register req.body, (err, account) ->
-    return res.error utils.pickErrorName err if err
+  Response {Token}.
+  Set-Cookie: token.
+###
+router.post '/register', (req, res, next) ->
+  Account.register(req.body).then (account) ->
+    res.createToken account
+  .catch (err) ->
+    if err.message.match /duplicate.*username/
+      next new Error 'username exist'
+    else
+      next err
 
-    account.createToken 'full_access',
-      ip: req.headers['x-real-ip']
-      ua: req.headers['user-agent']
-    , (err, token) ->
-      logger.error err if err
+###
+  Router: POST /account/forget
 
-      res.cookie 'token', token.token,
-        expires: new Date(Date.now() + config.account.cookie_time)
+  Request {Object}
 
-      res.json
-        id: account._id
+    * `email` {String}
 
-exports.post '/login', (req, res) ->
-  Account.search req.body.username, (account) ->
-    unless account
-      return res.error 'wrong_password'
+  Response HTML send mail result page (success or failed)
+###
+router.post '/forget', (req, res) ->
+  Account.search(req.body.email).then (account) ->
+    account.forgetPassword(req.getClientInfo()).then (token) ->
+      # the send mail module can't work
+      # todo: send email with a url like: /account/reset/:email/:token
+      # return the success or ...
+      res.sendStatus 200
 
-    unless account.matchPassword req.body.password
-      return res.error 'wrong_password'
+###
+  Router: POST /account/forget
 
-    account.createToken 'full_access',
-      ip: req.headers['x-real-ip']
-      ua: req.headers['user-agent']
-    , (err, token) ->
-      logger.error err if err
+  Request {Object}
 
-      res.cookie 'token', token.token,
-        expires: new Date Date.now() + config.account.cookie_time
+    * `email` {String}
 
-      res.cookie 'language', account.preferences.language,
-        expires: new Date Date.now() + config.account.cookie_time
+  Response HTML send mail result page (success or failed)
+###
+router.post '/reset', (req, res) ->
+  Account.search(req.body.email).done (account) ->
+    # TODO: check token type
+    if account and account.token.length is 1 and account.token[0] is req.body.token
+      account.setPassword(req.body.password).then ->
+        account.update
+          $set:
+            token: []
+        .then ->
+          res.json account
+    else
+      throw new Error 'illegal action'
 
-      res.json
-        id: account._id
+  , next
+
+###
+  Router: POST /account/login
+
+  Request {Object}
+
+    * `username` {String} Username, email or account_id.
+    * `password` {String}
+
+  Response {Token}.
+  Set-Cookie: token, language.
+###
+router.post '/login', (req, res, next) ->
+  Account.search(req.body.username).then (account) ->
+    unless account?.matchPassword req.body.password
+      throw new Error 'wrong password'
+
+    res.createCookie 'language', account.preferences.language
+
+    res.createToken(account).then (token) ->
+      req.createSecurityLog 'login', {},
+        account: account
         token: token
 
-exports.post '/logout', requireAuthenticate, (req, res) ->
-  req.token.revoke ->
-    req.account.createSecurityLog 'revoke_token', req.token,
-      revoke_ip: req.headers['x-real-ip']
-      revoke_ua: req.headers['user-agent']
-    , (err) ->
-      logger.error err if err
-
-      res.clearCookie 'token'
-      res.json {}
-
-exports.post '/update_password', requireAuthenticate, (req, res) ->
-  unless req.account.matchPassword req.body.original_password
-    return res.error 'wrong_password'
-
-  unless utils.rx.password.test req.body.password
-    return res.error 'invalid_password'
-
-  req.account.updatePassword req.body.password, ->
-    req.account.createSecurityLog 'update_password', req.token, {}, (err) ->
-      logger.error err if err
-
-      res.json {}
-
-exports.post '/update_email', requireAuthenticate, (req, res) ->
-  unless req.account.matchPassword req.body.password
-    return res.error 'wrong_password'
-
-  unless utils.rx.email.test req.body.email
-    return res.error 'invalid_email'
-
-  req.account.email = req.body.email
-
-  req.account.save (err) ->
-    logger.error err if err
-
-    req.account.createSecurityLog 'update_email', req.token,
-      original_email: req.account.email
-      email: req.body.email
-    , (err) ->
-      logger.error err if err
-
-      res.json {}
-
-exports.post '/update_preferences', requireAuthenticate, (req, res) ->
-  req.body = _.omit req.body, 'csrf_token'
-
-  for k, v of req.body
-    if k in ['qq', 'language', 'timezone']
-      req.account.preferences[k] = v
-      req.account.markModified "preferences.#{k}"
+  .catch (err) ->
+    if err.message.match /must be a/
+      next new Error 'wrong password'
     else
-      return res.error 'invalid_field'
+      next err
 
-  req.account.save (err) ->
-    logger.error err if err
+###
+  Router: POST /account/logout
 
-    req.account.createSecurityLog 'update_preferences', req.token,
-      original_preferences: _.pick.apply @, [req.account.preferences].concat _.keys(req.body)
-      preferences: req.body
-    , (err) ->
-      logger.error err if err
+  Set-Cookie: token.
+###
+router.post '/logout', requireAuthenticate, (req, res, next) ->
+  req.token.revoke().done ->
+    req.createSecurityLog('revoke_token').then ->
+      res.clearCookie('token').sendStatus 204
+  , next
 
-      res.json {}
+###
+  Router: PUT /account/password
+
+  Request {Object}
+
+    * `original_password` {String}
+    * `password` {String}
+
+###
+router.put '/password', requireAuthenticate, (req, res, next) ->
+  Q().done ->
+    unless req.account.matchPassword req.body.original_password
+      throw new Error 'wrong_password'
+
+    unless utils.rx.password.test req.body.password
+      throw new Error 'invalid_password'
+
+    req.account.setPassword(req.body.password).then ->
+      req.createSecurityLog 'update_password'
+      res.sendStatus 204
+
+  , next
+
+###
+  Router: PUT /email
+
+  Request {Object}
+
+    * `email` {String}
+    * `password` {String}
+
+###
+router.post '/update_email', requireAuthenticate, (req, res, next) ->
+  Q().done ->
+    unless req.account.matchPassword req.body.password
+      throw new Error 'wrong_password'
+
+    unless utils.rx.email.test req.body.email
+      throw new Error 'invalid_email'
+
+    original_email = req.account.email
+
+    req.account.setEmail(req.body.email).then ->
+      req.createSecurityLog 'update_email',
+        original_email: original_email
+        current_email: req.account.email
+
+      res.sendStatus 204
+
+  , next
+
+###
+  Router: PATCH /account/preferences
+
+  Request {Preferences}.
+
+  Response {Preferences}.
+###
+router.patch '/preferences', requireAuthenticate, (req, res, next) ->
+  req.account.updatePreferences(req.body).done (preferences) ->
+    res.json preferences
+  , next
+
+router.use '/plans', do (router = new Router) ->
+  router.param 'plan', (req, res, next, plan_name) ->
+    if req.plan = root.billing.byName plan_name
+      next()
+    else
+      next new Error 'plan not found'
+
+  ###
+    Router: POST /account/plans/:plan/join
+  ###
+  router.post '/:plan/join', (req, res, next) ->
+    if root.billing.isFrozen req.account
+      return next new Error 'insufficient_balance'
+
+    unless req.plan.join_freely
+      return next new Error 'cant_join_plan'
+
+    req.plan.addMember(req.account).done ->
+      res.sendStatus 204
+    , next
+
+  ###
+    Router: POST /account/plans/:plan/leave
+  ###
+  router.post '/:plan/leave', (req, res, next) ->
+    req.plan.removeMember(req.account).done ->
+      res.sendStatus 204
+    , next
+
+router.use '/coupons', do (router = new Router) ->
+  ###
+    Router: GET /account/coupons/:code
+
+    Response {CouponCode}.
+  ###
+  router.get '/:code', (req, res, next) ->
+    CouponCode.findByCode(req.params.code).done (coupon) ->
+      if coupon
+        coupon.populate(req: req).then ->
+          coupon.validate(req.account).then (available) ->
+            res.json _.extend coupon.pick(),
+              available: available
+      else
+        throw new Error 'coupon_not_found'
+    , next
+
+  ###
+    Router: POST /account/coupons/:code/apply
+  ###
+  router.post '/:code/apply', requireAuthenticate, (req, res, next) ->
+    CouponCode.findByCode(req.params.code).done (coupon) ->
+      if coupon
+        coupon.apply(account).then ->
+          res.sendStatus 204
+      else
+        throw new Error 'coupon_not_found'
+    , next

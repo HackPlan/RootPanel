@@ -1,58 +1,55 @@
-stringify = require 'json-stable-stringify'
+jsonStableStringify = require 'json-stable-stringify'
 getParameterNames = require 'get-parameter-names'
-CounterCache = require 'counter-cache'
+redis = require 'redis'
 _ = require 'underscore'
+Q = require 'q'
 
-config = require '../config'
+###
+  Public: Cache factory,
+  You can access a global instance via `root.cache`.
+###
+module.exports = class CacheFactory
+  constructor: ({host, port, password}) ->
+    @redis = redis.createClient port, host,
+      auth_pass: password
 
-{redis} = app
+    _.extend @,
+      get: Q.denodeify @redis.get.bind @redis
+      del: Q.denodeify @redis.del.bind @redis
+      set: Q.denodeify @redis.set.bind @redis
+      setEx: Q.denodeify @redis.setex.bind @redis
 
-exports.counter = new CounterCache()
-
-exports.hashKey = (key) ->
-  if _.isString key
-    return "#{config.redis.prefix}:" + key
-  else
-    return "#{config.redis.prefix}:" + stringify key
-
-# @param key: string|object
-# @param setter(COMMAND(value, command_params...), key)
-# @param callback(value)
-exports.try = (key, setter, callback) ->
-  original_key = key
-  key = exports.hashKey key
-
-  redis.get key, (err, value) ->
-    if value != undefined and value != null
-      try
-        callback JSON.parse value
-      catch e
-        callback value
-
+  hashKey: (key) ->
+    if _.isString key
+      return key
     else
-      setter (value, command_params...) ->
-        original_value = value
+      return jsonStableStringify key
 
-        if _.isObject value
-          value = JSON.stringify value
+  getJSON: (key) ->
+    @get(@hashKey key).then (result) ->
+      try
+        return JSON.parse result
+      catch
+        return null
 
-        command = _.first getParameterNames setter
-        command = exports[command.toUpperCase()]
+  try: (key, setter) ->
+    @tryHelper key, setter, =>
+      @set arguments...
 
-        params = [key, value].concat command_params
-        params.push ->
-          callback original_value
+  tryExpire: (key, expired, setter) ->
+    @tryHelper key, setter, (key, value) =>
+      @setEx key, expired, value
 
-        command.apply @, params
+  refresh: (key) ->
+    @del @hashKey key
 
-      , original_key
+  tryHelper: (key, setter, operator) ->
+    hashed_key = @hashKey key
 
-exports.delete = (key, callback) ->
-  redis.del exports.hashKey(key), ->
-    callback()
-
-exports.SET = (key, value, callback) ->
-  redis.set key, value, callback
-
-exports.SETEX = (key, value, seconds, callback) ->
-  redis.setex key, seconds, value, callback
+    @get(hashed_key).then (value) ->
+      Q().then ->
+        if value in [undefined, null]
+          Q(setter()).then (value) ->
+            command(hashed_key, value).thenReject value
+        else
+          return value

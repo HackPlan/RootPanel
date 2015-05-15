@@ -1,126 +1,138 @@
-{config} = app
-{_, expressSession, redisStore, path, fs, moment} = app.libs
-{Account} = app.models
+expressBunyanLogger = require 'express-bunyan-logger'
+expressSession = require 'express-session'
+redisStore = require 'connect-redis'
+moment = require 'moment-timezone'
+crypto = require 'crypto'
+csrf = require 'csrf'
+path = require 'path'
+fs = require 'fs'
+_ = require 'lodash'
 
-exports.errorHandling = (req, res, next) ->
-  res.error = (name, param = {}, status = 400) ->
-    res.status(status).json _.extend param,
-      error: name
+{Account, SecurityLog, config} = root
+
+builtInErrors = [
+  EvalError, RangeError, ReferenceError
+  SyntaxError, TypeError, URIError
+]
+
+exports.reqHelpers = (req, res, next) ->
+  req.getTokenCode = ->
+    if req.method == 'GET'
+      return req.cookies?.token ? req.headers?['x-token'] ? req.headers?.token
+    else
+      return req.headers?['x-token'] ? req.headers?.token
+
+  req.getClientInfo = ->
+    return {
+      ip: req.headers['x-real-ip'] ? req.ip
+      ua: req.headers['user-agent']
+    }
+
+  req.getLanguage = ->
+    if req.cookies?.language and req.cookies.language != 'auto'
+      return req.cookies.language
+    else
+      return config.i18n.default_language
+
+  req.getTimezone = ->
+    return req.cookies?.timezone ? config.i18n.default_timezone
+
+  req.getTranslator = ->
+    return root.i18n.translator req
+
+  req.getMoment = ->
+    return moment.apply(arguments...).locale(req.getLanguage()).tz(req.getTimezone())
+
+  req.createSecurityLog = (type, options, {account, token} = {}) ->
+    SecurityLog.createLog (account ? req.account),
+      token: token ? req.token
+      options: options
+      type: type
+
+  res.createCookie = (name, value) ->
+    res.cookie name, value,
+      expires: new Date(Date.now() + config.web.cookie_time)
+
+  res.createToken = (account = req.account) ->
+    account.createToken('full_access', req.getClientInfo()).then (token) ->
+      res.createCookie('token', token.code).json
+        account_id: account._id
+        token: token.code
+
+      return token
 
   next()
 
-exports.session = ->
+exports.renderHelpers = (req, res, next) ->
+  _.extend res.locals,
+    _: _
+    req: req
+    res: res
+    root: root
+    config: config
+
+    t: root.i18n.translator req
+
+    plugin: (name) ->
+      return root.plugins.byName name
+
+    account: req.account
+
+    site:
+      name: req.getTranslator() config.web.name
+
+  res.render = (view, locals = {}) ->
+    root.views.render view, _.defaults(locals, res.locals)
+    .done (html) ->
+      res.send html
+    , (err) ->
+      exports.errorHandling err, req, res, ->
+
+  next()
+
+exports.errorHandling = (err, req, res, next) ->
+  if err.constructor in builtInErrors
+    root.log err.stack
+
+  res.json
+    error: err.message
+
+exports.session = ({redis}) ->
+  session_key_path = path.join __dirname, '../session.key'
+
+  unless fs.existsSync session_key_path
+    fs.writeFileSync session_key_path, crypto.randomBytes(48).toString('hex')
+    fs.chmodSync session_key_path, 0o750
+
   RedisStore = redisStore expressSession
-  secret = fs.readFileSync(path.join __dirname, '../session.key').toString()
+  secret = fs.readFileSync(session_key_path).toString()
 
   return expressSession
     store: new RedisStore
-      client: app.redis
+      client: redis
 
     resave: false
     saveUninitialized: false
     secret: secret
 
-exports.csrf = ->
-  csrf = app.libs.csrf()
-
-  return (req, res, next) ->
-    if req.path in _.pluck app.pluggable.selectHook(null, 'app.ignore_csrf'), 'path'
-      return next()
-
-    validator = ->
-      unless req.method == 'GET'
-        unless csrf.verify req.session.csrf_secret, req.body.csrf_token
-          return res.error 'invalid_csrf_token', null, 403
-
-      next()
-
-    if req.session.csrf_secret
-      return validator()
-    else
-      csrf.secret (err, secret) ->
-        req.session.csrf_secret = secret
-        req.session.csrf_token = csrf.create secret
-
-        validator()
-
 exports.authenticate = (req, res, next) ->
-  token_field = do ->
-    if req.headers['x-token']
-      return req.headers['x-token']
-    else
-      return req.cookies.token
-
-  unless token_field
-    return next()
-
-  Account.authenticate token_field, (token, account) ->
-    if token and token.type == 'full_access'
-      req.token = token
-      req.account = account
-
-    next()
-
-exports.accountHelpers = (req, res, next) ->
-  _.extend res,
-    language: req.cookies.language ? config.i18n.default_language
-    timezone: req.cookies.timezone ? config.i18n.default_timezone
-
-    t: app.i18n.getTranslator req
-
-    moment: ->
-      if res.language and res.language != 'auto'
-        return moment.apply(@, arguments).locale(res.language).tz(res.timezone)
-      else if res.timezone
-        return moment.apply(@, arguments).tz(res.timezone)
-      else
-        return moment.apply(@, arguments)
-
-  _.extend req,
-    res: res
-    t: res.t
-
-  _.extend res.locals,
-    _: _
-
-    app: app
-    req: req
-    res: res
-    config: config
-
-    account: req.account
-
-    t: res.t
-    moment: res.moment
-
-    selectHook: (name) ->
-      return app.pluggable.selectHook req.account, name
-
-  next()
+  Account.authenticate(req.getTokenCode()).then ({token, account}) ->
+    if token?.type == 'full_access'
+      _.extend req,
+        token: token
+        account: account
+  .finally next
 
 exports.requireAuthenticate = (req, res, next) ->
   if req.account
     next()
+  else if req.method == 'GET'
+    res.redirect '/account/login'
   else
-    if req.method == 'GET'
-      res.redirect '/account/login/'
-    else
-      res.error 'auth_failed', null, 403
+    next new Error 'auth failed'
 
 exports.requireAdminAuthenticate = (req, res, next) ->
-  req.inject [exports.requireAuthenticate], ->
-    unless 'root' in req.account.groups
-      if req.method == 'GET'
-        return res.status(403).end()
-      else
-        return res.error 'forbidden'
-
+  if req.account?.isAdmin()
     next()
-
-exports.requireInService = (service_name) ->
-  return (req, res, next) ->
-    req.inject [exports.requireAuthenticate], ->
-      unless service_name in req.account.billing.services
-        return res.error 'not_in_service'
-
-      next()
+  else
+    next new Error 'forbidden'

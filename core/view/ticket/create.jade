@@ -1,20 +1,15 @@
 extends ../layout
 
 prepend header
-  title #{t('ticket.create_ticket')} | #{t(config.web.t_name)}
-
-append header
-  link(rel='stylesheet', href='/style/ticket.css')
+  title #{t('ticket.create_ticket')} | #{site.name}
 
 block main
-  header= t('ticket.create_ticket')
-  form.form-horizontal
-    .form-group.padding
-      input.input-title.form-control(type='text', placeholder= t('ticket.title'))
-    .form-group.padding
-      textarea.input-content.form-control(rows='15')
-    .form-group.padding
-      button.btn.btn-lg.btn-primary.action-create(type='button')= t('ticket.create')
-
-append footer
-  script(src='/script/ticket/create.js')
+  #create-view.row
+    header= t('ticket.create_ticket')
+    form.form-horizontal
+      .form-group.padding
+        input.form-control(name='title', type='text', placeholder= t('ticket.title'))
+      .form-group.padding
+        textarea.form-control(name='content', rows='15')
+      .form-group.padding
+        button.btn.btn-lg.btn-primary.action-create(type='button')= t('ticket.create')

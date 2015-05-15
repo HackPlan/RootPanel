@@ -1,0 +1,39 @@
+extends ../layout
+
+prepend header
+  title 元件 | #{site.name}
+
+block main
+  #list-view
+    header 可用模板
+    
+    table.table-template.table.table-hover
+      thead
+        tr
+          th 模板
+          th 限制
+          th 操作
+      tbody
+        for provider in root.components.all()
+          tr
+            td= provider.name
+            td
+            td
+    
+    header 拥有元件
+    
+    table.table-component.table.table-hover
+      thead
+        tr
+          th 元件模板
+          th 名称
+          th 节点
+          th 状态
+      tbody
+
+append footer
+  script(id='list-item-template', type='text/x-jquery-tmpl')
+    td ${template}
+    td ${name}
+    td ${node_name}
+    td ${status}

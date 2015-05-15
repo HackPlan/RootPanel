@@ -6,57 +6,17 @@
     apt-get update
     apt-get upgrade
 
-    vi /etc/hostname
-    vi /etc/hosts
-
     apt-get install mongodb=1:2.4.9-1ubuntu2
-    apt-get install python g++ make nodejs git nginx redis-server ntp supervisor
+    apt-get install python g++ make nodejs git nginx redis-server supervisor
 
     npm install coffee-script -g
 
-    mongo
-
-        use admin
-        db.addUser({user: 'rpadmin', pwd: 'password', roles: ['readWriteAnyDatabase', 'userAdminAnyDatabase', 'dbAdminAnyDatabase', 'clusterAdmin']})
-        use RootPanel
-        db.addUser({user: 'rpadmin', pwd: 'password', roles: ['readWrite']})
-
-    vi /etc/mongodb.conf
-
-        auth = true
-        noprealloc = true
-        smallfiles = true
-        
-    vi /etc/redis/redis.conf
-        
-        requirepass password
-
-    rm /etc/nginx/sites-enabled/default
-    
     vi /etc/nginx/sites-enabled/rpadmin
-
-        ssl_certificate /home/rpadmin/rpvhost.crt;
-        ssl_certificate_key /home/rpadmin/keys/rpvhost.key;
-
-        ssl_session_cache shared:SSL:10m;
-
-        server {
-            listen 80 default_server;
-            listen 443 ssl default_server;
-            listen [::]:80 default_server ipv6only=on;
-
-            rewrite .* $scheme://rp.rpvhost.net/#redirect redirect;
-        }
 
         server {
             listen 80;
-            listen 443 ssl;
 
             server_name rp.rpvhost.net;
-
-            location ~ /\.git {
-                deny all;
-            }
 
             location / {
                 proxy_set_header X-Real-IP $remote_addr;
@@ -66,8 +26,6 @@
 
     useradd -m rpadmin
     usermod -G rpadmin -a www-data
-
-    mkdir -m 750 /home/rpadmin/keys
 
     vi /etc/sudoers
 
@@ -99,10 +57,89 @@
         redirect_stderr = true
         user = rpadmin
 
-    service nginx restart
-    service mongodb restart
-    service redis-server restart
-    service supervisor restart
+### Optional Security Settings
+
+    mongo
+
+        use admin
+        db.addUser({user: 'rpadmin', pwd: 'password', roles: ['readWriteAnyDatabase', 'userAdminAnyDatabase', 'dbAdminAnyDatabase', 'clusterAdmin']})
+        use RootPanel
+        db.addUser({user: 'rpadmin', pwd: 'password', roles: ['readWrite']})
+
+    vi /etc/mongodb.conf
+
+        auth = true
+
+    vi /etc/redis/redis.conf
+
+        requirepass password
+
+    rm /etc/nginx/sites-enabled/default
+
+    vi /etc/nginx/sites-enabled/rpadmin
+
+      server {
+          listen 80 default_server;
+          listen [::]:80 default_server ipv6only=on;
+
+          rewrite .* $scheme://rp.rpvhost.net/#redirect redirect;
+      }
+
+### Optional Performance Settings
+
+
+    vi /etc/hostname
+    vi /etc/hosts
+
+    vi /etc/mongodb.conf
+
+        noprealloc = true
+        smallfiles = true
+
+### Optional SSL Settings
+
+    vi /etc/nginx/sites-enabled/rpadmin
+
+        ssl_certificate /home/rpadmin/rpvhost.crt;
+        ssl_certificate_key /home/rpadmin/keys/rpvhost.key;
+
+        ssl_session_cache shared:SSL:10m;
+
+        server {
+            listen 80 default_server;
+            listen 443 ssl default_server;
+            listen [::]:80 default_server ipv6only=on;
+
+            rewrite .* $scheme://rp.rpvhost.net/#redirect redirect;
+        }
+
+        server {
+            listen 80;
+            listen 443 ssl;
+
+            server_name rp.rpvhost.net;
+
+            location ~ /\.git {
+                deny all;
+            }
+
+            location / {
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_pass http://unix:/home/rpadmin/rootpanel.sock:/;
+            }
+        }
+
+    mkdir -m 750 /home/rpadmin/keys
+
+### Clusters
+
+    useradd -m rpadmin
+
+    su rpadmin
+
+    mkdir ~/.ssh
+    echo 'Master SSH Public Key' >> ~/.ssh/authorized_keys
+    chmod -R 700 ~/.ssh
 
 ### Plugins
 
@@ -123,21 +160,21 @@
     apt-get install memcached
 
     # MySQL
-    
+
     apt-get install mariadb-server
-    
+
     mysql -u root -p
-    
+
         GRANT ALL ON *.* TO 'rpadmin'@'localhost' IDENTIFIED BY 'password' WITH GRANT OPTION;
-        
+
     # PHP-FPM
-        
+
     apt-get install php5-fpm php-pear php5-readline php5-mysql php5-curl php5-gd php5-imap php5-mcrypt php5-memcache php5-tidy php5-xmlrpc php5-sqlite php5-mongo
-    
+
     rm /etc/php5/fpm/pool.d/www.conf
 
     vi /etc/nginx/fastcgi_params
-        
+
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
 
     # ShadowSocks
@@ -158,7 +195,7 @@
 ### Runtime
 
     # Shell
-    apt-get install screen wget zip unzip iftop vim curl htop iptraf nethogs
+    apt-get install screen wget zip unzip iftop vim curl htop iptraf nethogs ntp
     apt-get install libcurl4-openssl-dev axel unrar-free emacs subversion subversion-tools tmux mercurial postfix
 
     # Golang
@@ -170,3 +207,10 @@
 
     # Node.js
     npm install forever gulp mocha harp bower -g
+
+### Restart Services
+
+    service nginx restart
+    service mongodb restart
+    service redis-server restart
+    service supervisor restart
