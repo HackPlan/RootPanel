@@ -3,6 +3,7 @@ gulp = require 'gulp'
 less = require 'gulp-less'
 shell = require 'gulp-shell'
 order = require 'gulp-order'
+rsync = require 'gulp-rsync'
 coffee = require 'gulp-coffee'
 filter = require 'gulp-filter'
 concat = require 'gulp-concat'
@@ -11,8 +12,7 @@ minifyCss = require 'gulp-minify-css'
 bowerFiles = require 'main-bower-files'
 runSequence = require 'run-sequence'
 
-gulp.task 'install:bower', ->
-  shell.task 'bower install'
+gulp.task 'install:bower', shell.task 'bower install'
 
 gulp.task 'clean', ->
   del 'public/*'
@@ -62,4 +62,17 @@ gulp.task 'build:scripts', ->
   .pipe uglify()
   .pipe gulp.dest 'public'
 
+gulp.task 'watch', ->
+  gulp.watch 'core/public/style/*.less', ['build:styles']
+  gulp.watch 'core/public/script/*.coffee', ['build:scripts']
+
 gulp.task 'build', ['build:vendor', 'build:styles', 'build:scripts']
+
+gulp.task 'build:docs', shell.task 'node_modules/.bin/endokken --extension html --theme bullet --dest ./docs-public'
+
+gulp.task 'deploy:docs', ['build:docs'], ->
+  gulp.src 'docs-public/*'
+  .pipe rsync
+    root: 'docs-public',
+    hostname: 'spawn.rpvhost.net',
+    destination: '/home/jysperm/rootpanel/docs'

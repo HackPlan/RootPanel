@@ -6,6 +6,7 @@
 node_modules/
 bower_components/
 /public/
+/docs-public/
 
 /package.box
 /npm-debug.log

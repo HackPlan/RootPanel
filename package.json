@@ -17,8 +17,8 @@
   ],
   "main": "core",
   "scripts": {
-    "start": "./node_modules/.bin/coffee app.coffee",
-    "test": "./node_modules/.bin/mocha --compilers coffee:coffee-script/register --require test/env -- core/test/*.test.coffee",
+    "start": "coffee app.coffee",
+    "test": "mocha --compilers coffee:coffee-script/register --require test/env -- core/test/*.test.coffee",
     "docker-build": "docker build -t=jysperm/rootpanel .",
     "docker-create": "docker run --name rootpanel -P -v `pwd`:/rootpanel -i -t jysperm/rootpanel",
     "docker-start": "docker start -i -a rootpanel"
@@ -43,7 +43,7 @@
     "jade": "^1.9.2",
     "json-stable-stringify": "^1.0.0",
     "lodash": "^3.6.0",
-    "mabolo": "^0.3.0-rc.1",
+    "mabolo": "^0.3.0",
     "markdown": "^0.5.0",
     "moment-timezone": "^0.2.5",
     "mongodb": "^2.0.7",
@@ -71,6 +71,7 @@
     "gulp-less": "^3.0.3",
     "gulp-minify-css": "^1.1.0",
     "gulp-order": "^1.1.1",
+    "gulp-rsync": "0.0.5",
     "gulp-shell": "^0.4.1",
     "gulp-uglify": "^1.2.0",
     "main-bower-files": "^2.7.0",
