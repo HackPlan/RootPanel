@@ -1,0 +1,15 @@
+*~
+.DS_Store
+
+.idea/
+.vagrant/
+node_modules/
+bower_components/
+
+/package.box
+/npm-debug.log
+
+/.remote-sync.json
+/session.key
+/config.coffee
+/coverage-reporter.html

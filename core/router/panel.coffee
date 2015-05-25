@@ -16,6 +16,7 @@ router.use requireAuthenticate
 ###
 router.get '/financials', (req, res, next) ->
   Q.all([
+    null
     Financials.getDepositLogs req.account, req: req, limit: 10
     Financials.getBillingLogs req.account, limit: 10
   ]).done ([payment_providers, deposit_logs, billing_logs]) ->

@@ -24,7 +24,7 @@ append footer
   script(id='content-template', type='text/x-jquery-tmpl')
     header
       | ${title} &nbsp;
-      span.small(class='text-${color}') ${RP.t('ticket_status.' + status)}
+      span.small(class='text-${color}') ${root.t('ticket_status.' + status)}
       
     p {{html content_html}}
   script(id='reply-template', type='text/x-jquery-tmpl')

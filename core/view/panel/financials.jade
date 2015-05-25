@@ -18,7 +18,7 @@ block main
           th= t('common.amount')
           th= t('view.financials.pay_method')
       tbody
-        for item in deposit_log
+        for item in deposit_logs
           tr
             td= moment(item.created_at).format('YYYY-MM-DD HH:mm:ss')
             td #{item.amount.toFixed(2)} #{t('plan.currency.' + config.billing.currency)}
@@ -36,7 +36,7 @@ block main
           th= t('common.details')
           th= t('common.amount')
       tbody
-        for item in billing_log
+        for item in billing_logs
           tr
             td= moment(item.created_at).format('YYYY-MM-DD HH:mm:ss')
             td

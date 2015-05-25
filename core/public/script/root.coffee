@@ -3,8 +3,16 @@ methods = ['get', 'post', 'delete', 'put', 'patch', 'head', 'options']
 window.root =
   agent: {}
 
+  # Private: (name) -> String
   t: (name) ->
     return name
+
+  # Private: (selector) -> (view_data) -> String
+  tmpl: (selector) ->
+    cache = $(selector).template()
+
+    return (view_data) ->
+      return $.tmpl cache, view_data
 
 methods.forEach (method) ->
   root.agent[method] = (url, data, options = {}) ->

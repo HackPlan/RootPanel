@@ -17,8 +17,9 @@
   ],
   "main": "core",
   "scripts": {
+    "prepushlish": "gulp build",
     "start": "coffee app.coffee",
-    "test": "mocha --compilers coffee:coffee-script/register --require test/env -- core/test/*.test.coffee",
+    "test": "mocha --compilers coffee:coffee-script/register --require test/env --recursive core/test",
     "docker-build": "docker build -t=jysperm/rootpanel .",
     "docker-create": "docker run --name rootpanel -P -v `pwd`:/rootpanel -i -t jysperm/rootpanel",
     "docker-start": "docker start -i -a rootpanel"
@@ -67,6 +68,7 @@
     "gulp": "^3.8.11",
     "gulp-coffee": "^2.3.1",
     "gulp-concat": "^2.5.2",
+    "gulp-debug": "^2.0.1",
     "gulp-filter": "^2.0.2",
     "gulp-less": "^3.0.3",
     "gulp-minify-css": "^1.1.0",

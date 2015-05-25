@@ -22,6 +22,6 @@ prepend sidebar
 append footer
   script(id='list-item-template', type='text/x-jquery-tmpl')
     td
-      a(href='/tickets/view/${_id}') ${title}
+      a(href='/tickets/${_id}/view') ${title}
     td
-      span(class='text-${color}') ${RP.t('ticket_status.' + status)}
+      span(class='text-${color}') ${root.t('ticket_status.' + status)}

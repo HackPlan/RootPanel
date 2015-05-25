@@ -4,7 +4,7 @@ $ ->
 
   CompontentCollection = Backbone.Collection.extend
     model: Component
-    url: '/component/resource/'
+    url: '/components/'
 
   ListItemView = Backbone.View.extend
     tagName: 'tr'

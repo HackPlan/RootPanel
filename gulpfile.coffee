@@ -2,6 +2,7 @@ del = require 'del'
 gulp = require 'gulp'
 less = require 'gulp-less'
 shell = require 'gulp-shell'
+debug = require 'gulp-debug'
 order = require 'gulp-order'
 rsync = require 'gulp-rsync'
 coffee = require 'gulp-coffee'
@@ -34,7 +35,7 @@ gulp.task 'vendor:scripts', ->
 
 gulp.task 'vendor:fonts', ->
   gulp.src bowerFiles()
-  .pipe filter ['*.eot', '*.svg', '*.ttf', '*.woff']
+  .pipe filter ['*.eot', '*.svg', '*.ttf', '*.woff', '*.woff2']
   .pipe gulp.dest 'public/fonts'
 
 gulp.task 'build:vendor', ->
@@ -51,7 +52,7 @@ gulp.task 'build:styles', ->
   gulp.src 'core/public/style/*.less'
   .pipe less()
   .pipe concat 'core.css'
-  .pipe minifyCss()
+  # .pipe minifyCss()
   .pipe gulp.dest 'public'
 
 gulp.task 'build:scripts', ->
@@ -59,7 +60,7 @@ gulp.task 'build:scripts', ->
   .pipe coffee()
   .pipe order ['root.coffee', '*']
   .pipe concat 'core.js'
-  .pipe uglify()
+  # .pipe uglify()
   .pipe gulp.dest 'public'
 
 gulp.task 'watch', ->

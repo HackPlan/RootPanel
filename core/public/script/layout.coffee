@@ -1,9 +1,4 @@
 $ ->
-  _.templateSettings =
-    evaluate: /\{%([\s\S]+?)%\}/g,
-    interpolate: /\{:([\s\S]+?)\}\}/g
-    escape: /\{\{([\s\S]+?)\}\}/g
-
   _.extend window.RP,
     i18n_data: {}
 

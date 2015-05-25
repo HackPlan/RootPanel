@@ -101,6 +101,17 @@ createLoggedAgent = (options) ->
 
   return agent
 
+_.extend global, {
+  utils
+
+  ifEnabled
+  unlessTravis
+  randomAccount
+
+  createAgent
+  createLoggedAgent
+}
+
 printHttpResponse = ({httpVersion, statusCode, statusMessage, headers, body}) ->
   message = """
     Response:
@@ -119,14 +130,3 @@ printHttpResponse = ({httpVersion, statusCode, statusMessage, headers, body}) ->
   message += "\n#{body}"
 
   return message
-
-_.extend global, {
-  utils
-
-  ifEnabled
-  unlessTravis
-  randomAccount
-
-  createAgent
-  createLoggedAgent
-}

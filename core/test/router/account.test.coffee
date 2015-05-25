@@ -1,4 +1,4 @@
-describe 'account.register', ->
+describe 'router.account', ->
   agent = createAgent
     baseUrl: '/account'
 

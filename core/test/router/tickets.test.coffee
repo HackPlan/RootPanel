@@ -1,4 +1,4 @@
-describe 'tickets.user', ->
+describe 'router.tickets', ->
   agent = createLoggedAgent
     baseUrl: '/tickets'
 

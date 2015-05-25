@@ -7,7 +7,12 @@
     "jquery": "~2.1.2",
     "backbone": "~1.1.2",
     "moment": "~2.9.0",
-    "jquery-tmpl": "vBeta1.0.0",
+    "jquery-tmpl": "git://github.com/jquery/jquery-tmpl.git#b504c8afba",
     "q": "~1.2.0"
+  },
+  "overrides": {
+    "jquery-tmpl": {
+      "main": "jquery.tmpl.js"
+    }
   }
 }

@@ -1,4 +1,8 @@
 $ ->
+  $.ajaxSetup
+    headers:
+      'X-Token': $.cookie 'token'
+
   color_mapping =
     closed: 'muted'
     open: 'primary'
@@ -12,7 +16,7 @@ $ ->
     model: Reply
 
   Ticket = Backbone.Model.extend
-    urlRoot: '/ticket/rest/'
+    urlRoot: '/tickets'
     idAttribute: '_id'
 
     initialize: ->
@@ -24,7 +28,7 @@ $ ->
 
   TicketCollection = Backbone.Collection.extend
     model: Ticket
-    url: '/ticket/rest/'
+    url: '/tickets'
 
   CreateView = Backbone.View.extend
     el: '#create-view'
@@ -38,14 +42,14 @@ $ ->
         content: @$('[name=content]').val()
 
       ticket.save().success (ticket) ->
-        location.href = "/ticket/view/#{ticket._id}"
+        location.href = "/tickets/#{ticket._id}/view"
 
   ReplyView = Backbone.View.extend
     tagName: 'li'
     className: 'list-group-item clearfix'
 
     initialize: ->
-      @template = RP.tmpl '#reply-template'
+      @template = root.tmpl '#reply-template'
       @model.on 'change', @render.bind @
 
     render: ->
@@ -70,10 +74,10 @@ $ ->
 
       @model.fetch()
 
-      @templateContent = RP.tmpl '#content-template'
-      @templateActions = RP.tmpl '#actions-template'
-      @templateAccountInfo = RP.tmpl '#account-info-template'
-      @templateMembers = RP.tmpl '#members-template'
+      @templateContent = root.tmpl '#content-template'
+      @templateActions = root.tmpl '#actions-template'
+      @templateAccountInfo = root.tmpl '#account-info-template'
+      @templateMembers = root.tmpl '#members-template'
 
     render: ->
       view_data = @model.toJSON()
@@ -108,7 +112,7 @@ $ ->
     tagName: 'tr'
 
     initialize: ->
-      @template = RP.tmpl '#list-item-template'
+      @template = root.tmpl '#list-item-template'
 
     render: ->
       view_data = @model.toJSON()
@@ -132,9 +136,9 @@ $ ->
 
   TicketRouter = Backbone.Router.extend
     routes:
-      'ticket/create(/)': 'create'
-      'ticket/list(/)': 'list'
-      'ticket/view/:id(/)': 'view'
+      'tickets/create(/)': 'create'
+      'tickets/list(/)': 'list'
+      'tickets/:id/view(/)': 'view'
 
     create: -> new CreateView()
     list: -> new ListView()
