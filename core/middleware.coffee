@@ -1,4 +1,3 @@
-expressBunyanLogger = require 'express-bunyan-logger'
 expressSession = require 'express-session'
 redisStore = require 'connect-redis'
 moment = require 'moment-timezone'

@@ -121,6 +121,7 @@ Account.ensureIndex
 Account.ensureIndex
   'tokens.code': 1
 ,
+  sparse: true
   unique: true
 
 ###
@@ -167,13 +168,13 @@ Account.search = (identify) ->
   Return {Promise} resolve with `{account: Account, token: Token}` or `{}`.
 ###
 Account.authenticate = (tokenCode) ->
-  @findOneAndUpdate(
+  @findOneAndUpdate
     'tokens.code': tokenCode
   ,
     $set:
       'tokens.$.updated_at': new Date()
 
-  ).then (account) ->
+  .then (account) ->
     return {
       account: account
 
@@ -251,7 +252,7 @@ Account.register = ({username, email, password}) ->
   Public: Create token for this account.
 
   * `type` {String} Type of {Token}
-  * `options` {Object} Options of {Token}
+  * `options` (optional) {Object} Options of {Token}
 
   Return {Promise} resolve with create {Token}.
 ###
@@ -263,11 +264,10 @@ Account::createToken = (type, options) ->
     created_at: new Date()
     updated_at: new Date()
 
-  @update(
+  @update
     $push:
       tokens: token
-  ).then ->
-    return token
+  .thenResolve token
 
 ###
   Public: Remove all token and create a new one just for reset password.

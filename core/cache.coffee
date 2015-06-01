@@ -1,55 +1,42 @@
-jsonStableStringify = require 'json-stable-stringify'
-getParameterNames = require 'get-parameter-names'
-redis = require 'redis'
-_ = require 'underscore'
+{EventEmitter} = require 'events'
+Redis = require 'ioredis'
+_ = require 'lodash'
 Q = require 'q'
 
 ###
   Public: Cache factory,
   You can access a global instance via `root.cache`.
 ###
-module.exports = class CacheFactory
+module.exports = class CacheFactory extends EventEmitter
   constructor: ({host, port, password}) ->
-    @redis = redis.createClient port, host,
-      auth_pass: password
+    @redis = new Redis {host, port, password}
 
-    _.extend @,
-      get: Q.denodeify @redis.get.bind @redis
-      del: Q.denodeify @redis.del.bind @redis
-      set: Q.denodeify @redis.set.bind @redis
-      setEx: Q.denodeify @redis.setex.bind @redis
-
-  hashKey: (key) ->
-    if _.isString key
-      return key
-    else
-      return jsonStableStringify key
-
-  getJSON: (key) ->
-    @get(@hashKey key).then (result) ->
+  getJSON: (keys) ->
+    @redis.get(keys.join ':').then (result) ->
       try
         return JSON.parse result
       catch
         return null
 
-  try: (key, setter) ->
-    @tryHelper key, setter, =>
-      @set arguments...
+  try: (keys, {setex}, setter) ->
+    hashed = keys.join ':'
 
-  tryExpire: (key, expired, setter) ->
-    @tryHelper key, setter, (key, value) =>
-      @setEx key, expired, value
+    @redis.get(hashed).then (value) =>
+      if value != undefined and value != null
+        try
+          return JSON.parse value
+        catch err
+          return result
 
-  refresh: (key) ->
-    @del @hashKey key
+      else
+        Q(setter keys).tap (value) =>
+          if _.isObject value
+            value = JSON.stringify value
 
-  tryHelper: (key, setter, operator) ->
-    hashed_key = @hashKey key
+          if setex
+            @redis.setex hashed, setex, value
+          else
+            @redis.set hashed, value
 
-    @get(hashed_key).then (value) ->
-      Q().then ->
-        if value in [undefined, null]
-          Q(setter()).then (value) ->
-            command(hashed_key, value).thenReject value
-        else
-          return value
+  clean: (keys) ->
+    client.del keys.join ':'
