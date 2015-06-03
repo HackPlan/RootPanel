@@ -33,6 +33,20 @@ randomAccount = ->
 createAccount = ->
   root.Account.register randomAccount()
 
+createComponent = (options) ->
+  options = _.defaults {}, options,
+    name: 'linux component'
+    type: 'linux'
+    node: 'master'
+
+  Q().then ->
+    if options.account
+      return options.account
+    else
+      return createAccount()
+  .then (account) ->
+    root.Component.createComponent account, options
+
 createLoggedAgent = (options) ->
   ready = null
   agent = {}
@@ -61,6 +75,7 @@ module.exports = {
   randomAccount
 
   createAccount
+  createComponent
   createAgent
   createLoggedAgent
 }

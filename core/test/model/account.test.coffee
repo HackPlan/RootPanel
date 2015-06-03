@@ -1,8 +1,5 @@
 describe 'model.account', ->
-  Account = null
-
-  before ->
-    {Account} = root
+  Account = require '../../model/account'
 
   describe '.register', ->
     it 'should success', ->
@@ -34,7 +31,7 @@ describe 'model.account', ->
       Account.search(randomAccount().username).then (account) ->
         expect(account).to.not.exists
 
-  describe '#createToken', ->
+  describe '::createToken', ->
     it 'should success', ->
       createAccount().then (account) ->
         account.createToken('full_access').then ({code}) ->

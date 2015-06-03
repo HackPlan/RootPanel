@@ -65,6 +65,8 @@ module.exports = Component = Mabolo.model 'Component',
     type: Object
     default: -> {}
 
+Account = require './account'
+
 Component.createComponent = (account, {name, type, node, dependencies, options}) ->
   @create
     account_id: account._id
@@ -152,7 +154,7 @@ Component::populate = ->
     @account = _.find accounts, ({_id}) =>
       return @account_id.equals _id
 
-    @coworkers.each (coworker) ->
+    @coworkers.forEach (coworker) ->
       coworker.account = _.find accounts, ({_id}) ->
         return coworker.account_id.equals _id
 
