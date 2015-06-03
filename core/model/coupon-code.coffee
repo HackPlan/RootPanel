@@ -1,16 +1,16 @@
+Mabolo = require 'mabolo'
 _ = require 'lodash'
 Q = require 'q'
 
 utils = require '../utils'
 
-{mabolo} = root
-{ObjectID} = mabolo
+{ObjectID} = Mabolo
 
 ###
   Model: Apply log of CouponCode,
   Embedded as a array at `apply_log` of {CouponCode}.
 ###
-ApplyLog = mabolo.model 'ApplyLog',
+ApplyLog = Mabolo.model 'ApplyLog',
   # Public: Related account
   account_id:
     required: true
@@ -24,7 +24,7 @@ ApplyLog = mabolo.model 'ApplyLog',
 ###
   Model: CouponCode.
 ###
-module.exports = CouponCode = mabolo.model 'CouponCode',
+module.exports = CouponCode = Mabolo.model 'CouponCode',
   # Public: Code of coupon
   code:
     required: true

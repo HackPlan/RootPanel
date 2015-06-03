@@ -104,9 +104,11 @@ module.exports = class Root extends EventEmitter
   start: ->
     CacheFactory = require './cache'
 
+    mabolo = new Mabolo mongodbUri @config.mongodb
+
     _.extend @,
       express: express()
-      mabolo: new Mabolo mongodbUri @config.mongodb
+      mabolo: mabolo
       mailer: nodemailer.createTransport @config.email.account
 
       insight: new Insight
@@ -117,13 +119,13 @@ module.exports = class Root extends EventEmitter
       cache: new CacheFactory @config.redis
 
     _.extend @,
-      Account: require './model/account'
-      Financials: require './model/financials'
-      CouponCode: require './model/coupon-code'
-      Notification: require './model/notification'
-      SecurityLog: require './model/security-log'
-      Ticket: require './model/ticket'
-      Component: require './model/component'
+      Account: mabolo.bind require './model/account'
+      Financials: mabolo.bind require './model/financials'
+      CouponCode: mabolo.bind require './model/coupon-code'
+      Notification: mabolo.bind require './model/notification'
+      SecurityLog: mabolo.bind require './model/security-log'
+      Ticket: mabolo.bind require './model/ticket'
+      Component: mabolo.bind require './model/component'
 
     HookRegistry = require './registry/hook'
     ViewRegistry = require './registry/view'

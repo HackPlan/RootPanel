@@ -1,12 +1,12 @@
+Mabolo = require 'mabolo'
 _ = require 'lodash'
 
-{mabolo} = root
-{ObjectID} = mabolo
+{ObjectID} = Mabolo
 
 ###
   Model: Security log
 ###
-module.exports = SecurityLog = mabolo.model 'SecurityLog',
+module.exports = SecurityLog = Mabolo.model 'SecurityLog',
   # Public: Related account
   account_id:
     required: true

@@ -1,15 +1,15 @@
 {markdown} = require 'markdown'
+Mabolo = require 'mabolo'
 _ = require 'lodash'
 Q = require 'q'
 
-{mabolo} = root
-{ObjectID} = mabolo
+{ObjectID} = Mabolo
 
 ###
   Model: Ticket reply,
   Embedded as a array at `replies` of {Ticket}.
 ###
-Reply = mabolo.model 'Reply',
+Reply = Mabolo.model 'Reply',
   # Public: Related account
   account_id:
     required: true
@@ -34,7 +34,7 @@ Reply = mabolo.model 'Reply',
 ###
   Model: Ticket.
 ###
-module.exports = Ticket = mabolo.model 'Ticket',
+module.exports = Ticket = Mabolo.model 'Ticket',
   # Public: Related account
   account_id:
     required: true
@@ -77,6 +77,8 @@ module.exports = Ticket = mabolo.model 'Ticket',
     required: true
     type: Date
     default: -> new Date()
+
+Account = require './account'
 
 ###
   Public: Create ticket.
@@ -270,5 +272,3 @@ Ticket::populateAccounts = ->
         return reply.account_id.equals _id
 
     return @
-
-Account = require './account'

@@ -1,12 +1,12 @@
+Mabolo = require 'mabolo'
 Q = require 'q'
 
-{mabolo} = root
-{ObjectID} = mabolo
+{ObjectID} = Mabolo
 
 ###
   Model: Financials.
 ###
-module.exports = Financials = mabolo.model 'Financials',
+module.exports = Financials = Mabolo.model 'Financials',
   # Public: Related account
   account_id:
     required: true

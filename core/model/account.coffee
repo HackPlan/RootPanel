@@ -1,15 +1,14 @@
 validator = require 'validator'
+Mabolo = require 'mabolo'
 _ = require 'lodash'
 
 utils = require '../utils'
-
-{mabolo} = root
 
 ###
   Model: Account Session Token Model,
   Embedded as a array at `tokens` of {Account}.
 ###
-Token = mabolo.model 'Token',
+Token = Mabolo.model 'Token',
   # Public: Type of token
   type:
     required: true
@@ -42,7 +41,7 @@ Token = mabolo.model 'Token',
 
   TODO: verify fields
 ###
-Preferences = mabolo.model 'Preferences',
+Preferences = Mabolo.model 'Preferences',
   # Public: A url refer to a avatar of account
   avatar_url: String
   # Public: A language code, e.g. `zh-CN`
@@ -55,7 +54,7 @@ Preferences = mabolo.model 'Preferences',
 ###
   Model: Account Model.
 ###
-module.exports = Account = mabolo.model 'Account',
+module.exports = Account = Mabolo.model 'Account',
   # Public: User name
   username:
     required: true

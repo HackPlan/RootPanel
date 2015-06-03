@@ -1,13 +1,13 @@
+Mabolo = require 'mabolo'
 _ = require 'lodash'
 Q = require 'q'
 
-{mabolo} = root
-{ObjectID} = mabolo
+{ObjectID} = Mabolo
 
 ###
   Model: Notification.
 ###
-module.exports = Notification = mabolo.model 'Notification',
+module.exports = Notification = Mabolo.model 'Notification',
   # Public: Plugin that created this notification
   source:
     required: true
