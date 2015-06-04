@@ -137,6 +137,11 @@ Ticket.getTickets = (account) ->
 Ticket.getTicketsGroupByStatus = (account, options) ->
   getTicketsOfStatus = (status) =>
     @find
+      $or: [
+        account_id: account._id
+      ,
+        members_id: account._id
+      ]
       status: status
     ,
       sort:
@@ -191,7 +196,6 @@ Ticket::createReply = (account, {content, status}) ->
     $set:
       status: status
       updated_at: new Date()
-
   .thenResolve reply
 
 ###

@@ -392,6 +392,11 @@ Account::isAdmin = ->
 Account::inGroup = (group) ->
   return group in @groups
 
+Account::joinGroup = (group) ->
+  @update
+    $addToSet:
+      groups: group
+
 ###
   Public: Set email.
 

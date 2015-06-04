@@ -33,19 +33,9 @@ randomAccount = ->
 createAccount = ->
   root.Account.register randomAccount()
 
-createComponent = (options) ->
-  options = _.defaults {}, options,
-    name: 'linux component'
-    type: 'linux'
-    node: 'master'
-
-  Q().then ->
-    if options.account
-      return options.account
-    else
-      return createAccount()
-  .then (account) ->
-    root.Component.createComponent account, options
+createAdmin = ->
+  root.Account.register(randomAccount()).then (account) ->
+    account.joinGroup 'root'
 
 createLoggedAgent = (options) ->
   ready = null
@@ -66,16 +56,17 @@ createLoggedAgent = (options) ->
 
 module.exports = {
   _
+  Q
   chai
   utils
   expect
 
   ifEnabled
   unlessTravis
-  randomAccount
 
+  randomAccount
+  createAdmin
   createAccount
-  createComponent
   createAgent
   createLoggedAgent
 }

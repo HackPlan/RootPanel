@@ -1,7 +1,7 @@
 _ = require 'lodash'
 Q = require 'q'
 
-{Component} = root
+Component = require '../model/component'
 
 ###
   Public: Add widgets to panel page.

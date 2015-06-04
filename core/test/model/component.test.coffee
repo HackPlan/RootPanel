@@ -25,3 +25,17 @@ describe 'model.component', ->
       createComponent().then (component) ->
         component.populate().then ->
           component.account.username.should.be.exists
+
+createComponent = (options) ->
+  options = _.defaults {}, options,
+    name: 'linux component'
+    type: 'linux'
+    node: 'master'
+
+  Q().then ->
+    if options.account
+      return options.account
+    else
+      return createAccount()
+  .then (account) ->
+    root.Component.createComponent account, options

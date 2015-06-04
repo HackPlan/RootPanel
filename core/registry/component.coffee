@@ -1,5 +1,7 @@
 _ = require 'lodash'
 
+Component = require '../model/component'
+
 ###
   Class: Component provider, Managed by {ComponentRegistry}.
 ###
@@ -104,4 +106,4 @@ module.exports = class ComponentRegistry
   byName: (name) ->
     return @providers[name]
 
-Component = require '../model/component'
+ComponentRegistry.ComponentProvider = ComponentProvider

@@ -61,3 +61,5 @@ module.exports = class CouponTypeRegistry
   ###
   byName: (name) ->
     return @providers[name]
+
+CouponTypeRegistry.CouponType = CouponType

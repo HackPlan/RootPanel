@@ -59,3 +59,5 @@ module.exports = class PaymentProviderRegistry
   ###
   byName: (name) ->
     return @providers[name]
+
+PaymentProviderRegistry.PaymentProvider = PaymentProvider

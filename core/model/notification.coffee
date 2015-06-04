@@ -55,7 +55,7 @@ module.exports = Notification = Mabolo.model 'Notification',
   Return {Boolean}.
 ###
 Notification::isGroupNotice = ->
-  return @target instanceof ObjectID
+  return @target not instanceof ObjectID
 
 ###
   Public: Send a email about this notification.

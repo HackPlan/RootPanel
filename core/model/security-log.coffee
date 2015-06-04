@@ -51,5 +51,5 @@ SecurityLog.createLog = (account, {token, type, options}) ->
   @create
     account_id: account._id
     options: options
-    token: _.pick token, 'type', 'token', 'created_at', 'payload'
+    token: _.pick token, 'type', 'code', 'created_at', 'options'
     type: type
