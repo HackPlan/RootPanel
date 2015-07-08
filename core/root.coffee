@@ -74,6 +74,8 @@ module.exports = class Root extends EventEmitter
   # Public: global {PaymentProviderRegistry} instance
   paymentProviders: null
 
+  Plugin: null
+
   # Public: global {I18nManager} instance
   i18n: null
   # Public: global {PluginManager} instance
@@ -149,6 +151,9 @@ module.exports = class Root extends EventEmitter
     ServerManager = require './server-manager'
     BillingManager = require './billing-manager'
     NotificationManager = require './notification-manager'
+
+    _.extend @,
+      Plugin: PluginManager.Plugin
 
     _.extend @,
       i18n: new I18nManager @config.i18n

@@ -1,4 +1,17 @@
 $ ->
+  {agent} = root
+
+  $('nav a').each ->
+    if $(@).attr('href') == location.pathname
+      $(@).parent().addClass 'active'
+
+  $('.action-logout').click (event) ->
+    event.preventDefault()
+    agent.post('/account/logout').then ->
+      location.href = '/'
+
+  #
+
   _.extend window.RP,
     i18n_data: {}
 
@@ -33,25 +46,10 @@ $ ->
     tErr: (name) ->
       return RP.t "error_code.#{name}"
 
-    tmpl: (selector) ->
-      cache = $(selector).template()
-
-      return (view_data) ->
-        return $.tmpl cache, view_data
-
-  $('nav a').each ->
-    if $(@).attr('href') == location.pathname
-      $(@).parent().addClass('active')
-
   $('.label-language').text $.cookie('language')
 
   if location.hash == '#redirect'
     $('#site-not-exist').modal 'show'
-
-  $('.action-logout').click (e) ->
-    e.preventDefault()
-    request '/account/logout', {}, ->
-      location.href = '/'
 
   $('.action-switch-language').click (e) ->
     e.preventDefault()

@@ -93,7 +93,7 @@ exports.errorHandling = (err, req, res, next) ->
   if err.constructor in builtInErrors
     root.log err.stack
 
-  res.json
+  res.status(400).json
     error: err.message
 
 exports.session = ({redis}) ->

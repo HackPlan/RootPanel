@@ -1,5 +1,5 @@
-module.exports = class Builtin
-  constructor: (@injector) ->
+module.exports = class Builtin extends root.Plugin
+  activate: ->
     @injector.couponType 'cash', new CashCoupon()
 
     @injector.router('/').get '/', (req, res) ->

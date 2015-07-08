@@ -37,21 +37,8 @@ class Injector
   ###
     Public: Constructor.
 
-    * `Plugin` Constructor {Function} of {Plugin}.
-    * `plugin` {Object}
-
-      * `name` {String}
-      * `path` {String}
-      * `config` {Object}
-      * `package` {Object}
-
   ###
-  constructor: (Plugin, {name, path, config, package: pkg}) ->
-    @owner = new Plugin @, config
-
-    _.extend @owner,
-      name: name
-      path: path
+  constructor: ->
 
   ###
     Public: Get owner plugin.
@@ -139,13 +126,20 @@ module.exports = class PluginManager
     if @plugins[name]
       throw new Error "Plugin `#{name}` already exists"
 
-    injector = new Injector require(path),
+    Plugin = require path
+
+    injector = new Injector()
+    plugin = new Plugin injector, config
+
+    injector.owner = plugin
+
+    @plugins[name] = _.extend plugin,
       name: name
       path: path
-      config: config
-      package: require "#{path}/package.json"
 
-    @plugins[name] = injector.plugin()
+    plugin.activate()
+
+    return plugin
 
   ###
     Public: Get all plugins.
@@ -164,3 +158,14 @@ module.exports = class PluginManager
   ###
   byName: (name) ->
     return @plugins[name]
+
+  getRegisteredExtends: (plugin) ->
+    filter = (registeredExtends) ->
+      return _.filter registeredExtends, ({plugin: {name}}) ->
+        return plugin.name == name
+
+    return {
+      routers: filter root.routers
+    }
+
+PluginManager.Plugin = Plugin

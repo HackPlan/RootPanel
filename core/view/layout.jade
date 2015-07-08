@@ -28,7 +28,7 @@ html
                   a(href='/panel/')= t('panel.')
                 if account.inGroup('root')
                   li
-                    a(href='/admin/')= t('admin.admin_panel')
+                    a(href='/admin/dashboard')= t('admin.admin_panel')
                 li
                   a.action-logout(href='/account/logout/')= t('account.logout')
               else

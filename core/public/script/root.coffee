@@ -15,7 +15,7 @@ window.root =
       return $.tmpl cache, view_data
 
 methods.forEach (method) ->
-  root.agent[method] = (url, data, options = {}) ->
+  root.agent[method] = (url, data = {}, options = {}) ->
     unless method == 'get'
       data = JSON.stringify data
       options.contentType = 'application/json; charset=UTF-8'

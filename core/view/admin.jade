@@ -24,23 +24,35 @@ block main
         .page-header
           h1 
             | RootPanel &nbsp;
-            small= app.package.version
+            small= root.package.version
+
+        .row
+          header 付费方案
+          
+          for plan in root.billing.all()
+            .col-md-3
+              .panel.panel-success
+                .panel-heading
+                  strong= plan.name
+                .panel-body
+                  p join_freely: #{plan.join_freely}
+                  p components: #{_.keys(plan.components).join()}
+                  p billing: #{_.keys(plan.billing).join()}
+                  p 用户数量：0
+                  
+        .row
+          header 已加载的插件
+          
+          for plugin in root.plugins.all()
+            - registered = root.plugins.getRegisteredExtends(plugin)
             
-        header 付费方案
-        
-        each plan, name in app.plans
-          .panel.panel-success
-            .panel-heading
-              strong= name
-            .panel-body
-        
-        header 已加载的插件
-        
-        each plugin, name in app.plugins
-          .panel.panel-default
-            .panel-heading
-              strong= name
-            .panel-body
+            .col-md-3
+              .panel.panel-default
+                .panel-heading
+                  strong= plugin.name
+                .panel-body
+                  p dependencies: #{_.keys(plugin.dependencies).join()}
+                  p routes: #{_.pluck(registered.routers, 'path').join()}
               
       #tab-account-list.tab-pane
         table.table.table-hover
@@ -96,8 +108,8 @@ block main
             label.col-sm-2.control-label= t('common.type')
             .col-sm-5
               select.input-type.form-control
-                for type in coupon_code_types
-                  option= type
+                for type in root.couponTypes.all()
+                  option= type.name
           .form-group
             label.col-sm-2.control-label= t('view.admin.count')
             .col-sm-5
@@ -112,6 +124,10 @@ block main
               button.action-generate-code.btn.btn-lg.btn-primary(type='button')= t('common.generate')
 
         pre.output-coupon-code
+          
+      #tab-compontents.tab-pane
+        
+      #tab-system-log.tab-pane
 
   .account-details-modal.modal.fade
     .modal-dialog(style='width: 800px;')
@@ -149,8 +165,5 @@ block main
           button.btn.btn-success.action-confirm-payment(type='button')= t('common.create')
 
 prepend sidebar
-  for sidebar_html in sidebars_html
-    != sidebar_html
-
   .row
     a.btn.btn-lg.btn-success(href='/admin/ticket/')= t('ticket.ticket_list')
