@@ -1,7 +1,7 @@
 extends ../layout
 
 prepend header
-  title #{t('ticket.create_ticket')} | #{site.name}
+  title= helpers.title('ticket.create_ticket')
 
 block main
   #create-view.row

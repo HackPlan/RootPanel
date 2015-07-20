@@ -1,7 +1,7 @@
 extends ../layout
 
 prepend header
-  title #{req.ticket.title} | #{site.name}
+  title= helpers.title(req.ticket.title)
 
 block main
   .row.content

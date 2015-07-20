@@ -1,7 +1,7 @@
 extends ../../../core/view/layout
 
 prepend header
-  title RP 主机：Linux 虚拟主机 | #{site.name}
+  title= helpers.title('RP 主机：Linux 虚拟主机')
 
 append header
   link(rel='stylesheet', href='/plugins/rpvhost/style/index.css')

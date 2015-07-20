@@ -1,7 +1,7 @@
 extends ../layout
 
 prepend header
-  title #{t('account.register')} | #{site.name}
+  title= helpers.title('account.register')
 
 block main
   header= t('account.register')

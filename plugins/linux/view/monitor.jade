@@ -1,7 +1,7 @@
 extends ../../../core/view/layout
 
 prepend header
-  title #{t('server_monitor')} | #{site.name}
+  title= helpers.title('server_monitor')
 
 append header
   link(rel='stylesheet', href='/plugins/linux/style/monitor.css')

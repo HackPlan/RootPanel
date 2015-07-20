@@ -1,7 +1,7 @@
 extends layout
 
 prepend header
-  title #{t('panel.')} | #{site.name}
+  title= helpers.title('panel.')
 
 block main
   .row

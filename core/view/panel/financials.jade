@@ -1,7 +1,7 @@
 extends ../layout
 
 prepend header
-  title #{t('account.financials')} | #{site.name}
+  title= helpers.title('account.financials')
 
 block main
   .row

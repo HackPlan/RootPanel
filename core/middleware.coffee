@@ -7,6 +7,8 @@ path = require 'path'
 fs = require 'fs'
 _ = require 'lodash'
 
+ViewHelpers = require './view-helpers'
+
 {Account, SecurityLog, config} = root
 
 builtInErrors = [
@@ -79,6 +81,8 @@ exports.renderHelpers = (req, res, next) ->
 
     site:
       name: req.getTranslator() config.web.name
+
+    helpers: new ViewHelpers req, res
 
   res.render = (view, locals = {}) ->
     root.views.render view, _.defaults(locals, res.locals)
