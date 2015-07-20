@@ -17,7 +17,7 @@
   ],
   "main": "core",
   "scripts": {
-    "prepushlish": "gulp build",
+    "prepushlish": "bower install && gulp build",
     "start": "coffee app.coffee",
     "test": "mocha --compilers coffee:coffee-script/register --require test/env --recursive core/test",
     "docker-build": "docker build -t=jysperm/rootpanel .",

@@ -13,14 +13,13 @@ minifyCss = require 'gulp-minify-css'
 bowerFiles = require 'main-bower-files'
 runSequence = require 'run-sequence'
 
-gulp.task 'install:bower', shell.task 'bower install'
-
 gulp.task 'clean', ->
   del 'public/*'
 
 gulp.task 'vendor:styles', ->
   gulp.src bowerFiles()
-  .pipe filter '*.css'
+  .pipe filter '*.less'
+  .pipe less()
   .pipe concat 'vendor.css'
   .pipe minifyCss()
   .pipe gulp.dest 'public/vendor'
@@ -40,7 +39,6 @@ gulp.task 'vendor:fonts', ->
 
 gulp.task 'build:vendor', ->
   runSequence [
-    'install:bower'
     'clean'
   ], [
     'vendor:styles'

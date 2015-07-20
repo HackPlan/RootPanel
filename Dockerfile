@@ -8,12 +8,22 @@ RUN apt-get update &&\
 
 RUN npm install -g coffee-script gulp bower
 
+WORKDIR /rootpanel
+
+ADD . ./
+
+RUN npm install
+RUN bower install --allow-root
+RUN gulp build
+
+RUN rm /etc/nginx/sites-enabled/default
+RUN sed -i "s/user www-data;/user root;/g" /etc/nginx/nginx.conf
+
 ADD sample/nginx.conf /etc/nginx/sites-enabled/rpadmin
 
 EXPOSE 80
-WORKDIR /rootpanel
 
 CMD service nginx start &&\
     service mongodb start &&\
     service redis-server start &&\
-    /bin/bash
+    npm start
