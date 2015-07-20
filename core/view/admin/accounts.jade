@@ -1,0 +1,36 @@
+table.table.table-hover
+  thead
+    tr
+      th= t('account.username')
+      th= t('account.email')
+      th= t('plan.')
+      th= t('common.amount')
+      th= t('common.actions')
+  tbody
+    for account in accounts
+      tr(data-id='#{account._id}')
+        td= account.username
+        td= account.email
+        td= _.keys(account.plans).join(', ')
+        td= account.balance.toFixed(2)
+        td
+          button.btn.btn-info.btn-sm.action-details(type='button')= t('common.details')
+          .btn-group
+            button(type='button', data-toggle='dropdown').btn.btn-warning.btn-sm.dropdown-toggle
+              | 计划 &nbsp;
+              span.caret
+            ul.dropdown-menu
+              li
+                a(href='#') 加入套餐 A
+              li
+                a(href='#') 离开套餐 B
+          .btn-group
+            button(type='button', data-toggle='dropdown').btn.btn-primary.btn-sm.dropdown-toggle
+              | #{t('common.actions')} &nbsp;
+              span.caret
+            ul.dropdown-menu
+              li
+                a.action-confirm-payment(href='#')= t('view.admin.confirm_payment')
+              if account.balance <= 0 && !_.isEmpty(account.plans)
+                li
+                  a.action-delete-account(href='#')= t('view.admin.delete_account')

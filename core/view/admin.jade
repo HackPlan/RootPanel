@@ -1,133 +1,47 @@
 extends layout
 
 prepend header
-  title #{t('admin.admin_panel')} | #{site.name}
+  title= helpers.title('admin.admin_panel')
 
 block main
   .row
     ul.nav.nav-tabs(role='tablist')
       li.active
-        a(href='#tab-system-info', data-toggle='tab') 系统状态
+        a(href='#tab-dashboard', data-toggle='tab') 仪表盘
       li
-        a(href='#tab-account-list', data-toggle='tab')= t('view.admin.account_list')
+        a(href='#tab-extensions', data-toggle='tab') 插件和拓展
+      li
+        a(href='#tab-accounts', data-toggle='tab') 用户
       li
         a(href='#tab-tickets', data-toggle='tab') 工单
       li
-        a(href='#tab-coupon-code', data-toggle='tab')= t('view.admin.coupon_code')
+        a(href='#tab-coupons', data-toggle='tab') 优惠和兑换
       li
         a(href='#tab-compontents', data-toggle='tab') 元件
       li
-        a(href='#tab-system-log', data-toggle='tab') 系统日志
+        a(href='#tab-logs', data-toggle='tab') 系统日志
 
     .tab-content
-      #tab-system-info.tab-pane.active
-        .page-header
-          h1 
-            | RootPanel &nbsp;
-            small= root.package.version
-
-        .row
-          header 付费方案
-          
-          for plan in root.billing.all()
-            .col-md-3
-              .panel.panel-success
-                .panel-heading
-                  strong= plan.name
-                .panel-body
-                  p join_freely: #{plan.join_freely}
-                  p components: #{_.keys(plan.components).join()}
-                  p billing: #{_.keys(plan.billing).join()}
-                  p 用户数量：0
-                  
-        .row
-          header 已加载的插件
-          
-          for plugin in root.plugins.all()
-            - registered = root.plugins.getRegisteredExtends(plugin)
-            
-            .col-md-3
-              .panel.panel-default
-                .panel-heading
-                  strong= plugin.name
-                .panel-body
-                  p dependencies: #{_.keys(plugin.dependencies).join()}
-                  p routes: #{_.pluck(registered.routers, 'path').join()}
+      #tab-dashboard.tab-pane.active
+        include admin/dashboard
               
-      #tab-account-list.tab-pane
-        table.table.table-hover
-          thead
-            tr
-              th= t('account.username')
-              th= t('account.email')
-              th= t('plan.')
-              th= t('common.amount')
-              th= t('common.actions')
-          tbody
-            for account in accounts
-              tr(data-id='#{account._id}')
-                td= account.username
-                td= account.email
-                td= _.keys(account.plans).join(', ')
-                td= account.balance.toFixed(2)
-                td
-                  button.btn.btn-info.btn-sm.action-details(type='button')= t('common.details')
-                  .btn-group
-                    button(type='button', data-toggle='dropdown').btn.btn-warning.btn-sm.dropdown-toggle
-                      | 计划 &nbsp;
-                      span.caret
-                    ul.dropdown-menu
-                      li
-                        a(href='#') 加入套餐 A
-                      li
-                        a(href='#') 离开套餐 B
-                  .btn-group
-                    button(type='button', data-toggle='dropdown').btn.btn-primary.btn-sm.dropdown-toggle
-                      | #{t('common.actions')} &nbsp;
-                      span.caret
-                    ul.dropdown-menu
-                      li
-                        a.action-confirm-payment(href='#')= t('view.admin.confirm_payment')
-                      if account.balance <= 0 && !_.isEmpty(account.plans)
-                        li
-                          a.action-delete-account(href='#')= t('view.admin.delete_account')
+      #tab-extensions.tab-pane
+        include admin/extensions
+        
+      #tab-accounts.tab-pane
+        include admin/accounts
 
       #tab-tickets.tab-pane
+        include admin/tickets
 
-      #tab-coupon-code.tab-pane
-        form.form-horizontal
-          .form-group
-            label.col-sm-2.control-label= t('view.admin.expired')
-            .col-sm-5
-              input.input-expired.form-control(type='text', placeholder=t('view.admin.empty_expired_tips'))
-          .form-group
-            label.col-sm-2.control-label= t('view.admin.available_times')
-            .col-sm-5
-              input.input-available_times.form-control(type='text', value='1')
-          .form-group
-            label.col-sm-2.control-label= t('common.type')
-            .col-sm-5
-              select.input-type.form-control
-                for type in root.couponTypes.all()
-                  option= type.name
-          .form-group
-            label.col-sm-2.control-label= t('view.admin.count')
-            .col-sm-5
-              input.input-count.form-control(type='text', value='1')
-          .form-group
-            label.col-sm-2.control-label= t('view.admin.meta')
-            .col-sm-5
-              input.input-meta.form-control(type='text', value='{"amount": 5, "category": "2014"}')
-          .form-group
-            label.col-sm-2.control-label
-            .col-sm-5
-              button.action-generate-code.btn.btn-lg.btn-primary(type='button')= t('common.generate')
-
-        pre.output-coupon-code
+      #tab-coupons.tab-pane
+        include admin/coupons
           
       #tab-compontents.tab-pane
+        include admin/compontents
         
-      #tab-system-log.tab-pane
+      #tab-logs.tab-pane
+        include admin/logs
 
   .account-details-modal.modal.fade
     .modal-dialog(style='width: 800px;')

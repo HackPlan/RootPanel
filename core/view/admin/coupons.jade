@@ -1,0 +1,29 @@
+form.form-horizontal
+  .form-group
+    label.col-sm-2.control-label= t('view.admin.expired')
+    .col-sm-5
+      input.input-expired.form-control(type='text', placeholder=t('view.admin.empty_expired_tips'))
+  .form-group
+    label.col-sm-2.control-label= t('view.admin.available_times')
+    .col-sm-5
+      input.input-available_times.form-control(type='text', value='1')
+  .form-group
+    label.col-sm-2.control-label= t('common.type')
+    .col-sm-5
+      select.input-type.form-control
+        for type in root.couponTypes.all()
+          option= type.name
+  .form-group
+    label.col-sm-2.control-label= t('view.admin.count')
+    .col-sm-5
+      input.input-count.form-control(type='text', value='1')
+  .form-group
+    label.col-sm-2.control-label= t('view.admin.meta')
+    .col-sm-5
+      input.input-meta.form-control(type='text', value='{"amount": 5, "category": "2014"}')
+  .form-group
+    label.col-sm-2.control-label
+    .col-sm-5
+      button.action-generate-code.btn.btn-lg.btn-primary(type='button')= t('common.generate')
+
+pre.output-coupon-code

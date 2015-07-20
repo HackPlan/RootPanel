@@ -1,0 +1,32 @@
+.page-header
+  h1 
+    | RootPanel &nbsp;
+    small= root.package.version
+
+.row
+  header 付费方案
+  
+  for plan in root.billing.all()
+    .col-md-3
+      .panel.panel-success
+        .panel-heading
+          strong= plan.name
+        .panel-body
+          p join_freely: #{plan.join_freely}
+          p components: #{_.keys(plan.components).join()}
+          p billing: #{_.keys(plan.billing).join()}
+          p 用户数量：0
+          
+.row
+  header 已加载的插件
+  
+  for plugin in root.plugins.all()
+    - registered = root.plugins.getRegisteredExtends(plugin)
+    
+    .col-md-3
+      .panel.panel-default
+        .panel-heading
+          strong= plugin.name
+        .panel-body
+          p dependencies: #{_.keys(plugin.dependencies).join()}
+          p routes: #{_.pluck(registered.routers, 'path').join()}
