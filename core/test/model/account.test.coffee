@@ -1,5 +1,7 @@
+{createAccount, randomAccount} = helpers
+
 describe 'model.account', ->
-  Account = require '../../model/account'
+  {Account} = root
 
   describe '.register', ->
     it 'should success', ->
@@ -39,3 +41,14 @@ describe 'model.account', ->
             _.findWhere(account.tokens,
               code: code
             ).type.should.be.equal 'full_access'
+
+  describe '::inGroup, ::joinGroup, ::leaveGroup', ->
+    it 'should success', ->
+      createAccount().then (account) ->
+        account.joinGroup('test').then ->
+          account.inGroup('test').should.be.true
+          account.inGroup('root').should.be.false
+        .then ->
+          account.leaveGroup 'test'
+        .then ->
+          account.inGroup('test').should.be.false

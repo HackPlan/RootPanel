@@ -84,3 +84,8 @@ module.exports = class ViewRegistry
       fs.read(filename).then (source) ->
         return jade.compile extendSource(source.toString()),
           filename: filename
+
+  getExpansionsAsArray: ->
+    return _.flatten _.map @viewExtends, (expansion, view) ->
+      return _.extend {}, expansion,
+        view: view

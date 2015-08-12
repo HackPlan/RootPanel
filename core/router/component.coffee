@@ -34,7 +34,18 @@ router.get '/', (req, res, next) ->
 
   Response {Component}.
 ###
-router.post '/:type', (req, res) ->
+router.post '/:type', (req, res, next) ->
+  {account, params: {type}, body: {name, options}} = req
+
+  unless type in root.billing.availableComponents(account)
+    next new Error 'component_not_available'
+
+  root.components.byName(type).create account, root.servers.master(),
+    name: name
+    options: options
+  .done (component) ->
+    res.send component
+  , next
 
 ###
   Router: PATCH /components/:id
@@ -46,6 +57,9 @@ router.patch '/:id', (req, res) ->
 ###
   Router: DELETE /components/:id
 ###
-router.delete '/:id', (req, res) ->
+router.delete '/:id', (req, res, next) ->
+  req.component.destroy().done ->
+    res.sendStatus 204
+  , next
 
 router.all '/:id/actions/:action', (req, res) ->

@@ -111,8 +111,7 @@ Component::setStatus = (status) ->
   Return {Promise}.
 ###
 Component::destroy = ->
-  @populate().then =>
-    @provider.destroyComponent @
+  @provider.destroyComponent @
 
 ###
   Public: Check has specified member.

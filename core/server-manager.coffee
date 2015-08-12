@@ -157,7 +157,7 @@ module.exports = class ServerManager
   constructor: (@config) ->
     @servers = {}
 
-    for name, options of @config
+    for name, options of @config.servers
       @servers[name] = new ServerNode _.extend options,
         name: name
 
@@ -180,5 +180,5 @@ module.exports = class ServerManager
     return @servers[name]
 
   master: ->
-    return _.findWhere @servers,
+    return _.findWhere @all(),
       master: true

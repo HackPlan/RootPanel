@@ -10,8 +10,22 @@ class Plugin
   name: null
   # Public: {String}
   path: null
+  # Public: {Object}
+  config: {}
   # Public: {Array} or {String}
   dependencies: []
+
+  @create: ({PluginClass, name, path, config}) ->
+    instance = new PluginClass()
+
+    _.extend instance,
+      name: name
+      path: path
+      config: config
+
+    instance.injector = new InjectorHelpers instance
+
+    return instance
 
   ###
     Public: Constructor.
@@ -20,6 +34,12 @@ class Plugin
 
   ###
   constructor: (@injector) ->
+
+  ###
+    Public: Resolve path based on plugin directory.
+  ###
+  resolve: ->
+    return root.resolve 'plugins', @name, arguments...
 
   ###
     Public: Get translator of plugin.
@@ -33,20 +53,8 @@ class Plugin
 ###
   Class: Private injector of {Plugin}.
 ###
-class Injector
-  ###
-    Public: Constructor.
-
-  ###
-  constructor: ->
-
-  ###
-    Public: Get owner plugin.
-
-    Return {Plugin}.
-  ###
-  plugin: ->
-    return @owner
+class InjectorHelpers
+  constructor: (@plugin) ->
 
   router: (path) ->
     router = new Router()
@@ -55,7 +63,7 @@ class Injector
     root.routers.push
       path: path
       router: router
-      plugin: @owner
+      plugin: @plugin
 
     return router
 
@@ -64,42 +72,42 @@ class Injector
   ###
   hook: (path, options) ->
     return root.hooks.register path, _.extend options,
-      plugin: @owner
+      plugin: @plugin
 
   ###
     Public: Register a view, proxy of {ViewRegistry::register}.
   ###
   view: (view, options) ->
     return root.views.register view, _.extend options,
-      plugin: @owner
+      plugin: @plugin
 
   ###
     Public: Register a widget, proxy of {WidgetRegistry::register}.
   ###
   widget: (view, options) ->
     return root.widgets.register view, _.extend options,
-      plugin: @owner
+      plugin: @plugin
 
   ###
     Public: Register a component, proxy of {ComponentRegistry::register}.
   ###
   component: (name, options) ->
     return root.components.register name, _.extend options,
-      plugin: @owner
+      plugin: @plugin
 
   ###
     Public: Register a coupon type, proxy of {CouponTypeRegistry::register}.
   ###
   couponType: (name, options) ->
     return root.couponTypes.register name, _.extend options,
-      plugin: @owner
+      plugin: @plugin
 
   ###
     Public: Register a payment provider, proxy of {PaymentProviderRegistry::register}.
   ###
   paymentProvider: (name, options) ->
     return root.paymentProviders.register name, _.extend options,
-      plugin: @owner
+      plugin: @plugin
 
 ###
   Manager: Plugin manager,
@@ -126,16 +134,11 @@ module.exports = class PluginManager
     if @plugins[name]
       throw new Error "Plugin `#{name}` already exists"
 
-    Plugin = require path
-
-    injector = new Injector()
-    plugin = new Plugin injector, config
-
-    injector.owner = plugin
-
-    @plugins[name] = _.extend plugin,
+    @plugins[name] = plugin = Plugin.create
       name: name
       path: path
+      config: config
+      PluginClass: require path
 
     plugin.activate()
 
@@ -166,6 +169,12 @@ module.exports = class PluginManager
 
     return {
       routers: filter root.routers
+      hooks: filter root.hooks.getHooksAsArray()
+      views: filter root.views.getExpansionsAsArray()
+      widgets: filter root.widgets.getWidgetsAsArray()
+      components: filter root.components.all()
+      couponTypes: filter root.couponTypes.all()
+      paymentProviders: filter root.paymentProviders.all()
     }
 
 PluginManager.Plugin = Plugin

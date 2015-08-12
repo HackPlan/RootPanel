@@ -33,7 +33,7 @@ module.exports =
       arrears_above: 0
 
     plans:
-      all:
+      sample:
         name: 'plans.sample.name'
         description: 'plans.sample.description'
 

@@ -1,9 +1,17 @@
+{Account, CouponCode} = root
+
 module.exports = class Builtin extends root.Plugin
   activate: ->
     @injector.couponType 'cash', new CashCoupon()
 
     @injector.router('/').get '/', (req, res) ->
       res.redirect '/panel/'
+
+    @injector.hook 'account.after_register',
+      action: (account) ->
+        Account.count().then (count) ->
+          if count == 1
+            account.joinGroup 'root'
 
 class CashCoupon
   validate: (account, coupon) ->

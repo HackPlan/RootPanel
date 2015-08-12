@@ -1,5 +1,7 @@
+{createAccount} = helpers
+
 describe 'model.component', ->
-  Component = require '../../model/component'
+  {Component} = root
 
   describe '.createComponent', ->
     it 'should success', ->

@@ -1,7 +1,6 @@
 request = require 'request'
 chai = require 'chai'
 _ = require 'lodash'
-Q = require 'q'
 
 utils = require '../core/utils'
 createAgent = require './agent'
@@ -55,12 +54,6 @@ createLoggedAgent = (options) ->
   return agent
 
 module.exports = {
-  _
-  Q
-  chai
-  utils
-  expect
-
   ifEnabled
   unlessTravis
 

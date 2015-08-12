@@ -1,3 +1,5 @@
+{createLoggedAgent} = helpers
+
 describe 'router.tickets', ->
   agent = createLoggedAgent
     baseUrl: '/tickets'

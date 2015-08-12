@@ -1,6 +1,7 @@
+{createAccount} = helpers
+
 describe 'model.security-log', ->
-  SecurityLog = require '../../model/security-log'
-  {Token} = require '../../model/account'
+  {SecurityLog, Account: {Token}} = root
 
   describe '.createLog', ->
     it 'should success', ->

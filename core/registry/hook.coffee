@@ -9,8 +9,10 @@ module.exports = class HookRegistry
   constructor: ->
     @hooks =
       account:
-        # filter: (account) -> Promise
+        # action: (account) -> Promise
         before_register: []
+        # action: (account) -> Promise
+        after_register: []
 
   ###
     Public: Register a hook.
@@ -38,13 +40,13 @@ module.exports = class HookRegistry
 
     Return {Array}.
   ###
-  applyHooks: (path, {execute, pluck, req, payload} = {}) ->
+  applyHooks: (path, {execute, pluck, req, params} = {}) ->
     return _.compact @getHooks(path).map (hook) ->
       if execute
-        return hook[execute].call
+        return hook[execute].apply
           req: req
           plugin: hook.plugin
-        , payload
+        , params
 
       else if pluck
         return hook[pluck]
@@ -63,6 +65,9 @@ module.exports = class HookRegistry
     Q.all @applyHooks arguments...
 
   getHooks: (path, {array, object} = {}) ->
+    unless path
+      return @hooks
+
     words = path.split '.'
     last = words.pop()
 
@@ -78,3 +83,26 @@ module.exports = class HookRegistry
       ref[last] ?= {}
 
     return ref[last]
+
+  getHooksAsArray: (path) ->
+    if path
+      currentPaths = path.split '.'
+    else
+      currentPaths = []
+
+    result = []
+
+    iterator = (hooks) ->
+      for k, v of hooks
+        if _.isArray v
+          for hook in v
+            result.push _.extend {}, hook,
+              path: [currentPaths..., k].join '.'
+        else if _.isObject v
+          currentPaths.push k
+          iterator v
+          currentPaths.pop()
+
+    iterator @getHooks path
+
+    return result

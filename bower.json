@@ -1,14 +1,14 @@
 {
   "name": "rootpanel",
   "dependencies": {
-    "bootstrap": "~3.3.1",
-    "jquery-cookie": "~1.4.1",
-    "underscore": "~1.7.0",
-    "jquery": "~2.1.2",
-    "backbone": "~1.1.2",
-    "moment": "~2.9.0",
+    "bootstrap": "3.3.1",
+    "jquery-cookie": "1.4.1",
+    "underscore": "1.7.0",
+    "jquery": "2.1.2",
+    "backbone": "1.1.2",
+    "moment": "2.9.0",
     "jquery-tmpl": "git://github.com/jquery/jquery-tmpl.git#b504c8afba",
-    "q": "~1.2.0"
+    "q": "1.2.0"
   },
   "overrides": {
     "jquery-tmpl": {

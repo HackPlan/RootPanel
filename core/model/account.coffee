@@ -241,11 +241,15 @@ Account.register = ({username, email, password}) ->
     preferences:
       avatar_url: avatar_url
 
-  root.hooks.executeHooks('account.before_register',
+  root.hooks.executeHooks 'account.before_register',
     execute: 'filter'
     params: [account]
-  ).then ->
+  .then ->
     account.save()
+  .tap ->
+    root.hooks.executeHooks 'account.after_register',
+      execute: 'action'
+      params: [account]
 
 ###
   Public: Create token for this account.
@@ -395,6 +399,11 @@ Account::inGroup = (group) ->
 Account::joinGroup = (group) ->
   @update
     $addToSet:
+      groups: group
+
+Account::leaveGroup = (group) ->
+  @update
+    $pull:
       groups: group
 
 ###

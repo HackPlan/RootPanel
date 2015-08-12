@@ -1,23 +1,24 @@
 validator = require 'validator'
 
-module.exports = class Linux
-  constructor: (@injector, {@monitor_cycle}) ->
-    {requireAuthenticate} = root.middleware
+{requireAuthenticate} = root.middleware
 
+module.exports = class Linux extends root.Plugin
+  activate: ->
     @injector.view 'layout',
-      filename: __dirname + '/view/layout'
-      locals: linux: @
+      filename: @resolve 'view/layout'
+      locals:
+        linux: @
 
     @injector.router('/public/monitor').get '/node?', requireAuthenticate, (req, res) =>
       server = @getLinuxServer req.params.node
 
-      Q.all([
-        server.system()
-        server.getStorageUsages()
-        server.getProcessList()
-        server.getMemoryUsages()
-      ]).then ([system, storage, processes, memory]) ->
-        res.render __dirname + '/view/monitor',
+      Q.all
+        system: server.system()
+        storage: server.getStorageUsages()
+        processes: server.getProcessList()
+        memory: server.getMemoryUsages()
+      .then (statistics) ->
+        res.render @resolve('view/monitor'),
           system: system
           storage: storage
           processes: processes
@@ -50,12 +51,12 @@ module.exports = class Linux
       repeating:
         every: 'linux'
       generator: (account, component) ->
-        root.views.render __dirname + '/view/widget'
+        root.views.render @resolve 'view/widget'
 
-    if @monitor_cycle
+    if @config.monitor_cycle
       @monitors = root.servers.all().map ({name}) =>
         return new LinuxMonitoring @getLinuxServer(name),
-          monitor_cycle: @monitor_cycle
+          monitor_cycle: @config.monitor_cycle
 
   getLinuxServer: (node) ->
     if node

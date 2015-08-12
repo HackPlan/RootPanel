@@ -158,3 +158,8 @@ module.exports = class WidgetRegistry
 
       .then (result) ->
         return _.compact result
+
+  getWidgetsAsArray: ->
+    return _.flatten _.map @widgets, (widget, view) ->
+      return _.extend {}, widget,
+        view: view

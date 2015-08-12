@@ -1,5 +1,5 @@
 describe 'model.coupon-code', ->
-  CouponCode = require '../../model/coupon-code'
+  {CouponCode} = root
 
   describe '.createCoupons', ->
     it 'should success', ->

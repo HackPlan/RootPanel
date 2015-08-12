@@ -1,5 +1,7 @@
+{createAccount} = helpers
+
 describe 'model.notification', ->
-  Notification = require '../../model/notification'
+  {Notification} = root
 
   describe '::isGroupNotice', ->
     it 'return true', ->

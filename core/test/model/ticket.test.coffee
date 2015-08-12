@@ -1,5 +1,7 @@
+{createAccount, createAdmin, createTicket} = helpers
+
 describe 'model.ticket', ->
-  Ticket = require '../../model/ticket'
+  {Ticket} = root
 
   describe '.createTicket', ->
     it 'should success', ->

@@ -7,7 +7,7 @@ expect = chai.expect
 
 methods = ['get', 'post', 'delete', 'put', 'patch', 'head', 'options']
 
-module.exports = createAgent = (agent_options) ->
+module.exports = (agent_options) ->
   if _.isNumber config.web.listen
     prefix = "http://127.0.0.1:#{config.web.listen}"
   else

@@ -1,6 +1,8 @@
 _ = require 'lodash'
 Q = require 'q'
 
+{Component} = root
+
 ###
   Class: Billing Plan, Managed by {BillingManager}.
 ###

@@ -1,7 +1,7 @@
-describe 'model.financials', ->
-  Account = require '../../model/account'
-  Financials = require '../../model/financials'
+{createAccount} = helpers
 
+describe 'model.financials', ->
+  {Account, Financials} = root
   {PaymentProvider} = require root.resolve 'core/registry/payment-provider'
   provider = new PaymentProvider name: 'taobao'
 
