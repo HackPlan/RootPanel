@@ -1,6 +1,6 @@
 validator = require 'validator'
 
-{requireAuthenticate} = root.middleware
+{requireAuthenticate} = require root.resolve 'core/middleware'
 
 module.exports = class Linux extends root.Plugin
   activate: ->

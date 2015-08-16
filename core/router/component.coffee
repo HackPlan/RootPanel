@@ -38,12 +38,12 @@ router.post '/:type', (req, res, next) ->
   {account, params: {type}, body: {name, options}} = req
 
   unless type in root.billing.availableComponents(account)
-    next new Error 'component_not_available'
+    return next new Error 'component_not_available'
 
   root.components.byName(type).create account, root.servers.master(),
     name: name
     options: options
-  .done (component) ->
+  .then (component) ->
     res.send component
   , next
 

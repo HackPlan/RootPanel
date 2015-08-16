@@ -2,7 +2,7 @@
 
 module.exports = class Builtin extends root.Plugin
   activate: ->
-    @injector.couponType 'cash', new CashCoupon()
+    @injector.couponType 'cash', cashCoupon
 
     @injector.router('/').get '/', (req, res) ->
       res.redirect '/panel/'
@@ -13,7 +13,9 @@ module.exports = class Builtin extends root.Plugin
           if count == 1
             account.joinGroup 'root'
 
-class CashCoupon
+    @injector.component 'sample', sampleComponent
+
+cashCoupon =
   validate: (account, coupon) ->
     apply_log = _.find coupon.apply_log, (log) ->
       return log.account_id.equals account._id
@@ -38,3 +40,8 @@ class CashCoupon
 
   populateCoupon: (coupon) ->
     return coupon
+
+sampleComponent =
+  initialize: (component) ->
+
+  destroy: (component) ->

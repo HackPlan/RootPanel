@@ -2,7 +2,7 @@
 _ = require 'lodash'
 Q = require 'q'
 
-{Account, Ticket, Financials, CouponCode} = root
+{Account, Ticket, Financials, CouponCode, Component} = root
 {requireAdminAuthenticate} = require '../middleware'
 
 module.exports = router = new Router()
@@ -17,26 +17,19 @@ router.use requireAdminAuthenticate
 router.get '/dashboard', (req, res, next) ->
   Q.all([
     Account.find()
-  ]).done ([accounts]) ->
+    Component.find()
+    Ticket.getTicketsGroupByStatus
+      opening:
+        limit: 10
+      finished:
+        limit: 10
+      closed:
+        limit: 10
+  ]).done ([accounts, components, tickets]) ->
     res.render 'admin',
       accounts: accounts
-  , next
-
-###
-  Router: GET /admin/tickets/list
-
-  Response HTML.
-###
-router.get '/tickets/list', (req, res, next) ->
-  Ticket.getTicketsGroupByStatus
-    opening:
-      limit: 10
-    finished:
-      limit: 10
-    closed:
-      limit: 10
-  .done (tickets) ->
-    res.render 'ticket/list', tickets
+      components: components
+      tickets: tickets
   , next
 
 ###

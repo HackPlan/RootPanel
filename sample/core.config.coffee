@@ -14,6 +14,8 @@ module.exports =
   plugins:
     'built-in':
       enable: true
+    linux:
+      enable: true
 
   server:
     ssh:
@@ -37,13 +39,7 @@ module.exports =
         name: 'plans.sample.name'
         description: 'plans.sample.description'
 
-        available_components:
-          linux:
-            defaults: (account) ->
-              return {
-                payload:
-                  username: account.username
-              }
+        components: {}
 
         billing:
           time:

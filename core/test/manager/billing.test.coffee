@@ -3,10 +3,9 @@
 describe 'manager.billing', ->
   describe 'addMember and removeMember', ->
     account = null
-    plan = null
+    plan = root.billing.byName 'sample'
 
     before ->
-      plan = root.billing.byName 'sample'
       createAccount().then (result) ->
         account = result
 

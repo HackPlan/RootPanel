@@ -1,8 +1,7 @@
 {createAccount} = helpers
+{Component} = root
 
 describe 'registry.component', ->
-  {Component} = root
-
   describe 'ComponentProvider', ->
     describe 'create and destroyComponent', ->
       initializeCount = 0
@@ -10,8 +9,7 @@ describe 'registry.component', ->
 
       before ->
         root.components.register 'mock',
-          plugin:
-            name: 'mock'
+          plugin: root.plugins.byName 'built-in'
 
           initialize: (component) ->
             initializeCount++
@@ -20,14 +18,14 @@ describe 'registry.component', ->
             destroyCount++
 
       it 'should success', ->
-        provider = root.components.byName 'mock.mock'
+        provider = root.components.byName 'built-in.mock'
 
         createAccount().then (account) ->
           provider.create account, root.servers.master(),
             name: 'test'
           .then (component) ->
             initializeCount.should.be.equal 1
-            component.type.should.be.equal 'mock.mock'
+            component.type.should.be.equal 'built-in.mock'
 
             provider.destroyComponent(component).then ->
               destroyCount.should.be.equal 1

@@ -1,19 +1,18 @@
 {createAccount} = helpers
+{Component} = root
 
 describe 'model.component', ->
-  {Component} = root
-
   describe '.createComponent', ->
     it 'should success', ->
       createAccount().then (account) ->
         Component.createComponent account,
-          name: 'linux component'
-          type: 'linux'
+          name: 'sample component'
+          type: 'built-in.sample'
           node: 'master'
         .then ->
           Component.getComponents(account).then (components) ->
             _.findWhere(components,
-              name: 'linux component'
+              name: 'sample component'
             ).should.be.exists
 
   describe '::hasMember', ->
@@ -30,8 +29,8 @@ describe 'model.component', ->
 
 createComponent = (options) ->
   options = _.defaults {}, options,
-    name: 'linux component'
-    type: 'linux'
+    name: 'sample component'
+    type: 'built-in.sample'
     node: 'master'
 
   Q().then ->
@@ -40,4 +39,4 @@ createComponent = (options) ->
     else
       return createAccount()
   .then (account) ->
-    root.Component.createComponent account, options
+    Component.createComponent account, options

@@ -1,0 +1,22 @@
+table.table.table-hover
+  thead
+    th 用户
+    th 元件模板
+    th 节点
+    th 状态
+  tbody
+    for component in components
+      tr
+        td= component.account_id
+        td= component.type
+        td= component.node
+        td= component.status
+        td
+          button.btn.btn-info.btn-sm.action-details(type='button')= t('common.details')
+          .btn-group
+            button(type='button', data-toggle='dropdown').btn.btn-primary.btn-sm.dropdown-toggle
+              | #{t('common.actions')} &nbsp;
+              span.caret
+            ul.dropdown-menu
+              li
+                a.action-destroy-component(href='#') 删除元件

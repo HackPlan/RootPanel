@@ -65,8 +65,9 @@ class BillingPlan
 
   setupDefaultComponents: (account) ->
     Q.all _.values(@components).map ({type, defaults}) ->
-      Q.all defaults.map (defaultOptions) ->
-        root.components.byName(type).createComponent account, defaultOptions(account)
+      if defaults
+        Q.all defaults.map (defaultOptions) ->
+          root.components.byName(type).createComponent account, defaultOptions(account)
 
   triggerTimeBilling: (account) ->
     unless @billing.time
@@ -317,3 +318,5 @@ module.exports = class BillingManager
       return true
     else
       return false
+
+BillingManager.BillingPlan = BillingPlan

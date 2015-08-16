@@ -37,21 +37,28 @@ createAdmin = ->
     account.joinGroup 'root'
 
 createLoggedAgent = (options) ->
-  ready = null
-  agent = {}
+  agent =
+    account: randomAccount()
+
+  agent.ready = createAgent().post '/account/register',
+    json: agent.account
 
   createAgent.methods.map (method) ->
     agent[method] = (args...) ->
-      ready ?= createAgent().post '/account/register',
-        json: randomAccount()
-
-      ready.then ({body}) ->
+      agent.ready.then ({body}) ->
         options ?= {}
         options.headers ?= {}
         options.headers.token = body.token
         createAgent(options)[method] args...
 
   return agent
+
+createAdminAgent = (options) ->
+  agent = createLoggedAgent options
+
+  agent.ready.then ->
+    root.Account.search(agent.account.username).then (account) ->
+      account.joinGroup 'root'
 
 module.exports = {
   ifEnabled
@@ -62,4 +69,5 @@ module.exports = {
   createAccount
   createAgent
   createLoggedAgent
+  createAdminAgent
 }
