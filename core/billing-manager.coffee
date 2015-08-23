@@ -1,7 +1,7 @@
 _ = require 'lodash'
 Q = require 'q'
 
-{Component} = root
+{Account, Component} = root
 
 ###
   Class: Billing Plan, Managed by {BillingManager}.
@@ -62,6 +62,9 @@ class BillingPlan
   removeMember: (account) ->
     @state(account).removePlan().then =>
       @manager.destroyOverflowedComponents account
+
+  membersInPlan: ->
+    Account.find _.zipObject ["plans.#{@name}"], [$exists: true]
 
   setupDefaultComponents: (account) ->
     Q.all _.values(@components).map ({type, defaults}) ->

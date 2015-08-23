@@ -11,6 +11,8 @@ fs = require 'q-io/fs'
 _ = require 'lodash'
 Q = require 'q'
 
+require('node-jsx').install harmony: true
+
 ###
   Class: Root object for control RootPanel, An instance is always available as the `root` global.
 ###

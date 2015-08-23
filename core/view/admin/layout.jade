@@ -1,0 +1,15 @@
+extends ../layout
+
+prepend header
+  title= helpers.title('admin.admin_panel')
+
+block main
+  != mainBlock
+  
+prepend sidebar
+  .row
+    a.btn.btn-lg.btn-success(href='/admin/ticket/')= t('ticket.ticket_list')
+
+append footer
+  script(id='initialize-props', type='application/json')!= JSON.stringify(initializeProps)
+  script(src='/public/admin.js')

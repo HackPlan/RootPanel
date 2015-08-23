@@ -3,7 +3,7 @@ html
   head
     meta(charset='utf-8')
     block header
-      link(rel='stylesheet', href='/public/vendor/vendor.css')
+      link(rel='stylesheet', href='/public/bootstrap.css')
       link(rel='stylesheet', href='/public/core.css')
 
   body(data-username="#{account ? account.username : ''}")
@@ -50,8 +50,9 @@ html
     block content
       #content.container
         .row
-          .col-md-9
+          #main-block.col-md-9
             block main
+              != mainBlock
 
           #sidebar.col-md-3
             block sidebar

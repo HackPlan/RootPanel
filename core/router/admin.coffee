@@ -1,4 +1,5 @@
 {Router} = require 'express'
+React = require 'react'
 _ = require 'lodash'
 Q = require 'q'
 
@@ -25,11 +26,42 @@ router.get '/dashboard', (req, res, next) ->
         limit: 10
       closed:
         limit: 10
-  ]).done ([accounts, components, tickets]) ->
-    res.render 'admin',
+    Q.all root.billing.all().map (plan) ->
+      plan.membersInPlan().then (accounts) ->
+        return {
+          name: plan.name
+          count: accounts.length
+        }
+    .then (result) ->
+      return _.mapValues _.indexBy(result, 'name'), 'count'
+  ]).done ([accounts, components, tickets, accountsInPlan]) ->
+    props =
       accounts: accounts
       components: components
       tickets: tickets
+      package: root.package
+      plans: root.billing.all().map (plan) ->
+        plan = _.extend {}, plan,
+          users: accountsInPlan[plan.name]
+        return _.pick plan, 'components', 'join_freely', 'billing', 'name', 'users'
+      plugins: root.plugins.all().map (plugin) ->
+        return _.extend {}, _.pick(plugin, 'dependencies', 'name'),
+          registered: do ->
+            {routers, hooks, views, widgets, components, couponTypes, paymentProviders} = root.plugins.getRegisteredExtends plugin
+
+            return {
+              routers: _.pluck routers, 'path'
+              hooks: _.pluck hooks, 'path'
+              views: _.pluck views, 'view'
+              widgets: _.pluck widgets, 'view'
+              components: _.pluck components, 'name'
+              couponTypes: _.pluck couponTypes, 'name'
+              paymentProviders: _.pluck paymentProviders, 'name'
+            }
+
+    res.render 'admin/layout',
+      mainBlock: React.renderToString React.createElement require('../view/admin/dashboard.jsx'), props
+      initializeProps: props
   , next
 
 ###
@@ -46,7 +78,7 @@ router.use '/users', do (router = new Router) ->
   router.param 'id', (req, res, next, user_id) ->
     Account.findById(user_id).then (user) ->
       if req.user = user
-        next
+        next()
       else
         next new Error 'user not found'
     .catch next
@@ -66,19 +98,29 @@ router.use '/users', do (router = new Router) ->
     res.json req.user.pick 'admin'
 
   ###
-    Router: GET /admin/users/:id/plans/join
+    Router: POST /admin/users/:id/plans/join
+
+    Request {Object}
+
+      * `plan` {String}
+
   ###
   router.post '/:id/plans/join', (req, res, next) ->
-    req.plan.addMember(req.account).done ->
-      res.sendStatus 204
+    root.billing.byName(req.body.plan).addMember(req.user).done ->
+      res.json req.user
     , next
 
   ###
-    Router: GET /admin/users/:id/plans/leave
+    Router: POST /admin/users/:id/plans/leave
+
+    Request {Object}
+
+      * `plan` {String}
+
   ###
   router.post '/:id/plans/leave', (req, res, next) ->
-    req.plan.removeMember(req.account).done ->
-      res.sendStatus 204
+    root.billing.byName(req.body.plan).removeMember(req.user).done ->
+      res.json req.user
     , next
 
   ###
