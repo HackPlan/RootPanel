@@ -137,7 +137,7 @@ router.use '/users', do (router = new Router) ->
   ###
   router.post '/:id/deposits/create', (req, res, next) ->
     Financials.createDepositRequest(req.user, req.body.amount,
-      provider: req.body.provider
+      provider: root.paymentProviders.byName(req.body.provider)
       order_id: req.body.orderId
     ).tap (financial) ->
       if req.body.status
