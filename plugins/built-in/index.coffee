@@ -4,6 +4,8 @@ module.exports = class Builtin extends root.Plugin
   activate: ->
     @injector.couponType 'cash', cashCoupon
 
+    @injector.paymentProvider 'manual', manualPayment
+
     @injector.router('/').get '/', (req, res) ->
       res.redirect '/panel/'
 
@@ -45,3 +47,6 @@ sampleComponent =
   initialize: (component) ->
 
   destroy: (component) ->
+
+manualPayment =
+  populateFinancial: (req, financial) ->

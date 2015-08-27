@@ -19,19 +19,18 @@ require('node-jsx').install
   Class: Root object for control RootPanel, An instance is always available as the `root` global.
 ###
 module.exports = class Root extends EventEmitter
-  ###
-    Public: Find and load configure file.
+  @loadConfig: ->
+    {existsSync} = require 'fs'
 
-    * `root_path` {String} e.g. `/home/rpadmin/RootPanel`
+    defaultPath = path.resolve 'sample/core.config.coffee'
+    configPath = path.resolve process.env.ROOTPANEL_CONFIG ? 'config.coffee'
 
-    Return {Object}.
-  ###
-  @findConfig: (root_path) ->
-    configPath = path.resolve root_path, 'config.coffee'
-    defaultPath = path.resolve root_path, 'sample/core.config.coffee'
-
-    fs.exists(configPath).then (exists) ->
-      return require if exists then configPath else defaultPath
+    if existsSync configPath
+      return _.extend require(configPath),
+        config_path: configPath
+    else
+      return _.extend require(defaultPath),
+        config_path: defaultPath
 
   log: console.log
 

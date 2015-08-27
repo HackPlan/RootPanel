@@ -5,6 +5,8 @@ Q = require 'q'
 
 expect = chai.expect
 
+{config} = root
+
 methods = ['get', 'post', 'delete', 'put', 'patch', 'head', 'options']
 
 module.exports = (agent_options) ->
@@ -73,6 +75,6 @@ printHttpResponse = ({httpVersion, statusCode, statusMessage, headers, body}) ->
   else if headers['content-type']?.match /application\/json/
     body = JSON.stringify body, null, '  '
 
-  message += "\n#{body}"
+  message += "\n#{body}\n"
 
   return message

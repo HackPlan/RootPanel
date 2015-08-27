@@ -1,4 +1,4 @@
-var {Row, Col, Panel} = require('react-bootstrap');
+var {Grid, Row, Col, Panel} = require('react-bootstrap');
 var React = require('react');
 var _ = require('lodash');
 
@@ -7,9 +7,11 @@ module.exports = AdminExtensions = React.createClass({
     var {plugins, plans} = this.props;
 
     return (
-      <div>
+      <Grid fluid>
         <Row>
-          <header>付费方案</header>
+          <Col md={12}>
+            <header>付费方案</header>
+          </Col>
           {plans.map(function(plan) {
             return (
               <Col md={3} key={plan.name}>
@@ -24,7 +26,9 @@ module.exports = AdminExtensions = React.createClass({
           })}
         </Row>
         <Row>
-          <header>插件</header>
+          <Col md={12}>
+            <header>插件</header>
+          </Col>
           {plugins.map(function(plugin) {
             return (
               <Col md={6} key={plugin.name}>
@@ -42,7 +46,7 @@ module.exports = AdminExtensions = React.createClass({
             );
           })}
         </Row>
-      </div>
+      </Grid>
     );
   }
 });

@@ -1,7 +1,13 @@
 Backbone = require 'backbone'
+Cookies = require 'js-cookie'
 React = require 'react'
+$ = require 'jquery'
 
 AdminDashboard = require './dashboard.jsx'
+
+$.ajaxSetup
+  headers:
+    'X-Token': Cookies.get('token')
 
 getInitializeProps = ->
   return JSON.parse $('#initialize-props').html()

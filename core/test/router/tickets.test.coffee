@@ -1,10 +1,12 @@
 {createLoggedAgent} = helpers
 
 describe 'router.tickets', ->
-  agent = createLoggedAgent
-    baseUrl: '/tickets'
-
+  agent = null
   ticket_id = null
+
+  before ->
+    agent = createLoggedAgent
+      baseUrl: '/tickets'
 
   it 'POST tickets', ->
     agent.post '/',

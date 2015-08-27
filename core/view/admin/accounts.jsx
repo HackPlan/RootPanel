@@ -2,8 +2,6 @@ var React = require('react');
 var {Table, Button, DropdownButton, MenuItem, Modal, Input} = require('react-bootstrap');
 var _ = require('lodash');
 var agent = require('../scripts/agent.coffee');
-var Cookies = require('js-cookie');
-var $ = require('jquery');
 
 module.exports = AdminAccounts = React.createClass({
   getInitialState: function() {
@@ -12,12 +10,6 @@ module.exports = AdminAccounts = React.createClass({
       accountDetailsModal: null,
       createDepositModal: null
     };
-  },
-
-  componentDidMount: function() {
-    $.ajaxSetup({
-      headers: {'X-Token': Cookies.get('token')}
-    });
   },
 
   showAccountDetails: function(account_id) {

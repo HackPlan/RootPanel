@@ -1,16 +1,9 @@
 process.env.NODE_ENV = 'test'
+process.env.ROOTPANEL_CONFIG ?= 'sample/core.config.coffee'
 
 chai = require 'chai'
 _ = require 'lodash'
 Q = require 'q'
-
-Root = require '../core'
-
-global.config = require '../sample/core.config.coffee'
-global.helpers = require './helpers'
-global.root = new Root config
-
-root.start()
 
 _.extend global,
   expect: chai.expect
@@ -21,3 +14,13 @@ chai.should()
 chai.config.includeStack = true
 
 Q.longStackSupport = true
+
+Root = require '../core'
+
+config = Root.loadConfig()
+config.mongodb.name = 'RootPanel-test'
+
+global.root = new Root config
+global.helpers = require './helpers'
+
+root.start()

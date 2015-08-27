@@ -36,8 +36,12 @@ router.get '/dashboard', (req, res, next) ->
       return _.mapValues _.indexBy(result, 'name'), 'count'
   ]).done ([accounts, components, tickets, accountsInPlan]) ->
     props =
-      accounts: accounts
-      components: components
+      accounts: accounts.map (account) ->
+        return _.extend account, _id: account._id.toString()
+      components: components.map (component) ->
+        return _.extend component,
+          _id: component._id.toString()
+          account_id: component.account_id.toString()
       tickets: tickets
       package: root.package
       plans: root.billing.all().map (plan) ->

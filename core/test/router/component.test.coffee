@@ -2,12 +2,13 @@
 {Account, Component} = root
 
 describe 'router.component', ->
-  agent = createLoggedAgent
-    baseUrl: '/components'
-
+  agent = null
   component_id = null
 
   before ->
+    agent = createLoggedAgent
+      baseUrl: '/components'
+
     {BillingPlan} = require '../../billing-manager'
 
     root.billing.plans['sample'].components['built-in.sample'] = {}

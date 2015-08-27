@@ -1,7 +1,9 @@
 var React = require('react');
 var {TabbedArea, TabPane} = require('react-bootstrap');
+
 var AdminExtensions = require('./extensions.jsx');
 var AdminAccounts = require('./accounts.jsx');
+var AdminComponents = require('./components.jsx');
 
 module.exports = AdminDashboard = React.createClass({
   render: function() {
@@ -17,8 +19,10 @@ module.exports = AdminDashboard = React.createClass({
           <AdminAccounts {...this.props} />
         </TabPane>
         <TabPane eventKey='tickets' tab='工单'></TabPane>
-        <TabPane eventKey='coupons' tab='优惠和兑换'></TabPane>
-        <TabPane eventKey='compontents' tab='元件'></TabPane>
+        <TabPane eventKey='orders' tab='订单'></TabPane>
+        <TabPane eventKey='compontents' tab='元件'>
+          <AdminComponents {...this.props} />
+        </TabPane>
         <TabPane eventKey='logs' tab='系统日志'></TabPane>
       </TabbedArea>
     );

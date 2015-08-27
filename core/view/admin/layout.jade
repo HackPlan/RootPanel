@@ -2,6 +2,9 @@ extends ../layout
 
 prepend header
   title= helpers.title('admin.admin_panel')
+  
+append header
+  link(rel='stylesheet', href='/public/admin.css')
 
 block main
   != mainBlock

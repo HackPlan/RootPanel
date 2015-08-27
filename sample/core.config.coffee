@@ -14,8 +14,6 @@ module.exports =
   plugins:
     'built-in':
       enable: true
-    linux:
-      enable: true
 
   server:
     ssh:

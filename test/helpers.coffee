@@ -60,6 +60,8 @@ createAdminAgent = (options) ->
     root.Account.search(agent.account.username).then (account) ->
       account.joinGroup 'root'
 
+  return agent
+
 module.exports = {
   ifEnabled
   unlessTravis

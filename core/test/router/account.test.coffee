@@ -1,14 +1,16 @@
 {createAgent, randomAccount} = helpers
 
 describe 'router.account', ->
-  agent = createAgent
-    baseUrl: '/account'
-
   account_id = null
   username = null
   password = null
   email = null
   token = null
+  agent = null
+
+  before ->
+    agent = createAgent
+      baseUrl: '/account'
 
   it 'GET login', ->
     agent.get '/login'
